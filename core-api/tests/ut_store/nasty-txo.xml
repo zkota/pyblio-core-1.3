@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="txo" type="txo" group="a">
+  <name>Text</name>
+ </attribute>
+</pyblio-schema>
+
+<txo-group id="a">
+  <txo-item id="1">
+   <name>1</name>
+   <txo-item id="2">
+    <name>1.1</name>
+   </txo-item>
+   <txo-item id="3">
+    <name>1.2</name>
+    <txo-item id="4">
+     <name>1.2.1</name>
+    </txo-item>
+   </txo-item>
+  </txo-item>
+</txo-group>
+</pyblio-db>

@@ -483,6 +483,7 @@ class Database (object):
             # additional special checks
             if s.type is Attribute.Txo:
 
+                
                 for v in vals:
 
                     # check if the enum is in the group defined in the schema
@@ -499,7 +500,27 @@ class Database (object):
                         raise Exceptions.SchemaError (
                             _('invalid txo item %s/%d') % (
                             v.group, v.id))
-            
+
+                # Remove unnecessary txo items (for instance when a
+                # more specific item is also present, there is no need
+                # to keep the parent)
+                g   = self.txo [s.group]
+                ids = map (lambda x: x.id, vals)
+                
+                for v in [] + vals:
+
+                    # exp is the list of children of the current txo item
+                    exp = g.expand (v.id)
+                    exp.remove (v.id)
+
+                    # If another txo is a child of the current txo,
+                    # the current one can be removed.
+                    for i in ids:
+                        if i in exp:
+                            vals.remove (v)
+                            break
+                
+                
         return entry
 
     def _txo_use_check (self, group, key):

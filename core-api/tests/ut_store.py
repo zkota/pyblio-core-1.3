@@ -207,6 +207,26 @@ class TestStore (pybut.TestCase):
 
         e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)
+
+    def testValidateTxoCleanup (self):
+
+        db = Store.get ('file').dbopen ('ut_store/nasty-txo.xml')
+
+        # check that unnecessary txo items are removed
+        g = db.txo ['a']
+        
+        e = Store.Entry ()
+        
+        e ['txo'] = [ Attribute.Txo (g [1]),
+                      Attribute.Txo (g [2]),
+                      Attribute.Txo (g [3]),
+                      Attribute.Txo (g [4]) ]
+
+        e = db.validate (e)
+        
+        assert e ['txo'] == [ Attribute.Txo (g [2]),
+                              Attribute.Txo (g [4]),], \
+                              'got %s' % `e ['enum']`
         return
     
         

@@ -166,7 +166,15 @@ class Txo:
     
     def sort (self):
         return '%s/%d' % (self.group, self.id)
-    
+
+    def __repr__ (self):
+
+        return 'Txo (%s, %s)' % (`self.group`, `self.id`)
+
+    def __cmp__ (self, other):
+
+        return cmp (self.group, other.group) or cmp (self.id, other.id)
+
 
 N_to_C = {
     'person'    : Person,
