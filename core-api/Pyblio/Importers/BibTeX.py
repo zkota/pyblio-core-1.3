@@ -765,7 +765,7 @@ class Exporter (object):
 
     def record_begin (self):
 
-        self.key = self.record ['id'] [0]
+        self.key = str (self.record ['id'] [0])
 
         tp = self.record ['doctype'] [0]
         self.type = self.db.txo [tp.group][tp.id].names ['C']
