@@ -27,8 +27,11 @@ from bsddb3 import db
 
 from Pyblio import Store, Schema
 
-class DBIterBase:
+# --------------------------------------------------
 
+class DBIterBase:
+    """ Iterators on the full database """
+    
     def __init__ (self, cursor):
         self._cursor = cursor
         self._data   = self._cursor.first ()
@@ -48,26 +51,71 @@ class DBIterBase:
         return self._content (data)
 
 class DBIter (DBIterBase):
-
+    """ Iterate over the keys """
     def _content (self, data):
 
         return data [0]
 
 class DBIterValues (DBIterBase):
-    
+    """ Iterate over the values """
     def _content (self, data):
 
         return pickle.loads (data [1])
 
 class DBIterItems (DBIterBase):
-    
+    """ Iterate over (key, value) pairs """
     def _content (self, data):
 
         return data [0], pickle.loads (data [1])
+
+
+# --------------------------------------------------
+
+class ResultSet:
+
+    def __init__ (self, env, rs, id, name = None):
+        self.name    = name
+
+        self._db = env
+        self._rs = rs
+        self._id = id
+        
+        self._cursor = rs.cursor ()
+        self._data   = self._cursor.first ()
+        return
+
+    def __iter__ (self):
+        return self
+
+
+    def next (self):
+        if self._data is None:
+            raise StopIteration ()
+
+        data = self._data
+        self._data = self._cursor.next ()
+        
+        return data [1]
+
+
+    def __del__ (self):
+        if self.name:
+            # This is a long-lived result set
+            return
+
+        self._rs.close ()
+
+        _db = db.DB (self._db)
+        _db.remove ('rs', self._id)
+        return
     
+    
+
+# --------------------------------------------------
     
 class Database:
-
+    """ A Pyblio database stored in a BSD DB3 engine """
+    
     def __init__ (self, path, schema = None, create = False):
 
         if create:
@@ -80,56 +128,87 @@ class Database:
             
             flag = db.DB_CREATE
 
-            self.schema = schema
         else:
             flag = 0
 
-            # the schema is in the directory
-            try:
-                s = os.path.join (path, 'schema.xml')
-                self.schema = Schema.Schema (s)
-                
-            except ValueError, msg:
-                raise Store.StoreError (_("cannot open '%s': %s") % (
-                    path, msg))
-            
         self._path = path
         
         self._env = db.DBEnv ()
         self._env.open (path, flag | db.DB_INIT_MPOOL)
-        
-        self._db  = db.DB (self._env)
-        self._db.open (path, 'db', db.DB_HASH, flag)
 
+        # DB containing the actual entries
+        self._db  = db.DB (self._env)
+        self._db.open ('core', 'db', db.DB_HASH, flag)
+
+        # DB with meta informations
+        self._meta  = db.DB (self._env)
+        self._meta.open ('core', 'meta', db.DB_HASH, flag)
+
+        if create:
+            self.schema = schema
+            self._meta.put ('schema', pickle.dumps (schema))
+            self._meta.put ('rs', '0')
+        else:
+            self.schema = pickle.loads (self._meta.get ('schema'))
+
+        # Full text indexing DB
+        self._idx = db.DB (self._env)
+        self._idx.set_flags (db.DB_DUP)
+        self._idx.open ('core', 'idx', db.DB_HASH, flag)
+        
         return
 
 
     def save (self):
 
-        # store the schema
-        file = os.path.join (self._path, 'schema.xml')
-        
-        try:
-            os.unlink (file + '.bak')
-        except OSError:
-            pass
-
-        if os.path.exists (file):
-            os.rename (file, file + '.bak')
-
-        fd = open (file, 'w')
-        self.schema.xmlwrite (fd)
-        fd.close ()
-
-        # Flush the database
+        # Flush the databases
         self._db.sync ()
+        self._meta.sync ()
+        self._idx.sync ()
         return
     
 
     def __setitem__ (self, key, val):
+        
+        idx = []
+        for attribs in val.values ():
+            for attrib in attribs:
+                
+                for idx in attrib.index ():
+                    idx = idx.encode ('utf-8')
+                    self._idx.put (idx, key)
+        
         val = pickle.dumps (val)
         self._db.put (key, val)
         return
+
+    def query (self, word, sort, name = None):
+
+        # get the next rs id
+        rsid = self._meta.get ('rs')
+        self._meta.put ('rs', '%d' % (int (rsid) + 1))
+        
+        rs = db.DB (self._env)
+        rs.open ('rs', rsid, db.DB_BTREE, db.DB_CREATE)
+        
+        cursor = self._idx.cursor ()
+        data   = cursor.set (word.encode ('utf-8'))
+        
+        while 1:
+            if data is None: break
+
+            key   = data [1]
+            entry = pickle.loads (self._db.get (key))
+            
+            # Insert the new value in a table according to the sort key
+            
+            sortkey = entry [sort] [0].sort ().encode ('utf-8')
+            rs.put (sortkey, key)
+
+            data = cursor.next_dup ()
+
+        return ResultSet (self._env, rs, rsid, name)
+    
     
     def __getitem__ (self, key):
         
@@ -151,6 +230,7 @@ class Database:
         
         return DBIterItems (self._db.cursor ())
 
+
     
 def dbdestroy (path, nobackup = False):
     shutil.rmtree (path + '.db')
@@ -165,5 +245,10 @@ def dbcreate (path, schema):
 
 def dbopen (path):
 
-    return Database (path = path + '.db', create = False)
-
+    try:
+        return Database (path = path + '.db', create = False)
+    
+    except db.DBNoSuchFileError, msg:
+        raise Store.StoreError (_("cannot open '%s': %s") % (
+            path, msg))
+                                

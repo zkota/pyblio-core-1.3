@@ -19,11 +19,10 @@
 # 
 
 
-''' This Module contains the interfaces one might want to implement in
-order to provide a specific database _storage_.
+''' This Module contains the interfaces one might want to inherit from
+in order to provide a specific database _storage_.
 
-Please note: this is an interface definition, but it can also be used
-as a base class.
+By itself, this base classes provide the XML import and export layers.
 '''
 
 import os, string
@@ -109,7 +108,21 @@ class Entry (dict):
             
         fd.write (' </entry>\n')
         return
-    
+
+
+class ResultSet:
+
+    """ This class defines a result set, which is the product of a
+    query on the database. ResultSets can be named and are then
+    persistent. """
+
+    def __init__ (self, name = None):
+        self.name = name
+        return
+
+    def __iter__ (self):
+        raise NotImplemented ('please override')
+        
 
 
 class Database (dict):
@@ -126,6 +139,7 @@ class Database (dict):
 
     def __init__ (self, schema = None, file = None):
 	''' Create a new empty database with the specified schema '''
+
         self.schema = schema
 
         if file:
@@ -144,6 +158,19 @@ class Database (dict):
         dict.__setitem__ (self, key, value)
         return
 
+
+    def rs_get (self):
+        """ Return the available Result Sets """
+        return []
+
+
+    def rs_del (self, name):
+        return
+
+
+    def query (self, word, sort, name = None):
+        raise NotImplemented ('please override')
+    
     
     def save (self):
         raise NotImplemented ('please override')

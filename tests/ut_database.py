@@ -94,7 +94,8 @@ class TestContent (pybut.TestCase):
 
     
     def testIterate (self):
-
+        """ Loop over the db content """
+        
         e = Store.Entry (self.db.schema ['article'])
 
         initial = ['a', 'b', 'c', 'd']
@@ -139,6 +140,26 @@ class TestContent (pybut.TestCase):
         assert keys == initial
         return
     
+
+    def testFullQuery (self):
+        """ Full text ordered queries """
+        
+        # Fill the db with some values
+        for k, v in (('a', 'one two three four'),
+                     ('b', 'four five six seven'),
+                     ('c', 'seven eight nine one')):
+
+            e = Store.Entry (self.db.schema ['article'])
+            e ['title'] = [Attribute.Text (v)]
+            
+            self.db [Store.Key (k)] = e
+
+        r = self.db.query (u'one', 'title')
+        a = []
+        for v in r: a.append (v)
+        
+        assert a == ['a', 'c']
+        
 
 fmts = ('bsddb', 'file')
 

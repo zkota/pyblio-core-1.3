@@ -47,6 +47,33 @@ class Database (Store.Database):
         else:
             Store.Database.__init__ (self, file = file)
         return
+
+
+    def query (self, word, sort, name = None):
+
+        res = []
+        for entry in self.itervalues ():
+
+            found = False
+            
+            for attrs in entry.values ():
+                idx = sum (map (lambda x: x.index (), attrs), [])
+                
+                if word in idx:
+                    found = True
+                    break
+                
+            if not found: continue
+
+            res.append ((entry [sort] [0].sort (), entry.key))
+
+        def zipsort (a, b):
+            return cmp (a [0], b [0])
+
+        res.sort (zipsort)
+
+        return zip (res [0], res [1]) [1]
+        
     
     def save (self):
 
@@ -80,7 +107,8 @@ def dbdestroy (path, nobackup = False):
     
 def dbcreate (path, schema):
 
-    return Database (schema = schema, file = path, create = True)
+    return Database (schema = schema, file = path,
+                     create = True)
 
 
 def dbopen (path):

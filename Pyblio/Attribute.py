@@ -20,7 +20,7 @@
 
 """ Basic data types that can be used as attributes for a Core.Entry """
 
-import string
+import string, re
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -50,6 +50,12 @@ class Person (object):
         fd.write ('<person %s/>' % string.join (data, ' '))
         return
     
+    def index (self):
+        return [x for x in (self.first, self.last) if x]
+
+    def sort (self):
+        return u'%s\0%s' % (self.last or '', self.first or '')
+
 
 class Date:
     ''' Description of a date '''
@@ -72,6 +78,16 @@ class Date:
         fd.write ('<date %s/>' % string.join (data, ' '))
         return
 
+    def index (self):
+        return []
+
+    def sort (self):
+        return '%.4d%.2d%.2d' % (self.year or 0,
+                                 self.month or 0,
+                                 self.day or 0)
+
+            
+re_split = re.compile (r'[^\w]+')
 
 class Text (unicode):
     ''' This class holds all the other fields (not an Author or a Date) '''
@@ -81,6 +97,12 @@ class Text (unicode):
         fd.write ('<text>%s</text>' % escape (self.encode ('utf-8')))
         return
 
+    def index (self):
+        return re_split.split (self)
+
+    def sort (self):
+        return self
+    
 
 class URL (str):
     ''' Holder for URL data (for example, the location of a database) '''
@@ -90,6 +112,11 @@ class URL (str):
         fd.write ('<url href=%s/>' % quoteattr (self.encode ('utf-8')))
         return
 
+    def index (self):
+        return re_split.split (self)
+
+    def sort (self):
+        return self
 
 class Reference (str):
     ''' Holder for a reference to a bibliographic entry (which can be
@@ -104,6 +131,11 @@ class Reference (str):
         fd.write ('<reference ref=%s/>' % quoteattr (str (self.key).encode ('utf-8')))
         return
 
+    def index (self):
+        return []
+    
+    def sort (self):
+        return self
 
 N_to_C = {
     'person'   : Person,
