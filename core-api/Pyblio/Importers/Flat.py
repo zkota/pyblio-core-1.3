@@ -1,8 +1,9 @@
 from gettext import gettext as _
 
-from Pyblio import Callback, Store
+from Pyblio import Callback, Store, Attribute
 
 """ Module containing convenience parsers for simple tags """
+
 
 class Flat (Callback.Publisher):
 
@@ -16,13 +17,7 @@ class Flat (Callback.Publisher):
         self.emit ('file-start')
         
         while 1:
-            try:
-                record = self._fd.next ()
-
-            except SyntaxError, msg:
-                
-                self.emit ('error', msg)
-                continue
+            record = self._fd.next ()
             
             if record is None: break
 
@@ -76,7 +71,9 @@ class Flat (Callback.Publisher):
             
         return
 
-    def add_text (self, value):
+    def add_text (self, field, value):
 
-        pass
+        self.record [field] = Attribute.Text (value)
+        return
+    
     

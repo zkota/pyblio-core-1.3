@@ -9,7 +9,34 @@ class T (Tagged.Tagged):
     
     start_re = re.compile (r'(\w{2,2})\s+(.*)')
     contd_re = re.compile (r'\s{2,2}(\s.*)')
-    split_re = re.compile (r'^\s*$')
+
+    def line_handler (self, line, count):
+
+        if line.strip () == '':
+            if self.state == self.ST_IN_FIELD:
+                self.push (self.EV_FIELD_END)
+                self.push (self.EV_RECORD_END)
+            return
+        
+        m = self.start_re.match (line)
+        if m:
+            if self.state == self.ST_OUTSIDE:
+                self.push (self.EV_RECORD_START)
+                
+            elif self.state == self.ST_IN_FIELD:
+                self.push (self.EV_FIELD_END)
+                
+            self.push (self.EV_FIELD_START, m.group (1), count)
+            self.push (self.EV_FIELD_DATA,  m.group (2))
+            return
+        
+        m = self.contd_re.match (line)
+        if m:
+            self.push (self.EV_FIELD_DATA, m.group (1))
+            return
+
+        raise SyntaxError (_('line %d: unexpected data') % count)
+
 
 class F (Flat.Flat):
 

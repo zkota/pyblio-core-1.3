@@ -18,22 +18,24 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
+from gettext import gettext as _
 
 class Tagged (object):
 
     """ Generic Parser for 'tagged' records, to be derived by actual
-    parsers."""
+    parsers. An actual subclass will need to at least override the
+    self.line_handler () method to generate events by calling
+    self.push (). The parser is in charge of general state
+    bookkeeping, and that sort of things..."""
 
-    # A regex with 2 groups, the tag and the data
-    start_re = None
+    
+    EV_RECORD_START, EV_RECORD_END, EV_FIELD_START, \
+                     EV_FIELD_DATA, EV_FIELD_END, EV_FILE_END = range (6)
 
-    # A regex with 1 group, the continued data
-    contd_re = None
+    # States
+    ST_IN_RECORD, ST_IN_FIELD, ST_OUTSIDE = range (3)
 
-    # A line that matches this regex marks the end of a record
-    split_re = None
-
-
+    
     def __init__ (self, fd, charset = 'UTF-8'):
 
         """ Create a new parser for a file containing 'tagged' records """
@@ -42,8 +44,13 @@ class Tagged (object):
         self._ln = 0
         
         self._charset = charset
-        self._stack = []
+        self._stack   = []
+        self._evstack = []
         self._started = False
+
+        self.state = self.ST_OUTSIDE
+
+        self.file_start ()
         return
 
 
@@ -60,11 +67,13 @@ class Tagged (object):
 
         pass
 
-    def line_handler (self, line):
+    def line_handler (self, line, number):
 
-        """ Transforms a single line of input, possibly returning None to skip the line """
+        """ Override me to handle each line of input and generate
+        self.push () events. Will be called with line == '' when the
+        end of file is reached. """
 
-        return line
+        return
     
 
     def field_handler (self, tag, value):
@@ -74,92 +83,133 @@ class Tagged (object):
         return tag, value.decode (self._charset)
 
 
-    def next (self):
+    def push (self, * ev):
 
-        if not self._started:
-            self.file_start ()
-            self._started = True
-
-        record  = []
-
-        while 1:
-            line = self._pop ()
-
-            if line is None:
-                if record: return record
-
-                self.file_stop ()
-                return None
-
-            match = self.start_re.match (line)
-            if match is None:
-                raise SyntaxError (_('line %d: syntax error') % self._ln)
-
-            tag, data = match.groups ((1, 2))
-            start     = self._ln
-            
-            while 1:
-                line = self._pop ()
-                if line is None: break
-            
-                match = self.contd_re.match (line)
-                if match is None:
-                    self._unpop (line)
-                    break
-
-                data = data + match.group (1)
-
-            record.append ((start,) + self.field_handler (tag, data))
-            
-            # check for record boundary
-            done = False
-            
-            while 1:
-                line = self._pop ()
-                
-                if line is None:
-                    done = True
-                    break
-                
-                if self.split_re.match (line):
-                    done = True
-                else:
-                    self._unpop (line)
-                    break
-
-            if done: break
-
-        return record
-            
-    def _pop (self):
-
-        """ Return a line from the file that should not be skipped, or
-        None if the end of file has been reached. """
+        """ Emit a new event. Available events are listed below, with
+        their additional parameters listed, when needed:
         
-        while 1:
-            
-            try:
-                line = self._stack.pop ()
+           - self.EV_RECORD_START
+           - self.EV_RECORD_END
+           - self.EV_FIELD_START, tag, line
+           - self.EV_FIELD_DATA,  data
+           - self.EV_FIELD_END
+           - self.EV_FILE_END
 
-            except IndexError:
-                self._ln = self._ln + 1
-            
-                line = self._fd.readline ()
-                if line == '': return None
-
-            line = self.line_handler (line)
-            if line is not None: break
-
-        return line
+        """
+       
+        self._evstack.append (ev)
+        return
 
 
-    def _unpop (self, line):
+    def unread (self, line, count):
 
         """ Put back a line so that it will be returned by self._pop
         when it is next invoked."""
 
-        self._stack.append (line)
+        self._stack.append ((line, count))
         return
+
+
+    def next (self):
+
+        """ Call this function to get the next record as a list of tuples
+
+            [ (tag, value), ...]
+
+            or None when there are no more records """
+        
+        record = []
+
+        while 1:
+            ev = self._ev_pop ()
+
+            ev, args = ev [0], ev [1:]
+
+            if ev == self.EV_FILE_END:
+                if self.state != self.ST_OUTSIDE:
+                    raise SyntaxError (_('line %d: unexpected end of file') % self._ln)
+                self.file_stop ()
+                return None
+
+            if ev == self.EV_RECORD_END:
+                if self.state == self.ST_OUTSIDE:
+                    raise SyntaxError (_('line %d: unexpected end of record') % self._ln)
+                self.state = self.ST_OUTSIDE
+                return record
+
+            if ev == self.EV_RECORD_START:
+                if self.state == self.ST_IN_RECORD:
+                    raise SyntaxError (_('line %d: nested record') % self._ln)
+
+                self.state = self.ST_IN_RECORD
+                
+                record = []
+                continue
+
+            if ev == self.EV_FIELD_START:
+                if self.state == self.ST_IN_FIELD:
+                    raise SyntaxError (_('line %d: nested field') % self._ln)
+
+                if self.state == self.ST_OUTSIDE:
+                    raise SyntaxError (_('line %d: field is not in a record') % self._ln)
+
+                self.state = self.ST_IN_FIELD
+                
+                tag, start = args
+                data = ''
+                continue
+            
+            if ev == self.EV_FIELD_DATA:
+                if self.state != self.ST_IN_FIELD:
+                    raise SyntaxError (_('line %d: unexpected field content') % self._ln)
+                
+                data = data + args [0]
+                continue
+
+            if ev == self.EV_FIELD_END:
+                record.append ((start,) + self.field_handler (tag, data))
+
+                self.state = self.ST_IN_RECORD
+                continue
+
+        return
+
+    def _ev_pop (self):
+
+        """ Parse enough lines to get the next event """
+
+        while 1:
+            try:
+                return self._evstack.pop (0)
+
+            except IndexError:
+                pass
+
+            line, count = self._pop ()
+
+            self.line_handler (line, count)
+            
+            if line == '': self.push (self.EV_FILE_END)
+            
+        return
+
+    
+    def _pop (self):
+
+        """ Return a line from the file with its line number. """
+        
+        try:
+            line, count = self._stack.pop ()
+
+        except IndexError:
+            self._ln = self._ln + 1
+            
+            line  = self._fd.readline ()
+            count = self._ln
+            
+        return line, count
+
+
 
             
 
