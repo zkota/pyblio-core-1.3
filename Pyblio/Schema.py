@@ -46,9 +46,34 @@ class Schema:
         return
 
 
-    def save (self, file):
+    def xmlwrite (self, fd):
 
-        pass
+        fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
+        fd.write ('<pyblio-schema>\n')
+
+        # Collect all the attributes
+        attrs = {}
+        for d in self.documents.values ():
+            for a in d.mandatory.values () + d.optional.values ():
+                attrs [a.id] = a
+
+        keys = attrs.keys ()
+        keys.sort ()
+
+        for k in keys:
+            attrs [k].xmlwrite (fd)
+            fd.write ('\n')
+            
+        # Output the documents themselves
+        docs = self.documents.keys ()
+        docs.sort ()
+
+        for k in docs:
+            self.documents [k].xmlwrite (fd)
+            fd.write ('\n')
+
+        fd.write ('</pyblio-schema>\n')
+        return
     
     
 class Document:
@@ -64,7 +89,39 @@ class Document:
         self.optional  = {}
         return
 
+    def xmlwrite (self, fd):
 
+        fd.write (' <document id="%s">\n' % self.id)
+
+        names = self.names.keys ()
+        names.sort ()
+
+        for k in names:
+            v = self.names [k]
+            if k: k = ' lang="%s"' % k
+            fd.write ('  <name%s>%s</name>\n' % (k, v))
+
+        fd.write ('\n')
+        
+        keys = self.mandatory.keys ()
+        keys.sort ()
+
+        for k in keys:
+            fd.write ('  <mandatory id="%s"/>\n' % k)
+            
+        fd.write ('\n')
+
+        keys = self.optional.keys ()
+        keys.sort ()
+
+        for k in keys:
+            fd.write ('  <optional id="%s"/>\n' % k)
+            
+
+        fd.write (' </document>\n')
+        return
+
+    
 class Attribute:
 
     def __init__ (self, id):
@@ -77,6 +134,21 @@ class Attribute:
         self.names = {}
         return
 
+    def xmlwrite (self, fd):
+
+        fd.write (' <attribute id="%s" type="%s">\n' % (self.id, self.type))
+
+        names = self.names.keys ()
+        names.sort ()
+
+        for k in names:
+            v = self.names [k]
+            if k: k = ' lang="%s"' % k
+            fd.write ('  <name%s>%s</name>\n' % (k, v))
+
+        fd.write (' </attribute>\n')
+        return
+    
     
 class SchemaParse (sax.handler.ContentHandler):
 
@@ -150,6 +222,8 @@ class SchemaParse (sax.handler.ContentHandler):
 
             id = self._attr ('id', attrs)
             self._attribute = Attribute (id)
+
+            self._attribute.type = self._attr ('type', attrs)
             return
         
         if name in ('mandatory', 'optional'):

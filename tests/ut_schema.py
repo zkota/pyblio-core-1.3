@@ -1,4 +1,4 @@
-import pybut
+import os, pybut
 
 from Pyblio import Schema
 
@@ -69,5 +69,24 @@ class TestSchema (pybut.TestCase):
         except Schema.sax.SAXException, msg:
             pass
 
-    
+    def testWrite (self):
+
+        import sys
+        a = Schema.Schema (file = 'ut_schema/simple.xml')
+
+        try:
+            out = open (',,tmp.xml', 'w')
+            a.xmlwrite (out)
+            out.close ()
+
+            # both files should be identical
+            d1 = open (',,tmp.xml').read ()
+            d2 = open ('ut_schema/simple.xml').read ()
+            
+            assert d1 == d2
+            
+        finally:
+            try: os.unlink (',,tmp.xml')
+            except OSError: pass
+        
 pybut.run (pybut.makeSuite (TestSchema, 'test'))
