@@ -143,6 +143,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('accents')
         return
 
+    def testVon (self):
+        """ Split authors with a Von in the name """
+        
+        self._check ('von')
+        return
+
 
 class TestBibTeXExport (pybut.TestCase):
 

@@ -831,6 +831,9 @@ class Importer (object):
                 elif s.lower () == s:
                     tags.append ('L')
 
+                elif s.lower () in ('van', 'von', 'de'):
+                    tags.append ('L')
+
                 else:
                     tags.append ('N')
 
@@ -861,12 +864,22 @@ class Importer (object):
                         return Attribute.Person (first = ' '.join (stream [1:]),
                                                  last  = stream [0])
 
+
                     if tt in (['N', 'N'],
                               ['I', 'N'],
                               ['I', 'I', 'N'],
                               ['I', 'I', 'I', 'N']):
                         return Attribute.Person (first = ' '.join (stream [0:-1]),
                                                  last  = stream [-1])
+
+                    try:
+                        von = tt.index ('L')
+
+                        return Attribute.Person (first = ' '.join (stream [0:von]),
+                                                 last  = ' '.join (stream [von:]))
+                        
+                    except ValueError:
+                        pass
                     
                     raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
                         repr (stream), repr (tt)))
