@@ -215,4 +215,5 @@ class TestStore (pybut.TestCase):
         return
     
         
-pybut.run (pybut.makeSuite (TestStore, 'test'))
+suite = pybut.suite (TestStore)
+if __name__ == '__main__':  pybut.run (suite)

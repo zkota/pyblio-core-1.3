@@ -2,14 +2,12 @@ import os, pybut, sys, string
 
 from Pyblio import Store, Schema, Attribute
 
-pybut.cleanup ()
 
 class TestDatabase (pybut.TestCase):
 
     """ Perform tests on the Pyblio.Stores main functions """
 
     def setUp (self):
-        self.fmt = fmt
         self.hd  = Store.get (self.fmt)
 
         self.nm = pybut.dbname ()
@@ -98,7 +96,7 @@ class TestContent (pybut.TestCase):
     count = 0
 
     def setUp (self):
-        self.fmt  = fmt
+
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
@@ -398,7 +396,7 @@ class TestContent (pybut.TestCase):
         
         self.db.add (e)
 
-        f = ',,enumdb-' + fmt
+        f = ',,enumdb-' + self.fmt
 
         fd = open (f, 'w')
         self.db.xmlwrite (fd)
@@ -721,7 +719,7 @@ class TestView (pybut.TestCase):
     count = 0
 
     def setUp (self):
-        self.fmt  = fmt
+
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
@@ -867,23 +865,27 @@ class TestView (pybut.TestCase):
         return
 
 
-if os.environ.has_key ('STORES'):
-    fmts = os.environ ['STORES'].split (':')
-else:
-    fmts = Store.modules ()
 
-classes = (pybut.makeSuite (TestDatabase, 'test'),
-           pybut.makeSuite (TestContent,  'test'),
-           pybut.makeSuite (TestView,     'test'))
+class TestDatabaseFile (TestDatabase):
+    fmt = 'file'
 
-if os.environ.has_key ('CLASS'):
-    c = int (os.environ ['CLASS'])
-    
-    classes = classes [c:c+1]
-    
-global fmt
+class TestContentFile (TestContent):
+    fmt = 'file'
 
-for fmt in fmts:
-    print "unittest: ------------ storage '%s' ----------" % fmt
-    pybut.run (pybut.TestSuite (classes))
+class TestViewFile (TestView):
+    fmt = 'file'
 
+class TestDatabaseDB (TestDatabase):
+    fmt = 'bsddb'
+
+class TestContentDB (TestContent):
+    fmt = 'bsddb'
+
+class TestViewDB (TestView):
+    fmt = 'bsddb'
+
+
+suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile,
+                     TestDatabaseDB,   TestContentDB,   TestViewDB)
+
+if __name__ == '__main__':  pybut.run (suite)

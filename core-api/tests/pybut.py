@@ -4,7 +4,7 @@
 import sys, os, time
 
 import unittest
-from unittest import makeSuite, TestSuite
+from unittest import makeSuite, TestSuite, TestCase
 
 # Setup the system so that we import the current python files
 srcdir = os.environ.get ('srcdir', '.')
@@ -13,11 +13,16 @@ sys.path.insert (0, os.path.join (srcdir, '..'))
 assert os.path.isdir (os.path.join (srcdir, '..', 'Pyblio'))
 
 
-class TestCase (unittest.TestCase):
+def _cleanup ():
+    import shutil
+    
+    for d in os.listdir ('.'):
 
-    def tearDown (self):
-        cleanup ()
-        return
+        if d [:2] != ',,': continue
+
+        if os.path.isdir (d): shutil.rmtree (d)
+        else:                 os.unlink (d)
+
     
 
 class _WritelnDecorator:
@@ -130,11 +135,20 @@ class TextTestRunner:
         return result
 
 
-def run (* args):
-    full = unittest.TestSuite (args)
+def suite (* args):
 
+    return TestSuite (map (lambda s: makeSuite (s, 'test'), args))
+
+
+def run (full):
+
+    _cleanup ()
+    
     r = TextTestRunner ()
-    return r.run (full)
+    r.run (full)
+    
+    return
+
 
 def fileeq (a, b):
 
@@ -142,16 +156,6 @@ def fileeq (a, b):
 
     os.system ("diff '%s' '%s'" % (a, b))
     assert False, '%s and %s differ' % (a, b)
-
-def cleanup ():
-    import shutil
-    
-    for d in os.listdir ('.'):
-
-        if d [:2] != ',,': continue
-
-        if os.path.isdir (d): shutil.rmtree (d)
-        else:                 os.unlink (d)
 
 _count = 0
 

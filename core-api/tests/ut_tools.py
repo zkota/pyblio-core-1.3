@@ -27,4 +27,5 @@ class TestTools (pybut.TestCase):
         return
     
 
-pybut.run (pybut.makeSuite (TestTools, 'test'))
+suite = pybut.suite (TestTools)
+if __name__ == '__main__':  pybut.run (suite)

@@ -254,7 +254,6 @@ ER  - \r
 
 
 
-
-pybut.run (pybut.makeSuite (TestTagged, 'test'),
-           pybut.makeSuite (TestRISTransport, 'test'))
+suite = pybut.suite (TestTagged, TestRISTransport)
+if __name__ == '__main__':  pybut.run (suite)
     

@@ -136,4 +136,5 @@ class TestSchema (pybut.TestCase):
         return
     
     
-pybut.run (pybut.makeSuite (TestSchema, 'test'))
+suite = pybut.suite (TestSchema)
+if __name__ == '__main__':  pybut.run (suite)

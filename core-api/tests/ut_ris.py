@@ -31,4 +31,6 @@ class TestRIS (pybut.TestCase):
     
 
 
-pybut.run (pybut.makeSuite (TestRIS, 'test'))
+suite = pybut.suite (TestRIS)
+
+if __name__ == '__main__':  pybut.run (suite)

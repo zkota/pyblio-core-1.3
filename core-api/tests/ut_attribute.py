@@ -124,4 +124,5 @@ class TestAttribute (pybut.TestCase):
         return
 
 
-pybut.run (pybut.makeSuite (TestAttribute, 'test'))
+suite = pybut.suite (TestAttribute)
+if __name__ == '__main__':  pybut.run (suite)

@@ -73,4 +73,5 @@ class TestBibTeX (pybut.TestCase):
         return
 
     
-pybut.run (pybut.makeSuite (TestBibTeX, 'test'))
+suite = pybut.suite (TestBibTeX)
+if __name__ == '__main__':  pybut.run (suite)
