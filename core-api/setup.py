@@ -21,5 +21,6 @@ This module contains the core API of Pybliographer.
 
        packages = [ 'Pyblio',
                     'Pyblio.Importers',
+                    'Pyblio.Importers.BibTeX',
                     'Pyblio.Stores' ]
        )

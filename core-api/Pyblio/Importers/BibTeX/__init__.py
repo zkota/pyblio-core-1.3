@@ -366,7 +366,7 @@ class Importer (object):
         for v in db.txo ['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
-        for data in Reader.read (fd):
+        for data in Reader.read (fd, self.charset):
 
             if isinstance (data, Reader.Comment):
                 self.comment_add (data)
