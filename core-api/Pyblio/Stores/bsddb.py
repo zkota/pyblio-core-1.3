@@ -48,7 +48,7 @@ Tables in use:
   key:   string value of the entry's key
   value: no meaning
 
-* view/<id> [BTREE / RECNUM / DUP]
+* view/<id> [BTREE / RECNUM]
 
   key:   field on which we sort
   value: key from which the field is taken
@@ -56,7 +56,7 @@ Tables in use:
 """
 from gettext import gettext as _
 
-import os, shutil, copy, sys, traceback, string
+import os, shutil, copy, sys, traceback, string, weakref
 
 import cPickle as pickle
 
@@ -80,6 +80,8 @@ class RSDB (object):
         self._db   = _db
         self._env  = _env
         self._meta = _meta
+
+        self._views = []
         return
     
     def itervalues (self):
@@ -122,11 +124,40 @@ class RSDB (object):
 
     def view (self, criterion):
 
-        return View (self._db, self._env, self._meta,
-                     self, criterion)
-    
-    
+        v = View (self._db, self._env, self._meta,
+                  self, criterion)
 
+        self._views.append (weakref.ref (v))
+        
+        return v
+
+    def _add (self, e, txn):
+        
+        for vref in [] + self._views:
+            v = vref ()
+
+            if v is None:
+                self._views.remove (vref)
+                continue
+
+            v._add (e, txn)
+        return
+
+    def _delete (self, key, txn):
+
+        # Update the views of the result set
+
+        for vref in [] + self._views:
+            v = vref ()
+
+            if v is None:
+                self._views.remove (vref)
+                continue
+
+            v._del (key, txn)
+
+        return
+    
 # --------------------------------------------------
 
 class View (Store.View):
@@ -162,37 +193,8 @@ class View (Store.View):
             
             self._v.open ('view', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
 
-            # Create the index for the view
-            self._vi = db.DB (self._env)
-            self._vi.open ('viewidx', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
-
-
             # fill the view with the current content of the result set
-            for e in rs.itervalues ():
-                try:
-                    value = e [criterion]
-                    value = string.join (map (lambda x: x.sort (), value), '\0')
-                    value = value.encode ('utf-8')
-                    
-                except KeyError:
-                    value = ''
-
-                # In order to store multiple values in a DB_RECNUM
-                # BTree, it is necessary to "cheat" a bit, and
-                # disambiguate between the duplicates; this is done by
-                # maintaining a counter by key, which holds the number
-                # of similar keys. This counter is appended to each
-                # entry.
-                
-                last = self._vi.get (value)
-                
-                if last is None: last = 0
-                else:            last = int (last)
-                
-                self._vi.put (value, str (last + 1), txn = txn)
-
-                value = value + '\0%d' % last
-                self._v.put (value, str (e.key), txn = txn)
+            for e in rs.itervalues (): self._add (e, txn)
             
         except:
             txn.abort ()
@@ -246,11 +248,9 @@ class View (Store.View):
             self._meta.put ('view', _ps ((serial, meta, revert)), txn = txn)
             
             self._v.close ()
-            self._vi.close ()
             
             db.DB (self._env).remove ('view', str (self._id))
-            db.DB (self._env).remove ('viewidx', str (self._id))
-            
+
         except:
             # exceptions in __del__ methods are not reported by default
             etype, value, tb = sys.exc_info ()
@@ -262,6 +262,42 @@ class View (Store.View):
         txn.commit ()
         return
 
+    def _collate (self, e):
+        try:
+            value = e [self._crit]
+            value = string.join (map (lambda x: x.sort (), value), '\0')
+            value = value.encode ('utf-8')
+
+        except KeyError:
+            value = ''
+
+        return value
+    
+    def _add (self, e, txn):
+
+        value = self._collate (e)
+        
+        # In order to store multiple values in a DB_RECNUM BTree, it
+        # is necessary to "cheat" a bit, and disambiguate between the
+        # duplicates; this is done by appending the entry key to the
+        # value, separated by a null byte
+
+        value = value + '\0%d' % e.key
+        self._v.put (value, str (e.key), txn = txn)
+        return
+
+    def _del (self, k, txn):
+
+        # To remove an entry, we have to assume the way we compute the
+        # sorting key has not changed since it has been created.
+
+        e = _pl (self._db.get (str (k), txn = txn))
+        
+        value = self._collate (e)
+
+        self._v.delete (value + '\0%d' % k, txn = txn)
+        return
+    
 # --------------------------------------------------
 
 class ResultSet (Store.ResultSet, Callback.Publisher):
@@ -287,6 +323,7 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         self._rs.open ('resultset', self._id, db.DB_HASH,
                        db.DB_CREATE, txn = txn)
 
+        self._views = []
         return
 
     def _name_set (self, name):
@@ -368,12 +405,22 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
         try:
             self._rs.put (str (k), '', txn = txn)
+
+            # Update the views of the result set
+            
+            for vref in [] + self._views:
+                v = vref ()
+                if v is None:
+                    self._views.remove (vref)
+                    continue
+
+                e = _pl (self._db.get (str (k), txn = txn))
+
+                v._add (e, txn)
+                
         except:
             txn.abort ()
             raise
-
-        # read the value and add it to all the views this set is
-        # involved in.
 
         txn.commit ()
         return
@@ -384,7 +431,22 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
         try:
             self._rs.delete (str (k), txn = txn)
+
+            # Update the views of the result set
+            
+            for vref in [] + self._views:
+                v = vref ()
+                
+                if v is None:
+                    self._views.remove (vref)
+                    continue
+
+                v._del (k, txn)
+
         except:
+            etype, value, tb = sys.exc_info ()
+            traceback.print_exception (etype, value, tb)
+
             txn.abort ()
             raise
 
@@ -394,8 +456,13 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
     def view (self, criterion):
 
-        return View (self._db, self._env, self._meta,
-                     self, criterion)
+        v = View (self._db, self._env, self._meta,
+                  self, criterion)
+
+        # keep a weakref for easy updating of the view
+        self._views.append (weakref.ref (v))
+        
+        return v
     
 
     def __del__ (self):
@@ -705,7 +772,7 @@ class EnumStore (Store.EnumStore, Callback.Publisher):
 # --------------------------------------------------
     
 class Database (Store.Database, Callback.Publisher):
-    """ A Pyblio database stored in a BSD DB3 engine """
+    """ A Pyblio database stored in a Berkeley DB engine """
     
     def __init__ (self, path, schema = None, create = False):
 
@@ -772,6 +839,9 @@ class Database (Store.Database, Callback.Publisher):
 
         # Result set containing the full db
         self._entries_rs = RSDB (self._db, self._env, self._meta)
+
+        self.register ('add',    self._entries_rs._add)
+        self.register ('delete', self._entries_rs._delete)
         
         # No header in this db yet
         self.header = None
@@ -823,6 +893,10 @@ class Database (Store.Database, Callback.Publisher):
             
             key = Store.Key (self._insert (key, val, txn))
 
+            val.key = key
+
+            self.emit ('add', val, txn)
+            
         except:
             txn.abort ()
             raise
@@ -858,10 +932,13 @@ class Database (Store.Database, Callback.Publisher):
         txn = self._env.txn_begin ()
 
         try:
+            # Start by cleaning up dependencies, as they might wish to
+            # access the item a last time.
+            self.emit ('delete', key, txn)
+
+            # Then, remove the index and entry itself
             self._idxdel (id, txn)
             self._db.delete (id, txn)
-
-            self.emit ('delete', key, txn)
 
         except:
             txn.abort ()

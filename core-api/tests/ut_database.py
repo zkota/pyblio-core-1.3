@@ -777,7 +777,11 @@ class TestView (pybut.TestCase):
         k = self.db.add (e)
 
         self.rs.add (k)
-        assert list (v) == [1, 4, 2, 3, k]
+
+        r = list (v)
+        assert r in ([1, 4, 2, 3, k],
+                     [4, 1, 2, 3, k]), 'got %s' % `r`
+        return
         
     def testInsertDB (self):
 
@@ -791,8 +795,8 @@ class TestView (pybut.TestCase):
         k = self.db.add (e)
 
         r = list (v)
-        assert r == [1, 4, 2, 3, k], 'got %s' % `r`
-
+        assert r in ([1, 4, 2, 3, k],
+                     [4, 1, 2, 3, k]), 'got %s' % `r`
         return
 
     def testDelRS (self):
