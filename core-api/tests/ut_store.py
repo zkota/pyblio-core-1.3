@@ -19,21 +19,24 @@ class TestStore (pybut.TestCase):
         assert len (db) == 0
 
         pybut.fileeq (f, 'ut_store/empty.xml')
-        os.unlink (f)
+
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
     def testReadEmpty (self):
         """ A schema in a database is equivalent to outside the database """
         
+        f = ',,t2.xml'
+
         db = Store.get ('file').dbopen ('ut_store/empty.xml')
 
-        file = open (',,t2.xml', 'w')
+        file = open (f, 'w')
         db.schema.xmlwrite (file)
         file.close ()
 
-        pybut.fileeq (',,t2.xml', 'ut_store/s:simple.xml')
+        pybut.fileeq (f, 'ut_store/s:simple.xml')
         
-        os.unlink (',,t2.xml')
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
     def testWrite (self):
@@ -60,45 +63,52 @@ class TestStore (pybut.TestCase):
         db.save ()
 
         pybut.fileeq (f, 'ut_store/simple.xml')
-        os.unlink (f)
+
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
 
     def testRead (self):
         """ A database can be read and saved again identically """
         
+        f = ',,t4.xml'
+
         db = Store.get ('file').dbopen ('ut_store/simple.xml')
 
-        fd = open (',,t4.xml', 'w')
+        fd = open (f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (',,t4.xml', 'ut_store/simple.xml')
+        pybut.fileeq (f, 'ut_store/simple.xml')
 
-        os.unlink (',,t4.xml')
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
     def testEnumRead (self):
         """ A database with enumerated fields can be read and saved again identically """
         
+        f = ',,t6.xml'
+
         db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
 
-        fd = open (',,t6.xml', 'w')
+        fd = open (f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (',,t6.xml', 'ut_store/enumerated.xml')
+        pybut.fileeq (f, 'ut_store/enumerated.xml')
 
-        os.unlink (',,t6.xml')
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
 
     def testNativeWrite (self):
 
         """ Native data is stored in the database, along with loss information """
+
+        f = ',,t5.xml'
         
         schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.get ('file').dbcreate (',,t5.xml', schema)
+        db = Store.get ('file').dbcreate (f, schema)
 
         e = Store.Entry ()
 
@@ -110,9 +120,9 @@ class TestStore (pybut.TestCase):
         db.add (e)
         db.save ()
         
-        pybut.fileeq (',,t5.xml', 'ut_store/native.xml')
+        pybut.fileeq (f, 'ut_store/native.xml')
 
-        os.unlink (',,t5.xml')
+        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
         
     def testNativeRead (self):

@@ -54,7 +54,7 @@ class DBIter (DBIterBase):
     """ Iterate over the keys """
     def _content (self, data):
 
-        return int (data [0], 16)
+        return Store.Key (data [0])
 
 class DBIterValues (DBIterBase):
     """ Iterate over the values """
@@ -66,7 +66,7 @@ class DBIterItems (DBIterBase):
     """ Iterate over (key, value) pairs """
     def _content (self, data):
 
-        return int (data [0], 16), pickle.loads (data [1])
+        return Store.Key (data [0]), pickle.loads (data [1])
 
 
 # --------------------------------------------------
@@ -108,7 +108,7 @@ class ResultSet (Store.ResultSet):
         data = self._data
         self._data = self._cursor.next ()
         
-        return int (data [0])
+        return Store.Key (data [0])
 
 
     def __del__ (self):
@@ -339,7 +339,7 @@ class Database (Store.Database):
             self._meta.put ('serial', str (serial + 1),
                             txn = txn)
             
-            key = int (self._insert (id, val, txn), 16)
+            key = Store.Key (self._insert (id, val, txn))
 
         except:
             txn.abort ()
@@ -357,7 +357,7 @@ class Database (Store.Database):
         txn = self._env.txn_begin ()
 
         try:
-            self._idxdel ('%.16x' % key, txn)
+            self._idxdel (str (key), txn)
             self._insert (key, val, txn)
 
         except:
@@ -369,7 +369,7 @@ class Database (Store.Database):
 
 
     def __delitem__ (self, key):
-        id = '%.16x' % key
+        id = str (key)
         
         txn = self._env.txn_begin ()
 
@@ -387,7 +387,7 @@ class Database (Store.Database):
 
     def has_key (self, k):
 
-        id = '%.16x' % k
+        id = str (k)
         
         try:
             self._db.get (id)
@@ -427,7 +427,7 @@ class Database (Store.Database):
     
     def _insert (self, key, val, txn):
         
-        id  = '%.16x' % key
+        id  = str (key)
         
         self._idxadd (id, val, txn)
 
@@ -457,7 +457,7 @@ class Database (Store.Database):
         while 1:
             if data is None: break
 
-            rs.add (int (data [1], 16), txn = txn)
+            rs.add (Store.Key (data [1]), txn = txn)
             data = cursor.next_dup ()
 
         txn.commit ()
@@ -467,7 +467,7 @@ class Database (Store.Database):
     
     def __getitem__ (self, key):
         
-        return pickle.loads (self._db.get ('%.16x' % key))
+        return pickle.loads (self._db.get (str (key)))
 
     def __iter__ (self):
         
