@@ -17,15 +17,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
-# 
 
-''' This module defines some common exceptions '''
+""" This module handles importing a biblio formatter by its name """
 
-    
-class ParserError (Exception):
+import os, string
 
-    pass
+_dir = os.path.normpath (os.path.join (
+    os.path.dirname (__file__), 'Importers'))
 
-class SchemaError (Exception):
+_modules = {}
 
-    pass
+for m in os.listdir (_dir):
+
+    m = os.path.splitext (m) [0]
+    _modules [m.lower ()] = m
+
+del _modules ['__init__']
+
+
+def get (fmt):
+
+    parts = ('Pyblio', 'Importers', _modules [fmt])
+
+    module = __import__ (string.join (parts, '.'))
+
+    for comp in parts [1:]:
+        module = getattr (module, comp)
+        
+    return module

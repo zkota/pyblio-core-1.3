@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+ <entry id="toto" type="article">
+  <attribute id="author">
+   <person first="Frederic" last="Gobry"/>
+   <person first="First" last="Last"/>
+  </attribute>
+  <attribute id="journal">
+   <text>My journal is "</text>
+  </attribute>
+  <attribute id="note">
+   <text>a { and a }</text>
+  </attribute>
+  <attribute id="number">
+   <text>123</text>
+  </attribute>
+  <attribute id="title">
+   <text>This is a title</text>
+  </attribute>
+ </entry>
+</pyblio-db>

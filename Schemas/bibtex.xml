@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE pyblio-schema SYSTEM "pyblio-schema.dtd">
 
 <pyblio-schema>
  <attribute id="crossref" type="reference">
@@ -10,7 +9,7 @@
   <name>Key</name>
  </attribute>
 
- <attribute id="author" type="author">
+ <attribute id="author" type="person">
   <name>Author</name>
  </attribute>
 
@@ -58,7 +57,7 @@
   <name>Series</name>
  </attribute>
 
- <attribute id="editor" type="author">
+ <attribute id="editor" type="person">
   <name>Editor</name>
  </attribute>
 

@@ -66,7 +66,7 @@ class TestAttribute (pybut.TestCase):
 
     def testReference (self):
 
-        from Pyblio.Core import Key
+        from Pyblio.Store import Key
         
         self._check (Attribute.Reference (Key ('toto')),
                      u'<reference ref="toto"/>')

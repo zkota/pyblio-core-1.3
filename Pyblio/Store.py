@@ -120,11 +120,12 @@ class Database (dict):
         
 	return
 
-    def xmlwrite (self, fd):
+    def xmlwrite (self, fd, schema = True):
         fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
         fd.write ('<pyblio-db>\n')
 
-        self.schema.xmlwrite (fd, embedded = True)
+        if schema:
+            self.schema.xmlwrite (fd, embedded = True)
 
         for v in self.itervalues ():
             v.xmlwrite (fd)

@@ -43,7 +43,12 @@ class Schema:
 
         if file:
             handler = SchemaParse (self)
-            sax.parse (file, handler)
+
+            parser  = sax.make_parser ()
+            parser.setFeature (sax.handler.feature_validation, False)
+            parser.setContentHandler (handler)
+            
+            parser.parse (file)
         return
 
 
