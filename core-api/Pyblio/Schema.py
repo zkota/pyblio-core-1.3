@@ -77,6 +77,11 @@ class Attribute:
 
         self.name  = None
         self.type  = None
+
+        # Is the attribute to be indexed ?
+        self.indexed = False
+
+        # A grouping information (for Enumerated types for instance)
         self.group = None
         
         self.names = {}
@@ -95,9 +100,14 @@ class Attribute:
             group = ""
         else:
             group = ' group="%s"' % self.group
+
+        if self.indexed:
+            idx = ' indexed="1"'
+        else:
+            idx = ''
         
-        fd.write (' <attribute id="%s" type="%s"%s%s>\n' % (
-            self.id, C_to_N [self.type], card, group))
+        fd.write (' <attribute id="%s" type="%s"%s%s%s>\n' % (
+            self.id, C_to_N [self.type], card, group, idx))
 
         names = self.names.keys ()
         names.sort ()
@@ -185,7 +195,14 @@ class SchemaParse (sax.handler.ContentHandler):
 
             if attrs.has_key ('group'):
                 self._attribute.group = attrs ['group']
-            
+
+            if attrs.has_key ('indexed'):
+                try:
+                    v = int (attrs ['indexed'])
+                except ValueError:
+                    self._error ("invalid 'indexed' attribute")
+                
+                if v: self._attribute.indexed = True
             return
         
         

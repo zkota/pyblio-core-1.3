@@ -125,6 +125,9 @@ class ResultSet:
 
 class EnumItem:
 
+    """ Definition of an enumerated item. This item can then be reused
+    as the argument for Attribute.Enumerated creation."""
+
     def __init__ (self):
 
         self.id = None
@@ -156,6 +159,8 @@ class EnumItem:
     
 
 class EnumGroup (dict):
+
+    """ Definition of a group of enumerated items """
 
     def xmlwrite (self, fd):
 
@@ -191,6 +196,7 @@ class EnumStore (dict):
             
         return
 
+
     def add (self, group, item, key = None):
 
         if key:
@@ -205,10 +211,10 @@ class EnumStore (dict):
 
         v = copy.deepcopy (item)
         
-        item.id    = key
-        item.group = group
+        v.id    = key
+        v.group = group
         
-        self [group] [key] = item
+        self [group] [key] = v
 
         return key
     

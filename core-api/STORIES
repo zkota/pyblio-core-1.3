@@ -26,7 +26,7 @@ defined, and used in place of the corresponding attribute. When the
 shortcut content is updated, all the entries that used it are also
 updated.
 
-* [ ] Search for several words
+* [ ] Search for several words in the global query
 
 The query can accept several words as a logical AND
 

@@ -107,6 +107,7 @@ class TestSchema (pybut.TestCase):
         try: os.unlink (file)
         except OSError: pass
 
+        
     def testTypes (self):
         """ Attribute types """
 
@@ -123,5 +124,16 @@ class TestSchema (pybut.TestCase):
         assert s ['enum'].type is Attribute.Enumerated
 
         return
+
+    def testIndexed (self):
+
+        s = Schema.Schema ('ut_schema/indexed.xml')
+
+        assert s ['author'].indexed
+        assert not s ['url'].indexed
+        assert not s ['enum'].indexed
+
+        return
+    
     
 pybut.run (pybut.makeSuite (TestSchema, 'test'))

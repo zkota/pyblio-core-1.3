@@ -20,7 +20,7 @@
 
 from gettext import gettext as _
 
-import os, shutil
+import os, shutil, copy
 import cPickle as pickle
 
 from bsddb3 import db
@@ -110,10 +110,80 @@ class ResultSet:
         return
     
     
+# --------------------------------------------------
+
+
+class EnumStore (Store.EnumStore):
+
+
+    def __init__ (self, env):
+
+        Store.EnumStore.__init__ (self)
+
+        self._env = env
+
+        self._enum = db.DB (self._env)
+        self._enum.open ('pybliographer', 'enum',
+                         db.DB_HASH, db.DB_CREATE)
+        return
+
+    
+    def __getitem__ (self, k):
+        v = self._enum.get (k)
+
+        if v is None:
+            raise KeyError, _('unknown group %s' % `k`)
+
+        return pickle.loads (v) [1]
+
+    def keys (self):
+        k = []
+        c = self._enum.cursor ()
+
+        d = c.first ()
+        while d:
+            key, data = d
+            k.append (key)
+            
+            d = c.next ()
+
+        return k
+    
+    def add (self, group, item, key = None):
+
+        v = self._enum.get (group)
+
+        if v is None:
+            id, data = 1, Store.EnumGroup ()
+        else:
+            id, data = pickle.loads (v)
+
+        # Key is the key that will be used for the entry, id is
+        # the current serial (which can be different)
+        if key:
+            if key > id: id  = key
+        else:
+            key = id
+
+        txn = self._env.txn_begin ()
+
+        v = copy.deepcopy (item)
+        v.id    = key
+        v.group = group
+        
+        data [key] = v
+        
+        self._enum.put (group, pickle.dumps ((id + 1, data)))
+
+        txn.commit ()
+        
+        return key
+
+
 
 # --------------------------------------------------
     
-class Database:
+class Database (Store.Database):
     """ A Pyblio database stored in a BSD DB3 engine """
     
     def __init__ (self, path, schema = None, create = False):
@@ -138,11 +208,11 @@ class Database:
 
         # DB containing the actual entries
         self._db  = db.DB (self._env)
-        self._db.open ('core', 'db', db.DB_HASH, flag)
+        self._db.open ('pybliographer', 'db', db.DB_HASH, flag)
 
         # DB with meta informations
         self._meta  = db.DB (self._env)
-        self._meta.open ('core', 'meta', db.DB_HASH, flag)
+        self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag)
 
         if create:
             self.schema = schema
@@ -155,8 +225,12 @@ class Database:
         # Full text indexing DB
         self._idx = db.DB (self._env)
         self._idx.set_flags (db.DB_DUP)
-        self._idx.open ('core', 'idx', db.DB_HASH, flag)
-        
+        self._idx.open ('pybliographer', 'idx', db.DB_HASH, flag)
+
+        # Store for Enumerated values
+        self.enum = EnumStore (self._env)
+
+        self.header = None
         return
 
 
@@ -177,10 +251,14 @@ class Database:
         try:
             serial = int (self._meta.get ('serial'))
 
-            if id: serial = max (serial, id)
+            if id:
+                if id > serial: serial = id
+            else:
+                id = serial
+            
             self._meta.put ('serial', str (serial + 1))
             
-            key = int (self._insert (serial, val), 16)
+            key = int (self._insert (id, val), 16)
 
         except:
             txn.abort ()
@@ -191,7 +269,9 @@ class Database:
     
 
     def __setitem__ (self, key, val):
-        assert self.has_key (key)
+
+        assert self.has_key (key), \
+               _('entry %s does not exist') % `key`
 
         txn = self._env.txn_begin ()
 
@@ -269,6 +349,10 @@ class Database:
         id  = '%.16x' % key
         
         self._idxadd (id, val)
+
+        val = copy.copy (val)
+        val.key = key
+        
         val = pickle.dumps (val)
         
         self._db.put (id, val)

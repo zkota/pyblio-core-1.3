@@ -19,7 +19,7 @@
  <attribute id="id" type="id">
   <name>Identifier</name>
  </attribute>
- <attribute id="enum" type="enumerated">
+ <attribute id="enum" type="enumerated" group="fake">
   <name>Enumerated</name>
  </attribute>
 </pyblio-schema>

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+<pyblio-db>
 <pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
 
  <attribute id="enum-a" type="enumerated" group="a">
   <name>Enum A</name>
@@ -8,10 +12,6 @@
 
  <attribute id="enum-b" type="enumerated" group="b">
   <name>Enum B</name>
- </attribute>
-
- <attribute id="author" type="person">
-  <name>Author</name>
  </attribute>
 
  <attribute id="title" type="text">
@@ -23,3 +23,18 @@
  </attribute>
 
 </pyblio-schema>
+ <enum-group id="a">
+  <enum-item id="1">
+   <name>A / 1</name>
+  </enum-item>
+  <enum-item id="2">
+   <name>A / 2</name>
+  </enum-item>
+ </enum-group>
+
+ <entry id="1">
+  <attribute id="enum-a">
+   <enumerated group="a" id="1"/>
+  </attribute>
+ </entry>
+</pyblio-db>

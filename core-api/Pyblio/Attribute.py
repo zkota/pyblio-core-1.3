@@ -153,10 +153,10 @@ class Enumerated:
         return
 
     def index (self):
-        return []
+        return [ '%s/%d' % (self._item.group, self._item.id) ]
     
     def sort (self):
-        return str (self)
+        return self._item.name
     
 
 

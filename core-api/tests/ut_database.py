@@ -237,7 +237,7 @@ class TestContent (pybut.TestCase):
         return
     
 
-    def testFullQuery (self):
+    def testFullTextQuery (self):
         """ Full text ordered queries """
 
         import random
@@ -289,6 +289,67 @@ class TestContent (pybut.TestCase):
             real.sort ()
 
             assert vals == real, "%s != %s" % (vals, real)
+        return
+
+
+    def testEnumAdd (self):
+
+        """ Check for enum addition in the database """
+        
+        # add some enums to the database
+        i = Store.EnumItem ()
+
+        a  = []
+        va = ['A / 1', 'A / 2']
+        
+        for k in va:
+            i.names [''] = k
+            a.append (self.db.enum.add ('a', i))
+            
+        b = []
+        vb = ['B / 1', 'B / 2']
+        
+        for k in vb:
+            i.names [''] = k
+            b.append (self.db.enum.add ('b', i))
+
+        na = []
+        for v in self.db.enum ['a'].itervalues ():
+            na.append (v.names [''])
+
+        assert na == va
+        return
+
+    def testEnumInDB (self):
+
+        """ Use Enums in database entries """
+        
+        # add some enums to the database
+        i = Store.EnumItem ()
+
+        a  = []
+        va = ['A / 1', 'A / 2']
+        
+        for k in va:
+            i.names [''] = k
+            id = self.db.enum.add ('a', i)
+
+            a.append (self.db.enum ['a'][id])
+        
+
+        e = Store.Entry ()
+        e ['enum-a'] = [ Attribute.Enumerated (a [0]) ]
+        
+        self.db.add (e)
+
+        f = ',,enumdb-' + fmt
+
+        fd = open (f, 'w')
+        self.db.xmlwrite (fd)
+        fd.close ()
+        
+        pybut.fileeq (f, 'ut_database/enumerate.xml')
+        os.unlink (f)
         return
     
 

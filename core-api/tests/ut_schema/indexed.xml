@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-schema>
+ <attribute id="author" type="person" indexed="1">
+  <name>Author</name>
+ </attribute>
+ <attribute id="url" type="url" indexed="0">
+  <name>URL</name>
+ </attribute>
+ <attribute id="enum" type="enumerated">
+  <name>Enumerated</name>
+ </attribute>
+</pyblio-schema>
