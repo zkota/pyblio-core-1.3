@@ -499,12 +499,12 @@ class Database (Store.Database, Callback.Publisher):
             self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag, txn = txn)
 
             if create:
-                self.schema = schema
+                self._schema = schema
                 self._meta.put ('schema', _ps (schema), txn = txn)
                 self._meta.put ('rs', _ps ((1, {})), txn = txn)
                 self._meta.put ('serial', '1', txn = txn)
             else:
-                self.schema = _pl (self._meta.get ('schema', txn = txn))
+                self._schema = _pl (self._meta.get ('schema', txn = txn))
 
             # Result sets handler
             self.rs = ResultSetStore (self._env, self._meta, txn)
@@ -528,6 +528,27 @@ class Database (Store.Database, Callback.Publisher):
         # No header in this db yet
         self.header = None
         return
+
+    def _schema_get (self):
+
+        return self._schema
+
+    def _schema_set (self, schema, txn = None):
+
+        txn = self._env.txn_begin (txn)
+        try:
+            self._meta.put ('schema', _ps (schema), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        self._schema = schema
+        return
+
+    schema = property (_schema_get, _schema_set)
+    
 
     def save (self):
 
@@ -738,3 +759,20 @@ def dbopen (path):
         raise Store.StoreError (_("cannot open '%s': %s") % (
             path, msg))
                                 
+
+def dbimport (target, source):
+
+    db = Database (path   = target + '.db',
+                   schema = None, create = True)
+
+    handler = Store.DatabaseParse (db)
+
+    try:
+        handler.parse (source)
+
+    except ValueError, msg:
+
+        dbdestroy (target)
+        raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
+
+    return db

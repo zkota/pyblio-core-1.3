@@ -23,7 +23,7 @@ search on indexed and non-indexed attributes.
 Index information is part of the schema. These indexes are used when
 searching for a specific attribute value.
 
-** [ ] Import the XML into any Store
+** [X] Import the XML into any Store
 
 Create an empty Store of every existing type. Import an existing XML
 database into it, with no loss.

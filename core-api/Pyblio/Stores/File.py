@@ -290,3 +290,12 @@ def dbopen (path):
 
     return Database (file = path)
 
+
+def dbimport (target, source):
+
+    db = Database (file = source)
+    db.file = target
+
+    return db
+
+

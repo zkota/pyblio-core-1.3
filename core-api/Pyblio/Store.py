@@ -529,8 +529,9 @@ class DatabaseParse (sax.handler.ContentHandler):
         if name == 'enum-group':
             if self._enumg is not None:
                 self._error (_('nested "enum-group" are not supported'))
-            
-            self._enumg = self.db.enum.add (self._attr ('id', attrs))
+
+            name = self._attr ('id', attrs).encode ('ascii')
+            self._enumg = self.db.enum.add (name)
             return
 
         if name == 'enum-item':
@@ -750,7 +751,10 @@ _modules = {}
 
 for m in os.listdir (_dir):
 
-    m = os.path.splitext (m) [0]
+    m, ext = os.path.splitext (m)
+
+    if ext != '.py': continue
+    
     _modules [m.lower ()] = m
 
 del _modules ['__init__']
@@ -761,9 +765,13 @@ def get (fmt):
     """ Return the methods provided by a specific storage layer. The
     methods are:
 
-      - dbcreate (file, schema)
-      - dbopen (file)
-      - dbdestroy (file)
+      - dbcreate (file, schema): create a new database
+      
+      - dbopen (file): open a database in the specific store
+      
+      - dbimport (file): import an XML database into the specific store
+      
+      - dbdestroy (file): destroy a database
 
     """
 
@@ -775,3 +783,7 @@ def get (fmt):
         module = getattr (module, comp)
         
     return module
+
+def modules ():
+
+    return _modules.keys ()

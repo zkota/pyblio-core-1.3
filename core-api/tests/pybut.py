@@ -131,5 +131,7 @@ def run (* args):
 
 def fileeq (a, b):
 
-    assert open (a).read () == open (b).read (), \
-           '%s and %s differ' % (a, b)
+    if open (a).read () == open (b).read (): return
+
+    os.system ("diff '%s' '%s'" % (a, b))
+    assert False, '%s and %s differ' % (a, b)

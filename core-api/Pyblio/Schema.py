@@ -180,7 +180,7 @@ class SchemaParse (sax.handler.ContentHandler):
             if self._attribute is not None:
                 self._error (_("'attribute' tags cannot be nested"))
 
-            id = self._attr ('id', attrs)
+            id = self._attr ('id', attrs).encode ('ascii')
             self._attribute = Attribute (id)
 
             tname = self._attr ('type', attrs)
@@ -197,7 +197,7 @@ class SchemaParse (sax.handler.ContentHandler):
                     self._error ('invalid range value in attribute "%s"' % tname)
 
             if attrs.has_key ('group'):
-                self._attribute.group = attrs ['group']
+                self._attribute.group = attrs ['group'].encode ('ascii')
 
             if attrs.has_key ('indexed'):
                 try:

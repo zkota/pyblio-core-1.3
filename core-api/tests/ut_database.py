@@ -68,6 +68,23 @@ class TestDatabase (pybut.TestCase):
         self.hd.dbdestroy (',,db3', nobackup = True)
         return
 
+    def testImport (self):
+        ''' Import an XML database in the Store '''
+
+        db = self.hd.dbimport (',,db4', 'ut_database/sample.xml')
+        db.save ()
+        
+        fd = open (',,db5', 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (',,db5', 'ut_database/sample.xml')
+        self.hd.dbdestroy (',,db4', nobackup = True)
+
+        os.unlink (',,db5')
+        return
+    
+        
     
 class TestContent (pybut.TestCase):
 
@@ -608,7 +625,7 @@ fmts = ('file', 'bsddb')
 
 global fmt
 
-for fmt in fmts:
+for fmt in Store.modules ():
     print "unittest: ------------ storage '%s' ----------" % fmt
     pybut.run (pybut.TestSuite ((pybut.makeSuite (TestDatabase, 'test'),
                                  pybut.makeSuite (TestContent,  'test'))))

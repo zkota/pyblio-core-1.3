@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="doctype" type="enumerated" group="type">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="journal" type="enumerated" group="journal">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="text" type="text">
+  <name>Text</name>
+ </attribute>
+
+</pyblio-schema>
+ <enum-group id="journal">
+  <enum-item id="3">
+   <name>Journal 1</name>
+  </enum-item>
+  <enum-item id="4">
+   <name>Journal 2</name>
+  </enum-item>
+ </enum-group>
+
+ <enum-group id="type">
+  <enum-item id="1">
+   <name>Journal</name>
+  </enum-item>
+  <enum-item id="2">
+   <name>Book</name>
+  </enum-item>
+ </enum-group>
+
+ <entry id="1">
+  <attribute id="doctype">
+   <enumerated group="type" id="1"/>
+  </attribute>
+  <attribute id="journal">
+   <enumerated group="journal" id="4"/>
+  </attribute>
+  <attribute id="text">
+   <text>Youyou</text>
+  </attribute>
+ </entry>
+ <resultset id="1" name="My Set">
+  <entry ref="1"/>
+ </resultset>
+</pyblio-db>
