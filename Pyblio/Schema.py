@@ -33,6 +33,23 @@ from gettext import gettext as _
 from xml import sax
 from xml.sax.saxutils import escape
 
+from Pyblio import Fields
+
+
+_mapping = {
+    'author'   : Fields.AuthorGroup,
+    'date'     : Fields.Date,
+    'text'     : Fields.Text,
+    'url'      : Fields.URL,
+    'reference': Fields.Reference,
+    }
+
+_revmap = {}
+
+for k, v in _mapping.items ():
+    _revmap [v] = k
+
+
 
 class Schema:
 
@@ -138,7 +155,7 @@ class Attribute:
 
     def xmlwrite (self, fd):
 
-        fd.write (' <attribute id="%s" type="%s">\n' % (self.id, self.type))
+        fd.write (' <attribute id="%s" type="%s">\n' % (self.id, _revmap [self.type]))
 
         names = self.names.keys ()
         names.sort ()
@@ -225,7 +242,12 @@ class SchemaParse (sax.handler.ContentHandler):
             id = self._attr ('id', attrs)
             self._attribute = Attribute (id)
 
-            self._attribute.type = self._attr ('type', attrs)
+            tname = self._attr ('type', attrs)
+            try:
+                self._attribute.type = _mapping [tname]
+            except KeyError:
+                self._error ('unknown attribute type "%s"' % tname)
+                
             return
         
         if name in ('mandatory', 'optional'):

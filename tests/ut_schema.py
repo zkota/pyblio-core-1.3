@@ -111,5 +111,18 @@ class TestSchema (pybut.TestCase):
         try: os.unlink (file)
         except OSError: pass
 
+    def testTypes (self):
+        """ Attribute types """
+
+        from Pyblio import Fields
+        
+        s = Schema.Schema (file = 'ut_schema/types.xml')
+        a = s.documents ['sample']
+        
+        assert a.mandatory ['url'].type is Fields.URL
+        assert a.mandatory ['text'].type is Fields.Text
+        assert a.mandatory ['author'].type is Fields.AuthorGroup
+        assert a.mandatory ['date'].type is Fields.Date
+        assert a.mandatory ['ref'].type is Fields.Reference
         
 pybut.run (pybut.makeSuite (TestSchema, 'test'))
