@@ -81,15 +81,26 @@ class EnumStore (dict, Store.EnumStore):
 
 
 # --------------------------------------------------
+class View (object):
 
-class Viewable (object):
+    def __init__ (self, src, crit):
 
-    def view (self, criterion):
+        self._crit = crit
+        self._src  = src
+        
+        self._update (None)
+
+        self._src.register ('add-item', self._update)
+        self._src.register ('delete-item', self._update)
+        return
+    
+    def _update (self, key):
+
         view = []
         
-        for e in self.itervalues ():
+        for e in self._src.itervalues ():
             try:
-                value = e [criterion]
+                value = e [self._crit]
                 value = string.join (map (lambda x: x.sort (), value), '\0')
                 
             except KeyError:
@@ -99,13 +110,30 @@ class Viewable (object):
 
         view.sort (lambda a, b: cmp (a [0], b [0]))
 
-        return map (lambda x: x [1], view)
+        self._view = map (lambda x: x [1], view)
+
+    def __getitem__ (self, i):
+
+        return self._view [i]
+
+    def __iter__ (self):
+
+        return iter (self._view)
     
 
-class ResultSet (dict, Viewable, Store.ResultSet):
+class Viewable (object):
+
+    def view (self, criterion):
+
+        return View (self, criterion)
+        
+    
+
+class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
 
     def __init__ (self, rsid, db):
 
+        Callback.Publisher.__init__ (self)
         dict.__init__ (self)
 
         self.id   = rsid
@@ -118,9 +146,15 @@ class ResultSet (dict, Viewable, Store.ResultSet):
     def add (self, k):
         
         self [k] = 1
+        self.emit ('add-item', k)
         return
 
+    def __delitem__ (self, k):
 
+        dict.__delitem__ (self, k)
+        self.emit ('delete-item', k)
+        return
+    
     def itervalues (self):
         
         for k in dict.iterkeys (self):
@@ -135,17 +169,23 @@ class ResultSet (dict, Viewable, Store.ResultSet):
     def _on_db_delete (self, k):
         """ invoked when the database removes an item """
 
-        try: del self [k]
-        except KeyError: pass
+        try:
+            del self [k]
+            self.emit ('delete-item', k)
+            
+        except KeyError:
+            pass
         
         return
 
 
-class RODict (Viewable):
+class RODict (Viewable, Callback.Publisher):
 
     """ Read-only dictionnary """
 
     def __init__ (self, _dict):
+        Callback.Publisher.__init__ (self)
+        
         self._dict = _dict
         return
 
@@ -166,7 +206,15 @@ class RODict (Viewable):
     def __len__ (self):
 
         return len (self._dict)
-    
+
+    def _forward (self, * args):
+
+        """ forward messages. the message name is passed last """
+        
+        args, msg = args [:-1], args [-1]
+        
+        return apply (self.emit, (msg,) + args)
+
 
 class ResultSetStore (dict, Store.ResultSetStore):
 
@@ -205,6 +253,9 @@ class Database (Store.Database, Callback.Publisher):
 
         self._dict   = {}
         self._rodict = RODict (self._dict)
+
+        self.register ('add-item', self._rodict._forward, 'add-item')
+        self.register ('delete-item', self._rodict._forward, 'delete-item')
         
         self.file = file
 
@@ -272,6 +323,9 @@ class Database (Store.Database, Callback.Publisher):
         value = self.validate (value)
         
         self._dict [key] = value
+
+        self.emit ('add-item', key)
+        
         return key
 
 
@@ -299,6 +353,8 @@ class Database (Store.Database, Callback.Publisher):
         value = self.validate (value)
         
         self._dict [key] = value
+
+        self.emit ('update-item', key)
         return
 
 

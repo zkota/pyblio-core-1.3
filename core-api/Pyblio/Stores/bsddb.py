@@ -264,10 +264,12 @@ class View (Store.View):
 
 # --------------------------------------------------
 
-class ResultSet (Store.ResultSet):
+class ResultSet (Store.ResultSet, Callback.Publisher):
 
     def __init__ (self, _db, _env, _meta, id,
                   permanent = False, txn = None):
+
+        Callback.Publisher.__init__ (self)
         
         # RS id as a string and as an integer
         self.id  = id
@@ -369,6 +371,9 @@ class ResultSet (Store.ResultSet):
         except:
             txn.abort ()
             raise
+
+        # read the value and add it to all the views this set is
+        # involved in.
 
         txn.commit ()
         return

@@ -765,6 +765,70 @@ class TestView (pybut.TestCase):
         
         return
 
+    def testInsertRS (self):
+
+        """ A view is updated when the result set is updated """
+
+        v = self.rs.view ('text')
+
+        e = Store.Entry ()
+        e ['text'] = Attribute.Text ('zzzzzzzzz')
+
+        k = self.db.add (e)
+
+        self.rs.add (k)
+        assert list (v) == [1, 4, 2, 3, k]
+        
+    def testInsertDB (self):
+
+        """ A view of the DB is updated when the result set is updated """
+
+        v = self.db.entries.view ('text')
+
+        e = Store.Entry ()
+        e ['text'] = Attribute.Text ('zzzzzzzzz')
+
+        k = self.db.add (e)
+
+        r = list (v)
+        assert r == [1, 4, 2, 3, k], 'got %s' % `r`
+
+        return
+
+    def testDelRS (self):
+
+        """ A view is updated when removing from the result set  """
+
+        v = self.rs.view ('text')
+
+        del self.rs [4]
+
+        r = list (v)
+        assert r == [1, 2, 3], 'got %s' % `r`
+
+        # removing from the DB directly should cascade
+        del self.db [2]
+        
+        r = list (v)
+        assert r == [1, 3], 'got %s' % `r`
+
+        return
+
+    
+    def testDelDB (self):
+
+        """ A view of the DB is updated when removing from the DB """
+
+        v = self.db.entries.view ('text')
+
+        del self.db [4]
+
+        r = list (v)
+        assert r == [1, 2, 3], 'got %s' % `r`
+
+        return
+
+
 if os.environ.has_key ('STORES'):
     fmts = os.environ ['STORES'].split (':')
 else:
