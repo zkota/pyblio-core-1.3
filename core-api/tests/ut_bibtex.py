@@ -125,10 +125,16 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('initials')
         return
 
-    def testSingleName (self):
+    def testCRInName (self):
         """ A carriage return in a name """
         
         self._check ('carriage')
+        return
+
+    def testVariants (self):
+        """ Multiple variants in names """
+        
+        self._check ('variants')
         return
 
 

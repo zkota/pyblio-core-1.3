@@ -39,18 +39,13 @@
 
  <entry id="1">
   <attribute id="author">
-   <person first="T." last="Chapman"/>
-   <person first="A. T." last="Hayes"/>
-   <person first="M." last="Tilden"/>
+   <person first="F." last="Gobry"/>
   </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
   </attribute>
   <attribute id="id">
-   <id value="Chapman"/>
-  </attribute>
-  <attribute id="journal">
-   <text>Proc. of the 6th Int. Conf. on Simulation of Adaptive Behavior SAB-00</text>
+   <id value="Sample"/>
   </attribute>
  </entry>
 </pyblio-db>

@@ -44,7 +44,7 @@ class Symbol (str):
         return 'Symbol (%s)' % str.__repr__ (self)
 
     def subst (self):
-        return self
+        return [self]
 
     def tobib (self):
         return self
@@ -63,7 +63,7 @@ class Command (object):
         return self._cmd.decode (charset)
 
     def subst (self):
-        return self
+        return [self]
 
     def tobib (self):
         return '\\%s' % self._cmd
@@ -78,7 +78,7 @@ class Text (str):
         return 'Text (%s)' % str.__repr__ (self)
 
     def subst (self):
-        return self
+        return [self]
 
     def tobib (self):
         return self
@@ -106,7 +106,11 @@ class Block (object):
                                        `self._d`)
 
     def subst (self):
-        return self._d
+        r = []
+        for d in self._d:
+            r = r + d.subst ()
+            
+        return r
 
     def tobib (self):
         return '%s%s%s' % (
@@ -122,7 +126,7 @@ class Join (list):
         return 'Join (%s)' % list.__repr__ (self)
 
     def subst (self):
-        v = ()
+        v = []
         for data in self:
             v = v + data.subst ()
         
@@ -576,28 +580,41 @@ class Importer (object):
 
         ''' Parse a stream of tokens as a series of person names '''
 
-        stream = list (stream.subst ())
+        stream = [x.decode (self.charset) for x in stream.subst ()]
 
-        # Merge dots with their preceding name, to recreate initials.
-        # Merge also dashes with the surrounding text
+        # Ensure the stream is a sequence of complete words (ie,
+        # concatenate successive text parts and space parts).  The
+        # comma must remain on its own, as it serves as a separator.
+        # The dot is always appended to the previous word.
+        
+        in_space = True
         os, stream = stream, []
+        
         while os:
             s = os.pop (0)
-            
+
             if s == '.':
-                try:
-                    stream [-1] = Text (stream [-1] + '.')
-                except IndexError:
-                    pass
+                stream [-1] += '.'
+                continue
+            
+            is_space = s in (' ', '\n')
 
-            elif s == '-':
-                try:
-                    stream [-1] = Text (stream [-1] + '-' + os.pop (0))
-                except IndexError:
-                    pass
-
+            if in_space:
+                if not is_space:
+                    stream.append (s)
+                    in_space = False
+                continue
+            
             else:
-                stream.append (s)
+                if is_space:
+                    in_space = True
+                else:
+                    if s == ',':
+                        stream.append (s)
+                        in_space = True
+                    else:
+                        stream [-1] += s
+                    
             
         # Person names are separated by 'and' keywords
         avail  = []
@@ -613,33 +630,60 @@ class Importer (object):
         if stream:
             avail.append (stream)
 
-        def _person_decode (stream):
+        def _typetag (stream):
+            """ For each element of the string, return a list that
+            indicates if the corresponding element is :
+               - I : an initial
+               - L : a lower case word
+               - N : a name
+            """
+            
+            tags = []
+            
+            for s in stream:
+                if '.' in s:
+                    tags.append ('I')
 
-            stream = filter (lambda x: x not in (' ', '\n'), stream)
+                elif s.lower () == s:
+                    tags.append ('L')
+
+                else:
+                    tags.append ('N')
+
+            return tags
+        
+        def _person_decode (stream):
 
             # Check for ',' syntax for names
             comma = stream.count (',')
 
             if comma == 0:
                 # Use the number of segments in the name
-                stream = map (lambda x: x.flat (self.charset).strip (), stream)
-
                 ls = len (stream)
                 if ls == 1:
                     return Attribute.Person (last = stream [0])
 
-                elif ls == 2:
-                    return Attribute.Person (first = stream [0],
-                                             last  = stream [1])
                 else:
-                    raise Exceptions.ParserError ("don't know how to handle this name properly: %s" % repr (stream))
+                    tt = _typetag (stream)
+
+                    if tt == ['N', 'I']:
+                        return Attribute.Person (first = stream [1],
+                                                 last  = stream [0])
+
+                    if tt in (['N', 'N'],
+                              ['I', 'N']):
+                        return Attribute.Person (first = stream [0],
+                                                 last  = stream [1])
+                    
+                    raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
+                        repr (stream), repr (tt)))
                     
             elif comma == 1:
                 i = stream.index (',')
 
                 return Attribute.Person \
-                       (last  = Block ('{','}', stream [:i]).flat (self.charset).strip (),
-                        first = Block ('{','}', stream [i+1:]).flat (self.charset).strip ())
+                       (last  = ' '.join (stream [:i]),
+                        first = ' '.join (stream [i+1:]))
 
             return Attribute.Person ()
 
