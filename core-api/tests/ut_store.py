@@ -15,13 +15,6 @@ class TestStore (pybut.TestCase):
 
         return
 
-    def tearDown (self):
-        
-        if os.path.exists (self.f):
-            db = Store.get ('file').dbdestroy (self.f, nobackup = True)
-
-        return
-    
 
     def testEmpty (self):
         """ Create an empty database with a schema """

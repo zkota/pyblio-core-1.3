@@ -245,9 +245,7 @@ class TxoItem (object):
     name = property (_name_get)
     
 
-    def xmlwrite (self, fd):
-
-        fd.write ('  <txo-item id="%d">\n' % self.id)
+    def xmlwrite (self, fd, space = ''):
 
         keys = self.names.keys ()
         keys.sort ()
@@ -259,10 +257,9 @@ class TxoItem (object):
             else:
                 lang = ''
             
-            fd.write ('   <name%s>%s</name>\n' % (
-                lang, escape (v)))
+            fd.write ('   %s<name%s>%s</name>\n' % (
+                space, lang, escape (v)))
         
-        fd.write ('  </txo-item>\n')
         return
     
 
@@ -290,11 +287,32 @@ class TxoGroup (object):
         
     def xmlwrite (self, fd):
 
-        keys = self.keys ()
-        keys.sort ()
+        # Create the reversed taxonomy tree
+        children = {}
 
-        for k in keys:
-            self [k].xmlwrite (fd)
+        for v in self.values ():
+            c = children.get (v.parent, [])
+            c.append (v.id)
+            children [v.parent] = c
+        
+        def subwrite (node, depth = 0):
+            child = self [node]
+
+            space = ' ' * depth
+            
+            fd.write ('  %s<txo-item id="%d">\n' % (
+                space, child.id))
+
+            child.xmlwrite (fd, space)
+
+            for n in children.get (node, []):
+                subwrite (n, depth + 1)
+                
+            fd.write ('  %s</txo-item>\n' % space)
+            return
+
+        for n in children [None]:
+            subwrite (n)
         
         return
 
@@ -542,7 +560,7 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._tdata = None
         self._ntype = None
 
-        self._txoi = None
+        self._txoi = []
         self._txog = None
 
         self._rs = None
@@ -598,12 +616,14 @@ class DatabaseParse (sax.handler.ContentHandler):
             if self._txog is None:
                 self._error (_('missing "txo-group"'))
 
-            self._txoi = TxoItem ()
-            self._txoi.id = int (self._attr ('id', attrs))
+            i = TxoItem ()
+            i.id = int (self._attr ('id', attrs))
+            
+            self._txoi.append (i)
             return
 
         if name == 'name':
-            if self._txoi is None:
+            if not self._txoi:
                 self._error (_('missing "txo-item"'))
             self._tdata = ''
             self._lang = attrs.get ('lang', '')
@@ -753,8 +773,12 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
         
         if name == 'txo-item':
-            self._txog.add (self._txoi, key = self._txoi.id)
-            self._txoi = None
+            i = self._txoi.pop ()
+
+            if self._txoi:
+                i.parent = self._txoi [-1].id
+            
+            self._txog.add (i, key = i.id)
             return
         
         if name == 'header':
@@ -779,7 +803,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
         
         if name == 'name':
-            self._txoi.names [self._lang] = self._tdata
+            self._txoi [-1].names [self._lang] = self._tdata
             self._tdata = None
             return
         

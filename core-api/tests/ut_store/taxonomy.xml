@@ -30,6 +30,9 @@
   </txo-item>
   <txo-item id="2">
    <name>Book</name>
+   <txo-item id="3">
+    <name>PocketBook</name>
+   </txo-item>
   </txo-item>
  </txo-group>
 
