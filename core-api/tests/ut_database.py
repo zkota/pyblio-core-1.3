@@ -482,6 +482,32 @@ class TestContent (pybut.TestCase):
         
         return
 
+    def testResultSetUpdate (self):
+
+        """ If an item is removed from the database, it is removed
+        from the result sets too.  """
+
+        rs = self.db.rs.add ()
+
+        e = Store.Entry ()
+        items = []
+        
+        for i in range (5):
+            items.append (self.db.add (e))
+        
+        for i in items: rs.add (i)
+
+        # remove one item in the db
+        del self.db [items [0]]
+
+        got = map (None, rs)
+        got.sort ()
+        
+        assert got == items [1:], \
+               "expected %s, got %s" % (items [1:], got)
+
+        return
+    
     
 fmts = ('file', 'bsddb')
 

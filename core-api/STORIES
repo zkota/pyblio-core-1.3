@@ -2,10 +2,10 @@
 
 * TO DO
 
-** [ ] Update result sets when the database is changed.
+** [ ] Maintain coherency between enumerated definitions and use
 
-When an item is removed from the database, it must not be referenced
-in any result set anymore. Updated items must be reindexed properly.
+What happens when an enumerated definition is removed and is used in
+the db ?
 
 ** [ ] Refine the content of a result set
 
@@ -66,4 +66,9 @@ Schemas contain information about attributes (type, cardinality,...),
 so that an attribute can have exactly one occurence, O..N, 1..N,
 ... Inserting/updating an entry in the database cannot occur if the
 entry does not match the schema definition.
+
+** [X] Update result sets when the database is changed.
+
+When an item is removed from the database, it must not be referenced
+in any result set anymore.
 

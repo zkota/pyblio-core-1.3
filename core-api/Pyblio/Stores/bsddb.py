@@ -25,7 +25,7 @@ import cPickle as pickle
 
 from bsddb3 import db
 
-from Pyblio import Store, Schema
+from Pyblio import Store, Schema, Callback
 
 # --------------------------------------------------
 
@@ -99,9 +99,9 @@ class ResultSet (Store.ResultSet):
         self._restart ()
         return
 
-    def __delitem__ (self, k):
+    def __delitem__ (self, k, txn = None):
 
-        self._rs.delete (str (k))
+        self._rs.delete (str (k), txn = txn)
         self._restart ()
         return
     
@@ -131,12 +131,26 @@ class ResultSet (Store.ResultSet):
         return
 
 
+    def _on_delete (self, key, txn = None):
+
+        try:
+            self.__delitem__ (key, txn)
+            self._restart ()
+            
+        except KeyError:
+            pass
+
+        return
+    
+
 class ResultSetStore (dict, Store.ResultSetStore):
 
-    def __init__ (self, env, meta):
+    def __init__ (self, db):
 
-        self._env = env
-        self._meta = meta
+        self._env  = db._env
+        self._meta = db._meta
+
+        self._db = db
         return
     
 
@@ -172,6 +186,8 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
         rs = ResultSet (self._env, rs, rsid, name)
         if name: self [name] = rs
+
+        self._db.register ('delete-item', rs._on_delete)
         
         return rs
     
@@ -248,11 +264,13 @@ class EnumStore (Store.EnumStore):
 
 # --------------------------------------------------
     
-class Database (Store.Database):
+class Database (Store.Database, Callback.Publisher):
     """ A Pyblio database stored in a BSD DB3 engine """
     
     def __init__ (self, path, schema = None, create = False):
 
+        Callback.Publisher.__init__ (self)
+        
         if create:
             try:
                 os.mkdir (path)
@@ -279,7 +297,7 @@ class Database (Store.Database):
         self._meta  = db.DB (self._env)
         self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag)
 
-        self.rs = ResultSetStore (self._env, self._meta)
+        self.rs = ResultSetStore (self)
 
         if create:
             self.schema = schema
@@ -390,6 +408,8 @@ class Database (Store.Database):
         except:
             txn.abort ()
             raise
+
+        self.emit ('delete-item', key, txn)
 
         txn.commit ()
         return

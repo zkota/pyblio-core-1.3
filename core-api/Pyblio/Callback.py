@@ -6,7 +6,7 @@ event."""
 import weakref
 
 
-class Error (Exception):
+class WeakError (Exception):
     """ Invoked when a function call is performed on a destroyed method """
     pass
 

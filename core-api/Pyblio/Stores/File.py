@@ -22,7 +22,7 @@ from gettext import gettext as _
 
 import os, copy
 
-from Pyblio import Store
+from Pyblio import Store, Callback
 
 
 class EnumGroup (Store.EnumGroup, dict):
@@ -77,14 +77,30 @@ class ResultSet (dict, Store.ResultSet):
     
     def __iter__ (self):
         return self.iterkeys ()
+
+
+    def _on_db_delete (self, k):
+        """ invoked when the database removes an item """
+
+        try: del self [k]
+        except KeyError: pass
+        
+        return
     
 
 class ResultSetStore (dict, Store.ResultSetStore):
+
+    def __init__ (self, db):
+        self._db = db
+        return
+    
 
     def add (self, rs_name = None):
         """ Create an empty result set """
 
         rs = ResultSet (rs_name)
+
+        self._db.register ('delete-item', rs._on_db_delete)
         
         if rs_name:
             self [rs_name] = rs
@@ -96,18 +112,20 @@ class ResultSetStore (dict, Store.ResultSetStore):
         return self.itervalues ()
 
 
-class Database (dict, Store.Database):
+class Database (dict, Store.Database, Callback.Publisher):
 
     def __init__ (self, schema = None, file = None,
                   create = False):
 
+        Callback.Publisher.__init__ (self)
+        
         self.file = file
 
         self.schema = schema
         
         self.header = None
         self.enum   = EnumStore ()
-        self.rs     = ResultSetStore ()
+        self.rs     = ResultSetStore (self)
         
         self._id = 1
 
@@ -163,6 +181,14 @@ class Database (dict, Store.Database):
         dict.__setitem__ (self, id, value)
         return id
 
+
+    def __delitem__ (self, k):
+
+        dict.__delitem__ (self, k)
+        self.emit ('delete-item', k)
+
+        return
+    
 
     def __setitem__ (self, key, value):
 
