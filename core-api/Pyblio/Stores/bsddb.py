@@ -248,7 +248,8 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         for rsid, name in avail.items ():
             rs = ResultSet (self._env, self._meta, self._rs, rsid, True)
             rs._name = name
-            
+
+            self.register ('item-delete', rs._on_delete)
             self [rsid] = rs
         
         return

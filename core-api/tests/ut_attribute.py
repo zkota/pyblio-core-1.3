@@ -95,8 +95,8 @@ class TestAttribute (pybut.TestCase):
         
         assert idx == ['jean-albert', u'd‚‚', 'schnock' ]
 
-        idx = Attribute.URL ('http://www.pybliographer.org/faq/').index ()
-        assert idx == ['http', 'www', 'pybliographer', 'org', 'faq']
+        idx = Attribute.URL ('http://www.pybliographer.org/faq/toto.html').index ()
+        assert idx == ['www', 'pybliographer', 'org', 'faq', 'toto']
 
         assert Attribute.Date (year = 2003).index () == []
         

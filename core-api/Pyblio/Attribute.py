@@ -20,7 +20,7 @@
 
 """ Basic data types that can be used as attributes for a Core.Entry """
 
-import string, re
+import string, re, urlparse, os
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -119,7 +119,12 @@ class URL (str):
         return
 
     def index (self):
-        idx = re_split.split (self)
+        # do not index the document suffix, only the server name and document page
+        url = urlparse.urlparse (self)
+        
+        idx = re_split.split (url [1]) + \
+              re_split.split (os.path.splitext (url [2]) [0])
+        
         return filter (None, idx)
 
     def sort (self):

@@ -547,25 +547,35 @@ class TestContent (pybut.TestCase):
         """ If an item is removed from the database, it is removed
         from the result sets too.  """
 
+        def check (rs):
+            e = Store.Entry ()
+            items = []
+        
+            for i in range (5):
+                items.append (self.db.add (e))
+        
+            for i in items: rs.add (i)
+
+            # remove one item in the db
+            del self.db [items [0]]
+
+            got = map (None, rs)
+            got.sort ()
+        
+            assert got == items [1:], \
+                   "expected %s, got %s" % (items [1:], got)
+            return
+
+        # check on a fresh result set
         rs = self.db.rs.add ()
+        check (rs)
 
-        e = Store.Entry ()
-        items = []
+        # check on a saved result set
+        rsid = self.db.rs.add (permanent = True).id
+        self.db.save ()
         
-        for i in range (5):
-            items.append (self.db.add (e))
-        
-        for i in items: rs.add (i)
-
-        # remove one item in the db
-        del self.db [items [0]]
-
-        got = map (None, rs)
-        got.sort ()
-        
-        assert got == items [1:], \
-               "expected %s, got %s" % (items [1:], got)
-
+        self.db = self.hd.dbopen (self.name)
+        check (self.db.rs [rsid])
         return
 
     def testEnumDel (self):
