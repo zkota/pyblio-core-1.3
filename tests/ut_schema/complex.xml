@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-schema>
+ <attribute id="author" type="author">
+  <name>Héhé &lt; Huhu</name>
+ </attribute>
+
+ <document id="article">
+  <name>Hihi &lt; Höhö</name>
+
+  <mandatory id="author"/>
+
+ </document>
+
+</pyblio-schema>

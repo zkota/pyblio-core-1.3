@@ -70,23 +70,46 @@ class TestSchema (pybut.TestCase):
             pass
 
     def testWrite (self):
+        """ Writing does not modify the file """
 
+        file = ',,t1.xml'
+        
         import sys
         a = Schema.Schema (file = 'ut_schema/simple.xml')
 
-        try:
-            out = open (',,tmp.xml', 'w')
-            a.xmlwrite (out)
-            out.close ()
+        out = open (file, 'w')
+        a.xmlwrite (out)
+        out.close ()
+        
+        # both files should be identical
+        d1 = open (file).read ()
+        d2 = open ('ut_schema/simple.xml').read ()
+        
+        assert d1 == d2
+        
+        try: os.unlink (file)
+        except OSError: pass
+            
+    def testComplex (self):
+        """ Accents and escaping """
 
-            # both files should be identical
-            d1 = open (',,tmp.xml').read ()
-            d2 = open ('ut_schema/simple.xml').read ()
-            
-            assert d1 == d2
-            
-        finally:
-            try: os.unlink (',,tmp.xml')
-            except OSError: pass
+        file = ',,t2.xml'
+        
+        import sys
+        a = Schema.Schema (file = 'ut_schema/complex.xml')
+
+        out = open (file, 'w')
+        a.xmlwrite (out)
+        out.close ()
+        
+        # both files should be identical
+        d1 = open (file).read ()
+        d2 = open ('ut_schema/complex.xml').read ()
+
+        assert d1 == d2
+        
+        try: os.unlink (file)
+        except OSError: pass
+
         
 pybut.run (pybut.makeSuite (TestSchema, 'test'))

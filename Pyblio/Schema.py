@@ -31,6 +31,8 @@ optional fields that describe the document. These fields are typed.
 from gettext import gettext as _
 
 from xml import sax
+from xml.sax.saxutils import escape
+
 
 class Schema:
 
@@ -97,7 +99,7 @@ class Document:
         names.sort ()
 
         for k in names:
-            v = self.names [k]
+            v = escape (self.names [k].encode ('utf-8'))
             if k: k = ' lang="%s"' % k
             fd.write ('  <name%s>%s</name>\n' % (k, v))
 
@@ -142,7 +144,7 @@ class Attribute:
         names.sort ()
 
         for k in names:
-            v = self.names [k]
+            v = escape (self.names [k].encode ('utf-8'))
             if k: k = ' lang="%s"' % k
             fd.write ('  <name%s>%s</name>\n' % (k, v))
 
