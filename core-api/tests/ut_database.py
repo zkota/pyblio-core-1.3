@@ -832,6 +832,38 @@ class TestView (pybut.TestCase):
 
         return
 
+    def testChangeDB (self):
+
+        """ Doing a modification in an entry is reflected in the DB views """
+        
+        v = self.db.entries.view ('text')
+        
+        e = self.db [4]
+        e ['text'] = Attribute.Text ('zzzzzzzzz')
+
+        self.db [4] = e
+
+        r = list (v)
+        assert r == [1, 2, 3, 4], 'got %s' % r
+
+        return
+
+    def testChangeRS (self):
+
+        """ Doing a modification in an entry is reflected in the RS views """
+        
+        v = self.rs.view ('text')
+        
+        e = self.db [4]
+        e ['text'] = Attribute.Text ('zzzzzzzzz')
+
+        self.db [4] = e
+
+        r = list (v)
+        assert r == [1, 2, 3, 4], 'got %s' % r
+
+        return
+
 
 if os.environ.has_key ('STORES'):
     fmts = os.environ ['STORES'].split (':')

@@ -157,6 +157,21 @@ class RSDB (object):
             v._del (key, txn)
 
         return
+
+    def _update (self, k, val, txn):
+        
+        # Update the views of the result set
+
+        for vref in [] + self._views:
+            v = vref ()
+
+            if v is None:
+                self._views.remove (vref)
+                continue
+
+            v._del (k, txn)
+            v._add (val, txn)
+        return
     
 # --------------------------------------------------
 
@@ -499,6 +514,22 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         return self._rs.stat () ['nkeys']
 
 
+    def _on_update (self, k, val, txn):
+        
+        # Update the views of the result set
+
+        for vref in [] + self._views:
+            v = vref ()
+
+            if v is None:
+                self._views.remove (vref)
+                continue
+
+            v._del (k, txn)
+            v._add (val, txn)
+        return
+
+    
     def _on_delete (self, key, txn = None):
 
         try:
@@ -610,12 +641,18 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         if permanent: self [rsid] = rs
 
         self.register ('item-delete', rs._on_delete)
+        self.register ('item-update', rs._on_update)
         
         return rs
 
     def _on_delete (self, k, trn):
 
         self.emit ('item-delete', k, trn)
+        return
+
+    def _on_update (self, k, val, trn):
+
+        self.emit ('item-update', k, val, trn)
         return
 
     
@@ -821,6 +858,7 @@ class Database (Store.Database, Callback.Publisher):
             # Result sets handler
             self.rs = ResultSetStore (self._db, self._env, self._meta, txn)
             self.register ('delete', self.rs._on_delete)
+            self.register ('update', self.rs._on_update)
 
             # Full text indexing DB
             self._idx = db.DB (self._env)
@@ -842,6 +880,7 @@ class Database (Store.Database, Callback.Publisher):
 
         self.register ('add',    self._entries_rs._add)
         self.register ('delete', self._entries_rs._delete)
+        self.register ('update', self._entries_rs._update)
         
         # No header in this db yet
         self.header = None
@@ -915,6 +954,10 @@ class Database (Store.Database, Callback.Publisher):
         txn = self._env.txn_begin ()
 
         try:
+            # Start by doing the update in the external tables, which
+            # might still want to access the previous version
+            self.emit ('update', key, val, txn)
+            
             self._idxdel (str (key), txn)
             self._insert (key, val, txn)
 

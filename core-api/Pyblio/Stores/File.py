@@ -92,6 +92,7 @@ class View (object):
 
         self._src.register ('add-item', self._update)
         self._src.register ('delete-item', self._update)
+        self._src.register ('update-item', self._update)
         return
     
     def _update (self, key):
@@ -178,6 +179,11 @@ class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
         
         return
 
+    def _on_db_update (self, k):
+
+        self.emit ('update-item', k)
+        return
+    
 
 class RODict (Viewable, Callback.Publisher):
 
@@ -232,6 +238,7 @@ class ResultSetStore (dict, Store.ResultSetStore):
         rs = ResultSet (rsid, self._db._dict)
         
         self._db.register ('delete-item', rs._on_db_delete)
+        self._db.register ('update-item', rs._on_db_update)
         
         if permanent:
             self [rs.id] = rs
@@ -256,6 +263,7 @@ class Database (Store.Database, Callback.Publisher):
 
         self.register ('add-item', self._rodict._forward, 'add-item')
         self.register ('delete-item', self._rodict._forward, 'delete-item')
+        self.register ('update-item', self._rodict._forward, 'update-item')
         
         self.file = file
 
