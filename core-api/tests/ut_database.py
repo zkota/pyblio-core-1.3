@@ -300,7 +300,7 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.enum.add ('a')
+        g = self.db.txo.add ('a')
         
         for k in va:
             i.names [''] = k
@@ -309,13 +309,13 @@ class TestContent (pybut.TestCase):
         b = []
         vb = ['B / 1', 'B / 2']
         
-        g = self.db.enum.add ('b')
+        g = self.db.txo.add ('b')
         for k in vb:
             i.names [''] = k
             g.add (i)
 
         na = []
-        for v in self.db.enum ['a'].values ():
+        for v in self.db.txo ['a'].values ():
             na.append (v.names [''])
 
         assert na == va
@@ -331,12 +331,12 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.enum.add ('a')
+        g = self.db.txo.add ('a')
         for k in va:
             i.names [''] = k
 
             v = g.add (i)
-            a.append (self.db.enum ['a'][v])
+            a.append (self.db.txo ['a'][v])
         
 
         e = Store.Entry ()
@@ -620,22 +620,22 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.enum.add ('a')
+        g = self.db.txo.add ('a')
         for k in va:
             i.names [''] = k
             v = g.add (i)
 
-            a.append (self.db.enum ['a'][v])
+            a.append (self.db.txo ['a'][v])
             
         e = Store.Entry ()
         
         e ['enum-a'] = [Attribute.Txo (a [1])]
         self.db.add (e)
 
-        del self.db.enum ['a'][a [0].id]
+        del self.db.txo ['a'][a [0].id]
 
         try:
-            del self.db.enum ['a'][a [1].id]
+            del self.db.txo ['a'][a [1].id]
             assert False, 'should not be possible'
             
         except Exceptions.ConstraintError:
@@ -649,7 +649,7 @@ class TestContent (pybut.TestCase):
 
         from Pyblio import Exceptions
         
-        g = self.db.enum.add ('group')
+        g = self.db.txo.add ('group')
 
         a = g.add (Store.TxoItem ())
         
@@ -677,7 +677,7 @@ class TestContent (pybut.TestCase):
         """ Refuse invalid parent value for a TxoItem """
         from Pyblio import Exceptions
 
-        g = self.db.enum.add ('group')
+        g = self.db.txo.add ('group')
 
         i = Store.TxoItem ()
         i.parent = 123
@@ -710,10 +710,10 @@ class TestContent (pybut.TestCase):
 
         from Pyblio import Exceptions
         
-        g = self.db.enum.add ('a')
+        g = self.db.txo.add ('a')
 
         try:
-            g = self.db.enum.add ('a')
+            g = self.db.txo.add ('a')
             assert False, 'should not succeed'
             
         except Exceptions.ConstraintError:

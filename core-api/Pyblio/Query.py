@@ -101,10 +101,10 @@ class Txo (Constraint):
 
     Attr = Attribute.Txo
 
-    def __init__ (self, field, id):
+    def __init__ (self, field, txo):
 
         self.field = field
-        self.id = id
+        self.txo   = txo
         return
         
     def validate (self, schema):
@@ -153,6 +153,22 @@ class Queryable (object):
 
         return res
 
+
+    def _q_txo (self, q, res):
+
+        full = self.txo [q.txo.group].expand (q.txo.id)
+
+        for e in self.entries.itervalues ():
+
+            try:             fs = e [q.field]
+            except KeyError: continue
+
+            for f in fs:
+                if f.id in full:
+                    res.add (e.key)
+                    break
+            
+        return
 
     def _q_anyword (self, q, res):
 

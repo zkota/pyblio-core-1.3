@@ -919,9 +919,9 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self._idx.set_flags (db.DB_DUP)
             self._idx.open ('index', 'full', db.DB_HASH, flag, txn = txn)
 
-            # Store for Enumerated values
-            self.enum = TxoStore (self._env, txn)
-            self.enum.register ('delete', self._enum_use_check)
+            # Store for Txo values
+            self.txo = TxoStore (self._env, txn)
+            self.txo.register ('delete', self._txo_use_check)
 
         except:
             txn.abort ()

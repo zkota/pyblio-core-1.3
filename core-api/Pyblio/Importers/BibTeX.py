@@ -601,7 +601,7 @@ def file_import (file, encoding, db, ** kargs):
     header   = []
 
     doctype = {}
-    for v in db.enum ['doctype'].values ():
+    for v in db.txo ['doctype'].values ():
         doctype [v.names [''].lower ()] = v
 
     for data in datalist:

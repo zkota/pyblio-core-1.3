@@ -23,7 +23,7 @@ class TestBibTeX (pybut.TestCase):
         db = Store.get ('file').dbcreate (f, s)
 
         # Add a few document types
-        g = db.enum.add ('doctype')
+        g = db.txo.add ('doctype')
         
         for t in ('Article',):
             dt = Store.TxoItem ()

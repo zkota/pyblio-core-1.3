@@ -15,8 +15,52 @@ class TestSimpleQuery (pybut.TestCase):
         return
 
 
+    def testTxoQuery (self):
+        """ Txo query """
+
+        self.db.txo.add ('a')
+
+        g = self.db.txo ['a']
+
+        a = g [g.add (Store.TxoItem ())]
+        b = g [g.add (Store.TxoItem ())]
+
+        c = Store.TxoItem ()
+        c.parent = b.id
+
+        c = g [g.add (c)]
+
+        e = Store.Entry ()
+
+        e ['enum-a'] = [ Attribute.Txo (a) ]
+        ea = self.db.add (e)
+
+        e ['enum-a'] = [ Attribute.Txo (b) ]
+        eb = self.db.add (e)
+
+        e ['enum-a'] = [ Attribute.Txo (c) ]
+        ec = self.db.add (e)
+
+
+        # Check that querying for a base txo also returns the children
+        
+        for q, res in ((a, [ea]),
+                       (b, [eb, ec]),
+                       (c, [ec])):
+            
+            rs = self.db.query (Query.Txo ('enum-a', q))
+
+            got = list (rs)
+            got.sort ()
+
+            assert got == res, 'got %s instead of %s' % (
+                `got`, `res`)
+
+        return
+    
+
     def testFullTextQuery (self):
-        """ Full text ordered queries """
+        """ Full text query """
 
         import random
 

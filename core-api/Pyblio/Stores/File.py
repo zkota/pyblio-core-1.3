@@ -110,7 +110,7 @@ class TxoStore (dict, Store.TxoStore):
                   (_('group %s exists') % `group`)
         
         gp = TxoGroup (group)
-        gp.register ('delete', self._db._enum_use_check)
+        gp.register ('delete', self._db._txo_use_check)
         
         self [group] = gp
         
@@ -312,7 +312,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self.schema = schema
         
         self.header = None
-        self.enum   = TxoStore (self)
+        self.txo    = TxoStore (self)
         self.rs     = ResultSetStore (self)
         
         self._id = 1

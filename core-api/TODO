@@ -1,0 +1,2 @@
+
+ - use the schema to create the Txo groups (hence remove .add and __del__)

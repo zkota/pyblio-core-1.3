@@ -195,13 +195,13 @@ class TestStore (pybut.TestCase):
         fail (e)
 
         # check that unexpected enums are rejected
-        g = db.enum.add ('c')
+        g = db.txo.add ('c')
 
         i = Store.TxoItem ()
         i.names [''] = 'youou'
         i = g.add (i)
         
-        enu = db.enum ['c'][i]
+        enu = db.txo ['c'][i]
 
         e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)

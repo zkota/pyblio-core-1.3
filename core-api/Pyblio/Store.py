@@ -287,16 +287,40 @@ class TxoGroup (object):
 
     def values (self):
         raise NotImplemented ('please override')
-        
-    def xmlwrite (self, fd):
 
-        # Create the reversed taxonomy tree
-        children = {}
+
+    def _reverse (self):
+
+        """ Create the reversed taxonomy tree """
+        
+        children = { None: [] }
+
+        for k in self.keys ():
+            children [k] = []
 
         for v in self.values ():
-            c = children.get (v.parent, [])
-            c.append (v.id)
-            children [v.parent] = c
+            children [v.parent].append (v.id)
+
+        return children
+
+
+    def expand (self, k):
+        """ Return a txo and all its children """
+
+        children = self._reverse ()
+
+        full = []
+        for c in children [k]:
+            full = full + self.expand (c)
+
+        full.append (k)
+        
+        return full
+
+    
+    def xmlwrite (self, fd):
+
+        children = self._reverse ()
         
         def subwrite (node, depth = 0):
             child = self [node]
@@ -308,7 +332,7 @@ class TxoGroup (object):
 
             child.xmlwrite (fd, space)
 
-            for n in children.get (node, []):
+            for n in children [node]:
                 subwrite (n, depth + 1)
                 
             fd.write ('  %s</txo-item>\n' % space)
@@ -464,7 +488,7 @@ class Database (object):
 
                     # check for the enum existence
                     try:
-                        self.enum [v.group] [v.id]
+                        self.txo [v.group] [v.id]
                         
                     except KeyError:
                         raise Exceptions.SchemaError (
@@ -473,12 +497,12 @@ class Database (object):
             
         return entry
 
-    def _enum_use_check (self, group, key):
+    def _txo_use_check (self, group, key):
         
-        """ Check if an enum can be safely removed """
+        """ Check if a Txo can be safely removed """
         
         to_check = []
-        # get the attributes that contain the enums of interest
+        # get the attributes that contain the txos of interest
         for s in self.schema.values ():
             if s.type is not Attribute.Txo: continue
             if s.group != group: continue
@@ -497,7 +521,7 @@ class Database (object):
                     if attr.id != key: continue
                     
                     raise Exceptions.ConstraintError \
-                          (_('enum %s/%d still used in item %d') % (
+                          (_('txo %s/%d still used in item %d') % (
                         group, key, v.key))
 
         return
@@ -510,7 +534,7 @@ class Database (object):
 
         self.schema.xmlwrite (fd, embedded = True)
 
-        self.enum.xmlwrite (fd)
+        self.txo.xmlwrite (fd)
 
         if self.header:
             fd.write ('<header>%s</header>\n' % escape (self.header))
@@ -613,7 +637,7 @@ class DatabaseParse (sax.handler.ContentHandler):
                 self._error (_('nested "txo-group" are not supported'))
 
             name = self._attr ('id', attrs).encode ('ascii')
-            self._txog = self.db.enum.add (name)
+            self._txog = self.db.txo.add (name)
             return
 
         if name == 'txo-item':
@@ -739,7 +763,7 @@ class DatabaseParse (sax.handler.ContentHandler):
                 group = self._schema [self._attribute [0]].group
                 id    = int (self._attr ('id', attrs))
 
-                item  = self.db.enum [group] [id]
+                item  = self.db.txo [group] [id]
                 
                 self._o = Attribute.Txo (item)
 
