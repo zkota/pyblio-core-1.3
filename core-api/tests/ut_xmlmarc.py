@@ -9,6 +9,7 @@ SI = XMLMARC.SimpleImporter
 
 mapping = {
 
+    001                 : 'marc-id',
     (245, '', '', 'a')  : 'title',
     (700, '', '', 'a')  : 'author',
     (773, '', '', 'p')  : 'journal',
@@ -42,6 +43,10 @@ class TestImport (pybut.TestCase):
     def testBase (self):
 
         self._check ('simple')
+        
+    def testControl (self):
+        """ handling of control fields """
+        self._check ('control')
         
 
 

@@ -753,7 +753,7 @@ class Exporter (object):
 
         v = ', '.join (data)
         
-        self.field [field] = '{%s}' % self._escape (v)
+        self.field [field] = '{%s}' % v
         return
 
     def date_add (self, field, data):

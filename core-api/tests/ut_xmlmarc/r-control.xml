@@ -50,6 +50,9 @@
   <attribute id="journal">
    <text>AACE, WebNet 98 - World Conference of the WWW,Internet and Intranet</text>
   </attribute>
+  <attribute id="marc-id">
+   <id value="28440"/>
+  </attribute>
   <attribute id="title">
    <text>Some recommendations on building proxy caching service</text>
   </attribute>

@@ -42,6 +42,10 @@ class Importer (XML.Parser):
 
         pass
 
+    def do_control (self, field, value):
+
+        pass
+
     def record_parse (self, record):
 
         self.record = Store.Record ()
@@ -49,11 +53,14 @@ class Importer (XML.Parser):
 
         for field in record:
 
-            (maj, ind1, ind2), values = field
-
-            fn = getattr (self, 'do_%d' % maj, self.do_default)
-
-            fn (maj, ind1, ind2, values)
+            try:
+                (maj, ind1, ind2), values = field
+                fn = getattr (self, 'do_%d' % maj, self.do_default)
+                fn (maj, ind1, ind2, values)
+                
+            except TypeError:
+                ctrl, value = field
+                self.do_control (ctrl, value)
             
         self.record_end ()
 
@@ -109,19 +116,27 @@ class Importer (XML.Parser):
             self._tdata = ''
 
         elif name == 'controlfield':
-            pass
-        
+            if self._record is None:
+                self._error ('datafield must be in a record')
+            
+            self._tag   = int (self._attr ('tag', attrs))
+            self._tdata = ''
+            
         else:
             self._error ('unknown tag: %s' % `name`)
-            
         return
 
     def endElement (self, name):
-        
+
         if name == 'record':
             self.record_parse (self._record)
             self._record = None
             return
+
+        elif name == 'controlfield':
+            self._record.append ((self._tag, self._tdata))
+            self._tdata = None
+            self._tag   = None
 
         elif name == 'subfield':
             self._fields.append ((self._field, self._tdata))
@@ -259,7 +274,17 @@ class SimpleImporter (Importer):
                 self.do_unknown (tag, ind1, ind2, key, value)
 
         return
-    
+
+    def do_control (self, field, value):
+
+        try:
+            field, fn = self._mapping [field]
+            fn (field, value)
+
+        except KeyError:
+            pass
+
+        return
 
 class Exporter (object):
 

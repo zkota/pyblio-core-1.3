@@ -5,6 +5,10 @@
   <name>BibTeX Key</name>
  </attribute>
 
+ <attribute id="marc-id" type="id">
+  <name>Internal MARC ID</name>
+ </attribute>
+
  <attribute id="doctype" type="txo" group="doctype">
   <name>Document Type</name>
  </attribute>
