@@ -33,7 +33,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema, Attribute, Exceptions
+from Pyblio import Schema, Attribute, Exceptions, I18n
 
 
 class StoreError (Exception):
@@ -185,9 +185,15 @@ class EnumItem (object):
         self.id = None
         self.group = None
 
-        self.name  = None
         self.names = {}
         return
+
+    def _name_get (self):
+
+        return I18n.lz.trn (self.names)
+
+    name = property (_name_get)
+    
 
     def xmlwrite (self, fd):
 
@@ -497,13 +503,6 @@ class DatabaseParse (sax.handler.ContentHandler):
 
         return val
     
-    def _trn (self, table):
-
-        try:
-            return self._i18n.trn (table)
-        except KeyError:
-            self._error (_("missing default name"))
-
             
     def startElement (self, name, attrs):
 
@@ -693,8 +692,6 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
         
         if name == 'enum-item':
-            self._enumi.name = self._trn (self._enumi.names)
-
             self._enumg.add (self._enumi, key = self._enumi.id)
             self._enumi = None
             return

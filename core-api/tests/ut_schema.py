@@ -45,13 +45,14 @@ class TestSchema (pybut.TestCase):
     def testL10nName (self):
         """ Check that names are localized """
 
-        import locale
-
-        locale.setlocale (locale.LC_MESSAGES, 'en_US')
+        from Pyblio import I18n
+        
+        I18n.lz.lang     = 'en_US'
+        I18n.lz.lang_one = 'en'
         
         a = Schema.Schema ('ut_schema/simple.xml') ['author']
 
-        assert a.name == 'Author (en)'
+        assert a.name == 'Author (en)', a.name
         return
     
 

@@ -34,7 +34,7 @@ from xml import sax
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N
-from Pyblio.I18n import Localize
+from Pyblio import I18n
 
 class Schema (dict):
 
@@ -75,7 +75,6 @@ class Attribute:
 
         self.id = id
 
-        self.name  = None
         self.type  = None
 
         # Is the attribute to be indexed ?
@@ -88,6 +87,12 @@ class Attribute:
 
         self.range = (1, None)
         return
+
+    def _name_get (self):
+
+        return I18n.lz.trn (self.names)
+
+    name = property (_name_get)
 
     def xmlwrite (self, fd):
 
@@ -129,8 +134,6 @@ class SchemaParse (sax.handler.ContentHandler):
     """ This class parses the XML format of a Schema """
 
     def __init__ (self, schema):
-        self._i18n = Localize ()
-
         self.schema = schema
         return
 
@@ -221,16 +224,6 @@ class SchemaParse (sax.handler.ContentHandler):
             self._namedata = self._namedata + data
         return
 
-
-    def _trn (self, table):
-
-        try:
-            return self._i18n.trn (table)
-        
-        except KeyError:
-            self._error (_("missing default name"))
-            
-
     def endElement (self, name):
 
         if name == 'pyblio-schema':
@@ -238,8 +231,6 @@ class SchemaParse (sax.handler.ContentHandler):
             return
         
         if name == 'attribute':
-            self._attribute.name = self._trn (self._attribute.names)
-
             self.schema [self._attribute.id] = self._attribute
             self._attribute = None
             return

@@ -45,3 +45,5 @@ class Localize (object):
             return table [self.lang_one]
 
         return table ['']
+
+lz = Localize ()
