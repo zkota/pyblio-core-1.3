@@ -163,11 +163,21 @@ class SimpleImporter (Importer):
         self._mapping = {}
 
         for k, v in self._logical.items ():
+
+            if v is None:
+                self._mapping [k] = (v, self.skip)
+                continue
+
             attribute = db.schema [v]
 
             self._mapping [k] = (v, self._physical [attribute.type])
 
+        
         return Importer.parse (self, fd, db)
+
+    def skip (self, field, value):
+
+        pass
 
     def date_add (self, field, value):
 

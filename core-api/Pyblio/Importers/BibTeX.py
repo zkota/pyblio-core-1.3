@@ -682,10 +682,13 @@ class Exporter (object):
             }
         return
 
+    def _escape (self, text):
+
+        return text.encode ('latex', 'replace')
         
     def text_add (self, field, data):
 
-        data = ' '.join (data).encode ('latex','ignore')
+        data = self._escape (' '.join (data))
         
         # by default, new lines and multiple spaces are not significant in bibtex fields
         data = self._collapse.sub (' ', data)
@@ -699,16 +702,16 @@ class Exporter (object):
     
     def person_add (self, field, data):
 
-        v = ' and '.join (map (self._single_person, data)).encode ('latex')
+        v = self._escape (' and '.join (map (self._single_person, data)))
 
         self.field [field] = '{%s}' % v
         return
 
     def url_add (self, field, data):
 
-        v = ', '.join (map (lambda x: x.encode ('latex'), data))
+        v = ', '.join (data)
         
-        self.field [field] = '{%s}' % v
+        self.field [field] = '{%s}' % self._escape (v)
         return
 
     def date_add (self, field, data):
