@@ -154,16 +154,28 @@ class ResultSet (Store.ResultSet):
 
     def add (self, k, txn = None):
 
-        if not txn: txn = self._env.txn_begin ()
-            
-        self._rs.put (self._id + '/' + str (k), '', txn = txn)
+        txn = self._env.txn_begin (txn)
+
+        try:
+            self._rs.put (self._id + '/' + str (k), '', txn = txn)
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         return
 
     def __delitem__ (self, k, txn = None):
 
-        if not txn: txn = self._env.txn_begin ()
+        txn = self._env.txn_begin (txn)
 
-        self._rs.delete (self._id + '/' + str (k), txn = txn)
+        try:
+            self._rs.delete (self._id + '/' + str (k), txn = txn)
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         return
 
 
@@ -660,6 +672,7 @@ class Database (Store.Database, Callback.Publisher):
                 data = cursor.set (word.encode ('utf-8'))
 
             except db.DBNotFoundError:
+                txn.commit ()
                 return rs
 
             while 1:
