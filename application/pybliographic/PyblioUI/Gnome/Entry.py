@@ -51,8 +51,8 @@ class Entry (object):
                                          left_margin = 20)
 
         self._map = {
-            Attribute.Enumerated: self._show_enum,
-            Attribute.URL:        self._show_url
+            Attribute.Txo: self._show_txo,
+            Attribute.URL: self._show_url
             }
         
         return
@@ -64,9 +64,9 @@ class Entry (object):
         return
 
 
-    def _show_enum (self, iter, attr, db):
+    def _show_txo (self, iter, attr, db):
 
-        e = db.enum [attr.group] [attr.id]
+        e = db.txo [attr.group] [attr.id]
         
         self._text.insert (iter, e.name + '\n')
         return
