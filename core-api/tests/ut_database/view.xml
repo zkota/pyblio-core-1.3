@@ -2,7 +2,7 @@
 
 <pyblio-db>
 <pyblio-schema>
- <attribute id="enum" type="enumerated" group="type">
+ <attribute id="enum" type="txo" group="type">
   <name>Document Type</name>
  </attribute>
 
@@ -30,7 +30,7 @@
 
  <entry id="1">
   <attribute id="enum">
-   <enumerated group="type" id="1"/>
+   <txo group="type" id="1"/>
   </attribute>
   <attribute id="text">
    <text>ABC</text>
@@ -38,7 +38,7 @@
  </entry>
  <entry id="2">
   <attribute id="enum">
-   <enumerated group="type" id="2"/>
+   <txo group="type" id="2"/>
   </attribute>
   <attribute id="text">
    <text>BCD</text>
@@ -46,7 +46,7 @@
  </entry>
  <entry id="3">
   <attribute id="enum">
-   <enumerated group="type" id="2"/>
+   <txo group="type" id="2"/>
   </attribute>
   <attribute id="text">
    <text>CDE</text>
@@ -54,7 +54,7 @@
  </entry>
  <entry id="4">
   <attribute id="enum">
-   <enumerated group="type" id="2"/>
+   <txo group="type" id="2"/>
   </attribute>
   <attribute id="text">
    <text>ABC</text>

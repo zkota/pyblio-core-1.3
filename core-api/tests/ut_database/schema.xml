@@ -2,11 +2,11 @@
 
 <pyblio-schema>
 
- <attribute id="enum-a" type="enumerated" group="a">
+ <attribute id="enum-a" type="txo" group="a">
   <name>Enum A</name>
  </attribute>
 
- <attribute id="enum-b" type="enumerated" group="b">
+ <attribute id="enum-b" type="txo" group="b">
   <name>Enum B</name>
  </attribute>
 

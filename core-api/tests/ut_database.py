@@ -392,7 +392,7 @@ class TestContent (pybut.TestCase):
         
 
         e = Store.Entry ()
-        e ['enum-a'] = [ Attribute.Enumerated (a [0]) ]
+        e ['enum-a'] = [ Attribute.Txo (a [0]) ]
         
         self.db.add (e)
 
@@ -681,7 +681,7 @@ class TestContent (pybut.TestCase):
             
         e = Store.Entry ()
         
-        e ['enum-a'] = [Attribute.Enumerated (a [1])]
+        e ['enum-a'] = [Attribute.Txo (a [1])]
         self.db.add (e)
 
         del self.db.enum ['a'][a [0].id]

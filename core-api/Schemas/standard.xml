@@ -5,7 +5,7 @@
   <name>External Identifier</name>
  </attribute>
 
- <attribute id="doctype" type="enumerated" group="doctype">
+ <attribute id="doctype" type="txo" group="doctype">
   <name>Document Type</name>
  </attribute>
 

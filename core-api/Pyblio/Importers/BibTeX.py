@@ -642,7 +642,7 @@ def file_import (file, encoding, db, ** kargs):
 
         # Add the key and document type
         e ['id'] = [Attribute.ID (key.decode (encoding))]
-        e ['doctype'] = [Attribute.Enumerated (doctype [tp])]
+        e ['doctype'] = [Attribute.Txo (doctype [tp])]
         
         db.add (e)
         

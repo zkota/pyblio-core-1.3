@@ -106,15 +106,15 @@ class TestStore (pybut.TestCase):
         return
         
     def testTxoRead (self):
-        """ A database with enumerated fields can be read and saved again identically """
+        """ A database with taxonomy fields can be read and saved again identically """
         
-        db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
+        db = Store.get ('file').dbopen ('ut_store/taxonomy.xml')
 
         fd = open (self.f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (self.f, 'ut_store/enumerated.xml')
+        pybut.fileeq (self.f, 'ut_store/taxonomy.xml')
         return
 
     def testNativeRead (self):
@@ -192,13 +192,13 @@ class TestStore (pybut.TestCase):
         enu.id    = 1
         enu.group = 'b'
 
-        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)
         
         enu.id    = 1
         enu.group = 'a'
 
-        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)
 
         # check that unexpected enums are rejected
@@ -210,7 +210,7 @@ class TestStore (pybut.TestCase):
         
         enu = db.enum ['c'][i]
 
-        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)
         return
     

@@ -2,11 +2,11 @@
 
 <pyblio-db>
 <pyblio-schema>
- <attribute id="doctype" type="enumerated" group="type">
+ <attribute id="doctype" type="txo" group="type">
   <name>Document Type</name>
  </attribute>
 
- <attribute id="journal" type="enumerated" group="journal">
+ <attribute id="journal" type="txo" group="journal">
   <name>Document Type</name>
  </attribute>
 
@@ -35,10 +35,10 @@
 
  <entry id="1">
   <attribute id="doctype">
-   <enumerated group="type" id="1"/>
+   <txo group="type" id="1"/>
   </attribute>
   <attribute id="journal">
-   <enumerated group="journal" id="4"/>
+   <txo group="journal" id="4"/>
   </attribute>
   <attribute id="text">
    <text>Youyou</text>

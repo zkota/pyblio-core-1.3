@@ -7,7 +7,7 @@
  <attribute id="url" type="url" indexed="0">
   <name>URL</name>
  </attribute>
- <attribute id="enum" type="enumerated">
-  <name>Enumerated</name>
+ <attribute id="enum" type="txo">
+  <name>Txo</name>
  </attribute>
 </pyblio-schema>

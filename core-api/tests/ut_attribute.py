@@ -79,8 +79,8 @@ class TestAttribute (pybut.TestCase):
         i.id = 123
         i.group = 'a'
 
-        self._check (Attribute.Enumerated (i),
-                     u'<enumerated group="a" id="123"/>')
+        self._check (Attribute.Txo (i),
+                     u'<txo group="a" id="123"/>')
         return
 
     

@@ -6,7 +6,7 @@
   <name>Author</name>
  </attribute>
 
- <attribute id="doctype" type="enumerated" group="doctype">
+ <attribute id="doctype" type="txo" group="doctype">
   <name>Document Type</name>
  </attribute>
 
@@ -51,7 +51,7 @@
    <person first="First" last="Last"/>
   </attribute>
   <attribute id="doctype">
-   <enumerated group="doctype" id="1"/>
+   <txo group="doctype" id="1"/>
   </attribute>
   <attribute id="id">
    <id value="toto"/>

@@ -147,7 +147,9 @@ class ID (unicode):
         return self
 
 
-class Enumerated:
+class Txo:
+
+    """ Relationship to a Taxonomy """
 
     def __init__ (self, item):
         self.group = item.group
@@ -155,7 +157,7 @@ class Enumerated:
         return
     
     def xmlwrite (self, fd):
-        fd.write ('<enumerated group="%s" id="%d"/>' % (
+        fd.write ('<txo group="%s" id="%d"/>' % (
             self.group, self.id))
         return
 
@@ -172,7 +174,7 @@ N_to_C = {
     'text'      : Text,
     'url'       : URL,
     'id'        : ID,
-    'enumerated': Enumerated,
+    'txo'       : Txo,
     }
 
 C_to_N = {}

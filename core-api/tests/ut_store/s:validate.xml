@@ -10,7 +10,7 @@
  <attribute id="text" type="text">
   <name>Text</name>
  </attribute>
- <attribute id="enum" type="enumerated" group="a">
+ <attribute id="enum" type="txo" group="a">
   <name>Text</name>
  </attribute>
 </pyblio-schema>

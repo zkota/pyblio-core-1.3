@@ -223,8 +223,8 @@ class ResultSetStore (object):
     
 class TxoItem (object):
 
-    """ Definition of an enumerated item. This item can then be reused
-    as the argument for Attribute.Enumerated creation.
+    """ Definition of a Txo item. This item can then be reused
+    as the argument for Attribute.Txo creation.
 
     SHARED BY ALL STORES
     """
@@ -268,7 +268,7 @@ class TxoItem (object):
 
 class TxoGroup (object):
 
-    """ Definition of a group of enumerated items.
+    """ Definition of a group of Txo items.
 
     DERIVED BY ALL STORES
     """
@@ -301,7 +301,7 @@ class TxoGroup (object):
 
 class TxoStore (object):
 
-    """ This class is the interface via which Enumerated items can be
+    """ This class is the interface via which Txo items can be
     manipulated.
 
     DERIVED BY ALL STORES
@@ -430,14 +430,14 @@ class Database (object):
 
 
             # additional special checks
-            if s.type is Attribute.Enumerated:
+            if s.type is Attribute.Txo:
 
                 for v in vals:
 
                     # check if the enum is in the group defined in the schema
                     if v.group != s.group:
                         raise Exceptions.SchemaError (
-                            _('enumerated item %s/%d should be in %s') % (
+                            _('txo item %s/%d should be in %s') % (
                             v.group, v.id, s.group))
 
                     # check for the enum existence
@@ -446,7 +446,7 @@ class Database (object):
                         
                     except KeyError:
                         raise Exceptions.SchemaError (
-                            _('invalid enumerated item %s/%d') % (
+                            _('invalid txo item %s/%d') % (
                             v.group, v.id))
             
         return entry
@@ -458,7 +458,7 @@ class Database (object):
         to_check = []
         # get the attributes that contain the enums of interest
         for s in self.schema.values ():
-            if s.type is not Attribute.Enumerated: continue
+            if s.type is not Attribute.Txo: continue
             if s.group != group: continue
 
             to_check.append (s.id)
@@ -708,13 +708,13 @@ class DatabaseParse (sax.handler.ContentHandler):
             elif name == 'url':
                 self._o = Attribute.URL (self._attr ('href', attrs))
 
-            elif name == 'enumerated':
+            elif name == 'txo':
                 group = self._schema [self._attribute [0]].group
                 id    = int (self._attr ('id', attrs))
 
                 item  = self.db.enum [group] [id]
                 
-                self._o = Attribute.Enumerated (item)
+                self._o = Attribute.Txo (item)
 
             else:
                 self._error (_("unexpected tag: %s") % name)

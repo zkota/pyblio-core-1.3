@@ -16,7 +16,7 @@
  <attribute id="id" type="id">
   <name>Identifier</name>
  </attribute>
- <attribute id="enum" type="enumerated" group="fake">
-  <name>Enumerated</name>
+ <attribute id="enum" type="txo" group="fake">
+  <name>Txo</name>
  </attribute>
 </pyblio-schema>

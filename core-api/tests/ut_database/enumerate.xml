@@ -6,11 +6,11 @@
   <name>Author</name>
  </attribute>
 
- <attribute id="enum-a" type="enumerated" group="a">
+ <attribute id="enum-a" type="txo" group="a">
   <name>Enum A</name>
  </attribute>
 
- <attribute id="enum-b" type="enumerated" group="b">
+ <attribute id="enum-b" type="txo" group="b">
   <name>Enum B</name>
  </attribute>
 
@@ -34,7 +34,7 @@
 
  <entry id="1">
   <attribute id="enum-a">
-   <enumerated group="a" id="1"/>
+   <txo group="a" id="1"/>
   </attribute>
  </entry>
 </pyblio-db>
