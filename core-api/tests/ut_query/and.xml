@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="txo" type="txo" group="a">
+  <name>Txo</name>
+ </attribute>
+ <attribute id="txt" type="text">
+  <name>Text</name>
+ </attribute>
+</pyblio-schema>
+
+ <txo-group id="a">
+  <txo-item id="1">
+  </txo-item>
+  <txo-item id="2">
+   <txo-item id="3">
+   </txo-item>
+  </txo-item>
+ </txo-group>
+
+ <entry id="1">
+  <attribute id="txo">
+   <txo group="a" id="2"/>
+  </attribute>
+ </entry>
+
+ <entry id="2">
+  <attribute id="txt">
+   <text>First</text>
+  </attribute>
+ </entry>
+
+ <entry id="3">
+  <attribute id="txo">
+   <txo group="a" id="3"/>
+  </attribute>
+  <attribute id="txt">
+   <text>First</text>
+  </attribute>
+ </entry>
+
+ <entry id="4">
+  <attribute id="txo">
+   <txo group="a" id="1"/>
+  </attribute>
+  <attribute id="txt">
+   <text>Second</text>
+  </attribute>
+ </entry>
+
+</pyblio-db>

@@ -179,6 +179,9 @@ class ResultSet (object):
     def __len__ (self):
         raise NotImplemented ('please override')
 
+    def has_key (self):
+        raise NotImplemented ('please override')
+    
     def view (self, criterion):
         raise NotImplemented ('please override')
         

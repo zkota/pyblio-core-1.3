@@ -9,47 +9,57 @@ class TestSimpleQuery (pybut.TestCase):
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
-        sc = Schema.Schema ('ut_query/schema.xml')
-        self.db = self.hd.dbcreate (self.name, sc)
-
         return
 
+    def _res (self, rs):
+
+        res = list (rs)
+        res.sort ()
+
+        return res
+    
+
+    def testAndQuery (self):
+        
+        db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        g  = db.txo ['a']
+
+        q = Query.Txo ('txo', g [2]) & Query.AnyWord ('First')
+
+        res = self._res (db.query (q))
+        assert res == [3], 'got %s' % `res`
+        
+        return
+    
+    def testOrQuery (self):
+        
+        db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        g  = db.txo ['a']
+
+        q = Query.Txo ('txo', g [2]) | Query.AnyWord ('First')
+
+        res = self._res (db.query (q))
+        assert res == [1, 2, 3], 'got %s' % `res`
+        
+        return
+    
 
     def testTxoQuery (self):
         """ Txo query """
 
-        g = self.db.txo ['a']
-
-        a = g [g.add (Store.TxoItem ())]
-        b = g [g.add (Store.TxoItem ())]
-
-        c = Store.TxoItem ()
-        c.parent = b.id
-
-        c = g [g.add (c)]
-
-        e = Store.Entry ()
-
-        e ['enum-a'] = [ Attribute.Txo (a) ]
-        ea = self.db.add (e)
-
-        e ['enum-a'] = [ Attribute.Txo (b) ]
-        eb = self.db.add (e)
-
-        e ['enum-a'] = [ Attribute.Txo (c) ]
-        ec = self.db.add (e)
+        db = self.hd.dbimport (self.name, 'ut_query/txo.xml')
 
 
         # Check that querying for a base txo also returns the children
-        
-        for q, res in ((a, [ea]),
-                       (b, [eb, ec]),
-                       (c, [ec])):
-            
-            rs = self.db.query (Query.Txo ('enum-a', q))
+        g = db.txo ['a']
 
-            got = list (rs)
-            got.sort ()
+        a, b, c = g [1], g [2], g [3]
+        
+        for q, res in ((a, [1]),
+                       (b, [2, 3]),
+                       (c, [3])):
+            
+            got = self._res (db.query (Query.Txo ('txo', q)))
 
             assert got == res, 'got %s instead of %s' % (
                 `got`, `res`)
@@ -59,7 +69,10 @@ class TestSimpleQuery (pybut.TestCase):
 
     def testFullTextQuery (self):
         """ Full text query """
-
+        
+        sc = Schema.Schema ('ut_query/schema.xml')
+        self.db = self.hd.dbcreate (self.name, sc)
+        
         import random
 
         # generate 64 base words

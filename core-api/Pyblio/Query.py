@@ -134,24 +134,61 @@ class Queryable (object):
         
         query.apply (check, self.schema)
 
-        # Check for a single query
-        if len (query) > 1:
-            raise Exceptions.InvalidQuery ('only support single queries')
+        return self._q_run (query, permanent)
 
 
-        name = query.__class__.__name__
+    def _q_run (self, query, permanent):
+
+        # Otherwise, call the corresponding boolean method
+        if isinstance (query, ORed):
+            return self._q_or  (query, permanent)
+
+        if isinstance (query, ANDed):
+            return self._q_and (query, permanent)
+
+        # This must be a single query
+        res = self.rs.add (permanent)
+        self._q_single (query, res)
+        
+        return res
+
+
+    def _q_or (self, query, permanent):
+
+        ra = self._q_run (query.a, permanent)
+        rb = self._q_run (query.b, False)
+
+        for k in rb: ra.add (k)
+
+        return ra
+
+        
+    def _q_and (self, query, permanent):
+
+        rf = self.rs.add (permanent)
+
+        ra = self._q_run (query.a, False)
+        rb = self._q_run (query.b, False)
+
+        for k in ra:
+            if rb.has_key (k): rf.add (k)
+
+        return rf
+        
+
+    def _q_single (self, q, res):
+        
+        name = q.__class__.__name__
         
         try:
             fn = getattr (self, '_q_%s' % name.lower ())
             
         except AttributeError:
             raise Exceptions.InvalidQuery ('query on type %s unsupported' % name)
-        
-        res = self.rs.add (permanent)
 
-        fn (query, res)
+        fn (q, res)
 
-        return res
+        return
 
 
     def _q_txo (self, q, res):
@@ -172,7 +209,7 @@ class Queryable (object):
 
     def _q_anyword (self, q, res):
 
-        word = q.word
+        word = q.word.lower ()
         
         for entry in self.entries.itervalues ():
 

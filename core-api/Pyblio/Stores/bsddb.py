@@ -469,6 +469,11 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         return
 
 
+    def has_key (self, k):
+
+        return self._rs.get (str (k)) is not None
+
+
     def view (self, criterion):
 
         v = View (self._db, self._env, self._meta,
@@ -1117,7 +1122,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
     def _q_anyword (self, query, rs):
 
-        word = query.word
+        word = query.word.lower ()
 
         txn = self._env.txn_begin ()
 
@@ -1147,6 +1152,21 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
         return rs
     
+
+    def _q_and (self, query, permanent):
+
+        # BSDDB allows to remove the item under the cursor, therefore
+        # we do not need to use three result sets.
+        
+        ra = self._q_run (query.a, permanent)
+        rb = self._q_run (query.b, False)
+
+        for k in ra:
+            if not rb.has_key (k): del ra [k]
+
+        return ra
+        
+
     
     def __getitem__ (self, key):
         
