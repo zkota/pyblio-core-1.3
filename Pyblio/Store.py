@@ -147,7 +147,7 @@ class Database (dict):
     
     def save (self):
         raise NotImplemented ('please override')
-    
+
 
     def xmlwrite (self, fd, schema = True):
         fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')

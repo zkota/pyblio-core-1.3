@@ -4,7 +4,7 @@
 import sys, os, time
 
 import unittest
-from unittest import makeSuite, TestCase
+from unittest import makeSuite, TestCase, TestSuite
 
 # Setup the system so that we import the current python files
 srcdir = os.environ.get ('srcdir', '.')

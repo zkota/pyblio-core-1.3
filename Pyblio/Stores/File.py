@@ -18,6 +18,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+from gettext import gettext as _
+
 import os
 
 from Pyblio import Store
@@ -25,11 +27,25 @@ from Pyblio import Store
 
 class Database (Store.Database):
 
-    def __init__ (self, schema = None, file = None):
-
-        Store.Database.__init__ (self, schema, file)
+    def __init__ (self, schema = None, file = None, create = False):
 
         self.file = file
+        
+        if create:
+
+            # WARNING: this code contains a race condition. This
+            # exception is only here to trap blatant errors, not to
+            # avoid concurrent accesses. How does one open a file with
+            # O_CREAT, BTW ? Mabe this would not be portable at all.
+            
+            if os.path.exists (file):
+                raise Store.StoreError (_("database '%s' already exists") % file)
+            
+            Store.Database.__init__ (self, schema = schema)
+            self.save ()
+
+        else:
+            Store.Database.__init__ (self, file = file)
         return
     
     def save (self):
@@ -49,18 +65,22 @@ class Database (Store.Database):
         return
 
 
-def dbdestroy (path):
+def dbdestroy (path, nobackup = False):
 
     os.unlink (path)
+
+    if nobackup:
+        try:
+            os.unlink (path + '.bak')
+            
+        except OSError:
+            pass
     return
 
     
 def dbcreate (path, schema):
 
-    db = Database (schema = schema)
-    db.file = path
-
-    return db
+    return Database (schema = schema, file = path, create = True)
 
 
 def dbopen (path):

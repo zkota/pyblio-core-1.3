@@ -27,12 +27,57 @@ from bsddb3 import db
 
 from Pyblio import Store, Schema
 
+class DBIterBase:
+
+    def __init__ (self, cursor):
+        self._cursor = cursor
+        self._data   = self._cursor.first ()
+        return
+
+    def __iter__ (self):
+        return self
+
+
+    def next (self):
+        if self._data is None:
+            raise StopIteration ()
+
+        data = self._data
+        self._data = self._cursor.next ()
+        
+        return self._content (data)
+
+class DBIter (DBIterBase):
+
+    def _content (self, data):
+
+        return data [0]
+
+class DBIterValues (DBIterBase):
+    
+    def _content (self, data):
+
+        return pickle.loads (data [1])
+
+class DBIterItems (DBIterBase):
+    
+    def _content (self, data):
+
+        return data [0], pickle.loads (data [1])
+    
+    
 class Database:
 
     def __init__ (self, path, schema = None, create = False):
 
         if create:
-            os.mkdir (path)
+            try:
+                os.mkdir (path)
+
+            except OSError, msg:
+                raise Store.StoreError (_("cannot create '%s': %s") % (
+                    path, msg))
+            
             flag = db.DB_CREATE
 
             self.schema = schema
@@ -90,8 +135,24 @@ class Database:
         
         return pickle.loads (self._db.get (key))
 
+    def __iter__ (self):
+        
+        return DBIter (self._db.cursor ())
 
-def dbdestroy (path):
+    def itervalues (self):
+        
+        return DBIterValues (self._db.cursor ())
+    
+    def iterkeys (self):
+        
+        return DBIter (self._db.cursor ())
+    
+    def iteritems (self):
+        
+        return DBIterItems (self._db.cursor ())
+
+    
+def dbdestroy (path, nobackup = False):
     shutil.rmtree (path + '.db')
     return
 
