@@ -122,7 +122,7 @@ class TestContent (pybut.TestCase):
 
             def subcheck ():
                 seen = []
-                for k, v in self.db.iteritems ():
+                for k, v in self.db.entries.iteritems ():
                     seen.append (k)
                     assert v == content [k]
 
@@ -133,7 +133,7 @@ class TestContent (pybut.TestCase):
 
                 assert keys == seen
 
-                assert len (self.db) == len (seen)
+                assert len (self.db.entries) == len (seen)
                 return
 
             subcheck ()
@@ -180,8 +180,8 @@ class TestContent (pybut.TestCase):
             self.db.add (e)
 
         full = []
-        for x in self.db:
-            for y in self.db:
+        for x in self.db.entries:
+            for y in self.db.entries:
                 full.append ((x, y))
 
         assert len (full) == 9
@@ -254,7 +254,7 @@ class TestContent (pybut.TestCase):
 
         # Iterate over the keys
         keys = []
-        for k in self.db:
+        for k in self.db.entries:
             keys.append (k)
 
         keys.sort ()
@@ -262,7 +262,7 @@ class TestContent (pybut.TestCase):
         assert keys == initial
 
         keys = []
-        for k in self.db.iterkeys ():
+        for k in self.db.entries.iterkeys ():
             keys.append (k)
 
         keys.sort ()
@@ -271,7 +271,7 @@ class TestContent (pybut.TestCase):
 
         # Iterate over the values
         count = 0
-        for v in self.db.itervalues ():
+        for v in self.db.entries.itervalues ():
             assert v == e
             count = count + 1
         
@@ -279,7 +279,7 @@ class TestContent (pybut.TestCase):
 
         # Iterate over the values
         keys = []
-        for k, v in self.db.iteritems ():
+        for k, v in self.db.entries.iteritems ():
             assert v == e
             keys.append (k)
         
@@ -631,13 +631,16 @@ class TestContent (pybut.TestCase):
             pass
 
         return
-    
-    
-fmts = ('file', 'bsddb')
 
+
+if os.environ.has_key ('STORES'):
+    fmts = os.environ ['STORES'].split (':')
+else:
+    fmts = Store.modules ()
+    
 global fmt
 
-for fmt in Store.modules ():
+for fmt in fmts:
     print "unittest: ------------ storage '%s' ----------" % fmt
     pybut.run (pybut.TestSuite ((pybut.makeSuite (TestDatabase, 'test'),
                                  pybut.makeSuite (TestContent,  'test'))))

@@ -133,7 +133,18 @@ class ResultSet (object):
     def __iter__ (self):
         raise NotImplemented ('please override')
 
+    def itervalues (self):
+        raise NotImplemented ('please override')
+    
+    def iterkeys (self):
+        raise NotImplemented ('please override')
+    
+    def iteritems (self):
+        raise NotImplemented ('please override')
 
+    def __len__ (self):
+        raise NotImplemented ('please override')
+        
     def xmlwrite (self, fd):
 
         if self.name:
@@ -301,7 +312,15 @@ class Database (object):
 
     def __init__ (self):
         raise NotImplemented ('please override')
+
+
+    def _entries_get (self):
+        """ Return the result set that contains _all_ the entries. """
         
+        raise NotImplemented ('please override')
+
+    entries = property (_entries_get, None)
+    
 
     def add (self, value, key = None):
         """ Insert a new entry in the database.
@@ -310,19 +329,21 @@ class Database (object):
         with a hand-made Key.
 
         key is only useful for importing an existing database, by
-        proposing a key choice.
+        _proposing_ a key choice.
         """
 
-        raise NotImplemented ('please override')
-
-
-    def __len__ (self):
         raise NotImplemented ('please override')
 
 
     def __setitem__ (self, key, value):
         raise NotImplemented ('please override')
 
+    def __getitem__ (self, key):
+        raise NotImplemented ('please override')
+
+    def has_key (self, key):
+        raise NotImplemented ('please override')
+        
 
     def query (self, word, permanent = False):
         raise NotImplemented ('please override')
@@ -404,7 +425,7 @@ class Database (object):
             to_check.append (s.id)
 
 
-        for v in self.itervalues ():
+        for v in self.entries.itervalues ():
             for name in to_check:
                 try:
                     attrs = v [name]
@@ -433,7 +454,7 @@ class Database (object):
         if self.header:
             fd.write ('<header>%s</header>\n' % escape (self.header))
         
-        for v in self.itervalues ():
+        for v in self.entries.itervalues ():
             v.xmlwrite (fd)
 
         for rs in self.rs:

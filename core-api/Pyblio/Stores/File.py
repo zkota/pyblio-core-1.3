@@ -140,12 +140,14 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
 # --------------------------------------------------
 
-class Database (dict, Store.Database, Callback.Publisher):
+class Database (Store.Database, Callback.Publisher):
 
     def __init__ (self, schema = None, file = None,
                   create = False):
 
         Callback.Publisher.__init__ (self)
+
+        self._dict = {}
         
         self.file = file
 
@@ -182,6 +184,12 @@ class Database (dict, Store.Database, Callback.Publisher):
             
         return
 
+    def _entries_get (self):
+        """ Return the result set that contains all the entries. """
+        return self._dict
+
+    entries = property (_entries_get, None)
+
 
     def add (self, value, key = None):
         """ Insert a new entry in the database.
@@ -205,17 +213,21 @@ class Database (dict, Store.Database, Callback.Publisher):
 
         value = self.validate (value)
         
-        dict.__setitem__ (self, key, value)
+        self._dict [key] = value
         return key
 
 
     def __delitem__ (self, k):
 
-        dict.__delitem__ (self, k)
+        del self._dict [k]
         self.emit ('delete-item', k)
 
         return
-    
+
+
+    def has_key (self, k):
+        return self._dict.has_key (k)
+
 
     def __setitem__ (self, key, value):
 
@@ -228,14 +240,19 @@ class Database (dict, Store.Database, Callback.Publisher):
 
         value = self.validate (value)
         
-        dict.__setitem__ (self, key, value)
+        self._dict [key] = value
         return
+
+
+    def __getitem__ (self, key):
+        return self._dict [key]
+
 
     def query (self, word, permanent = False):
 
         res = self.rs.add (permanent)
         
-        for entry in self.itervalues ():
+        for entry in self.entries.itervalues ():
 
             found = False
             

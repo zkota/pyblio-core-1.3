@@ -31,7 +31,7 @@ class TestStore (pybut.TestCase):
         db = Store.get ('file').dbcreate (self.f, schema)
         db.save ()
         
-        assert len (db) == 0
+        assert len (db.entries) == 0
 
         pybut.fileeq (self.f, 'ut_store/empty.xml')
         return

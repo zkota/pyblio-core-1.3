@@ -73,6 +73,34 @@ class DBIterItems (DBIterBase):
         return Store.Key (data [0]), _pl (data [1])
 
 
+class RSDB (object):
+
+    def __init__ (self, db):
+
+        self._db = db
+        return
+    
+    def __iter__ (self):
+        
+        return DBIter (self._db.cursor ())
+
+    def itervalues (self):
+        
+        return DBIterValues (self._db.cursor ())
+    
+    def iterkeys (self):
+        
+        return DBIter (self._db.cursor ())
+    
+    def iteritems (self):
+        
+        return DBIterItems (self._db.cursor ())
+
+    def __len__ (self):
+
+        return self._db.stat () ['nkeys']
+    
+
 # --------------------------------------------------
 
 class RSIter (object):
@@ -554,6 +582,9 @@ class Database (Store.Database, Callback.Publisher):
             raise
         
         txn.commit ()
+
+        # Result set containing the full db
+        self._entries_rs = RSDB (self._db)
         
         # No header in this db yet
         self.header = None
@@ -588,10 +619,6 @@ class Database (Store.Database, Callback.Publisher):
         self._idx.sync ()
         return
 
-    def __len__ (self):
-
-        return self._db.stat () ['nkeys']
-    
 
     def add (self, val, key = None):
 
@@ -751,21 +778,14 @@ class Database (Store.Database, Callback.Publisher):
         
         return _pl (self._db.get (str (key)))
 
-    def __iter__ (self):
-        
-        return DBIter (self._db.cursor ())
 
-    def itervalues (self):
-        
-        return DBIterValues (self._db.cursor ())
+    def entries_get (self):
+
+        return self._entries_rs
+
+    entries = property (entries_get)
+
     
-    def iterkeys (self):
-        
-        return DBIter (self._db.cursor ())
-    
-    def iteritems (self):
-        
-        return DBIterItems (self._db.cursor ())
 
 
     
