@@ -685,12 +685,13 @@ class Exporter (object):
         
     def text_add (self, field, data):
 
-        data = ' '.join (data).encode ('latex')
-
+        data = ' '.join (data).encode ('latex','ignore')
+        
         # by default, new lines and multiple spaces are not significant in bibtex fields
         data = self._collapse.sub (' ', data)
         
-        return '{%s}' % data
+        self.field [field] = '{%s}' % data
+        return
 
     def _single_person (self, person):
 
@@ -698,42 +699,77 @@ class Exporter (object):
     
     def person_add (self, field, data):
 
-        return '{%s}' % (' and '.join (map (self._single_person, data)).encode ('latex'))
+        v = ' and '.join (map (self._single_person, data)).encode ('latex')
 
+        self.field [field] = '{%s}' % v
+        return
 
     def url_add (self, field, data):
 
-        return '{%s}' % (', '.join (map (lambda x: x.encode ('latex'), data)))
+        v = ', '.join (map (lambda x: x.encode ('latex'), data))
+        
+        self.field [field] = '{%s}' % v
+        return
 
     def date_add (self, field, data):
 
-        return '%s' % data [0].year
+        v = str (data [0].year)
+        
+        self.field [field] = v
+        return
 
+    def record_begin (self):
+
+        self.key = self.record ['id'] [0]
+
+        tp = self.record ['doctype'] [0]
+        self.type = self.db.txo [tp.group][tp.id].names ['C']
+
+        return
+
+    def record_end (self):
+
+        return
+
+    def record_parse (self, key, value):
+
+        if key in ('id', 'doctype'): return
+        
+        self._mapping [self.db.schema [key].type] (key, self.record [key])
+        return
     
     def write (self, fd, rs, db):
 
         """ Write a result set to a given file descriptor """
 
+        self.db = db
+        self.rs = rs
+        
         self.doctype = {}
 
         for v in db.txo ['doctype'].values ():
-            self.doctype [v.names [''].lower ()] = v
+            self.doctype [v.names ['C'].lower ()] = v
 
         for e in rs.itervalues ():
 
-            key = e ['id'] [0]
-            tp  = e ['doctype'] [0]
+            self.record = e
+
+            self.field = {}
+            self.type  = None
+            self.key   = None
+        
+            self.record_begin ()
+
+            for k, v in e.items ():
+                self.record_parse (k, v)
+
+            self.record_end ()
             
-            tp = db.txo [tp.group][tp.id].names ['']
-            
-            ret = '@%s{%s,\n' % (tp, key)
+            ret = '@%s{%s,\n' % (self.type, self.key)
 
             attrs = []
-            keys  = e.keys ()
+            keys  = self.field.keys ()
             keys.sort ()
-
-            keys.remove ('id')
-            keys.remove ('doctype')
 
             maxlen = 0
             for k in keys:
@@ -741,10 +777,8 @@ class Exporter (object):
                 if l > maxlen: maxlen = l
             
             for k in keys:
-                v = e [k]
+                v = self.field [k]
                 
-                v = self._mapping [db.schema [k].type] (k, e [k])
-
                 left = '   %s%s = ' % (k, ' ' * (maxlen - len (k)))
 
                 attrs.append (left + Tools.format (v, 75, 0, len (left)))

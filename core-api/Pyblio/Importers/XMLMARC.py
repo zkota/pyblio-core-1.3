@@ -154,6 +154,7 @@ class SimpleImporter (Importer):
             Attribute.URL   : self.url_add,
             Attribute.Person: self.person_add,
             Attribute.ID    : self.id_add,
+            Attribute.Date  : self.date_add,
             }
         return
 
@@ -167,7 +168,16 @@ class SimpleImporter (Importer):
             self._mapping [k] = (v, self._physical [attribute.type])
 
         return Importer.parse (self, fd, db)
-    
+
+    def date_add (self, field, value):
+
+        f = self.record.get (field, [])
+
+        # heuristic to match a date
+        f.append (Attribute.Date (year = int (value)))
+        
+        self.record [field] = f
+        return
 
     def id_add (self, field, value):
 

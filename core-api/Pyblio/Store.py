@@ -469,7 +469,8 @@ class Database (object):
             for v in vals:
                 if not isinstance (v, s.type):
                     raise Exceptions.SchemaError \
-                          (_('attribute %s has an incorrect type') % k)
+                          (_('attribute %s has an incorrect type (should be %s)') % (
+                        `k`, `s.type`))
 
             l = len (vals)
             lb, ub = s.range
