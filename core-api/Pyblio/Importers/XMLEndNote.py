@@ -149,7 +149,7 @@ class Exporter (object):
             if person.first:
                 txt = '%s, %s' % (person.last, person.first)
             else:
-                txt = self.last
+                txt = person.last
 
             if txt: txts.append ('<%s>%s</%s>' % (
                 tag, self._encode (txt), tag))
