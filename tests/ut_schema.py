@@ -124,5 +124,5 @@ class TestSchema (pybut.TestCase):
         assert a.mandatory ['author'].type is Fields.AuthorGroup
         assert a.mandatory ['date'].type is Fields.Date
         assert a.mandatory ['ref'].type is Fields.Reference
-        
+
 pybut.run (pybut.makeSuite (TestSchema, 'test'))
