@@ -173,7 +173,7 @@ t_RBRACE  = r'\}'
 t_LBRACE  = r'\{'
 
 def t_SPACE (t):
-    r'[\t ]+'
+    r'[\r\t ]+'
 
     t.value = ' '
     return t
@@ -804,6 +804,8 @@ class Exporter (object):
     def record_parse (self, key, value):
 
         if key in ('id', 'doctype'): return
+
+        key = key.encode ('ascii', 'replace')
         
         self._mapping [self.db.schema [key].type] (key, self.record [key])
         return
