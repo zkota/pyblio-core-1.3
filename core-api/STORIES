@@ -2,11 +2,6 @@
 
 * TO DO
 
-** [X] Manually add / remove items in a result set
-
-Create an empty result set. Add items in it and remove them. It is not
-possible to duplicate items in a result set.
-
 ** [ ] Refine the content of a result set
 
 Create a result set. Perform a query on its content. All queries
@@ -60,4 +55,9 @@ description.  Similarly, the Document Class is an Enumerated value.
 ** [X] There are Permanent Result Sets.
 
 They are stored in the XML format and in the storages.
+
+** [X] Manually add / remove items in a result set
+
+Create an empty result set. Add items in it and remove them. It is not
+possible to duplicate items in a result set.
 

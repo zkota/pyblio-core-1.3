@@ -403,8 +403,87 @@ class TestContent (pybut.TestCase):
         except KeyError: pass
         return
 
+
+    def testResultSetAddRemove (self):
+
+        """ Create a RS, add items in it and remove them """
+        e = Store.Entry ()
+        items = []
+        
+        e ['title'] = [Attribute.Text ('a sample')]
+
+        for i in range (5):
+            items.append (self.db.add (e))
+
+        items.sort ()
+
+        for name in (None, u'named'):
+            
+            rs = self.db.rs.add (name)
+
+            # put all the entries
+            for i in items:
+                rs.add (i)
+
+            got = []
+            for v in rs:
+                got.append (v)
+
+            got.sort ()
+            assert got == items, 'expected %s, got %s' % (
+                items, got)
+
+            # remove some items
+            del rs [items [0]]
+            del rs [items [-1]]
+            del rs [items [2]]
+
+            check = [] + items
+            del check [2]
+            del check [0]
+            del check [-1]
+
+            got = []
+            for v in rs:
+                got.append (v)
+
+            got.sort ()
+            assert got == check, 'expected %s, got %s' % (
+                check, got)
+            
+        return
+
+
+    def testResultSetDuplicates (self):
+
+        """ There are no duplicates in a result set """
+
+        e = Store.Entry ()
+        items = []
+        
+        e ['title'] = [Attribute.Text ('a sample')]
+
+        for i in range (5):
+            items.append (self.db.add (e))
+
+        rs = self.db.rs.add ()
+
+        # put all the entries twice
+        for i in items + items:
+            rs.add (i)
+
+        got = []
+        for v in rs:
+            got.append (v)
+
+        got.sort ()
+        assert got == items, 'expected %s, got %s' % (
+            items, got)
+        
+        return
+
     
-fmts = ('bsddb', 'file')
+fmts = ('file', 'bsddb')
 
 global fmt
 

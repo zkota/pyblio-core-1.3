@@ -98,6 +98,12 @@ class ResultSet (Store.ResultSet):
         self._rs.put (str (k), '', txn = txn)
         self._restart ()
         return
+
+    def __delitem__ (self, k):
+
+        self._rs.delete (str (k))
+        self._restart ()
+        return
     
 
     def next (self):
