@@ -32,6 +32,9 @@
   </txo-item>
  </txo-group>
 
+ <txo-group id="b">
+ </txo-group>
+
  <entry id="1">
   <attribute id="enum-a">
    <txo group="a" id="1"/>

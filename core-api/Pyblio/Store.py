@@ -353,15 +353,9 @@ class TxoStore (object):
     """
 
 
-    def add (self, group):
-        raise NotImplemented ('please override')
-
     def __getitem__ (self, k):
         raise NotImplemented ('please override')
         
-    def __delitem__ (self, k):
-        raise NotImplemented ('please override')
-
     def keys (self):
         raise NotImplemented ('please override')
         
@@ -376,6 +370,11 @@ class TxoStore (object):
             fd.write (' </txo-group>\n\n')
             
         return
+
+    # These methods are to be inherited, but are private
+
+    def _add (self, group):
+        raise NotImplemented ('please override')
 
     
 # --------------------------------------------------
@@ -637,7 +636,7 @@ class DatabaseParse (sax.handler.ContentHandler):
                 self._error (_('nested "txo-group" are not supported'))
 
             name = self._attr ('id', attrs).encode ('ascii')
-            self._txog = self.db.txo.add (name)
+            self._txog = self.db.txo [name]
             return
 
         if name == 'txo-item':
@@ -788,14 +787,29 @@ class DatabaseParse (sax.handler.ContentHandler):
     def endElement (self, name):
 
         if self._in_schema:
-            if name == 'pyblio-schema':
-                self._in_schema = False
-                self._sparse    = None
-                
-                self.db.schema = self._schema
-
-            else:
+            if name != 'pyblio-schema':
                 self._sparse.endElement (name)
+                return
+
+            
+            self._in_schema = False
+            self._sparse    = None
+            
+            self.db.schema = self._schema
+
+            # Finalize the link between the schema and the db:
+            #
+            #  1. create txo groups defined in the schema
+            #
+
+            for v in self.db.schema.values ():
+                if v.type is not Attribute.Txo: continue
+
+                try:
+                    self.db.txo._add (v.group)
+
+                except Exceptions.ConstraintError:
+                    pass
                 
             return
 

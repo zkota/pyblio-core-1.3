@@ -835,7 +835,7 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
         return k
 
     
-    def add (self, group):
+    def _add (self, group):
 
         txn = self._env.txn_begin ()
         
@@ -923,6 +923,19 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self.txo = TxoStore (self._env, txn)
             self.txo.register ('delete', self._txo_use_check)
 
+
+            if create and schema:
+                for v in self.schema.values ():
+                    if v.type is not Attribute.Txo: continue
+
+                    try:
+                        self.txo._add (v.group)
+
+                    except Exceptions.ConstraintError:
+                        pass
+                # for
+            # if
+            
         except:
             txn.abort ()
             raise

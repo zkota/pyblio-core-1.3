@@ -300,7 +300,7 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.txo.add ('a')
+        g = self.db.txo ['a']
         
         for k in va:
             i.names [''] = k
@@ -309,7 +309,7 @@ class TestContent (pybut.TestCase):
         b = []
         vb = ['B / 1', 'B / 2']
         
-        g = self.db.txo.add ('b')
+        g = self.db.txo ['b']
         for k in vb:
             i.names [''] = k
             g.add (i)
@@ -331,7 +331,7 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.txo.add ('a')
+        g = self.db.txo ['a']
         for k in va:
             i.names [''] = k
 
@@ -620,7 +620,7 @@ class TestContent (pybut.TestCase):
         a  = []
         va = ['A / 1', 'A / 2']
 
-        g = self.db.txo.add ('a')
+        g = self.db.txo ['a']
         for k in va:
             i.names [''] = k
             v = g.add (i)
@@ -649,7 +649,7 @@ class TestContent (pybut.TestCase):
 
         from Pyblio import Exceptions
         
-        g = self.db.txo.add ('group')
+        g = self.db.txo ['a']
 
         a = g.add (Store.TxoItem ())
         
@@ -677,7 +677,7 @@ class TestContent (pybut.TestCase):
         """ Refuse invalid parent value for a TxoItem """
         from Pyblio import Exceptions
 
-        g = self.db.txo.add ('group')
+        g = self.db.txo ['a']
 
         i = Store.TxoItem ()
         i.parent = 123
@@ -705,21 +705,6 @@ class TestContent (pybut.TestCase):
 
         return
 
-    
-    def testTxoSingle (self):
-
-        from Pyblio import Exceptions
-        
-        g = self.db.txo.add ('a')
-
-        try:
-            g = self.db.txo.add ('a')
-            assert False, 'should not succeed'
-            
-        except Exceptions.ConstraintError:
-            pass
-
-        return
 
 
 class TestView (pybut.TestCase):

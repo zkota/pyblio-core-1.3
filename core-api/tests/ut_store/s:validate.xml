@@ -13,4 +13,7 @@
  <attribute id="enum" type="txo" group="a">
   <name>Text</name>
  </attribute>
+ <attribute id="enum2" type="txo" group="c">
+  <name>Text</name>
+ </attribute>
 </pyblio-schema>

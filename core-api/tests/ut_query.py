@@ -18,8 +18,6 @@ class TestSimpleQuery (pybut.TestCase):
     def testTxoQuery (self):
         """ Txo query """
 
-        self.db.txo.add ('a')
-
         g = self.db.txo ['a']
 
         a = g [g.add (Store.TxoItem ())]
