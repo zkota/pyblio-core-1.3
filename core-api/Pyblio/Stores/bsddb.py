@@ -20,7 +20,8 @@
 
 from gettext import gettext as _
 
-import os, shutil, copy
+import os, shutil, copy, sys, traceback, weakref
+
 import cPickle as pickle
 
 from bsddb3 import db
@@ -76,12 +77,13 @@ class DBIterItems (DBIterBase):
 
 class ResultSet (Store.ResultSet):
 
-    def __init__ (self, env, rs, id, name = None):
+    def __init__ (self, env, meta, rs, id, name = None):
         self.name = name
 
-        self._db = env
-        self._rs = rs
-        self._id = id
+        self._env  = env
+        self._rs   = rs
+        self._id   = id
+        self._meta = meta
         
         self._cursor = rs.cursor ()
         self._permanent = self.name is not None
@@ -93,44 +95,82 @@ class ResultSet (Store.ResultSet):
         return self
 
     def _restart (self):
-        self._data   = self._cursor.first ()
+        self._cursor.set (self._id + '/')
         return
 
     def add (self, k, txn = None):
 
-        self._rs.put (str (k), '', txn = txn)
+        if not txn: txn = self._env.txn_begin ()
+            
+        self._rs.put (self._id + '/' + str (k), '',
+                      txn = txn)
+        
         self._restart ()
         return
 
     def __delitem__ (self, k, txn = None):
 
-        self._rs.delete (str (k), txn = txn)
+        if not txn: txn = self._env.txn_begin ()
+
+        self._rs.delete (self._id + '/' + str (k), txn = txn)
+        
         self._restart ()
         return
     
 
     def next (self):
-        if self._data is None:
+        data = self._cursor.next ()
+
+        if data is None:
             self._restart ()
             raise StopIteration ()
 
-        data = self._data
-        self._data = self._cursor.next ()
+        rs, key = data [0].split ('/')
         
-        return Store.Key (data [0])
+        if rs != self._id:
+            self._restart ()
+            raise StopIteration ()
+
+        return Store.Key (key)
 
 
     def __del__ (self):
-        self._rs.close ()
-
         if self._permanent: return
 
-        # physically destroy the database
-        _db = db.DB (self._db)
+        txn = self._env.txn_begin ()
 
-        try: _db.remove ('rs', self._id)
-        except db.DBNoSuchFileError: pass
-        
+        try:
+            c = self._rs.cursor (txn = txn)
+            c.set (self._id + '/')
+
+            while 1:
+                c.delete ()
+
+                d = c.next ()
+                if d is None: break
+
+                rs, key = d [0].split ('/')
+                if rs != self._id: break
+
+            c.close ()
+
+            if self.name:
+                # remove oneself from the meta list
+                (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+            
+                del avail [self.name]
+            
+                self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
+            
+        except:
+            # exceptions in __del__ methods are not reported by default
+            etype, value, tb = sys.exc_info ()
+            traceback.print_exception (etype, value, tb)
+            
+            txn.abort ()
+            raise
+
+        txn.commit ()
         return
 
 
@@ -138,7 +178,6 @@ class ResultSet (Store.ResultSet):
 
         try:
             self.__delitem__ (key, txn)
-            self._restart ()
             
         except KeyError:
             pass
@@ -146,16 +185,32 @@ class ResultSet (Store.ResultSet):
         return
     
 
-class ResultSetStore (dict, Store.ResultSetStore):
+class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
-    def __init__ (self, db):
+    def __init__ (self, env, meta, txn):
 
-        self._env  = db._env
-        self._meta = db._meta
+        Callback.Publisher.__init__ (self)
+        
+        self._env  = env
+        self._meta = meta
 
-        self._db = db
+        self._rs = db.DB (self._env)
+        self._rs.open ('pybliographer', 'rs', db.DB_BTREE,
+                       db.DB_CREATE, txn = txn)
+
+        (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+
+        for name, rsid in avail.items ():
+            rs = ResultSet (self._env, self._meta, self._rs, rsid, name)
+            self [name] = rs
+        
         return
     
+    def _close (self):
+
+        self._rs.close ()
+        return
+
 
     def __delitem__ (self, k):
 
@@ -172,40 +227,50 @@ class ResultSetStore (dict, Store.ResultSetStore):
         """ Create an empty result set """
 
         txn = self._env.txn_begin (parent = txn)
-        
-        # get the next rs id
-        (rsid, avail) = _pl (self._meta.get ('rs'))
 
-        if name: avail [name] = str (rsid)
+        try:
+            # get the next rs id
+            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+            
+            if name: avail [name] = str (rsid)
+            
+            self._meta.put ('rs', _ps ((rsid + 1, avail)), txn = txn)
+            
+            rsid = str (rsid) 
 
-        self._meta.put ('rs', _ps ((rsid + 1, avail)))
+            # the result set is simply defined by an entry with its number
+            self._rs.put (rsid + '/', '', txn = txn)
 
-        rsid = str (rsid)
-        
-        rs = db.DB (self._env)
-        rs.open ('rs', rsid, db.DB_HASH, db.DB_CREATE)
+        except:
+            txn.abort ()
+            raise
         
         txn.commit ()
 
-        rs = ResultSet (self._env, rs, rsid, name)
+        rs = ResultSet (self._env, self._meta, self._rs, rsid, name)
         if name: self [name] = rs
 
-        self._db.register ('delete-item', rs._on_delete)
+        self.register ('item-delete', rs._on_delete)
         
         return rs
+
+    def _on_delete (self, k, trn):
+
+        self.emit ('item-delete', k, trn)
+        return
+
     
 # --------------------------------------------------
 
 class EnumGroup (Store.EnumGroup, Callback.Publisher):
 
 
-    def __init__ (self, parent, group):
+    def __init__ (self, env, enum, group):
 
         Callback.Publisher.__init__ (self)
 
-        self._db   = parent._db
-        self._env  = parent._env
-        self._enum = parent._enum
+        self._env  = env
+        self._enum = enum
         
         self._group = group
         return
@@ -213,18 +278,27 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
     
     def add (self, item, key = None):
 
-        v = self._enum.get (self._group)
+        txn = self._env.txn_begin ()
 
-        vid, data = _pl (v)
-        vid, key  = Tools.id_make (vid, key)
+        try:
+            v = self._enum.get (self._group, txn = txn)
+            
+            vid, data = _pl (v)
+            vid, key  = Tools.id_make (vid, key)
 
-        v = copy.deepcopy (item)
-        v.id    = key
-        v.group = self._group
+            v = copy.deepcopy (item)
+            v.id    = key
+            v.group = self._group
+            
+            data [key] = v
         
-        data [key] = v
-        
-        self._enum.put (self._group, _ps ((vid, data)))
+            self._enum.put (self._group, _ps ((vid, data)), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         
         return key
 
@@ -240,12 +314,21 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
     
     def __delitem__ (self, k):
 
-        self._db._enum_use_check (self._group, k)
+        self.emit ('delete', self._group, k)
 
-        v = _pl (self._enum.get (self._group))
-        del v [1] [k]
+        txn = self._env.txn_begin ()
 
-        self._enum.put (self._group, _ps (v))
+        try:
+            v = _pl (self._enum.get (self._group, txn = txn))
+            del v [1] [k]
+
+            self._enum.put (self._group, _ps (v), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+        
+        txn.commit ()
         return
     
 
@@ -255,23 +338,38 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
         return _pl (v) [1] [k]
 
 
-class EnumStore (Store.EnumStore):
 
-    def __init__ (self, parent):
+class EnumStore (Store.EnumStore, Callback.Publisher):
 
-        self._db  = parent
-        self._env = parent._env
+    def __init__ (self, env, txn):
+
+        Callback.Publisher.__init__ (self)
+
+        self._env = env
 
         self._enum = db.DB (self._env)
         self._enum.open ('pybliographer', 'enum',
-                         db.DB_HASH, db.DB_CREATE)
+                         db.DB_HASH, db.DB_CREATE, txn = txn)
         return
 
+    def _close (self):
+
+        self._enum.close ()
+        return
+    
     
     def __getitem__ (self, group):
 
-        return EnumGroup (self, group)
+        g = EnumGroup (self._env, self._enum, group)
+        g.register ('delete', self._on_delete)
+        
+        return g
 
+    def _on_delete (self, g, k):
+
+        self.emit ('delete', g, k)
+        return
+    
 
     def keys (self):
         k = []
@@ -289,14 +387,27 @@ class EnumStore (Store.EnumStore):
     
     def add (self, group):
 
-        v = self._enum.get (group)
+        txn = self._env.txn_begin ()
+        
+        try:
+            v = self._enum.get (group, txn = txn)
 
+            if v is None:
+                self._enum.put (group, _ps ((1, {})), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        
         if v is not None:
             raise Exceptions.ConstraintError (_('group %s exists') % `group`)
         
-        self._enum.put (group, _ps ((1, {})))
-
-        return EnumGroup (self, group)
+        g = EnumGroup (self._env, self._enum, group)
+        g.register ('delete', self._on_delete)
+        
+        return g
     
 
 # --------------------------------------------------
@@ -308,6 +419,8 @@ class Database (Store.Database, Callback.Publisher):
 
         Callback.Publisher.__init__ (self)
         
+        self._env = db.DBEnv ()
+
         if create:
             try:
                 os.mkdir (path)
@@ -317,63 +430,55 @@ class Database (Store.Database, Callback.Publisher):
                     path, msg))
             
             flag = db.DB_CREATE
+            self._env.open (path, db.DB_CREATE | db.DB_INIT_MPOOL | db.DB_INIT_TXN)
 
         else:
             flag = 0
+            self._env.open (path, db.DB_INIT_MPOOL | db.DB_INIT_TXN)
 
         self._path = path
+
+        txn = self._env.txn_begin ()
+
+        try:
+            # DB containing the actual entries
+            self._db  = db.DB (self._env)
+            self._db.open ('pybliographer', 'db', db.DB_HASH, flag, txn = txn)
+
+            # DB with meta informations
+            self._meta  = db.DB (self._env)
+            self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag, txn = txn)
+
+            if create:
+                self.schema = schema
+                self._meta.put ('schema', _ps (schema), txn = txn)
+                self._meta.put ('rs', _ps ((0, {})), txn = txn)
+                self._meta.put ('serial', '1', txn = txn)
+            else:
+                self.schema = _pl (self._meta.get ('schema', txn = txn))
+
+            # Result sets handler
+            self.rs = ResultSetStore (self._env, self._meta, txn)
+            self.register ('delete', self.rs._on_delete)
+
+            # Full text indexing DB
+            self._idx = db.DB (self._env)
+            self._idx.set_flags (db.DB_DUP)
+            self._idx.open ('pybliographer', 'idx', db.DB_HASH, flag, txn = txn)
+
+            # Store for Enumerated values
+            self.enum = EnumStore (self._env, txn)
+            self.enum.register ('delete', self._enum_use_check)
+
+        except:
+            txn.abort ()
+            raise
         
-        self._env = db.DBEnv ()
-        self._env.open (path, flag | db.DB_INIT_MPOOL | db.DB_INIT_TXN)
-
-        # DB containing the actual entries
-        self._db  = db.DB (self._env)
-        self._db.open ('pybliographer', 'db', db.DB_HASH, flag)
-
-        # DB with meta informations
-        self._meta  = db.DB (self._env)
-        self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag)
-
-        self.rs = ResultSetStore (self)
-
-        if create:
-            self.schema = schema
-            self._meta.put ('schema', _ps (schema))
-            self._meta.put ('rs', _ps ((0, {})))
-            self._meta.put ('serial', '1')
-        else:
-            self.schema = _pl (self._meta.get ('schema'))
-            id, store = _pl (self._meta.get ('rs'))
-
-            for k, v in store.items ():
-                d = db.DB (self._env)
-
-                try:
-                    d.open ('rs', v, db.DB_HASH)
-                    
-                except db.DBNoSuchFileError:
-                    del store [k]
-                    continue
-                
-                rs = ResultSet (self._env, d, v, k)
-                self.rs [k] = rs
-
-            # store the updated rs list
-            self._meta.put ('rs', _ps ((id, store)))
-
+        txn.commit ()
         
-        # Full text indexing DB
-        self._idx = db.DB (self._env)
-        self._idx.set_flags (db.DB_DUP)
-        self._idx.open ('pybliographer', 'idx', db.DB_HASH, flag)
-
-        # Store for Enumerated values
-        self.enum = EnumStore (self)
-
         # No header in this db yet
         self.header = None
         return
-
 
     def save (self):
 
@@ -392,7 +497,7 @@ class Database (Store.Database, Callback.Publisher):
         txn = self._env.txn_begin ()
 
         try:
-            serial = int (self._meta.get ('serial'))
+            serial = int (self._meta.get ('serial', txn = txn))
 
             serial, key = Tools.id_make (serial, key)
             
@@ -438,11 +543,11 @@ class Database (Store.Database, Callback.Publisher):
             self._idxdel (id, txn)
             self._db.delete (id, txn)
 
+            self.emit ('delete', key, txn)
+
         except:
             txn.abort ()
             raise
-
-        self.emit ('delete-item', key, txn)
 
         txn.commit ()
         return
@@ -474,6 +579,8 @@ class Database (Store.Database, Callback.Publisher):
                 cursor.delete ()
 
             data = cursor.next ()
+
+        cursor.close ()
         return
 
 
@@ -507,22 +614,29 @@ class Database (Store.Database, Callback.Publisher):
 
         txn = self._env.txn_begin ()
 
-        rs = self.rs.add (name, txn = txn)
-        
-        cursor = self._idx.cursor ()
-
         try:
-            data = cursor.set (word.encode ('utf-8'))
+            rs = self.rs.add (name, txn = txn)
+
+            cursor = self._idx.cursor ()
+
+            try:
+                data = cursor.set (word.encode ('utf-8'))
+
+            except db.DBNotFoundError:
+                return rs
+
+            while 1:
+                if data is None: break
+
+                rs.add (Store.Key (data [1]), txn = txn)
+                data = cursor.next_dup ()
+
+            cursor.close ()
             
-        except db.DBNotFoundError:
-            return rs
+        except:
+            txn.abort ()
+            raise
         
-        while 1:
-            if data is None: break
-
-            rs.add (Store.Key (data [1]), txn = txn)
-            data = cursor.next_dup ()
-
         txn.commit ()
 
         return rs

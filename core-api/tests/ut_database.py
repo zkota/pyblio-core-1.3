@@ -573,3 +573,4 @@ for fmt in fmts:
     print "unittest: ------------ storage '%s' ----------" % fmt
     pybut.run (pybut.TestSuite ((pybut.makeSuite (TestDatabase, 'test'),
                                  pybut.makeSuite (TestContent,  'test'))))
+

@@ -28,10 +28,6 @@ searching for a specific attribute value.
 Create an empty Store of every existing type. Import an existing XML
 database into it, with no loss.
 
-** [ ] Multiple users accesses cannot corrupt a DB3 database
-
-Serial IDs are delivered atomically, and updates are transactional.
-
 ** [ ] Support "shortcuts" for persons and texts
 
 When a phrase or person name is repeated frequently, a shortcut can be
@@ -71,3 +67,8 @@ in any result set anymore.
 
 Refuse to remove an enumerated value as long as there is one use in
 the database. Refuse to add a group twice.
+
+** [X] Multiple users accesses cannot corrupt a DB3 database
+
+Serial IDs are delivered atomically, and updates are transactional.
+
