@@ -415,8 +415,6 @@ def file_import (file, encoding, db, ** kargs):
         
         e = Store.Entry (Store.Key (key), schema)
 
-        print val
-        
         for k, v in val.iteritems ():
 
             k = k.lower ()

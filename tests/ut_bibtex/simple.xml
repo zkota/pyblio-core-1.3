@@ -5,9 +5,9 @@
 
  <native type="bibtex">@article{toto,
    author = {Gobry, Frederic and First Last},
-   journal = {My journal},
+   journal = "My journal",
    note = {a \{ and a \}},
-   number = {123},
+   number = 123,
    title = {This is a title}
 }</native>
 
