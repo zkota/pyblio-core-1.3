@@ -1102,13 +1102,13 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         return id
 
 
-    def fulltextquery (self, word, permanent = False):
+    def _q_anyword (self, query, rs):
+
+        word = query.word
 
         txn = self._env.txn_begin ()
 
         try:
-            rs = self.rs.add (permanent, txn = txn)
-
             cursor = self._idx.cursor ()
 
             try:

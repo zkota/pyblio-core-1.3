@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-schema>
+
+ <attribute id="enum-a" type="txo" group="a">
+  <name>Enum A</name>
+ </attribute>
+
+ <attribute id="enum-b" type="txo" group="b">
+  <name>Enum B</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+</pyblio-schema>

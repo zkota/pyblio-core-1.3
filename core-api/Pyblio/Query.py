@@ -124,7 +124,7 @@ class Txo (Constraint):
 class Queryable (object):
 
     """ A mixin that provides an (one day optimized) query engine to a store """
-    
+
     def query (self, query, permanent = False):
 
         # Check if the query is well typed
@@ -134,13 +134,29 @@ class Queryable (object):
         
         query.apply (check, self.schema)
 
-        # Check for a single AnyWord
-        if len (query) > 1 or not isinstance (query, AnyWord):
-            raise Exceptions.InvalidQuery ('unsupported query')
+        # Check for a single query
+        if len (query) > 1:
+            raise Exceptions.InvalidQuery ('only support single queries')
 
-        word = query.word
+
+        name = query.__class__.__name__
+        
+        try:
+            fn = getattr (self, '_q_%s' % name.lower ())
+            
+        except AttributeError:
+            raise Exceptions.InvalidQuery ('query on type %s unsupported' % name)
         
         res = self.rs.add (permanent)
+
+        fn (query, res)
+
+        return res
+
+
+    def _q_anyword (self, q, res):
+
+        word = q.word
         
         for entry in self.entries.itervalues ():
 
@@ -161,7 +177,5 @@ class Queryable (object):
 
             res.add (entry.key)
 
-        return res
-
-    
+        return
     

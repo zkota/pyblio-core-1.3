@@ -2,6 +2,31 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2004-05-14 11:34:52 GMT	Frederic Gobry <frederic.gobry@smartdata.ch>	patch-88
+
+    Summary:
+      specialized anyword query
+    Revision:
+      pybliographer--devel--1.3--patch-88
+
+    The bsddb can use its index to respond to AnyWord
+    
+
+    new files:
+     core-api/tests/.arch-ids/ut_query.py.id
+     core-api/tests/ut_query.py
+     core-api/tests/ut_query/.arch-ids/=id
+     core-api/tests/ut_query/.arch-ids/schema.xml.id
+     core-api/tests/ut_query/schema.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Query.py
+     core-api/Pyblio/Stores/bsddb.py core-api/tests/ut_database.py
+
+    new directories:
+     core-api/tests/ut_query core-api/tests/ut_query/.arch-ids
+
+
 2004-05-13 15:28:59 GMT	Frederic Gobry <frederic.gobry@smartdata.ch>	patch-87
 
     Summary:
