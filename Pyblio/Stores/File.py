@@ -72,7 +72,9 @@ class Database (Store.Database):
 
         res.sort (zipsort)
 
-        return zip (res [0], res [1]) [1]
+        if not res: return res
+        
+        return apply (zip, res) [1]
         
     
     def save (self):

@@ -60,8 +60,8 @@ class TestAttribute (pybut.TestCase):
 
     def testURL (self):
 
-        self._check (Attribute.URL ('http://pybliographer.org'),
-                     u'<url href="http://pybliographer.org"/>')
+        self._check (Attribute.URL ('http://pybliographer.org/'),
+                     u'<url href="http://pybliographer.org/"/>')
         return
 
     def testReference (self):
@@ -72,6 +72,51 @@ class TestAttribute (pybut.TestCase):
                      u'<reference ref="toto"/>')
         return
 
+    def testIndex (self):
 
-    
+        idx = Attribute.Text (u"HÉHÉ les Gens, s'il vous plaît.").index ()
+
+        assert idx == [u'héhé', 'les', 'gens', 's', 'il', 'vous', u'plaît'], `idx`
+
+        idx = Attribute.Person (first = u'Jean-Albert',
+                                last  = u'Dââ Schnock').index ()
+        
+        assert idx == ['jean-albert', u'dââ', 'schnock' ]
+
+        idx = Attribute.URL ('http://www.pybliographer.org/faq/').index ()
+        assert idx == ['http', 'www', 'pybliographer', 'org', 'faq']
+
+        assert Attribute.Date (year = 2003).index () == []
+        
+        from Pyblio.Store import Key
+        
+        assert Attribute.Reference (Key ('fake')).index () == []
+        return
+
+    def testSort (self):
+
+        coll = Attribute.Text (u"HÉHÉ les Gens, s'il vous plaît.").sort ()
+        assert coll == u"héhé les gens, s'il vous plaît."
+        
+        coll = Attribute.Person (first = u'Jean-Albert',
+                                 last  = u'Dââ Schnock').sort ()
+        assert coll == u"dââ schnock\0jean-albert"
+
+        for d, c in (((2003, None, None), '20030000'),
+                     ((2003, 11,   None), '20031100'),
+                     ((2003, 11,   13  ), '20031113')):
+            
+            coll = Attribute.Date (year = d [0], month = d [1], day = d [2]).sort ()
+            assert coll == c
+
+        coll = Attribute.URL ('http://pybliographer.org/FAQ/').sort ()
+        assert coll == 'http://pybliographer.org/FAQ/'
+
+        from Pyblio.Store import Key
+        
+        coll = Attribute.Reference (Key ('Fake')).sort ()
+        assert coll == 'Fake'
+        return
+
+
 pybut.run (pybut.makeSuite (TestAttribute, 'test'))

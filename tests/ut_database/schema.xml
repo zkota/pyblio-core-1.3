@@ -201,6 +201,7 @@
   <optional id="number"/>
   <optional id="pages"/>
   <optional id="note"/>
+  <optional id="url"/>
  </document>
 
  <document id="book">

@@ -1,4 +1,4 @@
-import os, pybut, sys
+import os, pybut, sys, string
 
 from Pyblio import Store, Schema, Attribute
 
@@ -143,23 +143,59 @@ class TestContent (pybut.TestCase):
 
     def testFullQuery (self):
         """ Full text ordered queries """
+
+        import random
+
+        # generate 64 base words
+        words  = []
+        letter = 'abcdefgh'
         
-        # Fill the db with some values
-        for k, v in (('a', 'one two three four'),
-                     ('b', 'four five six seven'),
-                     ('c', 'seven eight nine one')):
+        for a in letter:
+            for b in letter:
+                words.append (a +b)
+
+        def phrase ():
+            random.shuffle (words)
+            return string.join (words [:5], ' ')
+
+        # Fill the db with some phrases
+        entries = {}
+        for w in words:
+            entries [w] = []
+
+        for i in range (0, 16):
 
             e = Store.Entry (self.db.schema ['article'])
-            e ['title'] = [Attribute.Text (v)]
+
+            a, b, c = phrase (), phrase (), phrase ()
+            
+            e ['title'] = [ Attribute.Text (a), Attribute.Text (b) ]
+            e ['url']   = [ Attribute.URL (c) ]
+
+            k = '%d' % i
+            
+            for w in a.split () + b.split () + c.split ():
+                if k not in entries [w]:
+                    entries [w].append (k)
             
             self.db [Store.Key (k)] = e
 
-        r = self.db.query (u'one', 'title')
-        a = []
-        for v in r: a.append (v)
-        
-        assert a == ['a', 'c']
-        
+        # Search the occurences of every word
+        for w in words:
+            rs = self.db.query (w, 'title')
+
+            vals = []
+            for v in rs:
+                vals.append (v)
+
+            real = [] + entries [w]
+
+            vals.sort ()
+            real.sort ()
+
+            assert vals == real, "%s != %s" % (vals, real)
+        return
+    
 
 fmts = ('bsddb', 'file')
 

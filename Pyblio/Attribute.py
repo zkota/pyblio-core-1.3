@@ -28,6 +28,9 @@ from xml.sax.saxutils import escape, quoteattr
 from gettext import gettext as _
 
 
+re_split = re.compile (r'[^\w]+', re.UNICODE)
+
+
 class Person (object):
     ''' Description of a person identity '''
 
@@ -51,10 +54,14 @@ class Person (object):
         return
     
     def index (self):
-        return [x for x in (self.first, self.last) if x]
+        idx = sum ([x.split () for x in (self.first, self.last) if x], [])
+        idx = map (string.lower,idx)
+                    
+        return filter (None, idx)
+    
 
     def sort (self):
-        return u'%s\0%s' % (self.last or '', self.first or '')
+        return (u'%s\0%s' % (self.last or '', self.first or '')).lower ()
 
 
 class Date:
@@ -87,8 +94,6 @@ class Date:
                                  self.day or 0)
 
             
-re_split = re.compile (r'[^\w]+')
-
 class Text (unicode):
     ''' This class holds all the other fields (not an Author or a Date) '''
 
@@ -98,10 +103,11 @@ class Text (unicode):
         return
 
     def index (self):
-        return re_split.split (self)
+        idx = map (string.lower, re_split.split (self))
+        return filter (None, idx)
 
     def sort (self):
-        return self
+        return self.lower ()
     
 
 class URL (str):
@@ -113,7 +119,8 @@ class URL (str):
         return
 
     def index (self):
-        return re_split.split (self)
+        idx = re_split.split (self)
+        return filter (None, idx)
 
     def sort (self):
         return self

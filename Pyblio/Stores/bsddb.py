@@ -192,7 +192,12 @@ class Database:
         rs.open ('rs', rsid, db.DB_BTREE, db.DB_CREATE)
         
         cursor = self._idx.cursor ()
-        data   = cursor.set (word.encode ('utf-8'))
+
+        try:
+            data = cursor.set (word.encode ('utf-8'))
+            
+        except db.DBNotFoundError:
+            return ResultSet (self._env, rs, rsid, name)
         
         while 1:
             if data is None: break
