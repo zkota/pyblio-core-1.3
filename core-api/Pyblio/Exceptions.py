@@ -21,10 +21,10 @@
 
 ''' This module defines some common exceptions '''
 
-    
 class ParserError (Exception):
 
-    pass
+    def __init__ (self, msg, line = None):
+        Exception.__init__ (self, line, msg)
 
 class SchemaError (Exception):
 

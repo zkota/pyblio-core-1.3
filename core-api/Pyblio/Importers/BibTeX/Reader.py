@@ -25,6 +25,26 @@ including comments, strings,..."""
 
 import re
 
+from Pyblio.Exceptions import ParserError
+
+class IBibTeX:
+    def flat (self):
+        """ Return a textual version of the field, with no visible BibTeX / LaTeX markup """
+        pass
+
+    def subst (self):
+        """ Return a flattened list of the balanced expressions composing the field """
+        pass
+
+    def execute (self, environ):
+        """ Execute the known LaTeX commands forming the field,
+        substitute the known symbols, and return the resulting string"""
+        pass
+
+    def tobib (self):
+        """ Return the BibTeX version of the field """
+        pass
+
 
 class Comment (unicode):
     """ A bibtex file comment """
@@ -203,88 +223,7 @@ class Block (object):
             self._c)
 
 
-
-
-_basemap = {
-    "'": {
-    'A': Text (u"Á"),
-    'E': Text (u"É"),
-    'I': Text (u"Í"),
-    'O': Text (u"Ó"),
-    'U': Text (u"Ú"),
-    'Y': Text (u"Ý"),
-    'a': Text (u"á"),
-    'e': Text (u"é"),
-    'i': Text (u"í"),
-    'o': Text (u"ó"),
-    'u': Text (u"ú"),
-    'y': Text (u"ý"),
-    },
-    
-    "`": {
-    'A': Text (u"À"),
-    'E': Text (u"È"),
-    'I': Text (u"Ì"),
-    'O': Text (u"Ò"),
-    'U': Text (u"Ù"),
-    'a': Text (u"à"),
-    'e': Text (u"è"),
-    'i': Text (u"ì"),
-    'o': Text (u"ò"),
-    'u': Text (u"ù"),
-    },
-    
-    "^": {
-    'A': Text (u"Â"),
-    'E': Text (u"Ê"),
-    'I': Text (u"Î"),
-    'O': Text (u"Ô"),
-    'U': Text (u"Û"),
-    'a': Text (u"â"),
-    'e': Text (u"ê"),
-    'i': Text (u"î"),
-    'o': Text (u"ô"),
-    'u': Text (u"û"),
-    },
-
-    "¨": {
-    'A': Text (u"Ä"),
-    'E': Text (u"Ë"),
-    'I': Text (u"Ï"),
-    'O': Text (u"Ö"),
-    'U': Text (u"Ü"),
-    'a': Text (u"ä"),
-    'e': Text (u"ë"),
-    'i': Text (u"ï"),
-    'o': Text (u"ö"),
-    'u': Text (u"ü"),
-    'y': Text (u"ÿ"),
-    },
-
-    "c": {
-    'C': Text (u"Ç"),
-    'c': Text (u"ç"),
-    },
-
-    
-    "~": {
-    'A': Text (u"Ã"),
-    'O': Text (u"Õ"),
-    'a': Text (u"ã"),
-    'o': Text (u"õ"),
-    'n': Text (u"ñ"),
-    'N': Text (u"Ñ"),
-    },
-    
-}
-
 class EndOfFile (Exception): pass
-
-class ParseError (Exception):
-
-    def __init__ (self, line, msg):
-        Exception.__init__ (self, line, msg)
-        
 
 class Cache (object):
 
@@ -399,7 +338,8 @@ def _on_open (fd, ctx):
             m = _cmd_re.match (l)
             
             if not m:
-                raise ParseError (fd.ln, 'backslash at the end of a line')
+                raise ParserError ('backslash at the end of a line',
+                                   fd.ln)
 
             if data: curr.append (Text (data))
             curr.append (Cmd (m.group (1)))
@@ -410,12 +350,14 @@ def _on_open (fd, ctx):
         
         if not container:
             if data:
-                raise ParseError (
-                    fd.ln, 'unexpected data before '
-                    'the opening of the record: %s' % repr (data))
+                raise ParserError (
+                    'unexpected data before '
+                    'the opening of the record: %s' % repr (data),
+                    fd.ln)
 
             if brace in ')}':
-                raise ParseError (fd.ln, 'unexpected closing symbol %s' % repr (brace))
+                raise ParserError ('unexpected closing symbol %s' % repr (brace),
+                                   fd.ln)
 
             container = brace
 
@@ -423,7 +365,7 @@ def _on_open (fd, ctx):
             if brace in '})':
                 # Discard bad matching of braces
                 if (brace == '}' and container != '{'):
-                    raise ParseError (fd.ln, 'mismatched "%s"' % brace)
+                    raise ParseError ('mismatched "%s"' % brace, fd.ln)
 
                 if brace == ')' and container != '(':
                     data += ')'
@@ -511,11 +453,11 @@ def _on_open (fd, ctx):
         k = stream.pop (0)
 
         if not stream or stream [0] == ',':
-            if key: raise ParseError (
-                start, "key is defined twice")
+            if key: raise ParserError (
+                "key is defined twice", start)
 
-            if field: raise ParseError (
-                start, "key is defined in the middle of the record")
+            if field: raise ParserError (
+                "key is defined in the middle of the record", start)
 
             key = k
             if stream: stream.pop (0)
@@ -523,8 +465,8 @@ def _on_open (fd, ctx):
 
         v = stream.pop (0)
         if v != '=':
-            raise ParseError (
-                start, "invalid syntax after field %s" % repr (k))
+            raise ParserError (
+                "invalid syntax after field %s" % repr (k), start)
 
         vs = Join ()
         
@@ -535,8 +477,8 @@ def _on_open (fd, ctx):
             if vs:
                 if v == '#':
                     if not stream:
-                        raise ParseError (
-                            start, "field %s: unexpected #" % k)
+                        raise ParserError (
+                            "field %s: unexpected #" % k, start)
                     vs.append (stream.pop (0))
 
                 else:
@@ -545,8 +487,8 @@ def _on_open (fd, ctx):
                         stream.insert (0, v)
                         break
                     
-                    raise ParseError (
-                        start, "field %s: missing #" % k)
+                    raise ParserError (
+                        "field %s: missing #" % k, start)
             else:
                 vs.append (v)
                     
