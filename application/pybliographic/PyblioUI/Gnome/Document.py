@@ -17,11 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
+import gtk
 
+from gettext import gettext as _
 from Pyblio.Callback import Publisher
 
-from PyblioUI.Gnome import Glade
-from PyblioUI.Logic import Document as LDoc
+from PyblioUI.Gnome import Glade, Index
+
+from PyblioUI import Document as LogicDoc
 
 
 
@@ -47,6 +50,18 @@ class Document (Glade.Window, Publisher):
         height = self.size_get ('pane', 50)
         self._w_pane.set_position (height)
 
+        # Configure the List View
+        col = gtk.TreeViewColumn ('Description', gtk.CellRendererText (), markup = 1)
+        self._w_index.append_column (col)
+
+        self._selection = self._w_index.get_selection ()
+        self._selection.set_mode (gtk.SELECTION_MULTIPLE)
+        self._selection.connect ('changed', self._on_row_select)
+
+        # Configure the text view
+        self._text = self._w_view.get_buffer ()
+
+        
         self._w_document.show ()
         return
 
@@ -56,17 +71,70 @@ class Document (Glade.Window, Publisher):
 
          - format: either the database type, or None if it should be guessed
          """
+
+        self._l = LogicDoc.Document (filename, format)
+
+        # update misc status info
+        self._w_document.set_title (_('Pybliographic - %s') % self._l.title ())
+
+        l = len (self._l.db)
+        if l > 1:    txt = _('%d entries') % l
+        elif l == 1: txt = _('1 entry')
+        else:        txt = _('No entry')
         
-        self._l = LDoc.Document (filename, format)
+        self._w_appbar.set_default (txt)
+
+        self._idx = Index.DatabaseModel (self._l.db)
+        self._w_index.set_model (self._idx)
+        
+        return
+
+    def display (self, entry):
+
+        if entry is None:
+            self._text.set_text ('')
+            return
+
+        self._text.set_text ('%s' % `entry`)
         return
 
 
+    def close (self):
+        """ Close the document """
+
+        self._on_close ()
+        self._w_document.destroy ()
+        return
+
+    
     def _on_close (self, * args):
+        """ Callback on the Close action or window button """
+        
         height = self._w_pane.get_position ()
 
         self.size_save (('pane', height))
         self.emit ('close', self)
-        
         return
+
+
+    def _on_quit (self, * args):
+        
+        self.emit ('quit', self)
+        return
+
     
+    def _on_row_select (self, sel, * args):
+
+        current = []
+        def get (model, path, iter):
+            current.append (model.get_value (iter, 0))
+
+        sel.selected_foreach (get)
+
+        if len (current) != 1:
+            self.display (None)
+            return
+        
+        self.display (self._l.db [current [0]])
+        return
     

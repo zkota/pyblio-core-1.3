@@ -29,8 +29,9 @@ def format_guess (filename):
 
     f, x = os.path.splitext (filename)
     
-    if x == '.pbl': return 'file'
-
+    if x == '.pbl':    return 'file'
+    if x == '.pbl-db': return 'bsddb'
+    
     raise RuntimeError (_('unknown file format'))
 
 
@@ -38,7 +39,7 @@ class Document (object):
 
     def __init__ (self, filename, format = None):
 
-        self._db = None
+        self.db = None
         
         assert filename is not None
 
@@ -49,9 +50,10 @@ class Document (object):
 
         da = Store.get (self._format)
 
-        self._db = da.dbopen   (self._filename)
+        self.db = da.dbopen   (self._filename)
         return
-    
-    def __len__ (self):
 
-        return len (self._db)
+    
+    def title (self):
+
+        return os.path.basename (self._filename)

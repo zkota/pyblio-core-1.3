@@ -1,6 +1,6 @@
 import os, pybut, sys, string
 
-from PyblioUI.Logic import Document
+from PyblioUI import Document
 
 class TestDocument (pybut.TestCase):
 

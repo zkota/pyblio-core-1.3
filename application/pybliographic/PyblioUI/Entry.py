@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # This file is part of pybliographer
 # 
 # Copyright (C) 1998-2003 Frederic GOBRY
@@ -18,53 +17,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
+import string
 
-""" Main module for pybliographic.
+from gettext import gettext as _
 
-This module handles the set of opened documents.
-"""
+from xml.sax.saxutils import escape
 
-import sys
+def summary (entry):
 
-from PyblioUI.Gnome import Document
+    """ Summarize an entry for displaying in an index """
 
-files = sys.argv [1:]
+    try: t = entry ['name']
+    except KeyError: t = [_('Untitled')]
 
-docs = []
+    t = string.join (map (escape, t), '; ')
 
-def _on_close (doc):
-
-    docs.remove (doc)
-    if not docs: Gnome.exit ()
-
-    return
-
-def _on_quit (doc):
-
-    for d in [] + docs:
-        d.close ()
-
-    return
-
-
-if files:
-    for f in files:
-        d = Document.Document ()
-        d.open (f, None)
-        
-        d.register ('close', _on_close)
-        d.register ('quit', _on_quit)
-        
-        docs.append (d)
-
-else:
-    d = Document.Document ()
-    d.register ('close', _on_close)
-    d.register ('quit', _on_quit)
+    if entry.has_key ('url'):
+        u = string.join (map (escape, entry ['url']), '; ')
+        t = t + ' <i>%s</i>' % u
     
-    docs.append (d)
+    return t
 
-
-from PyblioUI import Gnome
-
-Gnome.run ()
