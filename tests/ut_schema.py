@@ -10,23 +10,23 @@ class TestSchema (pybut.TestCase):
     def testEmpty (self):
         """ One can create an empty schema """
         s = Schema.Schema ()
-        assert s.documents == {}
+        assert s == {}
 
 
     def testEmpty (self):
         """ Open an empty document """
         
         s = Schema.Schema ('ut_schema/empty.xml')
-        assert s.documents == {}
+        assert s == {}
 
 
     def testSimple (self):
         """ Open a simple document """
         
         s = Schema.Schema ('ut_schema/simple.xml')
-        assert s.documents.has_key ('article')
+        assert s.has_key ('article')
 
-        a = s.documents ['article']
+        a = s ['article']
         
         assert a.mandatory.has_key ('author')
         assert a.optional.has_key ('url')
@@ -41,7 +41,7 @@ class TestSchema (pybut.TestCase):
     def testDefaultName (self):
         """ Check that the default names are used when no locale is specified """
 
-        a = Schema.Schema ('ut_schema/simple.xml').documents ['article']
+        a = Schema.Schema ('ut_schema/simple.xml') ['article']
 
         assert a.name == 'Article'
         assert a.mandatory ['author'].name == 'Author'
@@ -55,7 +55,7 @@ class TestSchema (pybut.TestCase):
 
         locale.setlocale (locale.LC_MESSAGES, 'en_US')
         
-        a = Schema.Schema ('ut_schema/simple.xml').documents ['article']
+        a = Schema.Schema ('ut_schema/simple.xml') ['article']
 
         assert a.name == 'Article (en)'
         assert a.mandatory ['author'].name == 'Author (en)'
@@ -120,7 +120,7 @@ class TestSchema (pybut.TestCase):
         from Pyblio import Attribute
         
         s = Schema.Schema ('ut_schema/types.xml')
-        a = s.documents ['sample']
+        a = s ['sample']
 
         assert a.mandatory ['url'].type is Attribute.URL
         assert a.mandatory ['text'].type is Attribute.Text

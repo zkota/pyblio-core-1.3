@@ -408,7 +408,8 @@ def file_import (file, encoding, db, ** kargs):
     for tp, key, val in data:
 
         try:
-            schema = db.schema.documents [tp]
+            schema = db.schema [tp]
+
         except KeyError:
             raise Exceptions.SchemaError (
                 _("document '%s' is unknown") % tp)
@@ -421,6 +422,7 @@ def file_import (file, encoding, db, ** kargs):
             
             try:
                 attp = schema.typeof (k)
+
             except KeyError:
                 raise Exceptions.SchemaError (
                     _("no attribute '%s' in document '%s'") % (
@@ -428,7 +430,7 @@ def file_import (file, encoding, db, ** kargs):
 
             e [k] = _mapping [attp.type] (v, encoding)
 
-        e.native = ('bibtex', _tostring (tp, key, val))
+        e.native = ('bibtex', _tostring (tp, key, val).decode ('latin-1'))
         
         db [e.key] = e
         

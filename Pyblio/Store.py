@@ -26,12 +26,19 @@ Please note: this is an interface definition, but it can also be used
 as a base class.
 '''
 
+import os, string
+
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
 from Pyblio import Schema, Attribute
+
+
+class StoreError (Exception):
+
+    pass
 
 
 class Key (str):
@@ -107,7 +114,13 @@ class Entry (dict):
 class Database (dict):
 
     ''' This class represents a full bibliographic database.  It also
-    looks like a dictionnary, linking a Core.Key with a Core.Entry.'''
+    looks like a dictionnary, linking a Core.Key with a Core.Entry.
+
+    [Update rules] Entries returned by a Database MUST be considered
+    read-only. Modifications MUST be performed on a copy of the entry,
+    and the resulting Entry MUST be set again in the database for the
+    modification to be kept.
+    '''
 
 
     def __init__ (self, schema = None, file = None):
@@ -116,9 +129,17 @@ class Database (dict):
 
         if file:
             handler = DatabaseParse (self)
-            sax.parse (file, handler)
-        
+
+            try:
+                sax.parse (file, handler)
+
+            except ValueError, msg:
+                raise StoreError (_("cannot open '%s': %s") % (file, msg))
+                                  
 	return
+
+    def save (self):
+        return
 
     def xmlwrite (self, fd, schema = True):
         fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
@@ -204,7 +225,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             tp = self._attr ('type', attrs)
 
             try:
-                tp = self.db.schema.documents [tp]
+                tp = self.db.schema [tp]
             except KeyError:
                 self._error (_("document type '%s' is unsupported") % tp)
 
@@ -341,3 +362,30 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._o = None
             
         return
+
+
+# --------------------------------------------------
+
+_dir = os.path.normpath (os.path.join (
+    os.path.dirname (__file__), 'Stores'))
+
+_modules = {}
+
+for m in os.listdir (_dir):
+
+    m = os.path.splitext (m) [0]
+    _modules [m.lower ()] = m
+
+del _modules ['__init__']
+
+
+def get (fmt):
+
+    parts = ('Pyblio', 'Stores', _modules [fmt])
+
+    module = __import__ (string.join (parts, '.'))
+
+    for comp in parts [1:]:
+        module = getattr (module, comp)
+        
+    return module

@@ -44,7 +44,7 @@ class TestStore (pybut.TestCase):
         db = Store.Database (schema = schema)
 
         e = Store.Entry (Store.Key ('entry 1'),
-                        schema.documents ['sample'])
+                        schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'Last 1'),
                          Attribute.Person (last = 'Last 2')]
@@ -86,7 +86,7 @@ class TestStore (pybut.TestCase):
         db = Store.Database (schema = schema)
 
         e = Store.Entry (Store.Key ('entry_1'),
-                        schema.documents ['sample'])
+                        schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'LastName') ]
         e.loss_set ('author', True)

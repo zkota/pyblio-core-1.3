@@ -17,16 +17,53 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
-# 
 
-''' This module defines some common exceptions '''
+import os
+
+from Pyblio import Store
+
+
+class Database (Store.Database):
+
+    def __init__ (self, schema = None, file = None):
+
+        Store.Database.__init__ (self, schema, file)
+
+        self.file = file
+        return
+    
+    def save (self):
+
+        try:
+            os.unlink (self.file + '.bak')
+        except OSError:
+            pass
+
+        if os.path.exists (self.file):
+            os.rename (self.file, self.file + '.bak')
+
+        fd = open (self.file, 'w')
+        self.xmlwrite (fd)
+        fd.close ()
+
+        return
+
+
+def dbdestroy (path):
+
+    os.unlink (path)
+    return
 
     
-class ParserError (Exception):
+def dbcreate (path, schema):
 
-    pass
+    db = Database (schema = schema)
+    db.file = path
 
-class SchemaError (Exception):
+    return db
 
-    pass
+
+def dbopen (path):
+
+    return Database (file = path)
 

@@ -35,11 +35,9 @@ from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N
 
-class Schema:
+class Schema (dict):
 
     def __init__ (self, file = None):
-
-        self.documents = {}
 
         if file:
             handler = SchemaParse (self)
@@ -61,7 +59,7 @@ class Schema:
 
         # Collect all the attributes
         attrs = {}
-        for d in self.documents.values ():
+        for d in self.values ():
             for a in d.mandatory.values () + d.optional.values ():
                 attrs [a.id] = a
 
@@ -73,11 +71,11 @@ class Schema:
             fd.write ('\n')
             
         # Output the documents themselves
-        docs = self.documents.keys ()
+        docs = self.keys ()
         docs.sort ()
 
         for k in docs:
-            self.documents [k].xmlwrite (fd)
+            self [k].xmlwrite (fd)
             fd.write ('\n')
 
         fd.write ('</pyblio-schema>\n')
@@ -195,7 +193,7 @@ class SchemaParse (sax.handler.ContentHandler):
     def startDocument (self):
         # Start with an empty schema
         
-        self.schema.documents = {}
+        self.schema.clear ()
 
         self._attributes = {}
         self._attribute = None
@@ -302,7 +300,7 @@ class SchemaParse (sax.handler.ContentHandler):
 
             self._document.name = self._trn (self._document.names)
             
-            self.schema.documents [self._document.id] = self._document
+            self.schema [self._document.id] = self._document
             self._document = None
             return
         
