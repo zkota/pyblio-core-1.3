@@ -19,29 +19,23 @@
 # 
 # 
 
-# Perform the first initialisation of Gnome, so that the options passed to the script
-# are not passed to Gnome
+""" Store GUI configuration information """
 
-import sys
+import gconf
 
-sys.argv = sys.argv [:2] + ['--'] + sys.argv [2:]
+# Information is automatically stored under a given subpath
+_root = '/apps/pybliographic/'
 
-# correctly identify the program
-import pygtk
-pygtk.require ('2.0')
+_engine = gconf.client_get_default ()
 
-import gnome
-import gnome.ui
+def _path (sub):
 
-from Pyblio import version
+    if sub [0] == '/': sub = sub [1:]
+    return _root + sub
 
-gnome.init ('Pybliographer', version.version)
 
-# clean up our garbage
-sys.argv = sys.argv [:2] + sys.argv [3:]
+def int_set (key, val):
+    _engine.set_int (_path (key), val)
 
-del sys
-
-import gtk.glade
-
-gtk.glade.bindtextdomain ("pybliographer", version.localedir)
+def int_get (key):
+    return _engine.get_int (_path (key))

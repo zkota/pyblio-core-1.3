@@ -19,11 +19,12 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+
 import sys
 
 from PyblioUI.Gnome import Document
 
-files = sys.argv [1:]
+files = sys.argv [2:]
 
 if files:
     for f in files:

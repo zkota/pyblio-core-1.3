@@ -18,10 +18,15 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+from Pyblio import Store
+
 def open (file, format):
     ''' Open a database of a given format '''
 
-    pass
+    da = Store.get (format)
+
+    return da.dbopen (file)
+
 
 
 def create (file, format):

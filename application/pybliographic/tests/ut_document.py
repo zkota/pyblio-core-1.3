@@ -8,17 +8,13 @@ class TestDocument (pybut.TestCase):
     def testOpen (self):
         """ Open an existing database """
 
-        for name, format in (('file', 'ut_document/sample.xml'),):
+        for format, name in (('file', 'ut_document/sample.xml'),):
             db = Document.open (name, format)
-        
+
+            assert len (db) == 1
+            
         return
 
-    def testCreate (self):
-        """ Create a new database """
-
-        
-        return
-    
 
 document = pybut.makeSuite (TestDocument, 'test')
 

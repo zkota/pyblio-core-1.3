@@ -18,9 +18,23 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+
+from PyblioUI.Gnome import Glade
+
+
+class Document (Glade.Window):
+    
+    gladeinfo = { 'file': 'main',
+                  'root': 'document',
+                  'name': 'main'
+                  }
+
+
 def open (file):
 
-    pass
+    d = Document ()
+    return d
+
 
 def create ():
     
