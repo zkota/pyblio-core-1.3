@@ -723,6 +723,40 @@ class TestContent (pybut.TestCase):
         
         return
 
+
+    def testTxoValidParent (self):
+
+        """ Refuse invalid parent value for a TxoItem """
+        from Pyblio import Exceptions
+
+        g = self.db.enum.add ('group')
+
+        i = Store.TxoItem ()
+        i.parent = 123
+
+        try:
+            g.add (i)
+            assert False, 'should not succeed'
+            
+        except Exceptions.ConstraintError:
+            pass
+
+        # Check at update
+
+        i.parent = None
+        k = g.add (i)
+
+        i.parent = 123
+
+        try:
+            g [k] = i
+            assert False, 'should not succeed'
+            
+        except Exceptions.ConstraintError:
+            pass
+
+        return
+
     
     def testTxoSingle (self):
 

@@ -671,9 +671,24 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         self._group = group
         return
 
+    def _check (self, item):
+    
+        if item.parent is not None:
+
+            try:
+                i = self [item.parent]
+
+            except KeyError:
+                raise Exceptions.ConstraintError \
+                      (_('txo has unknown parent %s') % `item.parent`)
+
+        return
+
     
     def add (self, item, key = None):
 
+        self._check (item)
+        
         txn = self._env.txn_begin ()
 
         try:
@@ -707,6 +722,38 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
 
         return _pl (self._enum.get (self._group)) [1].values ()
         
+
+    def __setitem__ (self, key, item):
+
+        self._check (item)
+        
+        try:
+            i = self [key]
+            
+        except KeyError:
+            raise KeyError (_('invalid txo key %s') % `key`)
+        
+        txn = self._env.txn_begin ()
+
+        try:
+            v = self._enum.get (self._group, txn = txn)
+            
+            vid, data = _pl (v)
+
+            v = copy.deepcopy (item)
+            v.id    = key
+            v.group = self._group
+            
+            data [key] = v
+        
+            self._enum.put (self._group, _ps ((vid, data)), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        return
     
     def __delitem__ (self, k):
 

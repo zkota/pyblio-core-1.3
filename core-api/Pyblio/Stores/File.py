@@ -35,9 +35,37 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         self._group = group
 
         return
-    
 
+    def _check (self, item):
+    
+        if item.parent is not None and \
+               not self.has_key (item.parent):
+
+            raise Exceptions.ConstraintError \
+                  (_('txo has unknown parent %s') % `item.parent`)
+
+        return
+
+
+    def __setitem__ (self, key, item):
+
+        self._check (item)
+
+        if not self.has_key (key):
+            raise KeyError (_('txo %s does not exist') % `key`)
+        
+        v = copy.deepcopy (item)
+        
+        v.id    = key
+        v.group = self._group
+        
+        dict.__setitem__ (self, key, v)
+        return
+
+    
     def add (self, item, key = None):
+
+        self._check (item)
 
         self._id, key = Tools.id_make (self._id, key)
 
@@ -46,7 +74,7 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         v.id    = key
         v.group = self._group
         
-        self [key] = v
+        dict.__setitem__ (self, key, v)
 
         return key
 

@@ -276,6 +276,9 @@ class TxoGroup (object):
     def __getitem__ (self, k):
         raise NotImplemented ('please override')
         
+    def __setitem__ (self, k):
+        raise NotImplemented ('please override')
+        
     def __delitem__ (self, k):
         raise NotImplemented ('please override')
 
@@ -618,6 +621,9 @@ class DatabaseParse (sax.handler.ContentHandler):
 
             i = TxoItem ()
             i.id = int (self._attr ('id', attrs))
+
+            # Already add this item as it is needed for potential children
+            self._txog.add (i, key = i.id)
             
             self._txoi.append (i)
             return
@@ -777,8 +783,9 @@ class DatabaseParse (sax.handler.ContentHandler):
 
             if self._txoi:
                 i.parent = self._txoi [-1].id
-            
-            self._txog.add (i, key = i.id)
+
+            # Update the item with its final value
+            self._txog [i.id] = i
             return
         
         if name == 'header':
