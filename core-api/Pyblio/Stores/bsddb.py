@@ -223,6 +223,10 @@ class View (Store.View):
 
         return Store.Key (self._v.get (idx + 1) [1])
     
+    def __len__ (self):
+
+        return self._v.stat () ['nkeys']
+
         
     def __del__ (self):
 

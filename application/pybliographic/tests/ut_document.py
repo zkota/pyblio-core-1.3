@@ -28,7 +28,7 @@ class TestDocument (pybut.TestCase):
                              (None,   'ut_document/sample.pbl')):
             d = Document.Document (name, format)
             
-            assert len (d) == 1
+            assert len (d.db.entries) == 1
             
         return
 

@@ -106,7 +106,7 @@ class Document (Glade.Window, Publisher):
         # update misc status info
         self._w_document.set_title (_('Pybliographic - %s') % self._l.title ())
 
-        l = len (self._l.db)
+        l = len (self._l.db.entries)
         if l > 1:    txt = _('%d entries') % l
         elif l == 1: txt = _('1 entry')
         else:        txt = _('No entry')
@@ -114,7 +114,9 @@ class Document (Glade.Window, Publisher):
         self._w_appbar.set_default (txt)
 
         # connect the database to the index view
-        idx = Index.DatabaseModel (self._l.db)
+        v = self._l.db.entries.view ('name')
+        
+        idx = Index.DatabaseModel (v, self._l.db)
         self._w_index.set_model (idx)
 
 
@@ -209,7 +211,9 @@ class Document (Glade.Window, Publisher):
         if len (path) == 1:
             
             if path [0] == 0:
-                idx = Index.DatabaseModel (self._l.db)
+                vw = self._l.db.entries.view ('name')
+                idx = Index.DatabaseModel (vw, self._l.db)
+                
                 self._w_index.set_model (idx)
 
             return
@@ -217,8 +221,9 @@ class Document (Glade.Window, Publisher):
         if path [0] == 1:
             # we have selected a result set
             rs = model.get_value (iter, 0)
+            vw = rs.view ('name')
             
-            idx = Index.DatabaseModel (rs, self._l.db)
+            idx = Index.DatabaseModel (vw, self._l.db)
             self._w_index.set_model (idx)
 
         return

@@ -35,10 +35,10 @@ class DatabaseModel (gtk.GenericTreeModel):
     _columns = (gobject.TYPE_PYOBJECT,
                 gobject.TYPE_STRING)
     
-    def __init__(self, rs, db = None):
+    def __init__(self, vw, db):
 	gtk.GenericTreeModel.__init__(self)
 
-        self._rs = rs
+        self._vw = vw
         self._db = db
         return
 
@@ -59,7 +59,7 @@ class DatabaseModel (gtk.GenericTreeModel):
 	'''returns the tree path. in our case, it is the first part of
 	the node tuple '''
         
-	return (node [0],)
+	return (node,)
     
     def on_get_iter(self, path):
 
@@ -68,51 +68,33 @@ class DatabaseModel (gtk.GenericTreeModel):
 
         if len (path) != 1: return None
 
-        # FIXME: obviously very inefficient !
+        n = path [0]
         
-        p = path [0]
+        if n >= len (self._vw): return None
         
-        i = p + 1
-        n = iter (self._rs)
+        return n
 
-        try:
-            while i:
-                d = n.next ()
-                i = i - 1
-                
-        except StopIteration:
-            return None
-        
-        return (path [0], d, n)
     
     def on_get_value (self, node, column):
 	'''returns the value stored in a particular column for the node'''
 
-        k = node [1]
+        k = self._vw [node]
+        
         # column 0 is simply the entry's key
         if column == 0: return k
 
         # column 1 is an actual description
-        if self._db is not None:
-            db = self._db
-        else:
-            db = self._rs
-            
-        e = db [k]
+        e = self._db [k]
         
 	return Entry.summary (e)
     
     def on_iter_next (self, node):
 	'''returns the next node at this level of the tree'''
 
-        p, d, n = node
-        try:
-            d = n.next ()
-
-        except StopIteration:
-            return None
-
-        return (p + 1, d, n)
+        node = node + 1
+        if node < len (self._vw): return node
+        
+        return None
     
     def on_iter_children(self, node):
 	'''returns the first child of this node'''
