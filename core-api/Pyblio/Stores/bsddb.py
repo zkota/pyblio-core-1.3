@@ -416,10 +416,17 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
     def add (self, k, txn = None):
 
+        if not isinstance (k, Store.Key):
+            raise ValueError ('the key must be of type Store.Key')
+
+        k = str (k)
+        
         txn = self._env.txn_begin (txn)
 
         try:
-            self._rs.put (str (k), '', txn = txn)
+            e = _pl (self._db.get (k, txn = txn))
+            
+            self._rs.put (k, '', txn = txn)
 
             # Update the views of the result set
             
@@ -428,8 +435,6 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
                 if v is None:
                     self._views.remove (vref)
                     continue
-
-                e = _pl (self._db.get (str (k), txn = txn))
 
                 v._add (e, txn)
                 
