@@ -37,11 +37,10 @@ class Item (Publisher):
     ''' A single configuration information. This object emits a 'set'
     event when a modification of its value is attempted.'''
     
-    def __init__ (self, name, description, vtype = None):
+    def __init__ (self, description, vtype = None):
 
         Publisher.__init__ (self)
         
-        self.name        = name
         self.description = description
 
         # type definition
@@ -57,9 +56,7 @@ class Item (Publisher):
     
     def _set (self, value):
 
-        if not self._type.match (value):
-            raise RuntimeError ('invalid value for type %s' % `self._type`)
-        
+        self._type.match (value)
         self.emit ('set', value)
         
         self._data = value
@@ -77,34 +74,7 @@ class Storage (dict):
 
            domain/subkey
 
-       ...where domain refers to some configuration file, which is
-       loaded when the first key requiring it is requested. """
-
-    def __init__ (self):
-        dict.__init__ (self)
-        self._sources = {}
-        return
-
-
-    def _maybe_resolve (self, key):
-
-        """ Ensure a given domain has been loaded """
-        
-        if dict.has_key (self, key): return
-        domain = string.split (key, '/') [0]
-
-        from PyblioUI import Config
-
-        env = {'Config': Config}
-        
-        if self._sources.has_key (domain):
-            file = self._sources [domain]
-
-            # Ensure the domain is loaded once
-            del self._sources [domain]
-
-            execfile (file, env, env)
-        return
+        and domains can be addressed separately."""
 
 
     def domains (self):
@@ -112,85 +82,51 @@ class Storage (dict):
         """ Return a list of available domains """
         
         # get all domains from the keys
-        doms = map (lambda key: string.split (key, '/') [0], self.keys ())
-        
-        # simplify the list
         table = {}
-        def mark (x): table [x] = 1
-        
-        map (mark, doms + self._sources.keys ())
 
+        for k in self.keys ():
+            d = string.split (k, '/') [0]
+            table [d] = 1
+            
         return table.keys ()
 
     def keys_in_domain (self, domain):
 
         """ Return a list of keys in a domain """
         
-        self._maybe_resolve (domain)
-
         # simplify the list
-        def test_dom (key, dom = domain):
-            f = string.split (key, '/')
-            if f [0] == dom:
-                return 1
-            return 0
+        def test_dom (key):
+            return string.split (key, '/') [0] == domain
     
         return filter (test_dom, self.keys ())
         
     
-    def has_key (self, key):
-
-        """ Check that a given key is defined. """
-        
-        self._maybe_resolve (key)
-        return dict.has_key (self, key)
-
-
-    def __getitem__ (self, key):
-
-        """ Get a given key. """
-        
-        self._maybe_resolve (key)
-        return dict.__getitem__ (self, key)
-        
-
-    def __setitem__ (self, key, value):
-
-        """ Set a given key. """
-
-        self._maybe_resolve (key)
-        return dict.__setitem__ (self, key, value)
-
-
-    def parse (self, directory):
-        files = map (lambda x: \
-                     os.path.join (directory, x),
-                     os.listdir (directory))
-
-        for filename in files:
-            if filename [-3:] == '.py':
-                domain = string.lower (os.path.split (filename [:-3]) [1])
-                self._sources [domain] = filename
-        return
-
-
 class PrimaryType (object):
     
     ''' Base class for simple types '''
-    
-    def match (self, value):
-        return type (value) is self._type
 
+    def match (self, value):
+        if type (value) is not self._type:
+            
+            raise TypeError (_('expected %s, got %s') % (
+                self._type, type (value)))
+        return
     
     
 class String (PrimaryType):
 
     _type = str
 
+    def __str__ (self):
+        return _('String')
+    
 class Boolean (PrimaryType):
 
     _type = bool
 
+    def __str__ (self):
+        return _('Boolean')
+    
 class Integer (PrimaryType):
 
     _type = int
@@ -201,12 +137,15 @@ class Integer (PrimaryType):
         return
 
     def match (self, value):
-        if not PrimaryType.match (self, value): return False
+        PrimaryType.match (self, value)
         
-        if self.min and value < self.min: return False
-        if self.max and value > self.max: return False
+        if (self.min and value < self.min) or \
+               (self.max and value > self.max):
 
-        return True
+            raise ValueError (_('value should be between %s and %s') % (
+                self.min, self.max))
+
+        return
 
     def __str__ (self):
 
@@ -220,7 +159,8 @@ class Integer (PrimaryType):
         return _("Integer between %d and %d") % (self.min, self.max)
     
 
-class Element:
+class Element (PrimaryType):
+    
     def __init__ (self, elements):
         self._set = elements
         return
@@ -232,115 +172,83 @@ class Element:
         return s
     
     def match (self, value):
-        return value in self._expand ()
+        exp = self._expand ()
+        if value in exp: return
+
+        raise ValueError (_('%s not in %s') % (
+            `value`, `exp`))
 
     def __str__ (self):
         return _("Element in `%s'") % str (self._expand ())
 
     
-class Tuple:
+class Tuple (PrimaryType):
+    
     ''' A tuple composed of different subtypes '''
+
+    _type = tuple
     
     def __init__ (self, subtypes):
         self._sub = subtypes
         return
 
     def match (self, value):
+        PrimaryType.match (self, value)
 
         for sub, val in zip (self._sub, value):
-            if not sub.match (val): return False
-        
-        return True
+            sub.match (val)
+            
+        return
 
     def __str__ (self):
         return _("Tuple (%s)") % \
                string.join (map (str, self._sub), ', ')
     
 
-class List:
+class List (PrimaryType):
+    
     ''' An enumeration of items of the same type '''
+
+    _type = list
 
     def __init__ (self, subtype):
         self._sub = subtype
         return
 
     def match (self, value):
+        PrimaryType.match (self, value)
 
         for v in value:
-            if not self._sub.match (v):
-                return False
-        
-        return True
+            self._sub.match (v)
+        return
 
     def __str__ (self):
         return _("List (%s)") % str (self._sub)
     
 
-class Dict:
+class Dict (PrimaryType):
+    
     ''' A dictionnary '''
 
+    _type = dict
+    
     def __init__ (self, key, value):
         self._k = key
         self._v = value
         return
 
     def match (self, value):
-
+        PrimaryType.match (self, value)
+        
         for k, v in value.items ():
-            if not self._k.match (k):
-                return False
-            if not self._v.match (v):
-                return False
+            self._k.match (k)
+            self._v.match (v)
                 
-        return True
+        return
 
     def __str__ (self):
         return _("Dictionary (%s, %s)") % (str (self._k),
                                            str (self._v))
-
-_items = None
-
-def reset ():
-    global _items
-    _items = Storage ()
-    return
-
-def define (key, description, vtype = None):
-    
-    if _items.has_key (key):
-        raise KeyError, "key `%s' already defined" % key
-
-    _items [key] = Item (key, description, vtype)
-    return
-
-
-def get (key):
-    return _items [key]
-
-
-def keys ():
-    return _items.keys ()
-
-
-def has_key (key):
-    return _items.has_key (key)
-
-
-def domains ():
-    return _items.domains ()
-
-
-def keys_in_domain (domain):
-    return _items.keys_in_domain (domain)
-
-
-def parse (dir):
-    _items.parse (dir)
-    return
-
-
-reset ()
-
 
 
 _changes = {}
