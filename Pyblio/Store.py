@@ -143,10 +143,11 @@ class Database (dict):
         value.key = key
         dict.__setitem__ (self, key, value)
         return
-    
 
+    
     def save (self):
-        return
+        raise NotImplemented ('please override')
+    
 
     def xmlwrite (self, fd, schema = True):
         fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')

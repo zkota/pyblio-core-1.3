@@ -57,5 +57,5 @@ fmts = ('bsddb', 'file')
 global fmt
 
 for fmt in fmts:
-
+    print "unittest: ------------ storage '%s' ----------" % fmt
     pybut.run (pybut.makeSuite (TestDatabase, 'test'))
