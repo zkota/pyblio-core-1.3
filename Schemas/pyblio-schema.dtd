@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<!ELEMENT pyblio-schema (attribute*, document*)>
+
+<!ELEMENT attribute (name+)>
+  <!ATTLIST attribute id   ID    #REQUIRED>
+  <!ATTLIST attribute type CDATA #REQUIRED>
+
+<!ELEMENT name (#PCDATA)>
+  <!ATTLIST name lang CDATA "">
+
+<!ELEMENT document (name+, mandatory*, optional*)>
+  <!ATTLIST document id   ID    #REQUIRED>
+
+<!ELEMENT mandatory EMPTY>
+  <!ATTLIST mandatory id  IDREF #REQUIRED>
+
+<!ELEMENT optional  EMPTY>
+  <!ATTLIST optional id   IDREF #REQUIRED>
