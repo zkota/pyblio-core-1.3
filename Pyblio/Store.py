@@ -31,7 +31,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema
+from Pyblio import Schema, Attribute
 
 
 class Key (str):
@@ -144,6 +144,8 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._started = False
 
         self._entry = None
+        self._attribute = None
+        self._tdata = None
         return
 
 
@@ -179,15 +181,89 @@ class DatabaseParse (sax.handler.ContentHandler):
         
         if not self._started:
             self._error (_("this is not a pybliographer database"))
+
+        # --------------------------------------------------
+        if name == 'entry':
+            id = self._attr ('id', attrs)
+            tp = self._attr ('type', attrs)
+
+            try:
+                tp = self.db.schema.documents [tp]
+            except KeyError:
+                self._error (_("document type '%s' is unsupported") % tp)
+
+            self._entry = Entry (id, tp)
+            return
+
+        if name == 'attribute':
+            if self._entry is None:
+                self._error (_("tag 'attribute' must be in an 'entry'"))
+
+            id = self._attr ('id', attrs)
+
+            try:
+                tp = self._entry.type.typeof (id)
+
+            except KeyError:
+                self._error (_("invalid attribute '%s' in document '%s'") %
+                             (id, self._entry.type.name))
+
+            self._attribute = (id, tp.type)
+            return
+
+        if name in Attribute.N_to_C.keys ():
+            if self._attribute is None:
+                self._error (_("attribute '%s' must be in an 'attribute' tag") % name)
+
+            id = self._attribute [0]
+
+            if self._attribute [1] is not Attribute.N_to_C [name]:
+                self._error (_("attribute '%s' does not match type of '%s'") %
+                             (name, id))
+                
+            if name == 'person':
+                self._o = Attribute.Person (honorific = attrs.get ('honorific', None),
+                                            first     = attrs.get ('first', None),
+                                            last      = attrs.get ('last', None),
+                                            lineage   = attrs.get ('lineage', None))
+            elif name == 'date':
+
+                d = []
+                for v in (attrs.get ('day', None),
+                          attrs.get ('month', None),
+                          attrs.get ('year', None)):
+                    if v: d.append (int (v))
+                    else: d.append (None)
+
+                self._o = Attribute.Date (day   = d [0],
+                                          month = d [1],
+                                          year  = d [2])
+
+            elif name == 'reference':
+                self._o = Attribute.Reference (self._attr ('ref', attrs))
+
+            elif name == 'text':
+                self._tdata = ''
+                
+            elif name == 'url':
+                self._o = Attribute.URL (self._attr ('href', attrs))
+
+            else:
+                assert False, _("unexpected tag: %s") % name
+
+            return
         
         self._error ("unknown tag '%s'" % name)
-
+        return
 
     def characters (self, data):
         if self._in_schema:
             self._sparse.characters (data)
             return
-        
+
+        if self._tdata is not None:
+            self._tdata = self._tdata + data
+            
         return
 
     def endElement (self, name):
@@ -203,7 +279,27 @@ class DatabaseParse (sax.handler.ContentHandler):
                 self._sparse.endElement (name)
                 
             return
-        
+
+        if name == 'entry':
+            self.db [self._entry.key] = self._entry
+            self._entry = None
+            return
+
+        if name in Attribute.N_to_C.keys ():
+
+            if name == 'text':
+                self._o = Attribute.Text (self._tdata)
+                self._tdata = None
+            
+            id = self._attribute [0]
+            
+            try:
+                self._entry [id].append (self._o)
+            except KeyError:
+                self._entry [id] = [self._o]
+
+            self._o = None
+            
         return
 
 

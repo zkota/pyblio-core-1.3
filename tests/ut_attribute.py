@@ -40,16 +40,16 @@ class TestAttribute (pybut.TestCase):
 
         txt = u'héhé\nhuhu'
         self._check (Attribute.Date (year = 2003),
-                     u'<date year=2003/>')
+                     u'<date year="2003"/>')
         
         self._check (Attribute.Date (year = 2003,
                                      month = 12),
-                     u'<date year=2003 month=12/>')
+                     u'<date year="2003" month="12"/>')
 
         self._check (Attribute.Date (year  = 2003,
                                      month = 12,
                                      day   = 25),
-                     u'<date year=2003 month=12 day=25/>')
+                     u'<date year="2003" month="12" day="25"/>')
         return
 
     def testText (self):

@@ -67,7 +67,7 @@ class Date:
         for f in ('year', 'month', 'day'):
             v = getattr (self, f)
             if v:
-                data.append ('%s=%d' % (f, v))
+                data.append ('%s="%d"' % (f, v))
         
         fd.write ('<date %s/>' % string.join (data, ' '))
         return

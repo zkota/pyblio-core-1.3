@@ -40,7 +40,7 @@
    <person last="Last 2"/>
   </attribute>
   <attribute id="date">
-   <date year=2003/>
+   <date year="2003"/>
   </attribute>
   <attribute id="ref">
    <reference ref="ref"/>
