@@ -126,12 +126,12 @@ class ResultSet (list):
 
     def xmlwrite (self, fd):
 
-        fd.write (' <resultset name="%s">\n' %
+        fd.write (' <resultset name=%s>\n' %
                   quoteattr (self.name.encode ('utf-8')))
         
         for v in self:
-            fd.write ('  <entry ref="%d">\n' % v)
-        fd.write (' </resultset>\n' % self.name)
+            fd.write ('  <entry ref="%d"/>\n' % v)
+        fd.write (' </resultset>\n')
         return
 
 
@@ -340,8 +340,8 @@ class Database (dict):
         for v in self.itervalues ():
             v.xmlwrite (fd)
 
-        for rs in self.rs.items ():
-            rs.xmlwrite (rs)
+        for rs in self.rs.values ():
+            rs.xmlwrite (fd)
         
         fd.write ('</pyblio-db>\n')
         return
@@ -383,6 +383,8 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._enumi = None
         self._enumg = None
 
+        self._rs = None
+        
         self._lang = None
         return
 
@@ -457,10 +459,15 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
         
         if name == 'entry':
-            id = self._attr ('id', attrs)
+            if self._rs is not None:
+                id = self._attr ('ref', attrs)
+                self._rs.append (Key (id))
+                
+            else:
+                id = self._attr ('id', attrs)
 
-            self._entry = Entry ()
-            self._ekey  = Key (id)
+                self._entry = Entry ()
+                self._ekey  = Key (id)
             return
 
         if name == 'native':
@@ -469,6 +476,10 @@ class DatabaseParse (sax.handler.ContentHandler):
 
             self._ntype = self._attr ('type', attrs)
             self._tdata = ''
+            return
+
+        if name == 'resultset':
+            self._rs = ResultSet (self._attr ('name', attrs))
             return
         
         if name == 'attribute':
@@ -592,10 +603,16 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'entry':
-            self.db.add (self._entry, id = self._ekey)
-            self._entry = None
+            if self._rs is None:
+                self.db.add (self._entry, id = self._ekey)
+                self._entry = None
             return
 
+        if name == 'resultset':
+            self.db.rs [self._rs.name] = self._rs
+            self._rs = None
+            return
+        
         if name == 'native':
             self._entry.native = (self._ntype, self._tdata)
             self._ntype = None
