@@ -23,36 +23,40 @@ Store implementation on top of Berkeley DB (>= 4.1)
 
 Tables in use:
 
-* database/entries:
+* database/entries [HASH]
 
   key:   string value of an entry key
   value: Store.Entry as a pickled object
 
-* database/meta:
+* database/meta [HASH]
 
   key:   a meta parameter (next available key,...)
   value: its value
 
-* database/enum:
+* database/enum [HASH]
 
   key:   id of the enum
   value: pickled dict containing the values
 
-* index/full:
+* index/full [HASH / DUP]
 
   key:   the indexed value
   value: the entry that contains the value
 
-* resultset/<id>
+* resultset/<id> [HASH]
 
   key:   string value of the entry's key
   value: no meaning
 
+* view/<id> [BTREE / RECNUM / DUP]
+
+  key:   field on which we sort
+  value: key from which the field is taken
 
 """
 from gettext import gettext as _
 
-import os, shutil, copy, sys, traceback
+import os, shutil, copy, sys, traceback, string
 
 import cPickle as pickle
 
@@ -69,9 +73,13 @@ class RSDB (object):
 
     """ Virtual result set that loops over the full database """
 
-    def __init__ (self, db):
+    def __init__ (self, _db, _env, _meta):
 
-        self._db = db
+        self.id  = 0
+        
+        self._db   = _db
+        self._env  = _env
+        self._meta = _meta
         return
     
     def itervalues (self):
@@ -110,7 +118,117 @@ class RSDB (object):
     def __len__ (self):
 
         return self._db.stat () ['nkeys']
+
+
+    def view (self, criterion):
+
+        return View (self._db, self._env, self._meta,
+                     self, criterion)
     
+    
+
+# --------------------------------------------------
+
+class View (Store.View):
+
+    def __init__ (self, _db, _env, _meta, rs, criterion, txn = None):
+
+        self._db   = _db
+        self._env  = _env
+        self._meta = _meta
+        self._crit = criterion
+        self._id   = None
+        
+        # Create the new view on top of the result set
+        txn = self._env.txn_begin (txn)
+
+        try:
+
+            # get a fresh view index
+            serial, meta, revert = _pl (self._meta.get ('view', txn = txn))
+
+            meta [serial] = rs.id
+            
+            info = revert.get (rs.id, {})
+            info [serial] = self._crit
+            revert [rs.id]  = info
+
+            self._meta.put ('view', _ps ((serial + 1, meta, revert)), txn = txn)
+
+            # create the new view
+            
+            self._v = db.DB (self._env)
+            self._v.set_flags (db.DB_DUP)
+            
+            self._v.open ('view', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
+
+            # fill the view with the current content of the result set
+            for e in rs.itervalues ():
+                try:
+                    value = e [criterion]
+                    value = string.join (map (lambda x: x.sort (), value), '\0')
+                    value = value.encode ('utf-8')
+                    
+                except KeyError:
+                    value = ''
+                
+                self._v.put (value, str (e.key), txn = txn)
+            
+        except:
+            txn.abort ()
+            raise
+
+        self._id = serial
+        
+        txn.commit ()
+        return
+
+    def iterkeys (self):
+
+        c = self._v.cursor ()
+        d = c.first ()
+        
+        while d:
+            key = d [1]
+            yield Store.Key (key)
+
+            d = c.next ()
+            
+        return
+
+    __iter__ = iterkeys
+    
+    def __del__ (self):
+
+        if self._id is None: return
+        
+        txn = self._env.txn_begin ()
+
+        try:
+            # remove oneself from the meta list
+            (serial, meta, revert) = _pl (self._meta.get ('view', txn = txn))
+
+            rs = meta [self._id]
+            
+            del revert [rs] [self._id]
+            del meta [self._id]
+
+            self._meta.put ('view', _ps ((serial, meta, revert)), txn = txn)
+            
+            self._v.close ()
+            
+            db.DB (self._env).remove ('view', str (self._id))
+            
+        except:
+            # exceptions in __del__ methods are not reported by default
+            etype, value, tb = sys.exc_info ()
+            traceback.print_exception (etype, value, tb)
+            
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        return
 
 # --------------------------------------------------
 
@@ -132,8 +250,9 @@ class ResultSet (Store.ResultSet):
         self._permanent = permanent
 
         self._rs = db.DB (self._env)
-        self._rs.open ('resultset', self._id, db.DB_BTREE,
+        self._rs.open ('resultset', self._id, db.DB_HASH,
                        db.DB_CREATE, txn = txn)
+
         return
 
     def _name_set (self, name):
@@ -235,6 +354,12 @@ class ResultSet (Store.ResultSet):
         txn.commit ()
         return
 
+
+    def view (self, criterion):
+
+        return View (self._db, self._env, self._meta,
+                     self, criterion)
+    
 
     def __del__ (self):
         if self._permanent: return
@@ -580,6 +705,8 @@ class Database (Store.Database, Callback.Publisher):
                 self._meta.put ('schema', _ps (schema), txn = txn)
                 self._meta.put ('rs', _ps ((1, {})), txn = txn)
                 self._meta.put ('serial', '1', txn = txn)
+                self._meta.put ('view', _ps ((1, {}, {})), txn = txn)
+                
             else:
                 self._schema = _pl (self._meta.get ('schema', txn = txn))
 
@@ -603,7 +730,7 @@ class Database (Store.Database, Callback.Publisher):
         txn.commit ()
 
         # Result set containing the full db
-        self._entries_rs = RSDB (self._db)
+        self._entries_rs = RSDB (self._db, self._env, self._meta)
         
         # No header in this db yet
         self.header = None

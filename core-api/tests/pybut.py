@@ -135,3 +135,23 @@ def fileeq (a, b):
 
     os.system ("diff '%s' '%s'" % (a, b))
     assert False, '%s and %s differ' % (a, b)
+
+def cleanup ():
+    import shutil
+    
+    for d in os.listdir ('.'):
+
+        if d [:2] != ',,': continue
+
+        if os.path.isdir (d): shutil.rmtree (d)
+        else:                 os.unlink (d)
+
+_count = 0
+
+def dbname ():
+    global _count
+
+    _count = _count + 1
+    return ',,db-%d' % _count
+
+            

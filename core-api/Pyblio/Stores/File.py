@@ -20,7 +20,7 @@
 
 from gettext import gettext as _
 
-import os, copy
+import os, copy, string
 
 from Pyblio import Store, Callback, Attribute, Exceptions, Tools
 
@@ -82,7 +82,27 @@ class EnumStore (dict, Store.EnumStore):
 
 # --------------------------------------------------
 
-class ResultSet (dict, Store.ResultSet):
+class Viewable (object):
+
+    def view (self, criterion):
+        view = []
+        
+        for e in self.itervalues ():
+            try:
+                value = e [criterion]
+                value = string.join (map (lambda x: x.sort (), value), '\0')
+                
+            except KeyError:
+                value = ''
+                
+            view.append ((value, e.key))
+
+        view.sort (lambda a, b: cmp (a [0], b [0]))
+
+        return map (lambda x: x [1], view)
+    
+
+class ResultSet (dict, Viewable, Store.ResultSet):
 
     def __init__ (self, rsid, db):
 
@@ -121,7 +141,7 @@ class ResultSet (dict, Store.ResultSet):
         return
 
 
-class RODict (object):
+class RODict (Viewable):
 
     """ Read-only dictionnary """
 

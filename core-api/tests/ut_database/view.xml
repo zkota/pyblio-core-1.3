@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="enum" type="enumerated" group="type">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="text" type="text">
+  <name>Text</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+</pyblio-schema>
+ <enum-group id="type">
+  <enum-item id="1">
+   <name>Journal</name>
+  </enum-item>
+  <enum-item id="2">
+   <name>Book</name>
+  </enum-item>
+ </enum-group>
+
+ <entry id="1">
+  <attribute id="enum">
+   <enumerated group="type" id="1"/>
+  </attribute>
+  <attribute id="text">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="enum">
+   <enumerated group="type" id="2"/>
+  </attribute>
+  <attribute id="text">
+   <text>BCD</text>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="enum">
+   <enumerated group="type" id="2"/>
+  </attribute>
+  <attribute id="text">
+   <text>CDE</text>
+  </attribute>
+ </entry>
+</pyblio-db>

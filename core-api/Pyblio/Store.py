@@ -116,6 +116,32 @@ class Entry (dict):
 
 # --------------------------------------------------
 
+class View (object):
+
+    """ A view of a Result Set represents the Result Set sorted
+    according to a specific criterion.
+
+    DERIVED BY ALL STORES
+    """
+
+    def __iter__ (self):
+        raise NotImplemented ('please override')
+
+    def itervalues (self):
+        raise NotImplemented ('please override')
+    
+    def iterkeys (self):
+        raise NotImplemented ('please override')
+    
+    def iteritems (self):
+        raise NotImplemented ('please override')
+
+    def __len__ (self):
+        raise NotImplemented ('please override')
+        
+
+# --------------------------------------------------
+
 class ResultSet (object):
 
     """ This class defines a result set. ResultSets can be named and
@@ -148,6 +174,10 @@ class ResultSet (object):
 
     def __len__ (self):
         raise NotImplemented ('please override')
+
+    def view (self, criterion):
+        raise NotImplemented ('please override')
+        
         
     def xmlwrite (self, fd):
 

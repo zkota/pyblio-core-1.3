@@ -2,6 +2,8 @@ import os, pybut, sys, string
 
 from Pyblio import Store, Schema, Attribute
 
+pybut.cleanup ()
+
 class TestDatabase (pybut.TestCase):
 
     """ Perform tests on the Pyblio.Stores main functions """
@@ -9,13 +11,15 @@ class TestDatabase (pybut.TestCase):
     def setUp (self):
         self.fmt = fmt
         self.hd  = Store.get (self.fmt)
+
+        self.nm = pybut.dbname ()
         return
     
     def testCreate (self):
         ''' Try to create a database, and check its content '''
-        
+
         sc = Schema.Schema ('ut_database/schema.xml')
-        db = self.hd.dbcreate (',,db', sc)
+        db = self.hd.dbcreate (self.nm, sc)
 
         e = Store.Entry ()
 
@@ -24,25 +28,24 @@ class TestDatabase (pybut.TestCase):
         
         db.save ()
 
-        db = self.hd.dbopen (',,db')
+        db = self.hd.dbopen (self.nm)
         assert db [k]['title'] == ['title']
 
-        self.hd.dbdestroy (',,db', nobackup = True)
         return
 
     def testDestroy (self):
         ''' Try to destroy a database '''
         
         sc = Schema.Schema ('ut_database/schema.xml')
-        db = self.hd.dbcreate (',,db2', sc)
+        db = self.hd.dbcreate (self.nm, sc)
 
         db.save ()
         del db
 
-        self.hd.dbdestroy (',,db2', nobackup = True)
+        self.hd.dbdestroy (self.nm, nobackup = True)
 
         try:
-            self.hd.dbopen (',,db2')
+            self.hd.dbopen (self.nm)
             assert False
             
         except Store.StoreError:
@@ -55,33 +58,35 @@ class TestDatabase (pybut.TestCase):
 
         sc = Schema.Schema ('ut_database/schema.xml')
 
-        db = self.hd.dbcreate (',,db3', sc)
+        db = self.hd.dbcreate (self.nm, sc)
         db.save ()
 
         try:
-            db = self.hd.dbcreate (',,db3', sc)
+            db = self.hd.dbcreate (self.nm, sc)
             assert False
             
         except Store.StoreError:
             pass
 
-        self.hd.dbdestroy (',,db3', nobackup = True)
+        self.hd.dbdestroy (self.nm, nobackup = True)
         return
 
     def testImport (self):
         ''' Import an XML database in the Store '''
 
-        db = self.hd.dbimport (',,db4', 'ut_database/sample.xml')
+        db = self.hd.dbimport (self.nm, 'ut_database/sample.xml')
         db.save ()
+
+        nmo = pybut.dbname ()
         
-        fd = open (',,db5', 'w')
+        fd = open (nmo, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (',,db5', 'ut_database/sample.xml')
-        self.hd.dbdestroy (',,db4', nobackup = True)
+        pybut.fileeq (nmo, 'ut_database/sample.xml')
+        self.hd.dbdestroy (self.nm, nobackup = True)
 
-        os.unlink (',,db5')
+        os.unlink (nmo)
         return
     
         
@@ -95,18 +100,13 @@ class TestContent (pybut.TestCase):
     def setUp (self):
         self.fmt  = fmt
         self.hd   = Store.get (self.fmt)
-        self.name = ',,db-%d' % self.count
+        self.name = pybut.dbname ()
         
         TestContent.count = self.count + 1
 
         sc = Schema.Schema ('ut_database/schema.xml')
         self.db = self.hd.dbcreate (self.name, sc)
 
-        return
-
-    def tearDown (self):
-
-        self.hd.dbdestroy (self.name, nobackup = True)
         return
 
     def testInsertRemove (self):
@@ -714,15 +714,62 @@ class TestContent (pybut.TestCase):
         return
 
 
+class TestView (pybut.TestCase):
+
+    """ Perform data manipulation tests """
+
+    count = 0
+
+    def setUp (self):
+        self.fmt  = fmt
+        self.hd   = Store.get (self.fmt)
+        self.name = pybut.dbname ()
+        
+        TestContent.count = self.count + 1
+
+        self.db = self.hd.dbimport (self.name, 'ut_database/view.xml')
+        self.db.save ()
+
+        # create a RS with all the entries
+        self.rs = self.db.rs.add ()
+        
+        for k in self.db.entries:
+            self.rs.add (k)
+            
+        return
+
+
+    def testViewText (self):
+
+        for rs in (self.rs, self.db.entries):
+                
+            v = rs.view ('text')
+
+            res = list (v)
+            assert res == [1, 2, 3], 'got %s' % res
+
+        return
+    
+            
+        
+
 if os.environ.has_key ('STORES'):
     fmts = os.environ ['STORES'].split (':')
 else:
     fmts = Store.modules ()
+
+classes = (pybut.makeSuite (TestDatabase, 'test'),
+           pybut.makeSuite (TestContent,  'test'),
+           pybut.makeSuite (TestView,     'test'))
+
+if os.environ.has_key ('CLASS'):
+    c = int (os.environ ['CLASS'])
+    
+    classes = classes [c:c+1]
     
 global fmt
 
 for fmt in fmts:
     print "unittest: ------------ storage '%s' ----------" % fmt
-    pybut.run (pybut.TestSuite ((pybut.makeSuite (TestDatabase, 'test'),
-                                 pybut.makeSuite (TestContent,  'test'))))
+    pybut.run (pybut.TestSuite (classes))
 
