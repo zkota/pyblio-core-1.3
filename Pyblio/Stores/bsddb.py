@@ -148,6 +148,7 @@ class Database:
             self.schema = schema
             self._meta.put ('schema', pickle.dumps (schema))
             self._meta.put ('rs', '0')
+            self._meta.put ('serial', '1')
         else:
             self.schema = pickle.loads (self._meta.get ('schema'))
 
@@ -166,21 +167,55 @@ class Database:
         self._meta.sync ()
         self._idx.sync ()
         return
+
+
+    def add (self, val, id = None):
+
+        # Be careful to always point after the last serial id used.
+        
+        serial = int (self._meta.get ('serial'))
+
+        if id: serial = max (serial, id)
+        self._meta.put ('serial', str (serial + 1))
+
+        return self._insert (serial, val)
     
 
     def __setitem__ (self, key, val):
+        assert self.has_key (key)
+        self._insert (key, val)
+        return
+
+
+    def has_key (self, k):
+
+        id = '%.16x' % k
         
+        try:
+            self._db.get (id)
+            
+        except db.DBNotFoundError:
+            return True
+
+        return False
+
+
+    def _insert (self, key, val):
+        
+        id  = '%.16x' % key
         idx = []
+        
         for attribs in val.values ():
             for attrib in attribs:
                 
                 for idx in attrib.index ():
                     idx = idx.encode ('utf-8')
-                    self._idx.put (idx, key)
+                    self._idx.put (idx, id)
         
         val = pickle.dumps (val)
-        self._db.put (key, val)
-        return
+        
+        self._db.put (id, val)
+        return id
 
     def query (self, word, sort, name = None):
 

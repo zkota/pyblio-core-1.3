@@ -68,8 +68,8 @@ class TestAttribute (pybut.TestCase):
 
         from Pyblio.Store import Key
         
-        self._check (Attribute.Reference (Key ('toto')),
-                     u'<reference ref="toto"/>')
+        self._check (Attribute.Reference (Key (123)),
+                     u'<reference ref="123"/>')
         return
 
     def testIndex (self):
@@ -90,7 +90,7 @@ class TestAttribute (pybut.TestCase):
         
         from Pyblio.Store import Key
         
-        assert Attribute.Reference (Key ('fake')).index () == []
+        assert Attribute.Reference (Key (314)).index () == []
         return
 
     def testSort (self):
@@ -114,8 +114,8 @@ class TestAttribute (pybut.TestCase):
 
         from Pyblio.Store import Key
         
-        coll = Attribute.Reference (Key ('Fake')).sort ()
-        assert coll == 'Fake'
+        coll = Attribute.Reference (Key (456)).sort ()
+        assert coll == '456'
         return
 
 

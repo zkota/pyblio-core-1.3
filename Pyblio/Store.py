@@ -40,7 +40,7 @@ class StoreError (Exception):
     pass
 
 
-class Key (str):
+class Key (int):
 
     ''' A key uniquely identifies an entry in a database '''
 
@@ -59,6 +59,8 @@ class Entry (dict):
 
     The entry.type is an instance of Schema.Document. It links the
     field names with their type.
+
+    The entry.native is a 2-uplet (format, native_content)
 
     For each attribute, it is possible that the returned value is
     lossy compared with the native data, if some information was not
@@ -84,7 +86,7 @@ class Entry (dict):
 
     def xmlwrite (self, fd):
         fd.write (' <entry id=%s type=%s>\n' %
-                  (quoteattr (self.key), quoteattr (self.type.id)))
+                  (quoteattr (str (self.key)), quoteattr (self.type.id)))
 
         if self.native:
             fd.write ('\n <native type=%s>%s</native>\n\n' %
@@ -130,12 +132,11 @@ class Database (dict):
     ''' This class represents a full bibliographic database.  It also
     looks like a dictionnary, linking a Core.Key with a Core.Entry.
 
-    [Update rules] Entries returned by a Database MUST be considered
+    [UPDATE RULE] Entries returned by a Database MUST be considered
     read-only. Modifications MUST be performed on a copy of the entry,
     and the resulting Entry MUST be set again in the database for the
     modification to be kept.
     '''
-
 
     def __init__ (self, schema = None, file = None):
 	''' Create a new empty database with the specified schema '''
@@ -143,6 +144,8 @@ class Database (dict):
         self.schema = schema
         self.header = None
         
+        self._id = 1
+
         if file:
             handler = DatabaseParse (self)
 
@@ -154,7 +157,38 @@ class Database (dict):
                                   
 	return
 
+
+    def add (self, value, id = None):
+        """ Insert a new entry in the database.
+
+        New entries MUST be added with this method, not via an update
+        with a hand-made Key.
+
+        key is only useful for importing an existing database, by
+        proposing a key choice.
+        """
+
+        if id:
+            v = int (id)
+            if v >= self._id:
+                self._id = v + 1
+            
+        else:
+            id = Key (self._id)
+            self._id = self._id + 1
+
+        assert not self.has_key (id), _("a duplicate key has been generated")
+
+        value.key = id
+        dict.__setitem__ (self, id, value)
+        return id
+    
+
     def __setitem__ (self, key, value):
+        # Ensure the key is not added, only updated.
+        assert self.has_key (key), \
+               _("use self.add () to add a new entry")
+
         value.key = key
         dict.__setitem__ (self, key, value)
         return
@@ -384,7 +418,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'entry':
-            self.db [self._ekey] = self._entry
+            self.db.add (self._entry, id = self._ekey)
             self._entry = None
             return
 

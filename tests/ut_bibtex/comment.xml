@@ -4,7 +4,7 @@
 <header>This is a comment
 This is a { comment too
 {mee too}</header>
- <entry id="toto" type="article">
+ <entry id="1" type="article">
 
  <native type="bibtex">@article{toto,
    author = {Gobry, Frederic and First Last},

@@ -34,7 +34,7 @@
  </document>
 
 </pyblio-schema>
- <entry id="entry_1" type="sample">
+ <entry id="1" type="sample">
 
  <native type="bibtex">@article{entry_1,
 author = {LastName}}</native>

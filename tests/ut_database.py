@@ -17,16 +17,15 @@ class TestDatabase (pybut.TestCase):
         sc = Schema.Schema ('ut_database/schema.xml')
         db = self.hd.dbcreate (',,db', sc)
 
-        k = Store.Key ('a')
         e = Store.Entry (db.schema ['article'])
 
         e ['title'] = [ Attribute.Text ('title') ]
-        db [k] = e
+        k = db.add (e)
         
         db.save ()
 
         db = self.hd.dbopen (',,db')
-        assert db ['a']['title'] == ['title']
+        assert db [k]['title'] == ['title']
 
         self.hd.dbdestroy (',,db', nobackup = True)
         return
@@ -98,11 +97,10 @@ class TestContent (pybut.TestCase):
         
         e = Store.Entry (self.db.schema ['article'])
 
-        initial = ['a', 'b', 'c', 'd']
+        initial = []
         
-        for k in initial:
-            k = Store.Key (k)
-            self.db [k] = e
+        for i in range (0, 10):
+            initial.append (self.db.add (e))
 
         # Iterate over the keys
         keys = []
@@ -127,7 +125,7 @@ class TestContent (pybut.TestCase):
             assert v == e
             count = count + 1
         
-        assert count == 4
+        assert count == len (initial)
 
         # Iterate over the values
         keys = []
@@ -172,13 +170,12 @@ class TestContent (pybut.TestCase):
             e ['title'] = [ Attribute.Text (a), Attribute.Text (b) ]
             e ['url']   = [ Attribute.URL (c) ]
 
-            k = '%d' % i
-            
+            k = self.db.add (e)
+
             for w in a.split () + b.split () + c.split ():
                 if k not in entries [w]:
                     entries [w].append (k)
             
-            self.db [Store.Key (k)] = e
 
         # Search the occurences of every word
         for w in words:

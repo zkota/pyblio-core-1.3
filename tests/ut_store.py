@@ -43,7 +43,6 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        k = Store.Key ('entry 1')
         e = Store.Entry (schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'Last 1'),
@@ -51,9 +50,9 @@ class TestStore (pybut.TestCase):
         e ['url']    = [ Attribute.URL ('http://pybliographer.org') ]
         e ['text']   = [ Attribute.Text (u'sample text') ]
         e ['date']   = [ Attribute.Date (year = 2003) ]
-        e ['ref']    = [ Attribute.Reference (Store.Key ('ref')) ]
+        e ['ref']    = [ Attribute.Reference (Store.Key (1)) ]
         
-        db [k] = e
+        db.add (e)
 
         db.header = u"Hi, I'm a database description"
         
@@ -87,7 +86,6 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        k = Store.Key ('entry_1')
         e = Store.Entry (schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'LastName') ]
@@ -95,7 +93,7 @@ class TestStore (pybut.TestCase):
         
         e.native = ('bibtex', '@article{entry_1,\nauthor = {LastName}}')
 
-        db [k] = e
+        db.add (e)
 
         fd = open (',,t5.xml', 'w')
         db.xmlwrite (fd)
@@ -112,7 +110,7 @@ class TestStore (pybut.TestCase):
         
         db = Store.Database (file = 'ut_store/native.xml')
 
-        e = db ['entry_1']
+        e = db [1]
         
         assert e.native == ('bibtex',
                             '@article{entry_1,\nauthor = {LastName}}')
