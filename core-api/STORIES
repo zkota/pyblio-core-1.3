@@ -111,6 +111,82 @@ An international exchange format, as defined by the IFLA.
 
 ** [ ] Annotation module
 
+** [X] Import architecture framework
+
+All import modules pertain to a common framework.  They share
+functionality, using the strategy pattern, and support Unicode.  
+
+*** [X] Tagged class module
+
+Common base for all *tagged* formats, that prefix each line or group
+of lines with a *tag*, i.e. field code.
+
+*** [X] Marc class module
+
+For all ISO 2907 type formats.
+
+*** [ ] Structured class module
+
+Common base for all SGML (better XML) derived formats.
+
+*** [ ] Text class module
+
+Common base for all modules scanning text files.
+
+** Import modules library
+
+Specific import formats are implemented by Reader classes that derive
+from one of the base class modules (tagged, structured or textual).
+
+*** [ ] Allegro import module
+
+The format of the German Allegro software.
+
+*** [ ] BibTeX import module
+
+The format defined by the BibTeX software.
+
+*** [ ] INSPEC import module
+
+The INSPEC format.
+
+*** [X] ISI import module
+
+The ISI format.
+
+*** [ ] Old Medline import module
+
+Tagged format that was used with Medline.
+
+*** [ ] MAB2 import module
+
+The German library (exchange) format.
+
+*** [ ] Marc21 import module
+
+This is the most frequently used library format. Defined by the
+Library of Congress.
+
+*** Swissmarc import module
+
+A variant of MARC21 as used by a part of the Swiss libraries.
+
+*** [ ] Unimarc import module
+
+An international exchange format, as defined by the IFLA.
+
+*** [ ] Ovid import module
+
+*** [ ] Refer import module
+
+*** [ ] RIS import module
+
+
+
+** [ ] Deduplication framework
+
+** [ ] Annotation module
+
 * DONE
 
 ** [X] BibTeX keys and document classes are attributes.
