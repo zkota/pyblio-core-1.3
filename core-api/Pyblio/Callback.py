@@ -62,7 +62,7 @@ def weakmethod (f):
     return WeakMethodBound (f)
 
 
-class Publisher:
+class Publisher (object):
 
     """ Base class for objects that wish to emit signals to registered
     clients."""

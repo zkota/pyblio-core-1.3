@@ -17,13 +17,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
-import gtk
+import gtk, gobject, pango
 
 from gettext import gettext as _
+from xml.sax.saxutils import escape
+
 from Pyblio.Callback import Publisher
 
 from PyblioUI.Gnome import Glade, Index
-
 from PyblioUI import Document as LogicDoc
 
 
@@ -47,29 +48,57 @@ class Document (Glade.Window, Publisher):
         Publisher.__init__ (self)
         Glade.Window.__init__ (self)
 
-        height = self.size_get ('pane', 50)
-        self._w_pane.set_position (height)
+        height = self.size_get ('vpane', 50)
+        self._w_vpane.set_position (height)
+
+        height = self.size_get ('hpane', 50)
+        self._w_hpane.set_position (height)
 
         # Configure the List View
-        col = gtk.TreeViewColumn ('Description', gtk.CellRendererText (), markup = 1)
+        col = gtk.TreeViewColumn (_('Description'), gtk.CellRendererText (), markup = 1)
         self._w_index.append_column (col)
 
-        self._selection = self._w_index.get_selection ()
-        self._selection.set_mode (gtk.SELECTION_MULTIPLE)
-        self._selection.connect ('changed', self._on_row_select)
+        s = self._w_index.get_selection ()
+        s.set_mode (gtk.SELECTION_MULTIPLE)
+        s.connect ('changed', self._on_entry_select)
 
         # Configure the text view
         self._text = self._w_view.get_buffer ()
 
+        self._tag = {}
         
+        self._tag ['title'] = \
+                  self._text.create_tag ('title',
+                                         weight = pango.WEIGHT_BOLD)
+        self._tag ['field'] = \
+                  self._text.create_tag ('field',
+                                         indent = -20,
+                                         style = pango.STYLE_OBLIQUE)
+        self._tag ['body'] = \
+                  self._text.create_tag ('body',
+                                         left_margin = 20)
+
+
+        # Configure the Result Set List
+        col = gtk.TreeViewColumn ('', gtk.CellRendererText (), markup = 1)
+        self._w_sets.append_column (col)
+
+        s = self._w_sets.get_selection ()
+        s.connect ('changed', self._on_rs_select)
+
+        # Let's go !
         self._w_document.show ()
         return
 
 
     def open (self, filename, format):
         """ Open an existing database.
-
-         - format: either the database type, or None if it should be guessed
+        
+            - filename: the database filename
+            
+            - format: either the database type, or None if it should
+              be guessed
+            
          """
 
         self._l = LogicDoc.Document (filename, format)
@@ -84,18 +113,64 @@ class Document (Glade.Window, Publisher):
         
         self._w_appbar.set_default (txt)
 
-        self._idx = Index.DatabaseModel (self._l.db)
-        self._w_index.set_model (self._idx)
-        
+        # connect the database to the index view
+        idx = Index.DatabaseModel (self._l.db)
+        self._w_index.set_model (idx)
+
+
+        # list the available result sets
+        self._rs = gtk.TreeStore (gobject.TYPE_PYOBJECT,
+                                  gobject.TYPE_STRING)
+
+        self._rs.append (None, (None, _('<b>Full database</b>')))
+
+        p = self._rs.append (None, (None, _('<i>Permanent Sets</i>')))
+
+        for rs in self._l.db.rs.values ():
+            self._rs.append (p, (rs, escape (rs.name) or _('Unnamed')))
+
+        self._w_sets.set_model (self._rs)
+        self._w_sets.expand_all ()
         return
 
-    def display (self, entry):
 
+    def display (self, entry):
+        """ Full text display of an entry """
+        
         if entry is None:
             self._text.set_text ('')
             return
 
-        self._text.set_text ('%s' % `entry`)
+        # Display this entry
+        self._text.delete (self._text.get_start_iter (),
+                           self._text.get_end_iter ())
+        
+        iter = self._text.get_start_iter ()
+        
+        fields = entry.keys ()
+        fields.sort ()
+        
+        
+        for k in fields:
+
+            desc = self._l.db.schema [k]
+
+            si = iter.get_offset ()
+            
+            self._text.insert (iter, desc.name + '\n')
+
+            mi = iter.get_offset ()
+
+            for f in entry [k]:
+                self._text.insert (iter, str (f) + '\n')
+            
+            si = self._text.get_iter_at_offset (si)
+            mi = self._text.get_iter_at_offset (mi)
+                
+            self._text.apply_tag (self._tag ['body'],  si, iter)
+            self._text.apply_tag (self._tag ['field'], si, mi)
+
+            self._text.insert (iter, '\n')
         return
 
 
@@ -110,9 +185,10 @@ class Document (Glade.Window, Publisher):
     def _on_close (self, * args):
         """ Callback on the Close action or window button """
         
-        height = self._w_pane.get_position ()
-
-        self.size_save (('pane', height))
+        hp = self._w_hpane.get_position ()
+        vp = self._w_vpane.get_position ()
+        
+        self.size_save (('hpane', hp), ('vpane', vp))
         self.emit ('close', self)
         return
 
@@ -122,8 +198,33 @@ class Document (Glade.Window, Publisher):
         self.emit ('quit', self)
         return
 
+
+    def _on_rs_select (self, sel, * args):
+
+        model, iter = sel.get_selected ()
+        if iter is None: return
+
+        path = model.get_path (iter)
+
+        if len (path) == 1:
+            
+            if path [0] == 0:
+                idx = Index.DatabaseModel (self._l.db)
+                self._w_index.set_model (idx)
+
+            return
+        
+        if path [0] == 1:
+            # we have selected a result set
+            rs = model.get_value (iter, 0)
+            
+            idx = Index.DatabaseModel (rs, self._l.db)
+            self._w_index.set_model (idx)
+
+        return
     
-    def _on_row_select (self, sel, * args):
+    
+    def _on_entry_select (self, sel, * args):
 
         current = []
         def get (model, path, iter):

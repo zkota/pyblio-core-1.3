@@ -30,15 +30,15 @@ from PyblioUI import Entry
 class DatabaseModel (gtk.GenericTreeModel):
 
     ''' This class represents the model of a list containing a full
-    database '''
+    database or a result set. '''
 
     _columns = (gobject.TYPE_PYOBJECT,
                 gobject.TYPE_STRING)
-
     
-    def __init__(self, db):
+    def __init__(self, rs, db = None):
 	gtk.GenericTreeModel.__init__(self)
 
+        self._rs = rs
         self._db = db
         return
 
@@ -73,7 +73,7 @@ class DatabaseModel (gtk.GenericTreeModel):
         p = path [0]
         
         i = p + 1
-        n = iter (self._db)
+        n = iter (self._rs)
 
         try:
             while i:
@@ -93,7 +93,12 @@ class DatabaseModel (gtk.GenericTreeModel):
         if column == 0: return k
 
         # column 1 is an actual description
-        e = self._db [k]
+        if self._db is not None:
+            db = self._db
+        else:
+            db = self._rs
+            
+        e = db [k]
         
 	return Entry.summary (e)
     
