@@ -2,11 +2,6 @@
 
 * TO DO
 
-** [ ] RSs can return values, not only keys
-
-When iterated with rs.itervalues () or rs.iteritems (), result sets
-can return the actual entry from the DB.
-
 ** [ ] One cannot alter Store ().entries
 
 This RS contains all the entries of the db but cannot be used to
@@ -81,4 +76,9 @@ the database. Refuse to add a group twice.
 ** [X] Multiple users accesses cannot corrupt a DB3 database
 
 Serial IDs are delivered atomically, and updates are transactional.
+
+** [X] RSs can return values, not only keys
+
+When iterated with rs.itervalues () or rs.iteritems (), result sets
+can return the actual entry from the DB.
 

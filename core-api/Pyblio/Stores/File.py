@@ -84,12 +84,14 @@ class EnumStore (dict, Store.EnumStore):
 
 class ResultSet (dict, Store.ResultSet):
 
-    def __init__ (self, rsid):
+    def __init__ (self, rsid, db):
 
         dict.__init__ (self)
 
         self.id   = rsid
         self.name = None
+
+        self._dict = db
         return
 
 
@@ -98,9 +100,16 @@ class ResultSet (dict, Store.ResultSet):
         self [k] = 1
         return
 
-    
-    def __iter__ (self):
-        return self.iterkeys ()
+
+    def itervalues (self):
+        
+        for k in dict.iterkeys (self):
+            yield self._dict [k]
+
+    def iteritems (self):
+        
+        for k in dict.iterkeys (self):
+            yield (k, self._dict [k])
 
 
     def _on_db_delete (self, k):
@@ -125,7 +134,7 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
         (self._id, rsid) = Tools.id_make (self._id, rsid)
         
-        rs = ResultSet (rsid)
+        rs = ResultSet (rsid, self._db._dict)
         
         self._db.register ('delete-item', rs._on_db_delete)
         

@@ -515,7 +515,62 @@ class TestContent (pybut.TestCase):
             
         return
 
+    def testResultSetsValues (self):
 
+        """ It is possible to loop over keys, values and pairs from result sets """
+
+        rs   = self.db.rs.add ()
+        keys = []
+        vals = range (5)
+        
+        for i in vals:
+            e = Store.Entry ()
+            e ['title'] = [Attribute.Text ('%d' % i)]
+            
+            k = self.db.add (e)
+            
+            rs.add (k)
+            keys.append (k)
+
+        keys.sort ()
+
+        # check the db resultset and a vanilla rs capabilities
+        for r in (self.db.entries, rs):
+
+            vs = []
+            for v in r: vs.append (v)
+            vs.sort ()
+
+            assert keys == vs, 'got %s instead of %s' % (vs, keys)
+
+            vs = []
+            for v in r.iterkeys (): vs.append (v)
+            vs.sort ()
+
+            assert keys == vs, 'got %s instead of %s' % (vs, keys)
+
+            vs = []
+            for v in r.itervalues ():
+                v = int (v ['title'][0])
+                vs.append (v)
+            vs.sort ()
+            
+            assert vals == vs, 'got %s instead of %s' % (vs, vals)
+            
+            vs = []
+            ks = []
+            for k, v in r.iteritems ():
+                v = int (v ['title'][0])
+                vs.append (v)
+                ks.append (k)
+
+            vs.sort ()
+            ks.sort ()
+            
+            assert vals == vs, 'got %s instead of %s' % (vs, vals)
+            assert keys == ks, 'got %s instead of %s' % (ks, keys)
+        return
+    
     def testResultSetDuplicates (self):
 
         """ There are no duplicates in a result set """

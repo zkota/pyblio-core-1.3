@@ -33,68 +33,47 @@ _ps = pickle.dumps
 
 # --------------------------------------------------
 
-class DBIterBase:
-    """ Iterators on the full database """
-    
-    def __init__ (self, cursor):
-        self._cursor = cursor
-        self._data   = self._cursor.first ()
-        return
-
-    def __iter__ (self):
-        return self
-
-
-    def next (self):
-        if self._data is None:
-            raise StopIteration ()
-
-        data = self._data
-        self._data = self._cursor.next ()
-        
-        return self._content (data)
-
-class DBIter (DBIterBase):
-    """ Iterate over the keys """
-    def _content (self, data):
-
-        return Store.Key (data [0])
-
-class DBIterValues (DBIterBase):
-    """ Iterate over the values """
-    def _content (self, data):
-
-        return _pl (data [1])
-
-class DBIterItems (DBIterBase):
-    """ Iterate over (key, value) pairs """
-    def _content (self, data):
-
-        return Store.Key (data [0]), _pl (data [1])
-
-
 class RSDB (object):
+
+    """ Virtual result set that loops over the full database """
 
     def __init__ (self, db):
 
         self._db = db
         return
     
-    def __iter__ (self):
-        
-        return DBIter (self._db.cursor ())
-
     def itervalues (self):
+        c = self._db.cursor ()
+        d = c.first ()
         
-        return DBIterValues (self._db.cursor ())
+        while d:
+            yield _pl (d [1])
+            d = c.next ()
+        return
     
     def iterkeys (self):
         
-        return DBIter (self._db.cursor ())
+        c = self._db.cursor ()
+        d = c.first ()
+        
+        while d:
+            yield Store.Key (d [0])
+            d = c.next ()
+
+        return
+
+    __iter__ = iterkeys
+    
     
     def iteritems (self):
+        c = self._db.cursor ()
+        d = c.first ()
         
-        return DBIterItems (self._db.cursor ())
+        while d:
+            yield Store.Key (d [0]), _pl (d [1])
+            d = c.next ()
+
+        return
 
     def __len__ (self):
 
@@ -103,47 +82,20 @@ class RSDB (object):
 
 # --------------------------------------------------
 
-class RSIter (object):
-    def __init__ (self, cursor, id):
-        self._id     = id
-        self._cursor = cursor
-        
-        self._cursor.set (self._id + '/')
-        return
-
-
-    def __iter__ (self):
-        return self
-
-    
-    def next (self):
-        data = self._cursor.next ()
-
-        if data is None:
-            raise StopIteration ()
-
-        rs, key = data [0].split ('/')
-        
-        if rs != self._id:
-            raise StopIteration ()
-
-        return Store.Key (key)
-
-
 class ResultSet (Store.ResultSet):
 
-    def __init__ (self, env, meta, rs, id, permanent = False):
+    def __init__ (self, rs, db, env, meta, id, permanent = False):
         # RS id as a string and as an integer
         self.id  = id
         self._id = str (id)
         
         self._name = None
 
-        # Useful db accesses
-        self._env  = env
+        self._db   = db
         self._rs   = rs
+        self._env  = env
         self._meta = meta
-
+        
         self._permanent = permanent
         return
 
@@ -175,10 +127,57 @@ class ResultSet (Store.ResultSet):
     name = property (_name_get, _name_set)
 
 
-    def __iter__ (self):
-        cursor = self._rs.cursor ()
+    def iterkeys (self):
+        c = self._rs.cursor ()
+        c.set (self._id + '/')
         
-        return RSIter (cursor, self._id)
+        d = c.next ()
+        while d:
+            rs, key = d [0].split ('/')
+            if rs != self._id: break
+
+            yield Store.Key (key)
+
+            d = c.next ()
+            
+        return
+
+    __iter__ = iterkeys
+    
+
+    def itervalues (self):
+        c = self._rs.cursor ()
+        c.set (self._id + '/')
+        
+        d = c.next ()
+        while d:
+            rs, key = d [0].split ('/')
+            if rs != self._id: break
+
+            k = Store.Key (key)
+            yield _pl (self._db.get (key))
+
+            d = c.next ()
+        
+        return
+
+    
+    def iteritems (self):
+
+        c = self._rs.cursor ()
+        c.set (self._id + '/')
+        
+        d = c.next ()
+        while d:
+            rs, key = d [0].split ('/')
+            if rs != self._id: break
+
+            k = Store.Key (key)
+            yield k, _pl (self._db.get (key))
+
+            d = c.next ()
+        
+        return
 
 
     def add (self, k, txn = None):
@@ -263,13 +262,14 @@ class ResultSet (Store.ResultSet):
 
 class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
-    def __init__ (self, env, meta, txn):
+    def __init__ (self, _db, _env, _meta, txn):
 
         Callback.Publisher.__init__ (self)
-        
-        self._env  = env
-        self._meta = meta
 
+        self._db   = _db
+        self._env  = _env
+        self._meta = _meta
+        
         self._rs = db.DB (self._env)
         self._rs.open ('pybliographer', 'rs', db.DB_BTREE,
                        db.DB_CREATE, txn = txn)
@@ -280,7 +280,7 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         for rsid, data in avail.items ():
             name, status = data
             
-            rs = ResultSet (self._env, self._meta, self._rs, rsid, status)
+            rs = ResultSet (self._rs, self._db, self._env, self._meta, rsid, status)
             rs._name = name
 
             self.register ('item-delete', rs._on_delete)
@@ -354,7 +354,7 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         
         txn.commit ()
 
-        rs = ResultSet (self._env, self._meta, self._rs, rsid, permanent)
+        rs = ResultSet (self._rs, self._db, self._env, self._meta, rsid, permanent)
         if permanent: self [rsid] = rs
 
         self.register ('item-delete', rs._on_delete)
@@ -565,7 +565,7 @@ class Database (Store.Database, Callback.Publisher):
                 self._schema = _pl (self._meta.get ('schema', txn = txn))
 
             # Result sets handler
-            self.rs = ResultSetStore (self._env, self._meta, txn)
+            self.rs = ResultSetStore (self._db, self._env, self._meta, txn)
             self.register ('delete', self.rs._on_delete)
 
             # Full text indexing DB

@@ -2,6 +2,27 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2004-02-06 10:53:22 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-65
+
+    Summary:
+      result sets cleanups
+    Revision:
+      pybliographer--devel--1.3--patch-65
+
+    - the db is not a result set by itself, but contains a .entries which contains
+      all the entries (and is a result set in its api)
+      
+    - it is possible to loop over values and items, in addition to keys
+    
+    - used generators in the bsddb api to remove unnecessary classes for iteration
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Stores/File.py
+     core-api/Pyblio/Stores/bsddb.py core-api/STORIES
+     core-api/tests/ut_database.py
+
+
 2004-02-05 14:03:47 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-64
 
     Summary:
