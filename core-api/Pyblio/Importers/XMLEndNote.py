@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string
+import string, re
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -67,44 +67,127 @@ class Importer (XML.Parser):
 
 class Exporter (object):
 
+    id2type = {
+        0  : "Journal Article",
+        1  : "Book",
+        2  : "Thesis",
+        3  : "Conference Proceedings",
+        4  : "Personal Communication",
+        5  : "Newspaper Article",
+        6  : "Computer Program",
+        7  : "Book Section",
+        8  : "Magazine Article",
+        9  : "Edited Book",
+        10 : "Report",
+        11 : "Map",
+        12 : "Audiovisual Material",
+        13 : "Artwork",
+        15 : "Patent",
+        16 : "Electronic Source",
+        17 : "Bill",
+        18 : "Case",
+        19 : "Hearing",
+        20 : "Manuscript",
+        21 : "Film or Broadcast",
+        22 : "Statute",
+        25 : "Figure",
+        26 : "Chart or Table",
+        27 : "Equation",
+        31 : "Generic",
+        }
+
+    type2id = {}
+
+    for k, v in id2type.items (): type2id [v] = k
+
+    _charref = re.compile (r'.*&#(\d+);')
+    
     def _encode (self, txt):
-
-        return escape (txt).encode ('ascii', 'xmlcharrefreplace')
         
-    def author_add (self, person):
+        txt = escape (txt).encode ('ascii', 'xmlcharrefreplace')
 
-        self.fd.write ('<AUTHOR>')
+        while 1:
+            d = self._charref.match (txt)
+            if d is None: break
 
-        if person.first:
-            txt = '%s, %s' % (person.last, person.first)
-        else:
-            txt = self.last
-        
-        self.fd.write (self._encode (txt))
-        
-        self.fd.write ('</AUTHOR>')
+            s, e = d.start (1), d.end (1)
+
+            v = int (d.group (1))
+            
+            txt = txt [:s] + 'x%X' % v + txt [e:]
+            
+        return txt.replace ('\n', '&#xD;')
+
+    def text_add (self, text, tag):
+
+        text = self._encode ('\n'.join (text))
+        if not text: return
+
+        self.fd.write ('<%s>%s</%s>' % (tag, text, tag))
         return
+
+    def keywords_add (self, keywords):
+
+        txts = []
+        for k in keywords:
+            k = self._encode (k)
+            if k: txts.append ('<KEYWORD>%s</KEYWORD>' % k)
+
+        if not txts: return
+
+        self.fd.write ('<KEYWORDS>')
+        for txt in txts: self.fd.write (txt)
+        self.fd.write ('</KEYWORDS>')
+
+        return
+    
+    def person_add (self, persons, tag = 'AUTHOR'):
+
+        txts = []
+
+        for person in persons:
+            if person.first:
+                txt = '%s, %s' % (person.last, person.first)
+            else:
+                txt = self.last
+
+            if txt: txts.append ('<%s>%s</%s>' % (
+                tag, self._encode (txt), tag))
+
+        if not txts: return
+        
+        self.fd.write ('<%sS>' % tag)
+        for txt in txts: self.fd.write (txt)
+        self.fd.write ('</%sS>' % tag)
+        
+        return
+
+    def header_add (self, key, reftype):
+        
+        self.fd.write ('<REFNUM>%d</REFNUM>' % key)
+        self.fd.write ('<REFERENCE_TYPE>%d</REFERENCE_TYPE>' % reftype)
+        return
+
+    
+    def record_parse (self, record):
+        pass
+
     
     def write (self, fd, rs, db):
 
         self.fd = fd
         
-        fd.write ('<XML><RECORDS>\n')
+        fd.write ('<XML><RECORDS>')
 
-        for k, r in rs.iteritems ():
+        for r in rs.itervalues ():
 
             fd.write ('<RECORD>')
-            fd.write ('<REFNUM>%d</REFNUM>\n' % k)
 
-            if r.has_key ('author'):
-                fd.write ('<AUTHORS>')
-                for auth in r ['author']:
-                    self.author_add (auth)
-                fd.write ('</AUTHORS>')
-                
-            fd.write ('</RECORD>\n')
-
-        fd.write ('</RECORDS></XML>')
+            self.record_parse (r)
+            
+            fd.write ('</RECORD>')
+            
+        fd.write ('</RECORDS></XML>\n')
         return
     
     
