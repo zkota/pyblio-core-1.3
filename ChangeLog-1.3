@@ -2,6 +2,185 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2003-11-19 16:22:23 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-30
+
+    Summary:
+      code reorganization
+    Revision:
+      pybliographer--devel--1.3--patch-30
+
+    Now, the core api is in a separate directory, and will be installable
+    as a python module.
+
+    new files:
+     core-api/.arch-ids/=id core-api/Pyblio/.arch-ids/=id
+     core-api/Pyblio/.arch-ids/__init__.py.id
+     core-api/Pyblio/__init__.py core-api/tests/.arch-ids/=id
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Stores/bsddb.py core-api/STORIES
+
+    renamed files:
+     .arch-ids/STORIES.id
+       ==> core-api/.arch-ids/STORIES.id
+     Pyblio/.arch-ids/Attribute.py.id
+       ==> core-api/Pyblio/.arch-ids/Attribute.py.id
+     Pyblio/.arch-ids/Exceptions.py.id
+       ==> core-api/Pyblio/.arch-ids/Exceptions.py.id
+     Pyblio/.arch-ids/Importer.py.id
+       ==> core-api/Pyblio/.arch-ids/Importer.py.id
+     Pyblio/.arch-ids/Schema.py.id
+       ==> core-api/Pyblio/.arch-ids/Schema.py.id
+     Pyblio/.arch-ids/Store.py.id
+       ==> core-api/Pyblio/.arch-ids/Store.py.id
+     Pyblio/Attribute.py
+       ==> core-api/Pyblio/Attribute.py
+     Pyblio/Exceptions.py
+       ==> core-api/Pyblio/Exceptions.py
+     Pyblio/Importer.py
+       ==> core-api/Pyblio/Importer.py
+     Pyblio/Importers/.arch-ids/=id
+       ==> core-api/Pyblio/Importers/.arch-ids/=id
+     Pyblio/Importers/.arch-ids/BibTeX.py.id
+       ==> core-api/Pyblio/Importers/.arch-ids/BibTeX.py.id
+     Pyblio/Importers/.arch-ids/__init__.py.id
+       ==> core-api/Pyblio/Importers/.arch-ids/__init__.py.id
+     Pyblio/Importers/.arch-ids/lex.py.id
+       ==> core-api/Pyblio/Importers/.arch-ids/lex.py.id
+     Pyblio/Importers/.arch-ids/yacc.py.id
+       ==> core-api/Pyblio/Importers/.arch-ids/yacc.py.id
+     Pyblio/Schema.py
+       ==> core-api/Pyblio/Schema.py
+     Pyblio/Store.py
+       ==> core-api/Pyblio/Store.py
+     Pyblio/Stores/.arch-ids/=id
+       ==> core-api/Pyblio/Stores/.arch-ids/=id
+     Pyblio/Stores/.arch-ids/File.py.id
+       ==> core-api/Pyblio/Stores/.arch-ids/File.py.id
+     Pyblio/Stores/.arch-ids/__init__.py.id
+       ==> core-api/Pyblio/Stores/.arch-ids/__init__.py.id
+     Pyblio/Stores/.arch-ids/bsddb.py.id
+       ==> core-api/Pyblio/Stores/.arch-ids/bsddb.py.id
+     STORIES
+       ==> core-api/STORIES
+     Schemas/.arch-ids/=id
+       ==> core-api/Schemas/.arch-ids/=id
+     Schemas/.arch-ids/bibtex.xml.id
+       ==> core-api/Schemas/.arch-ids/bibtex.xml.id
+     Schemas/.arch-ids/pyblio-schema.dtd.id
+       ==> core-api/Schemas/.arch-ids/pyblio-schema.dtd.id
+     tests/.arch-ids/pybut.py.id
+       ==> core-api/tests/.arch-ids/pybut.py.id
+     tests/.arch-ids/testsuite.sh.id
+       ==> core-api/tests/.arch-ids/testsuite.sh.id
+     tests/.arch-ids/ut_attribute.py.id
+       ==> core-api/tests/.arch-ids/ut_attribute.py.id
+     tests/.arch-ids/ut_bibtex.py.id
+       ==> core-api/tests/.arch-ids/ut_bibtex.py.id
+     tests/.arch-ids/ut_database.py.id
+       ==> core-api/tests/.arch-ids/ut_database.py.id
+     tests/.arch-ids/ut_schema.py.id
+       ==> core-api/tests/.arch-ids/ut_schema.py.id
+     tests/.arch-ids/ut_store.py.id
+       ==> core-api/tests/.arch-ids/ut_store.py.id
+     tests/pybut.py
+       ==> core-api/tests/pybut.py
+     tests/testsuite.sh
+       ==> core-api/tests/testsuite.sh
+     tests/ut_attribute.py
+       ==> core-api/tests/ut_attribute.py
+     tests/ut_bibtex.py
+       ==> core-api/tests/ut_bibtex.py
+     tests/ut_bibtex/.arch-ids/=id
+       ==> core-api/tests/ut_bibtex/.arch-ids/=id
+     tests/ut_bibtex/.arch-ids/comment.bib.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/comment.bib.id
+     tests/ut_bibtex/.arch-ids/comment.xml.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/comment.xml.id
+     tests/ut_bibtex/.arch-ids/empty.bib.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/empty.bib.id
+     tests/ut_bibtex/.arch-ids/empty.xml.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/empty.xml.id
+     tests/ut_bibtex/.arch-ids/nested.bib.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/nested.bib.id
+     tests/ut_bibtex/.arch-ids/nested.xml.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/nested.xml.id
+     tests/ut_bibtex/.arch-ids/sharp.bib.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/sharp.bib.id
+     tests/ut_bibtex/.arch-ids/sharp.xml.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/sharp.xml.id
+     tests/ut_bibtex/.arch-ids/simple.bib.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/simple.bib.id
+     tests/ut_bibtex/.arch-ids/simple.xml.id
+       ==> core-api/tests/ut_bibtex/.arch-ids/simple.xml.id
+     tests/ut_database.py
+       ==> core-api/tests/ut_database.py
+     tests/ut_database/.arch-ids/=id
+       ==> core-api/tests/ut_database/.arch-ids/=id
+     tests/ut_database/.arch-ids/schema.xml.id
+       ==> core-api/tests/ut_database/.arch-ids/schema.xml.id
+     tests/ut_schema.py
+       ==> core-api/tests/ut_schema.py
+     tests/ut_schema/.arch-ids/=id
+       ==> core-api/tests/ut_schema/.arch-ids/=id
+     tests/ut_schema/.arch-ids/complex.xml.id
+       ==> core-api/tests/ut_schema/.arch-ids/complex.xml.id
+     tests/ut_schema/.arch-ids/empty.xml.id
+       ==> core-api/tests/ut_schema/.arch-ids/empty.xml.id
+     tests/ut_schema/.arch-ids/simple.xml.id
+       ==> core-api/tests/ut_schema/.arch-ids/simple.xml.id
+     tests/ut_schema/.arch-ids/spurrious.xml.id
+       ==> core-api/tests/ut_schema/.arch-ids/spurrious.xml.id
+     tests/ut_schema/.arch-ids/types.xml.id
+       ==> core-api/tests/ut_schema/.arch-ids/types.xml.id
+     tests/ut_store.py
+       ==> core-api/tests/ut_store.py
+     tests/ut_store/.arch-ids/=id
+       ==> core-api/tests/ut_store/.arch-ids/=id
+     tests/ut_store/.arch-ids/empty.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/empty.xml.id
+     tests/ut_store/.arch-ids/native.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/native.xml.id
+     tests/ut_store/.arch-ids/s:full.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/s:full.xml.id
+     tests/ut_store/.arch-ids/s:simple.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/s:simple.xml.id
+     tests/ut_store/.arch-ids/simple.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/simple.xml.id
+
+    new directories:
+     core-api core-api/.arch-ids core-api/Pyblio
+     core-api/Pyblio/.arch-ids core-api/Pyblio/Importers/.arch-ids
+     core-api/Pyblio/Stores/.arch-ids core-api/Schemas/.arch-ids
+     core-api/tests core-api/tests/.arch-ids
+     core-api/tests/ut_bibtex/.arch-ids
+     core-api/tests/ut_database/.arch-ids
+     core-api/tests/ut_schema/.arch-ids
+     core-api/tests/ut_store/.arch-ids
+
+    removed directories:
+     Pyblio/Importers/.arch-ids Pyblio/Stores/.arch-ids
+     Schemas/.arch-ids tests/ut_bibtex/.arch-ids
+     tests/ut_database/.arch-ids tests/ut_schema/.arch-ids
+     tests/ut_store/.arch-ids
+
+    renamed directories:
+     Pyblio/Importers
+       ==> core-api/Pyblio/Importers
+     Pyblio/Stores
+       ==> core-api/Pyblio/Stores
+     Schemas
+       ==> core-api/Schemas
+     tests/ut_bibtex
+       ==> core-api/tests/ut_bibtex
+     tests/ut_database
+       ==> core-api/tests/ut_database
+     tests/ut_schema
+       ==> core-api/tests/ut_schema
+     tests/ut_store
+       ==> core-api/tests/ut_store
+
+
 2003-11-19 14:41:40 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-29
 
     Summary:

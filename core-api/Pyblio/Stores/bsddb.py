@@ -134,7 +134,7 @@ class Database:
         self._path = path
         
         self._env = db.DBEnv ()
-        self._env.open (path, flag | db.DB_INIT_MPOOL)
+        self._env.open (path, flag | db.DB_INIT_MPOOL | db.DB_INIT_TXN)
 
         # DB containing the actual entries
         self._db  = db.DB (self._env)
@@ -172,28 +172,55 @@ class Database:
     def add (self, val, id = None):
 
         # Be careful to always point after the last serial id used.
-        
-        serial = int (self._meta.get ('serial'))
+        txn = self._env.txn_begin ()
 
-        if id: serial = max (serial, id)
-        self._meta.put ('serial', str (serial + 1))
+        try:
+            serial = int (self._meta.get ('serial'))
 
-        return int (self._insert (serial, val), 16)
+            if id: serial = max (serial, id)
+            self._meta.put ('serial', str (serial + 1))
+            
+            key = int (self._insert (serial, val), 16)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        return key
     
 
     def __setitem__ (self, key, val):
         assert self.has_key (key)
 
-        self._idxdel ('%.16x' % key)
-        self._insert (key, val)
+        txn = self._env.txn_begin ()
+
+        try:
+            self._idxdel ('%.16x' % key)
+            self._insert (key, val)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         return
 
 
     def __delitem__ (self, key):
         id = '%.16x' % key
         
-        self._idxdel (id)
-        self._db.delete (id)
+        txn = self._env.txn_begin ()
+
+        try:
+            self._idxdel (id)
+            self._db.delete (id)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         return
     
 

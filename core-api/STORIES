@@ -1,10 +1,5 @@
 -*- outline -*-
 
-* The database queries must remain coherent after modifications
-
-Changing an entry that has not been updated in the DB should not
-change a query result. Updating the DB should change the result.
-
 * Import the XML into any Store
 
 Create an empty Store of every existing type. Import an existing XML
@@ -19,4 +14,11 @@ this information.
 * Multiple users accesses cannot corrupt a DB3 database
 
 Serial IDs are delivered atomically, and updates are transactional.
+
+* Support "shortcuts" for persons and texts
+
+When a phrase or person name is repeated frequently, a shortcut can be
+defined, and used in place of the corresponding attribute. When the
+shortcut content is updated, all the entries that used it are also
+updated.
 
