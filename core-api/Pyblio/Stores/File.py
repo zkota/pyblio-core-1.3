@@ -22,23 +22,22 @@ from gettext import gettext as _
 
 import os, copy
 
-from Pyblio import Store, Callback
+from Pyblio import Store, Callback, Attribute, Exceptions
 
 
-class EnumGroup (Store.EnumGroup, dict):
+class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
 
-    pass
+    def __init__ (self, group):
 
-
-class EnumStore (dict, Store.EnumStore):
-    def __init__ (self):
-
+        Callback.Publisher.__init__ (self)
+        
         self._id = 1
+        self._group = group
+
         return
     
 
-    def add (self, group, item, key = None):
-
+    def add (self, item, key = None):
         if key:
             if key >= self._id:
                 self._id = key + 1
@@ -46,18 +45,46 @@ class EnumStore (dict, Store.EnumStore):
             key = self._id
             self._id = self._id + 1
 
-        if not self.has_key (group):
-            self [group] = EnumGroup ()
-
         v = copy.deepcopy (item)
         
         v.id    = key
-        v.group = group
+        v.group = self._group
         
-        self [group] [key] = v
+        self [key] = v
 
         return key
+
+    def __delitem__ (self, k):
+
+        self.emit ('delete', (self._group, k))
+
+        dict.__delitem__ (self, k)
+        return
     
+
+class EnumStore (dict, Store.EnumStore):
+
+    def __init__ (self, db):
+
+        self._db = db
+        return
+    
+
+    def add (self, group):
+
+        if self.has_key (group):
+            raise Exceptions.ConstraintError \
+                  (_('group %s exists') % `group`)
+        
+        gp = EnumGroup (group)
+        gp.register ('delete', self._db._on_enum_delete)
+        
+        self [group] = gp
+        
+        return gp
+
+
+# --------------------------------------------------
 
 class ResultSet (dict, Store.ResultSet):
 
@@ -111,6 +138,7 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
         return self.itervalues ()
 
+# --------------------------------------------------
 
 class Database (dict, Store.Database, Callback.Publisher):
 
@@ -124,7 +152,7 @@ class Database (dict, Store.Database, Callback.Publisher):
         self.schema = schema
         
         self.header = None
-        self.enum   = EnumStore ()
+        self.enum   = EnumStore (self)
         self.rs     = ResultSetStore (self)
         
         self._id = 1
@@ -244,6 +272,21 @@ class Database (dict, Store.Database, Callback.Publisher):
 
         return
 
+
+    def _on_enum_delete (self, k):
+
+        for item in self.itervalues ():
+
+            for attrs in item.itervalues ():
+
+                for attr in attrs:
+                    if not isinstance (attr, Attribute.Enumerated): break
+
+                    if (attr.group, attr.id) == k:
+                        raise Exceptions.ConstraintError (_('enum %s/%d used in item %d') % (
+                            k [0], k [1], item.key))
+        return
+    
 
 def dbdestroy (path, nobackup = False):
 

@@ -23,11 +23,13 @@ class TestBibTeX (pybut.TestCase):
         db = Store.get ('file').dbcreate (f, s)
 
         # Add a few document types
+        g = db.enum.add ('doctype')
+        
         for t in ('Article',):
             dt = Store.EnumItem ()
             dt.names [''] = t
 
-            db.enum.add ('doctype', dt)
+            g.add (dt)
         
         BibTeX.file_import ('ut_bibtex/%s.bib' % base, 'latin-1', db)
 

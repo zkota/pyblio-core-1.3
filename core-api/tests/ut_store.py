@@ -142,7 +142,7 @@ class TestStore (pybut.TestCase):
         def fail (e):
             try:
                 db.validate (e)
-                raise False, 'should not be accepted'
+                assert False, 'should not be accepted'
             
             except SchemaError:
                 pass
@@ -183,7 +183,23 @@ class TestStore (pybut.TestCase):
         u = Attribute.URL ('abc')
         e ['author'] = [ u, u ]
         fail (e)
+
+        # Check that unknown enumerates are rejected
+        e = Store.Entry ()
+
+        enu = Store.EnumItem ()
+
+        enu.id    = 1
+        enu.group = 'b'
+
+        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        fail (e)
         
+        enu.id    = 1
+        enu.group = 'a'
+
+        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        fail (e)
         return
     
         

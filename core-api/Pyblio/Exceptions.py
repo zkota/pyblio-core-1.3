@@ -30,3 +30,6 @@ class SchemaError (Exception):
 
     pass
 
+class ConstraintError (Exception):
+
+    pass

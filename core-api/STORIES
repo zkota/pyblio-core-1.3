@@ -2,11 +2,6 @@
 
 * TO DO
 
-** [ ] Maintain coherency between enumerated definitions and use
-
-What happens when an enumerated definition is removed and is used in
-the db ?
-
 ** [ ] Refine the content of a result set
 
 Create a result set. Perform a query on its content. All queries
@@ -72,3 +67,7 @@ entry does not match the schema definition.
 When an item is removed from the database, it must not be referenced
 in any result set anymore.
 
+** [X] Maintain coherency between enumerated definitions and use
+
+Refuse to remove an enumerated value as long as there is one use in
+the database. Refuse to add a group twice.

@@ -215,6 +215,21 @@ class EnumGroup:
     DERIVED BY ALL STORES
     """
 
+    def add (self, item, key = None):
+        raise NotImplemented ('please override')
+
+    def __getitem__ (self, k):
+        raise NotImplemented ('please override')
+        
+    def __delitem__ (self, k):
+        raise NotImplemented ('please override')
+
+    def keys (self):
+        raise NotImplemented ('please override')
+
+    def values (self):
+        raise NotImplemented ('please override')
+        
     def xmlwrite (self, fd):
 
         keys = self.keys ()
@@ -235,6 +250,18 @@ class EnumStore:
     """
 
 
+    def add (self, group):
+        raise NotImplemented ('please override')
+
+    def __getitem__ (self, k):
+        raise NotImplemented ('please override')
+        
+    def __delitem__ (self, k):
+        raise NotImplemented ('please override')
+
+    def keys (self):
+        raise NotImplemented ('please override')
+        
     def xmlwrite (self, fd):
 
         keys = self.keys ()
@@ -247,16 +274,6 @@ class EnumStore:
             
         return
 
-    def add (self, group, item, key = None):
-        raise NotImplemented ('please override')
-
-    def __getitem__ (self, k):
-        raise NotImplemented ('please override')
-        
-    def __delitem__ (self, k):
-        raise NotImplemented ('please override')
-
-    
     
 # --------------------------------------------------
 
@@ -342,7 +359,20 @@ class Database:
                 raise Exceptions.SchemaError \
                       (_('attribute %s should have %s - %s values, not %d') % (
                     k, str (lb), str (ub), l))
-        
+
+
+            # additional special checks
+            if s.type is Attribute.Enumerated:
+                for v in vals:
+
+                    try:
+                        self.enum [v.group] [v.id]
+                        
+                    except KeyError:
+                        raise Exceptions.SchemaError (
+                            _('invalid enumerated item %s/%d') % (v.group, v.id))
+                    
+            
         return entry
 
     def xmlwrite (self, fd):
@@ -459,14 +489,14 @@ class DatabaseParse (sax.handler.ContentHandler):
 
         # --------------------------------------------------
         if name == 'enum-group':
-            if self._enumg:
+            if self._enumg is not None:
                 self._error (_('nested "enum-group" are not supported'))
             
-            self._enumg = self._attr ('id', attrs)
+            self._enumg = self.db.enum.add (self._attr ('id', attrs))
             return
 
         if name == 'enum-item':
-            if not self._enumg:
+            if self._enumg is None:
                 self._error (_('missing "enum-group"'))
 
             self._enumi = EnumItem ()
@@ -474,7 +504,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'name':
-            if not self._enumi:
+            if self._enumi is None:
                 self._error (_('missing "enum-item"'))
             self._tdata = ''
             self._lang = attrs.get ('lang', '')
@@ -618,9 +648,7 @@ class DatabaseParse (sax.handler.ContentHandler):
         if name == 'enum-item':
             self._enumi.name = self._trn (self._enumi.names)
 
-            self.db.enum.add (self._enumg, self._enumi,
-                              key = self._enumi.id)
-            
+            self._enumg.add (self._enumi, key = self._enumi.id)
             self._enumi = None
             return
         

@@ -25,7 +25,10 @@ import cPickle as pickle
 
 from bsddb3 import db
 
-from Pyblio import Store, Schema, Callback
+from Pyblio import Store, Schema, Callback, Attribute, Exceptions
+
+_pl = pickle.loads
+_ps = pickle.dumps
 
 # --------------------------------------------------
 
@@ -60,13 +63,13 @@ class DBIterValues (DBIterBase):
     """ Iterate over the values """
     def _content (self, data):
 
-        return pickle.loads (data [1])
+        return _pl (data [1])
 
 class DBIterItems (DBIterBase):
     """ Iterate over (key, value) pairs """
     def _content (self, data):
 
-        return Store.Key (data [0]), pickle.loads (data [1])
+        return Store.Key (data [0]), _pl (data [1])
 
 
 # --------------------------------------------------
@@ -171,11 +174,11 @@ class ResultSetStore (dict, Store.ResultSetStore):
         txn = self._env.txn_begin (parent = txn)
         
         # get the next rs id
-        (rsid, avail) = pickle.loads (self._meta.get ('rs'))
+        (rsid, avail) = _pl (self._meta.get ('rs'))
 
         if name: avail [name] = str (rsid)
 
-        self._meta.put ('rs', pickle.dumps ((rsid + 1, avail)))
+        self._meta.put ('rs', _ps ((rsid + 1, avail)))
 
         rsid = str (rsid)
         
@@ -193,17 +196,86 @@ class ResultSetStore (dict, Store.ResultSetStore):
     
 # --------------------------------------------------
 
-class EnumGroup (dict, Store.EnumGroup):
+class EnumGroup (Store.EnumGroup, Callback.Publisher):
+
+
+    def __init__ (self, parent, group):
+
+        Callback.Publisher.__init__ (self)
+
+        self._db   = parent._db
+        self._env  = parent._env
+        self._enum = parent._enum
+        
+        self._group = group
+        return
+
     
-    pass
+    def add (self, item, key = None):
+
+        v = self._enum.get (self._group)
+
+        vid, data = _pl (v)
+
+        # Key is the key that will be used for the entry, id is
+        # the current serial (which can be different)
+        if key:
+            if key > vid: vid = key
+        else:
+            key = vid
+
+        v = copy.deepcopy (item)
+        v.id    = key
+        v.group = self._group
+        
+        data [key] = v
+        
+        self._enum.put (self._group, _ps ((vid + 1, data)))
+        
+        return key
+
+
+    def keys (self):
+
+        return _pl (self._enum.get (self._group)) [1].keys ()
+
+    def values (self):
+
+        return _pl (self._enum.get (self._group)) [1].values ()
+        
+    
+    def __delitem__ (self, k):
+
+        for v in self._db.itervalues ():
+            for attrs in v.values ():
+                for attr in attrs:
+                    if not isinstance (attr, Attribute.Enumerated):
+                        break
+
+                    if (attr.id, attr.group) == (k, self._group):
+                        raise Exceptions.ConstraintError \
+                              (_('enum %s/%d used in item %d') % (
+                            self._group, k, v.key))
+
+        v = _pl (self._enum.get (self._group))
+        del v [1] [k]
+
+        self._enum.put (self._group, _ps (v))
+        return
+    
+
+    def __getitem__ (self, k):
+        v = self._enum.get (self._group)
+
+        return _pl (v) [1] [k]
 
 
 class EnumStore (Store.EnumStore):
 
+    def __init__ (self, parent):
 
-    def __init__ (self, env):
-
-        self._env = env
+        self._db  = parent
+        self._env = parent._env
 
         self._enum = db.DB (self._env)
         self._enum.open ('pybliographer', 'enum',
@@ -211,13 +283,10 @@ class EnumStore (Store.EnumStore):
         return
 
     
-    def __getitem__ (self, k):
-        v = self._enum.get (k)
+    def __getitem__ (self, group):
 
-        if v is None:
-            raise KeyError, _('unknown group %s' % `k`)
+        return EnumGroup (self, group)
 
-        return pickle.loads (v) [1]
 
     def keys (self):
         k = []
@@ -231,36 +300,19 @@ class EnumStore (Store.EnumStore):
             d = c.next ()
 
         return k
+
     
-    def add (self, group, item, key = None):
+    def add (self, group):
 
         v = self._enum.get (group)
 
-        if v is None:
-            id, data = 1, EnumGroup ()
-        else:
-            id, data = pickle.loads (v)
-
-        # Key is the key that will be used for the entry, id is
-        # the current serial (which can be different)
-        if key:
-            if key > id: id  = key
-        else:
-            key = id
-
-        txn = self._env.txn_begin ()
-
-        v = copy.deepcopy (item)
-        v.id    = key
-        v.group = group
+        if v is not None:
+            raise Exceptions.ConstraintError (_('group %s exists') % `group`)
         
-        data [key] = v
-        
-        self._enum.put (group, pickle.dumps ((id + 1, data)))
+        self._enum.put (group, _ps ((1, {})))
 
-        txn.commit ()
-        
-        return key
+        return EnumGroup (self, group)
+    
 
 # --------------------------------------------------
     
@@ -301,12 +353,12 @@ class Database (Store.Database, Callback.Publisher):
 
         if create:
             self.schema = schema
-            self._meta.put ('schema', pickle.dumps (schema))
-            self._meta.put ('rs', pickle.dumps ((0, {})))
+            self._meta.put ('schema', _ps (schema))
+            self._meta.put ('rs', _ps ((0, {})))
             self._meta.put ('serial', '1')
         else:
-            self.schema = pickle.loads (self._meta.get ('schema'))
-            id, store = pickle.loads (self._meta.get ('rs'))
+            self.schema = _pl (self._meta.get ('schema'))
+            id, store = _pl (self._meta.get ('rs'))
 
             for k, v in store.items ():
                 d = db.DB (self._env)
@@ -322,7 +374,7 @@ class Database (Store.Database, Callback.Publisher):
                 self.rs [k] = rs
 
             # store the updated rs list
-            self._meta.put ('rs', pickle.dumps ((id, store)))
+            self._meta.put ('rs', _ps ((id, store)))
 
         
         # Full text indexing DB
@@ -331,7 +383,7 @@ class Database (Store.Database, Callback.Publisher):
         self._idx.open ('pybliographer', 'idx', db.DB_HASH, flag)
 
         # Store for Enumerated values
-        self.enum = EnumStore (self._env)
+        self.enum = EnumStore (self)
 
         # No header in this db yet
         self.header = None
@@ -464,7 +516,7 @@ class Database (Store.Database, Callback.Publisher):
         val = copy.copy (val)
         val.key = key
         
-        val = pickle.dumps (val)
+        val = _ps (val)
         
         self._db.put (id, val, txn = txn)
         return id
@@ -497,7 +549,7 @@ class Database (Store.Database, Callback.Publisher):
     
     def __getitem__ (self, key):
         
-        return pickle.loads (self._db.get (str (key)))
+        return _pl (self._db.get (str (key)))
 
     def __iter__ (self):
         

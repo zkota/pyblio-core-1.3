@@ -301,20 +301,23 @@ class TestContent (pybut.TestCase):
 
         a  = []
         va = ['A / 1', 'A / 2']
+
+        g = self.db.enum.add ('a')
         
         for k in va:
             i.names [''] = k
-            a.append (self.db.enum.add ('a', i))
+            g.add (i)
             
         b = []
         vb = ['B / 1', 'B / 2']
         
+        g = self.db.enum.add ('b')
         for k in vb:
             i.names [''] = k
-            b.append (self.db.enum.add ('b', i))
+            g.add (i)
 
         na = []
-        for v in self.db.enum ['a'].itervalues ():
+        for v in self.db.enum ['a'].values ():
             na.append (v.names [''])
 
         assert na == va
@@ -329,12 +332,13 @@ class TestContent (pybut.TestCase):
 
         a  = []
         va = ['A / 1', 'A / 2']
-        
+
+        g = self.db.enum.add ('a')
         for k in va:
             i.names [''] = k
-            id = self.db.enum.add ('a', i)
 
-            a.append (self.db.enum ['a'][id])
+            v = g.add (i)
+            a.append (self.db.enum ['a'][v])
         
 
         e = Store.Entry ()
@@ -505,6 +509,58 @@ class TestContent (pybut.TestCase):
         
         assert got == items [1:], \
                "expected %s, got %s" % (items [1:], got)
+
+        return
+
+    def testEnumDel (self):
+
+        """ Forbid the removal of an Enum definition that is in use """
+
+        from Pyblio import Exceptions
+        
+        # Create two enums, one that will be used, the other not. Try
+        # to remove both.
+        i = Store.EnumItem ()
+
+        a  = []
+        va = ['A / 1', 'A / 2']
+
+        g = self.db.enum.add ('a')
+        for k in va:
+            i.names [''] = k
+            v = g.add (i)
+
+            a.append (self.db.enum ['a'][v])
+            
+        e = Store.Entry ()
+        
+        e ['enum-a'] = [Attribute.Enumerated (a [1])]
+        self.db.add (e)
+
+        del self.db.enum ['a'][a [0].id]
+
+        try:
+            del self.db.enum ['a'][a [1].id]
+            assert False, 'should not be possible'
+            
+        except Exceptions.ConstraintError:
+            pass
+
+        return
+
+
+    def testEnumSingle (self):
+
+        from Pyblio import Exceptions
+        
+        g = self.db.enum.add ('a')
+
+        try:
+            g = self.db.enum.add ('a')
+            assert False, 'should not succeed'
+            
+        except Exceptions.ConstraintError:
+            pass
 
         return
     
