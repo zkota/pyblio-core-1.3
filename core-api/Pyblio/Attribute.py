@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-""" Basic data types that can be used as attributes for a Core.Entry """
+""" Basic data types that can be used as attributes for a Core.Record """
 
 import string, re, urlparse, os
 

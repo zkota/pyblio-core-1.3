@@ -19,7 +19,7 @@ class TestDatabase (pybut.TestCase):
         sc = Schema.Schema ('ut_database/schema.xml')
         db = self.hd.dbcreate (self.nm, sc)
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         e ['title'] = [ Attribute.Text ('title') ]
         k = db.add (e)
@@ -112,7 +112,7 @@ class TestContent (pybut.TestCase):
 
         import copy
         
-        e = Store.Entry ()
+        e = Store.Record ()
 
         content = {}
 
@@ -172,7 +172,7 @@ class TestContent (pybut.TestCase):
     def testIterDB (self):
         """ A database provides independent iterators """
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         for i in range (3):
             self.db.add (e)
@@ -188,7 +188,7 @@ class TestContent (pybut.TestCase):
     def testIterRS (self):
         """ A database provides independent iterators """
 
-        e  = Store.Entry ()
+        e  = Store.Record ()
         rs = self.db.rs.add ()
         
         for i in range (3):
@@ -206,7 +206,7 @@ class TestContent (pybut.TestCase):
     def testIndexUpdate (self):
         """ Check for index coherency upon modifications """
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         e ['title'] = [ Attribute.Text ('a') ]
         a = self.db.add (e)
@@ -245,7 +245,7 @@ class TestContent (pybut.TestCase):
     def testIterate (self):
         """ Loop over the db content """
         
-        e = Store.Entry ()
+        e = Store.Record ()
 
         initial = []
         
@@ -341,7 +341,7 @@ class TestContent (pybut.TestCase):
             a.append (self.db.txo ['a'][v])
         
 
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['enum-a'] = [ Attribute.Txo (a [0]) ]
         
         self.db.add (e)
@@ -359,7 +359,7 @@ class TestContent (pybut.TestCase):
 
     def testNamedResultSet (self):
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         e ['title'] = [Attribute.Text ('a sample')]
         for i in range (5):
@@ -417,7 +417,7 @@ class TestContent (pybut.TestCase):
     def testResultSetAddRemove (self):
 
         """ Create a RS, add items in it and remove them """
-        e = Store.Entry ()
+        e = Store.Record ()
         items = []
         
         e ['title'] = [Attribute.Text ('a sample')]
@@ -472,7 +472,7 @@ class TestContent (pybut.TestCase):
         vals = range (5)
         
         for i in vals:
-            e = Store.Entry ()
+            e = Store.Record ()
             e ['title'] = [Attribute.Text ('%d' % i)]
             
             k = self.db.add (e)
@@ -523,7 +523,7 @@ class TestContent (pybut.TestCase):
 
         """ There are no duplicates in a result set """
 
-        e = Store.Entry ()
+        e = Store.Record ()
         items = []
         
         e ['title'] = [Attribute.Text ('a sample')]
@@ -553,7 +553,7 @@ class TestContent (pybut.TestCase):
         from the result sets too.  """
 
         def check (rs):
-            e = Store.Entry ()
+            e = Store.Record ()
             items = []
         
             for i in range (5):
@@ -594,7 +594,7 @@ class TestContent (pybut.TestCase):
         except AttributeError: pass
         except RuntimeError: pass
         
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['title'] = [Attribute.Text ('hehe')]
             
         k = self.db.add (e)
@@ -629,7 +629,7 @@ class TestContent (pybut.TestCase):
 
             a.append (self.db.txo ['a'][v])
             
-        e = Store.Entry ()
+        e = Store.Record ()
         
         e ['enum-a'] = [Attribute.Txo (a [1])]
         self.db.add (e)
@@ -768,7 +768,7 @@ class TestView (pybut.TestCase):
 
         v = self.rs.view ('text')
 
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['text'] = Attribute.Text ('zzzzzzzzz')
 
         k = self.db.add (e)
@@ -786,7 +786,7 @@ class TestView (pybut.TestCase):
 
         v = self.db.entries.view ('text')
 
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['text'] = Attribute.Text ('zzzzzzzzz')
 
         k = self.db.add (e)

@@ -26,7 +26,7 @@ Tables in use:
 * database/entries [HASH]
 
   key:   string value of an entry key
-  value: Store.Entry as a pickled object
+  value: Store.Record as a pickled object
 
 * database/meta [HASH]
 

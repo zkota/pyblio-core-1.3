@@ -36,7 +36,7 @@ class Flat (Callback.Publisher):
 
     def record_parse (self, record):
 
-        self.record = Store.Entry ()
+        self.record = Store.Record ()
         
         self.record_begin ()
         

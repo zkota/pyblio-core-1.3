@@ -50,7 +50,7 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.get ('file').dbcreate (self.f, schema)
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         e ['author'] = [ Attribute.Person (last = u'Last 1é'),
                          Attribute.Person (last = 'Last 2')]
@@ -88,7 +88,7 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.get ('file').dbcreate (self.f, schema)
 
-        e = Store.Entry ()
+        e = Store.Record ()
 
         e ['author'] = [ Attribute.Person (last = 'LastName') ]
         e.loss_set ('author', True)
@@ -146,20 +146,20 @@ class TestStore (pybut.TestCase):
             return
         
         # Discard empty attributes
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['title'] = []
 
         e = db.validate (e)
         assert not e.has_key ('title')
 
         # Discard unknown attributes
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['bozo'] = [ Attribute.Text ('yay') ]
 
         fail (e)
 
         # Check for entry types
-        e = Store.Entry ()
+        e = Store.Record ()
         e ['text'] = [ Attribute.Text ('yay'),
                        Attribute.Text ('yay'),
                        Attribute.URL ('hoho'),
@@ -169,19 +169,19 @@ class TestStore (pybut.TestCase):
         fail (e)
 
         # check for entry count
-        e = Store.Entry ()
+        e = Store.Record ()
         p = Attribute.Person (last = 'gobry')
         
         e ['author'] = [ p, p, p, p, p ]
         fail (e)
 
-        e = Store.Entry ()
+        e = Store.Record ()
         u = Attribute.URL ('abc')
         e ['author'] = [ u, u ]
         fail (e)
 
         # Check that unknown enumerates are rejected
-        e = Store.Entry ()
+        e = Store.Record ()
 
         enu = Store.TxoItem ()
 
@@ -216,7 +216,7 @@ class TestStore (pybut.TestCase):
         # check that unnecessary txo items are removed
         g = db.txo ['a']
         
-        e = Store.Entry ()
+        e = Store.Record ()
         
         e ['txo'] = [ Attribute.Txo (g [1]),
                       Attribute.Txo (g [2]),

@@ -136,7 +136,7 @@ class Join (list):
         return string.join (map (lambda x: x.tobib (), self), ' # ')
     
 
-class Entry (dict):
+class Record (dict):
     """ A bibliographic entry """
     
     def __init__ (self, tp, key):
@@ -146,7 +146,7 @@ class Entry (dict):
         return
 
     def __repr__ (self):
-        return 'Entry (%s, %s, %s)' % (
+        return 'Record (%s, %s, %s)' % (
             self.type, self.key, dict.__repr__ (self))
 
 
@@ -295,7 +295,7 @@ def p_entry (t):
               | LITERAL opt_space LPAREN opt_space LITERAL opt_space COMMA opt_space assignment_list RPAREN
               | LITERAL opt_space LPAREN opt_space LITERAL opt_space COMMA opt_space assignment_list COMMA opt_space RPAREN '''
 
-    e = Entry (t [1].lower (), t [5])
+    e = Record (t [1].lower (), t [5])
     e.update (t [9])
     
     t [0] = e
@@ -304,7 +304,7 @@ def p_entry (t):
 def p_empty_entry (t):
     ''' entry : LITERAL opt_space LBRACE opt_space LITERAL opt_space RBRACE
               | LITERAL opt_space LPAREN opt_space LITERAL opt_space RPAREN '''
-    t [0] = Entry (t [1], t [5])
+    t [0] = Record (t [1], t [5])
     return
 
 
@@ -613,7 +613,7 @@ class Importer (object):
 
     def record_parse (self, data):
 
-        self.record = Store.Entry ()
+        self.record = Store.Record ()
         self.record_begin ()
         
         tp, key, val = data.type, data.key, data

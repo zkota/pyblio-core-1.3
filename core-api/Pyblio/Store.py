@@ -52,7 +52,7 @@ class Key (int):
     pass
 
 
-class Entry (dict):
+class Record (dict):
 
     """
     A database entry. It behaves like a dictionnary, which returns a
@@ -388,11 +388,11 @@ class TxoStore (object):
 class Database (object):
 
     ''' This class represents a full bibliographic database.  It also
-    looks like a dictionnary, linking a Core.Key with a Core.Entry.
+    looks like a dictionnary, linking a Core.Key with a Core.Record.
 
     [UPDATE RULE] Entries returned by a Database MUST be considered
     read-only. Modifications MUST be performed on a copy of the entry,
-    and the resulting Entry MUST be set again in the database for the
+    and the resulting Record MUST be set again in the database for the
     modification to be kept.
 
 
@@ -686,7 +686,7 @@ class DatabaseParse (XML.Parser):
             else:
                 id = self._attr ('id', attrs)
 
-                self._entry = Entry ()
+                self._entry = Record ()
                 self._ekey  = Key (id)
             return
 

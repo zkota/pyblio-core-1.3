@@ -38,7 +38,7 @@ import sys
 from Pyblio import Base
 
 #
-#   Stub for Entry / Record
+#   Stub for Record / Record
 #------------------------------------------------------------
 
 class OldStyleRecord (Base.Record):

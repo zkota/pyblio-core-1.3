@@ -15,7 +15,7 @@ import sys, unittest
 sys.path.append('../')
 sys.path.append('../compiled')
 
-#from testlib import  Entry, get_entry, Key
+#from testlib import  Record, get_entry, Key
 import Tagged
 
 verbose = 1
