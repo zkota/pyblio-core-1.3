@@ -22,19 +22,8 @@
   <name>URL</name>
  </attribute>
 
- <document id="sample">
-  <name>Sample</name>
-
-  <mandatory id="author"/>
-  <mandatory id="date"/>
-  <mandatory id="ref"/>
-  <mandatory id="text"/>
-  <mandatory id="url"/>
-
- </document>
-
 </pyblio-schema>
- <entry id="1" type="sample">
+ <entry id="1">
 
  <native type="bibtex">@article{entry_1,
 author = {LastName}}</native>

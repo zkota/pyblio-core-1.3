@@ -125,6 +125,40 @@ class URL (str):
     def sort (self):
         return self
 
+
+class ID (unicode):
+
+    ''' External Identifier (not meaningful for Pyblio) '''
+
+    def xmlwrite (self, fd):
+        fd.write ('<id value=%s/>' % quoteattr (self.encode ('utf-8')))
+        return
+
+    def index (self):
+        return []
+    
+    def sort (self):
+        return self
+
+
+class Enumerated:
+
+    def __init__ (self, item):
+        self._item = item
+        return
+    
+    def xmlwrite (self, fd):
+        fd.write ('<enumerated id="%d"/>' % self._item.id)
+        return
+
+    def index (self):
+        return []
+    
+    def sort (self):
+        return str (self)
+    
+
+
 class Reference (str):
     ''' Holder for a reference to a bibliographic entry (which can be
     a crossref, a link to related entries, ... '''
@@ -145,11 +179,13 @@ class Reference (str):
         return self
 
 N_to_C = {
-    'person'   : Person,
-    'date'     : Date,
-    'text'     : Text,
-    'url'      : URL,
-    'reference': Reference,
+    'person'    : Person,
+    'date'      : Date,
+    'text'      : Text,
+    'url'       : URL,
+    'reference' : Reference,
+    'id'        : ID,
+    'enumerated': Enumerated,
     }
 
 C_to_N = {}

@@ -67,9 +67,7 @@ class Entry (dict):
     properly translated. This is known by calling self.has_loss (key)
     """
 
-    def __init__ (self, type):
-	self.type   = type
-        
+    def __init__ (self):
 	self.key    = None
         self.native = None
 
@@ -85,8 +83,7 @@ class Entry (dict):
         return
 
     def xmlwrite (self, fd):
-        fd.write (' <entry id=%s type=%s>\n' %
-                  (quoteattr (str (self.key)), quoteattr (self.type.id)))
+        fd.write (' <entry id=%s>\n' % quoteattr (str (self.key)))
 
         if self.native:
             fd.write ('\n <native type=%s>%s</native>\n\n' %
@@ -124,8 +121,97 @@ class ResultSet:
 
     def __iter__ (self):
         raise NotImplemented ('please override')
-        
 
+
+class EnumItem:
+
+    def __init__ (self, id, group):
+
+        self.id = id
+        self.group = group
+
+        self.name  = None
+        self.names = {}
+        return
+
+    def xmlwrite (self, fd):
+
+        fd.write ('  <enum-item id="%d">\n' % self.id)
+
+        keys = self.names.keys ()
+        keys.sort ()
+
+        for k in keys:
+            v = self.names [k]
+            if k:
+                lang = ' lang="%s"' % k
+            else:
+                lang = ''
+            
+            fd.write ('   <name%s>%s</name>\n' % (
+                lang, escape (self.name)))
+        
+        fd.write ('  </enum-item>\n')
+        return
+    
+
+class EnumGroup (dict):
+
+    def xmlwrite (self, fd):
+
+        keys = self.keys ()
+        keys.sort ()
+
+        for k in keys:
+            self [k].xmlwrite (fd)
+        
+        return
+
+
+class EnumStore (dict):
+
+    """ This class is the interface via which Enumerated items can be
+    manipulated. """
+
+    def __init__ (self):
+
+        self._id = 1
+        return
+    
+
+    def xmlwrite (self, fd):
+
+        keys = self.keys ()
+        keys.sort ()
+
+        for k in keys:
+            fd.write (' <enum-group id="%s">\n' % k)
+            self [k].xmlwrite (fd)
+            fd.write (' </enum-group>\n\n')
+            
+        return
+
+    def add (self, group, item, key = None):
+
+        if key:
+            if key >= self._id:
+                self._id = key + 1
+        else:
+            key = self._id
+            self._id = self._id + 1
+
+        if not self.has_key (group):
+            self [group] = EnumGroup ()
+
+        v = copy.deepcopy (item)
+        
+        item.id    = key
+        item.group = group
+        
+        self [group] [key] = item
+
+        return key
+    
 
 class Database (dict):
 
@@ -142,7 +228,9 @@ class Database (dict):
 	''' Create a new empty database with the specified schema '''
 
         self.schema = schema
+        
         self.header = None
+        self.enum   = EnumStore ()
         
         self._id = 1
 
@@ -223,6 +311,8 @@ class Database (dict):
         if schema:
             self.schema.xmlwrite (fd, embedded = True)
 
+        self.enum.xmlwrite (fd)
+
         if self.header:
             fd.write ('<header>%s</header>\n' % escape (self.header))
         
@@ -246,6 +336,10 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._sparse = Schema.SchemaParse (self._schema)
 
         self._in_schema = False
+
+        from Pyblio.I18n import Localize
+
+        self._i18n = Localize ()
         return
 
     def setDocumentLocator (self, locator):
@@ -261,6 +355,11 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._attribute = None
         self._tdata = None
         self._ntype = None
+
+        self._enumi = None
+        self._enumg = None
+
+        self._lang = None
         return
 
 
@@ -276,6 +375,14 @@ class DatabaseParse (sax.handler.ContentHandler):
 
         return val
     
+    def _trn (self, table):
+
+        try:
+            return self._i18n.trn (table)
+        except KeyError:
+            self._error (_("missing default name"))
+
+            
     def startElement (self, name, attrs):
 
         if self._in_schema:
@@ -298,20 +405,37 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._error (_("this is not a pybliographer database"))
 
         # --------------------------------------------------
+        if name == 'enum-group':
+            if self._enumg:
+                self._error (_('nested "enum-group" are not supported'))
+            
+            self._enumg = self._attr ('id', attrs)
+            return
+
+        if name == 'enum-item':
+            if not self._enumg:
+                self._error (_('missing "enum-group"'))
+
+            self._enumi = EnumItem (int (self._attr ('id', attrs)),
+                                    self._enumg)
+            return
+
+        if name == 'name':
+            if not self._enumi:
+                self._error (_('missing "enum-item"'))
+            self._tdata = ''
+            self._lang = attrs.get ('lang', '')
+            return
+        
+
         if name == 'header':
             self._tdata = ''
             return
         
         if name == 'entry':
             id = self._attr ('id', attrs)
-            tp = self._attr ('type', attrs)
 
-            try:
-                tp = self.db.schema [tp]
-            except KeyError:
-                self._error (_("document type '%s' is unsupported") % tp)
-
-            self._entry = Entry (tp)
+            self._entry = Entry ()
             self._ekey  = Key (id)
             return
 
@@ -330,11 +454,11 @@ class DatabaseParse (sax.handler.ContentHandler):
             id = self._attr ('id', attrs)
 
             try:
-                tp = self._entry.type.typeof (id)
+                tp = self._schema [id]
 
             except KeyError:
-                self._error (_("invalid attribute '%s' in document '%s'") %
-                             (id, self._entry.type.name))
+                self._error (_("invalid attribute '%s' in entry '%s'") %
+                             (id, self._ekey))
 
             self._attribute = (id, tp.type)
 
@@ -357,7 +481,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             if self._attribute [1] is not Attribute.N_to_C [name]:
                 self._error (_("attribute '%s' does not match type of '%s'") %
                              (name, id))
-                
+
             if name == 'person':
                 self._o = Attribute.Person (honorific = attrs.get ('honorific', None),
                                             first     = attrs.get ('first', None),
@@ -385,8 +509,16 @@ class DatabaseParse (sax.handler.ContentHandler):
             elif name == 'url':
                 self._o = Attribute.URL (self._attr ('href', attrs))
 
+            elif name == 'enumerated':
+                group = self._schema [self._attribute [0]].group
+                id    = int (self._attr ('id', attrs))
+
+                item  = self.db.enum [group] [id]
+                
+                self._o = Attribute.Enumerated (item)
+
             else:
-                assert False, _("unexpected tag: %s") % name
+                self._error (_("unexpected tag: %s") % name)
 
             return
         
@@ -417,6 +549,19 @@ class DatabaseParse (sax.handler.ContentHandler):
                 
             return
 
+        if name == 'enum-group':
+            self._enumg = None
+            return
+        
+        if name == 'enum-item':
+            self._enumi.name = self._trn (self._enumi.names)
+
+            self.db.enum.add (self._enumg, self._enumi,
+                              key = self._enumi.id)
+            
+            self._enumi = None
+            return
+        
         if name == 'header':
             self.db.header = self._tdata
             self._tdata = None
@@ -433,8 +578,12 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._tdata = None
             return
         
-            
-        if name in Attribute.N_to_C.keys ():
+        if name == 'name':
+            self._enumi.names [self._lang] = self._tdata
+            self._tdata = None
+            return
+        
+        if self._attribute and name in Attribute.N_to_C.keys ():
 
             if name == 'text':
                 self._o = Attribute.Text (self._tdata)
@@ -444,6 +593,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             
             try:
                 self._entry [id].append (self._o)
+
             except KeyError:
                 self._entry [id] = [self._o]
 

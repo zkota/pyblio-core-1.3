@@ -34,6 +34,7 @@ from xml import sax
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N
+from Pyblio.I18n import Localize
 
 class Schema (dict):
 
@@ -57,85 +58,16 @@ class Schema (dict):
         
         fd.write ('<pyblio-schema>\n')
 
-        # Collect all the attributes
-        attrs = {}
-        for d in self.values ():
-            for a in d.mandatory.values () + d.optional.values ():
-                attrs [a.id] = a
-
-        keys = attrs.keys ()
+        keys = self.keys ()
         keys.sort ()
 
         for k in keys:
-            attrs [k].xmlwrite (fd)
-            fd.write ('\n')
-            
-        # Output the documents themselves
-        docs = self.keys ()
-        docs.sort ()
-
-        for k in docs:
             self [k].xmlwrite (fd)
             fd.write ('\n')
-
+            
         fd.write ('</pyblio-schema>\n')
         return
     
-    
-class Document:
-
-    def __init__ (self, id):
-
-        self.id = id
-
-        self.name  = None
-        self.names = {}
-        
-        self.mandatory = {}
-        self.optional  = {}
-        return
-
-    def typeof (self, attr):
-
-        try:
-            return self.mandatory [attr]
-        except KeyError:
-            pass
-
-        return self.optional [attr]
-    
-    def xmlwrite (self, fd):
-
-        fd.write (' <document id="%s">\n' % self.id)
-
-        names = self.names.keys ()
-        names.sort ()
-
-        for k in names:
-            v = escape (self.names [k].encode ('utf-8'))
-            if k: k = ' lang="%s"' % k
-            fd.write ('  <name%s>%s</name>\n' % (k, v))
-
-        fd.write ('\n')
-        
-        keys = self.mandatory.keys ()
-        keys.sort ()
-
-        for k in keys:
-            fd.write ('  <mandatory id="%s"/>\n' % k)
-            
-        fd.write ('\n')
-
-        keys = self.optional.keys ()
-        keys.sort ()
-
-        for k in keys:
-            fd.write ('  <optional id="%s"/>\n' % k)
-            
-
-        fd.write (' </document>\n')
-        return
-
     
 class Attribute:
 
@@ -143,16 +75,29 @@ class Attribute:
 
         self.id = id
 
-        self.name = None
-        self.type = None
-
+        self.name  = None
+        self.type  = None
+        self.group = None
+        
         self.names = {}
+
+        self.range = (1, None)
         return
 
     def xmlwrite (self, fd):
 
-        fd.write (' <attribute id="%s" type="%s">\n' % (
-            self.id, C_to_N [self.type]))
+        if self.range [1] is None:
+            card = ""
+        else:
+            card = ' max="%d"' % self.range [1]
+        
+        if self.group is None:
+            group = ""
+        else:
+            group = ' group="%s"' % self.group
+        
+        fd.write (' <attribute id="%s" type="%s"%s%s>\n' % (
+            self.id, C_to_N [self.type], card, group))
 
         names = self.names.keys ()
         names.sort ()
@@ -174,12 +119,7 @@ class SchemaParse (sax.handler.ContentHandler):
     """ This class parses the XML format of a Schema """
 
     def __init__ (self, schema):
-        import locale
-
-        lang, charset = locale.getlocale (locale.LC_MESSAGES)
-
-        self.lang = lang or ''
-        self.lang_one = self.lang.split ('_') [0]
+        self._i18n = Localize ()
 
         self.schema = schema
         return
@@ -195,11 +135,8 @@ class SchemaParse (sax.handler.ContentHandler):
         
         self.schema.clear ()
 
-        self._attributes = {}
         self._attribute = None
-
-        self._document = None
-        self._started  = False
+        self._started   = False
         
         self._namelang = None
         self._namedata = None
@@ -226,15 +163,6 @@ class SchemaParse (sax.handler.ContentHandler):
         if not self._started:
             self._error (_("this is not a pybliographer schema"))
 
-        if name == 'document':
-
-            if self._document is not None:
-                self._error (_("'document' tags cannot be nested"))
-
-            id = self._attr ('id', attrs)
-            self._document = Document (id)
-            return
-
         if name == 'attribute':
             if self._attribute is not None:
                 self._error (_("'attribute' tags cannot be nested"))
@@ -247,26 +175,23 @@ class SchemaParse (sax.handler.ContentHandler):
                 self._attribute.type = N_to_C [tname]
             except KeyError:
                 self._error ('unknown attribute type "%s"' % tname)
-                
+
+            if attrs.has_key ('max'):
+                try:
+                    self._attribute.range = (1, int (attrs ['max']))
+
+                except ValueError:
+                    self._error ('invalid range value in attribute "%s"' % tname)
+
+            if attrs.has_key ('group'):
+                self._attribute.group = attrs ['group']
+            
             return
         
-        if name in ('mandatory', 'optional'):
-            if self._document is None:
-                self._error (_("'%s' must be in a 'document'") % name)
-
-            id = self._attr ('id', attrs)
-            if not self._attributes.has_key (id):
-                self._error (_("unknown document attribute '%s'") % id)
-
-            if name == 'mandatory':
-                self._document.mandatory [id] = self._attributes [id]
-            else:
-                self._document.optional [id] = self._attributes [id]
-            return
         
         if name == 'name':
             if self._attribute is None and self._document is None:
-                self._error (_("'name' must be in a 'document' or 'attribute'"))
+                self._error (_("'name' must be in an 'attribute'"))
             self._namelang = attrs.get ('lang', '')
             self._namedata = ''
             return
@@ -282,28 +207,15 @@ class SchemaParse (sax.handler.ContentHandler):
 
     def _trn (self, table):
 
-        if table.has_key (self.lang):
-            return table [self.lang]
-        
-        if table.has_key (self.lang_one):
-            return table [self.lang_one]
-
         try:
-            return table ['']
+            return self._i18n.trn (table)
+        
         except KeyError:
             self._error (_("missing default name"))
             
 
     def endElement (self, name):
 
-        if name == 'document':
-
-            self._document.name = self._trn (self._document.names)
-            
-            self.schema [self._document.id] = self._document
-            self._document = None
-            return
-        
         if name == 'pyblio-schema':
             self._started = False
             return
@@ -311,7 +223,7 @@ class SchemaParse (sax.handler.ContentHandler):
         if name == 'attribute':
             self._attribute.name = self._trn (self._attribute.names)
 
-            self._attributes [self._attribute.id] = self._attribute
+            self.schema [self._attribute.id] = self._attribute
             self._attribute = None
             return
 

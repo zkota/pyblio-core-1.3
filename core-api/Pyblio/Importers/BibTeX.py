@@ -624,26 +624,19 @@ def file_import (file, encoding, db, ** kargs):
             
         tp, key, val = data.type, data.key, data
         
-        try:
-            schema = db.schema [tp]
-
-        except KeyError:
-            raise Exceptions.SchemaError (
-                _("document '%s' is unknown") % tp)
-
-        e = Store.Entry (schema)
+        e = Store.Entry ()
 
         for k, v in val.iteritems ():
 
             k = k.lower ()
             
             try:
-                attp = schema.typeof (k)
+                attp = db.schema [k]
 
             except KeyError:
                 raise Exceptions.SchemaError (
                     _("no attribute '%s' in document '%s'") % (
-                    k, schema.name))
+                    k, tp))
 
             e [k] = _mapping [attp.type] (v, encoding)
 

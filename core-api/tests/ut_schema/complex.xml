@@ -5,11 +5,4 @@
   <name>Héhé &lt; Huhu</name>
  </attribute>
 
- <document id="article">
-  <name>Hihi &lt; Höhö</name>
-
-  <mandatory id="author"/>
-
- </document>
-
 </pyblio-schema>

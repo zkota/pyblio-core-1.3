@@ -5,11 +5,17 @@
 Create an empty Store of every existing type. Import an existing XML
 database into it, with no loss.
 
-* BibTeX keys are attributes.
+* BibTeX keys and document classes are attributes.
 
-The BibTeX key is an attribute that is part of the entry description.
-Upon import, the importer is told which attribute name should hold
-this information.
+The BibTeX key is an attribute of type ID that is part of the entry
+description.  Upon import, the importer is told which attribute name
+should hold this information. Similarly, the Document Class is an
+Enumerated value, whose group is passed as a parameter.
+
+* It is possible to search on a specific attribute
+
+Queries are dependent on the type of the attribute being searched (for
+instance, dates are ordered,...)
 
 * Multiple users accesses cannot corrupt a DB3 database
 
@@ -32,4 +38,10 @@ Result sets can be merged together, entries can be removed or
 added,...
 
 * There are Permanent Result Sets.
+
+They are stored in the XML format and in the storages.
+
+* Schemas contain information about attributes (type, cardinality,...)
+
+So that an attribute can have exactly one occurence, O..N, 1..N, ...
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-db>
- <entry id="1" type="article">
+ <entry id="1">
 
  <native type="bibtex">@article{toto,
    author = {Gobry, {}Frederic and First Last},

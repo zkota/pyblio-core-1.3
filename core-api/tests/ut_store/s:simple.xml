@@ -10,13 +10,4 @@
   <name>URL</name>
  </attribute>
 
- <document id="article">
-  <name>Article</name>
-  <name lang="en">Article (en)</name>
-
-  <mandatory id="author"/>
-
-  <optional id="url"/>
- </document>
-
 </pyblio-schema>

@@ -17,7 +17,7 @@ class TestDatabase (pybut.TestCase):
         sc = Schema.Schema ('ut_database/schema.xml')
         db = self.hd.dbcreate (',,db', sc)
 
-        e = Store.Entry (db.schema ['article'])
+        e = Store.Entry ()
 
         e ['title'] = [ Attribute.Text ('title') ]
         k = db.add (e)
@@ -97,7 +97,7 @@ class TestContent (pybut.TestCase):
 
         import copy
         
-        e = Store.Entry (self.db.schema ['article'])
+        e = Store.Entry ()
 
         content = {}
 
@@ -156,7 +156,7 @@ class TestContent (pybut.TestCase):
     def testIndexUpdate (self):
         """ Check for index coherency upon modifications """
 
-        e = Store.Entry (self.db.schema ['article'])
+        e = Store.Entry ()
 
         e ['title'] = [ Attribute.Text ('a') ]
         a = self.db.add (e)
@@ -193,7 +193,7 @@ class TestContent (pybut.TestCase):
     def testIterate (self):
         """ Loop over the db content """
         
-        e = Store.Entry (self.db.schema ['article'])
+        e = Store.Entry ()
 
         initial = []
         
@@ -261,7 +261,7 @@ class TestContent (pybut.TestCase):
 
         for i in range (0, 16):
 
-            e = Store.Entry (self.db.schema ['article'])
+            e = Store.Entry ()
 
             a, b, c = phrase (), phrase (), phrase ()
             

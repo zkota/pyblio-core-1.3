@@ -43,7 +43,7 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        e = Store.Entry (schema ['sample'])
+        e = Store.Entry ()
 
         e ['author'] = [ Attribute.Person (last = 'Last 1'),
                          Attribute.Person (last = 'Last 2')]
@@ -79,6 +79,21 @@ class TestStore (pybut.TestCase):
         os.unlink (',,t4.xml')
         return
 
+    def testEnumRead (self):
+        """ A database with enumerated fields can be read and saved again identically """
+        
+        db = Store.Database (file = 'ut_store/enumerated.xml')
+
+        fd = open (',,t6.xml', 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (',,t6.xml', 'ut_store/enumerated.xml')
+
+        os.unlink (',,t6.xml')
+        return
+
+
     def testNativeWrite (self):
 
         """ Native data is stored in the database, along with loss information """
@@ -86,7 +101,7 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        e = Store.Entry (schema ['sample'])
+        e = Store.Entry ()
 
         e ['author'] = [ Attribute.Person (last = 'LastName') ]
         e.loss_set ('author', True)

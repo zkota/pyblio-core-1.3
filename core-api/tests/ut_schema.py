@@ -24,27 +24,21 @@ class TestSchema (pybut.TestCase):
         """ Open a simple document """
         
         s = Schema.Schema ('ut_schema/simple.xml')
-        assert s.has_key ('article')
-
-        a = s ['article']
         
-        assert a.mandatory.has_key ('author')
-        assert a.optional.has_key ('url')
+        assert s.has_key ('author')
+        assert s.has_key ('url')
 
-        assert a.names.has_key ('en')
-        assert a.mandatory ['author'].names.has_key ('en')
-
-        assert a.names ['en'] == 'Article (en)'
-        assert a.mandatory ['author'].names ['en'] == 'Author (en)'
+        a = s ['author']
+        assert a.names ['en'] == 'Author (en)'
+        
         return
     
     def testDefaultName (self):
         """ Check that the default names are used when no locale is specified """
 
-        a = Schema.Schema ('ut_schema/simple.xml') ['article']
+        a = Schema.Schema ('ut_schema/simple.xml') ['author']
 
-        assert a.name == 'Article'
-        assert a.mandatory ['author'].name == 'Author'
+        assert a.name == 'Author'
         return
     
 
@@ -55,10 +49,9 @@ class TestSchema (pybut.TestCase):
 
         locale.setlocale (locale.LC_MESSAGES, 'en_US')
         
-        a = Schema.Schema ('ut_schema/simple.xml') ['article']
+        a = Schema.Schema ('ut_schema/simple.xml') ['author']
 
-        assert a.name == 'Article (en)'
-        assert a.mandatory ['author'].name == 'Author (en)'
+        assert a.name == 'Author (en)'
         return
     
 
@@ -120,12 +113,15 @@ class TestSchema (pybut.TestCase):
         from Pyblio import Attribute
         
         s = Schema.Schema ('ut_schema/types.xml')
-        a = s ['sample']
 
-        assert a.mandatory ['url'].type is Attribute.URL
-        assert a.mandatory ['text'].type is Attribute.Text
-        assert a.mandatory ['author'].type is Attribute.Person
-        assert a.mandatory ['date'].type is Attribute.Date
-        assert a.mandatory ['ref'].type is Attribute.Reference
+        assert s ['url'].type is Attribute.URL
+        assert s ['text'].type is Attribute.Text
+        assert s ['author'].type is Attribute.Person
+        assert s ['date'].type is Attribute.Date
+        assert s ['ref'].type is Attribute.Reference
+        assert s ['id'].type is Attribute.ID
+        assert s ['enum'].type is Attribute.Enumerated
 
+        return
+    
 pybut.run (pybut.makeSuite (TestSchema, 'test'))

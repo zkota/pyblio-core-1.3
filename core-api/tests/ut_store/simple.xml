@@ -22,20 +22,9 @@
   <name>URL</name>
  </attribute>
 
- <document id="sample">
-  <name>Sample</name>
-
-  <mandatory id="author"/>
-  <mandatory id="date"/>
-  <mandatory id="ref"/>
-  <mandatory id="text"/>
-  <mandatory id="url"/>
-
- </document>
-
 </pyblio-schema>
 <header>Hi, I'm a database description</header>
- <entry id="1" type="sample">
+ <entry id="1">
   <attribute id="author">
    <person last="Last 1"/>
    <person last="Last 2"/>

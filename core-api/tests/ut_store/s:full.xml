@@ -16,15 +16,4 @@
  <attribute id="ref" type="reference">
   <name>Reference</name>
  </attribute>
-
- <document id="sample">
-  <name>Sample</name>
-
-  <mandatory id="author"/>
-  <mandatory id="url"/>
-  <mandatory id="text"/>
-  <mandatory id="date"/>
-  <mandatory id="ref"/>
- </document>
-
 </pyblio-schema>

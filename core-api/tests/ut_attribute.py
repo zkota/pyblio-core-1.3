@@ -17,7 +17,7 @@ class TestAttribute (pybut.TestCase):
         xml = xml.getvalue ()
         txt = txt.encode ('utf-8')
         
-        assert xml == txt, 'unexpected: %s' % txt
+        assert xml == txt, 'unexpected: %s (expecting %s)' % (xml, txt)
 
         return
 
@@ -72,6 +72,24 @@ class TestAttribute (pybut.TestCase):
                      u'<reference ref="123"/>')
         return
 
+    def testID (self):
+
+        self._check (Attribute.ID (u'87657ejh#{[|é<'),
+                     u'<id value="87657ejh#{[|é&lt;"/>')
+        return
+
+
+    def testEnum (self):
+
+        from Pyblio.Store import EnumItem
+
+        i = EnumItem (123, 'group')
+        
+        self._check (Attribute.Enumerated (i),
+                     u'<enumerated id="123"/>')
+        return
+
+    
     def testIndex (self):
 
         idx = Attribute.Text (u"HÉHÉ les Gens, s'il vous plaît.").index ()
