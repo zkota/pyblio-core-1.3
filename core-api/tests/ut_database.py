@@ -745,6 +745,8 @@ class TestView (pybut.TestCase):
                 
             v = rs.view ('text')
 
+            assert len (v) == 4
+            
             res = list (v)
             assert res in ([1, 4, 2, 3],
                            [4, 1, 2, 3]), 'got %s' % res

@@ -113,6 +113,11 @@ class View (object):
 
         self._view = map (lambda x: x [1], view)
 
+    def __len__ (self):
+
+        return len (self._view)
+
+
     def __getitem__ (self, i):
 
         return self._view [i]
