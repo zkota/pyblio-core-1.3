@@ -20,7 +20,7 @@
 
 from gettext import gettext as _
 
-import os, shutil, copy, sys, traceback, weakref
+import os, shutil, copy, sys, traceback
 
 import cPickle as pickle
 
@@ -77,19 +77,51 @@ class DBIterItems (DBIterBase):
 
 class ResultSet (Store.ResultSet):
 
-    def __init__ (self, env, meta, rs, id, name = None):
-        self.name = name
+    def __init__ (self, env, meta, rs, id, permanent = None):
+        # RS id as a string and as an integer
+        self.id  = id
+        self._id = str (id)
+        
+        self._name = None
 
+        # Useful db accesses
         self._env  = env
         self._rs   = rs
-        self._id   = id
         self._meta = meta
+
         
         self._cursor = rs.cursor ()
-        self._permanent = self.name is not None
+        self._permanent = permanent
 
         self._restart ()
         return
+
+    def _name_set (self, name):
+
+        txn = self._env.txn_begin ()
+
+        try:
+            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+        
+            avail [int (self._id)] = name
+        
+            self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        self._name = name
+        
+        return
+
+    def _name_get (self):
+        return self._name
+
+
+    name = property (_name_get, _name_set)
+
 
     def __iter__ (self):
         return self
@@ -102,8 +134,7 @@ class ResultSet (Store.ResultSet):
 
         if not txn: txn = self._env.txn_begin ()
             
-        self._rs.put (self._id + '/' + str (k), '',
-                      txn = txn)
+        self._rs.put (self._id + '/' + str (k), '', txn = txn)
         
         self._restart ()
         return
@@ -154,13 +185,12 @@ class ResultSet (Store.ResultSet):
 
             c.close ()
 
-            if self.name:
-                # remove oneself from the meta list
-                (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+            # remove oneself from the meta list
+            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
             
-                del avail [self.name]
+            del avail [int (self._id)]
             
-                self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
+            self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
             
         except:
             # exceptions in __del__ methods are not reported by default
@@ -200,9 +230,12 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
         (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
-        for name, rsid in avail.items ():
-            rs = ResultSet (self._env, self._meta, self._rs, rsid, name)
-            self [name] = rs
+        # initialize with the existing permanent result sets
+        for rsid, name in avail.items ():
+            rs = ResultSet (self._env, self._meta, self._rs, rsid, True)
+            rs._name = name
+            
+            self [rsid] = rs
         
         return
     
@@ -223,23 +256,25 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         return self.itervalues ()
 
 
-    def add (self, name = None, txn = None):
+    def add (self, permanent = False, rsid = None, txn = None):
         """ Create an empty result set """
 
         txn = self._env.txn_begin (parent = txn)
 
         try:
             # get the next rs id
-            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+            (last, avail) = _pl (self._meta.get ('rs', txn = txn))
+            (last, rsid)  = Tools.id_make (last, rsid)
             
-            if name: avail [name] = str (rsid)
+            # Avail contains the name of the RS, which is initially None
+            avail [rsid] = None
             
-            self._meta.put ('rs', _ps ((rsid + 1, avail)), txn = txn)
+            self._meta.put ('rs', _ps ((last, avail)), txn = txn)
             
-            rsid = str (rsid) 
+            srsid = str (rsid) 
 
             # the result set is simply defined by an entry with its number
-            self._rs.put (rsid + '/', '', txn = txn)
+            self._rs.put (srsid + '/', '', txn = txn)
 
         except:
             txn.abort ()
@@ -247,8 +282,8 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         
         txn.commit ()
 
-        rs = ResultSet (self._env, self._meta, self._rs, rsid, name)
-        if name: self [name] = rs
+        rs = ResultSet (self._env, self._meta, self._rs, rsid, permanent)
+        if permanent: self [rsid] = rs
 
         self.register ('item-delete', rs._on_delete)
         
@@ -452,7 +487,7 @@ class Database (Store.Database, Callback.Publisher):
             if create:
                 self.schema = schema
                 self._meta.put ('schema', _ps (schema), txn = txn)
-                self._meta.put ('rs', _ps ((0, {})), txn = txn)
+                self._meta.put ('rs', _ps ((1, {})), txn = txn)
                 self._meta.put ('serial', '1', txn = txn)
             else:
                 self.schema = _pl (self._meta.get ('schema', txn = txn))
@@ -610,12 +645,12 @@ class Database (Store.Database, Callback.Publisher):
         return id
 
 
-    def query (self, word, name = None):
+    def query (self, word, permanent = False):
 
         txn = self._env.txn_begin ()
 
         try:
-            rs = self.rs.add (name, txn = txn)
+            rs = self.rs.add (permanent, txn = txn)
 
             cursor = self._idx.cursor ()
 

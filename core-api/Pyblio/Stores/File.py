@@ -84,11 +84,12 @@ class EnumStore (dict, Store.EnumStore):
 
 class ResultSet (dict, Store.ResultSet):
 
-    def __init__ (self, rs_name):
+    def __init__ (self, rsid):
 
         dict.__init__ (self)
-        
-        self.name = rs_name
+
+        self.id   = rsid
+        self.name = None
         return
 
 
@@ -115,18 +116,21 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
     def __init__ (self, db):
         self._db = db
+        self._id = 1
         return
     
 
-    def add (self, rs_name = None):
+    def add (self, permanent = False, rsid = None):
         """ Create an empty result set """
 
-        rs = ResultSet (rs_name)
-
+        (self._id, rsid) = Tools.id_make (self._id, rsid)
+        
+        rs = ResultSet (rsid)
+        
         self._db.register ('delete-item', rs._on_db_delete)
         
-        if rs_name:
-            self [rs_name] = rs
+        if permanent:
+            self [rs.id] = rs
         
         return rs
 
@@ -224,9 +228,9 @@ class Database (dict, Store.Database, Callback.Publisher):
         dict.__setitem__ (self, key, value)
         return
 
-    def query (self, word, name = None):
+    def query (self, word, permanent = False):
 
-        res = ResultSet (name)
+        res = self.rs.add (permanent)
         
         for entry in self.itervalues ():
 
@@ -242,8 +246,6 @@ class Database (dict, Store.Database, Callback.Publisher):
             if not found: continue
 
             res.add (entry.key)
-
-        if name: self.rs [name] = res
 
         return res
         

@@ -116,7 +116,7 @@ class Entry (dict):
 
 # --------------------------------------------------
 
-class ResultSet:
+class ResultSet (object):
 
     """ This class defines a result set. ResultSets can be named and
     are then persistent. A result set is a set of keys from the
@@ -125,8 +125,6 @@ class ResultSet:
     DERIVED BY ALL STORES
     """
 
-    def __init__ (self, rs_name):
-        raise NotImplemented ('please override')
 
     def add (self, k):
         """ Add a new item in the set """
@@ -138,8 +136,12 @@ class ResultSet:
 
     def xmlwrite (self, fd):
 
-        fd.write (' <resultset name=%s>\n' %
-                  quoteattr (self.name.encode ('utf-8')))
+        if self.name:
+            name = ' name=%s' % quoteattr (self.name.encode ('utf-8'))
+        else:
+            name = ''
+            
+        fd.write (' <resultset id="%d"%s>\n' % (self.id, name))
         
         for v in self:
             fd.write ('  <entry ref="%d"/>\n' % v)
@@ -148,7 +150,7 @@ class ResultSet:
         return
 
 
-class ResultSetStore:
+class ResultSetStore (object):
 
     """ Interface to the stored result sets.
 
@@ -164,13 +166,13 @@ class ResultSetStore:
     def __iter__ (self):
         raise NotImplemented ('please override')
         
-    def add (self, rs_name = None):
+    def add (self, permanent = False, rsid = None):
         raise NotImplemented ('please override')
         
 
 # --------------------------------------------------
     
-class EnumItem:
+class EnumItem (object):
 
     """ Definition of an enumerated item. This item can then be reused
     as the argument for Attribute.Enumerated creation.
@@ -208,7 +210,7 @@ class EnumItem:
         return
     
 
-class EnumGroup:
+class EnumGroup (object):
 
     """ Definition of a group of enumerated items.
 
@@ -241,7 +243,7 @@ class EnumGroup:
         return
 
 
-class EnumStore:
+class EnumStore (object):
 
     """ This class is the interface via which Enumerated items can be
     manipulated.
@@ -277,7 +279,7 @@ class EnumStore:
     
 # --------------------------------------------------
 
-class Database:
+class Database (object):
 
     ''' This class represents a full bibliographic database.  It also
     looks like a dictionnary, linking a Core.Key with a Core.Entry.
@@ -316,7 +318,7 @@ class Database:
         raise NotImplemented ('please override')
 
 
-    def query (self, word, name = None):
+    def query (self, word, permanent = False):
         raise NotImplemented ('please override')
     
     
@@ -573,7 +575,15 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'resultset':
-            self._rs = self.db.rs.add (self._attr ('name', attrs))
+
+            rsid = int (self._attr ('id', attrs))
+            self._rs = self.db.rs.add (permanent = True, rsid = rsid)
+            
+            try:
+                self._rs.name = attrs ['name']
+                
+            except KeyError:
+                pass
             return
         
         if name == 'attribute':

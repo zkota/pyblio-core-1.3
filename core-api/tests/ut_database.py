@@ -369,8 +369,9 @@ class TestContent (pybut.TestCase):
         for i in range (5):
             self.db.add (e)
 
-        rs = self.db.query ('youyou', name = u'my set')
-
+        rs = self.db.query ('youyou', permanent = True)
+        rs.name = u'my set'
+        
         def integrity (rs):
             i = 0
             for k in rs:
@@ -378,21 +379,24 @@ class TestContent (pybut.TestCase):
                 i = i + 1
 
             assert i == 5, 'obtained %d' % i
+            assert rs.name == u'my set'
             return
 
+        rsid = rs.id
+        
         integrity (rs)
-        integrity (self.db.rs [u'my set'])
+        integrity (self.db.rs [rsid])
         
         self.db.save ()
         self.db = self.hd.dbopen (self.name)
 
-        integrity (self.db.rs [u'my set'])
+        integrity (self.db.rs [rsid])
 
         # Once removed, the rs should not exist anymore
-        del self.db.rs [u'my set']
+        del self.db.rs [rsid]
 
         try:
-            r = self.db.rs [u'my set']
+            r = self.db.rs [rsid]
             assert False, 'the result set should not exist anymore'
 
         except KeyError: pass
@@ -401,7 +405,7 @@ class TestContent (pybut.TestCase):
         self.db = self.hd.dbopen (self.name)
 
         try:
-            r = self.db.rs [u'my set']
+            r = self.db.rs [rsid]
             assert False, 'the result set should not exist anymore'
 
         except KeyError: pass
@@ -421,9 +425,9 @@ class TestContent (pybut.TestCase):
 
         items.sort ()
 
-        for name in (None, u'named'):
+        for perm in (True, False):
             
-            rs = self.db.rs.add (name)
+            rs = self.db.rs.add (perm)
 
             # put all the entries
             for i in items:
