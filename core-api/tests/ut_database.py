@@ -152,6 +152,39 @@ class TestContent (pybut.TestCase):
         checkpoint ()
         return
 
+    def testIterDB (self):
+        """ A database provides independent iterators """
+
+        e = Store.Entry ()
+
+        for i in range (3):
+            self.db.add (e)
+
+        full = []
+        for x in self.db:
+            for y in self.db:
+                full.append ((x, y))
+
+        assert len (full) == 9
+        return
+    
+    def testIterRS (self):
+        """ A database provides independent iterators """
+
+        e  = Store.Entry ()
+        rs = self.db.rs.add ()
+        
+        for i in range (3):
+            ix = self.db.add (e)
+            rs.add (ix)
+
+        full = []
+        for x in rs:
+            for y in rs:
+                full.append ((x, y))
+
+        assert len (full) == 9
+        return
 
     def testIndexUpdate (self):
         """ Check for index coherency upon modifications """

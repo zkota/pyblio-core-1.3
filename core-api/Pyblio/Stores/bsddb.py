@@ -75,6 +75,33 @@ class DBIterItems (DBIterBase):
 
 # --------------------------------------------------
 
+class RSIter (object):
+    def __init__ (self, cursor, id):
+        self._id     = id
+        self._cursor = cursor
+        
+        self._cursor.set (self._id + '/')
+        return
+
+
+    def __iter__ (self):
+        return self
+
+    
+    def next (self):
+        data = self._cursor.next ()
+
+        if data is None:
+            raise StopIteration ()
+
+        rs, key = data [0].split ('/')
+        
+        if rs != self._id:
+            raise StopIteration ()
+
+        return Store.Key (key)
+
+
 class ResultSet (Store.ResultSet):
 
     def __init__ (self, env, meta, rs, id, permanent = None):
@@ -89,11 +116,7 @@ class ResultSet (Store.ResultSet):
         self._rs   = rs
         self._meta = meta
 
-        
-        self._cursor = rs.cursor ()
         self._permanent = permanent
-
-        self._restart ()
         return
 
     def _name_set (self, name):
@@ -124,19 +147,16 @@ class ResultSet (Store.ResultSet):
 
 
     def __iter__ (self):
-        return self
+        cursor = self._rs.cursor ()
+        
+        return RSIter (cursor, self._id)
 
-    def _restart (self):
-        self._cursor.set (self._id + '/')
-        return
 
     def add (self, k, txn = None):
 
         if not txn: txn = self._env.txn_begin ()
             
         self._rs.put (self._id + '/' + str (k), '', txn = txn)
-        
-        self._restart ()
         return
 
     def __delitem__ (self, k, txn = None):
@@ -144,25 +164,7 @@ class ResultSet (Store.ResultSet):
         if not txn: txn = self._env.txn_begin ()
 
         self._rs.delete (self._id + '/' + str (k), txn = txn)
-        
-        self._restart ()
         return
-    
-
-    def next (self):
-        data = self._cursor.next ()
-
-        if data is None:
-            self._restart ()
-            raise StopIteration ()
-
-        rs, key = data [0].split ('/')
-        
-        if rs != self._id:
-            self._restart ()
-            raise StopIteration ()
-
-        return Store.Key (key)
 
 
     def __del__ (self):
