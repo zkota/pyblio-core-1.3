@@ -722,12 +722,29 @@ class Exporter (object):
             Attribute.URL:    self.url_add,
             Attribute.Date:   self.date_add,
             Attribute.ID:     self.id_add,
+            Attribute.Txo:    self.txo_add,
             }
         return
 
     def _escape (self, text):
 
         return text.encode ('latex', 'replace')
+
+    def txo_add (self, field, data):
+
+        r = []
+        for d in data:
+            v = self.db.txo [d.group][d.id]
+
+            try: n = v.name
+            except KeyError: n = v.names.get ('C', None)
+                
+            if n: r.append (n)
+
+        data = self._escape ('; '.join (r))
+        
+        self.field [field] = '{%s}' % data
+        return
         
     def text_add (self, field, data):
 
