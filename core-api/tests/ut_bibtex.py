@@ -113,6 +113,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('missing-comma')
         return
 
+    def testSpaceInAuthors (self):
+        """ No extra spaces around authors """
+        
+        self._check ('authors')
+        return
+
 
 class TestBibTeXExport (pybut.TestCase):
 

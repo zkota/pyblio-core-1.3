@@ -601,7 +601,7 @@ class Importer (object):
 
             if comma == 0:
                 # Use the number of segments in the name
-                stream = map (lambda x: x.flat (self.charset), stream)
+                stream = map (lambda x: x.flat (self.charset).strip (), stream)
 
                 if len (stream) == 1:
                     return Attribute.Person (last = stream [0])
@@ -614,8 +614,8 @@ class Importer (object):
                 i = stream.index (',')
 
                 return Attribute.Person \
-                       (last  = Block ('{','}', stream [:i]).flat (self.charset),
-                        first = Block ('{','}', stream [i+1:]).flat (self.charset))
+                       (last  = Block ('{','}', stream [:i]).flat (self.charset).strip (),
+                        first = Block ('{','}', stream [i+1:]).flat (self.charset).strip ())
 
             return Attribute.Person ()
 
