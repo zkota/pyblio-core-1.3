@@ -261,5 +261,87 @@ class SimpleImporter (Importer):
         return
     
 
+class Exporter (object):
 
+    _re_marc = re.compile ('(\d{3,})(\w)(\w)')
+    
+    def begin (self):
+
+        self.fd.write (' <record>\n')
+        self._fields = {}
+        return
+
+    def end (self):
+
+        ks = self._fields.keys ()
+        ks.sort ()
+
+        for k in ks:
+            data = self._fields [k]
+            
+            r = self._re_marc.match (k)
+
+            if r is None:
+                raise SyntaxError ('invalid MARC code: %s' % `k`)
+
+            tag, ind1, ind2  = r.groups ((1, 2, 3, 4))
+
+            if ind1 == '_': ind1 = ''
+            if ind2 == '_': ind2 = ''
+
+            for kval in data:
+                self.fd.write ('  <datafield tag="%s" ind1="%s" ind2="%s">\n' % (
+                    tag, ind1, ind2))
+        
+                for sub, value in kval.items ():
+                    if not value: continue
+            
+                    self.fd.write ('   <subfield code="%s">%s</subfield>\n' % (
+                        sub, escape (value.encode ('utf-8'))))
+
+                self.fd.write ('  </datafield>\n')
+
+        self.fd.write (' </record>\n')
+        return
+
+    def single (self, rec, field):
+
+        return rec.get (field, [None]) [0]
+    
+    def add (self, code, ** kval):
+
+        for k, v in kval.items ():
+            if not v: del kval [k]
+
+        if not kval: return
+
+        data = self._fields.get (code, [])
+        data.append (kval)
+        
+        self._fields [code] = data
+        return
+    
+
+    def record_parse (self, record):
+
+        pass
+
+
+    def write (self, fd, rs, db):
+
+        self.fd = fd
+        self.db = db
+        
+        fd.write ('''\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection>
+''')
+
+        for r in rs.itervalues ():
+            self.record_parse (r)
+
+        fd.write ('''\
+</collection>
+''')
+        return
     
