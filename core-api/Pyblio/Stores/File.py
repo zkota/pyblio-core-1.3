@@ -22,7 +22,7 @@ from gettext import gettext as _
 
 import os, copy
 
-from Pyblio import Store, Callback, Attribute, Exceptions
+from Pyblio import Store, Callback, Attribute, Exceptions, Tools
 
 
 class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
@@ -38,12 +38,8 @@ class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
     
 
     def add (self, item, key = None):
-        if key:
-            if key >= self._id:
-                self._id = key + 1
-        else:
-            key = self._id
-            self._id = self._id + 1
+
+        self._id, key = Tools.id_make (self._id, key)
 
         v = copy.deepcopy (item)
         
@@ -56,7 +52,7 @@ class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
 
     def __delitem__ (self, k):
 
-        self.emit ('delete', (self._group, k))
+        self.emit ('delete', self._group, k)
 
         dict.__delitem__ (self, k)
         return
@@ -77,7 +73,7 @@ class EnumStore (dict, Store.EnumStore):
                   (_('group %s exists') % `group`)
         
         gp = EnumGroup (group)
-        gp.register ('delete', self._db._on_enum_delete)
+        gp.register ('delete', self._db._enum_use_check)
         
         self [group] = gp
         
@@ -180,7 +176,7 @@ class Database (dict, Store.Database, Callback.Publisher):
         return
 
 
-    def add (self, value, id = None):
+    def add (self, value, key = None):
         """ Insert a new entry in the database.
 
         New entries MUST be added with this method, not via an update
@@ -190,24 +186,20 @@ class Database (dict, Store.Database, Callback.Publisher):
         proposing a key choice.
         """
 
-        if id:
-            v = int (id)
-            if v >= self._id:
-                self._id = v + 1
-        else:
-            id = Store.Key (self._id)
-            self._id = self._id + 1
+        self._id, key = Tools.id_make (self._id, key)
 
-        assert not self.has_key (id), \
-               _("a duplicate key has been generated: %d") % id
+        key = Store.Key (key)
+        
+        assert not self.has_key (key), \
+               _("a duplicate key has been generated: %d") % key
 
         value = copy.deepcopy (value)
-        value.key = id
+        value.key = key
 
         value = self.validate (value)
         
-        dict.__setitem__ (self, id, value)
-        return id
+        dict.__setitem__ (self, key, value)
+        return key
 
 
     def __delitem__ (self, k):
@@ -270,21 +262,6 @@ class Database (dict, Store.Database, Callback.Publisher):
         self.xmlwrite (fd)
         fd.close ()
 
-        return
-
-
-    def _on_enum_delete (self, k):
-
-        for item in self.itervalues ():
-
-            for attrs in item.itervalues ():
-
-                for attr in attrs:
-                    if not isinstance (attr, Attribute.Enumerated): break
-
-                    if (attr.group, attr.id) == k:
-                        raise Exceptions.ConstraintError (_('enum %s/%d used in item %d') % (
-                            k [0], k [1], item.key))
         return
     
 

@@ -200,6 +200,18 @@ class TestStore (pybut.TestCase):
 
         e ['enum'] = [ Attribute.Enumerated (enu) ]
         fail (e)
+
+        # check that unexpected enums are rejected
+        g = db.enum.add ('c')
+
+        i = Store.EnumItem ()
+        i.names [''] = 'youou'
+        i = g.add (i)
+        
+        enu = db.enum ['c'][i]
+
+        e ['enum'] = [ Attribute.Enumerated (enu) ]
+        fail (e)
         return
     
         

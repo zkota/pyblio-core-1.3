@@ -363,17 +363,54 @@ class Database:
 
             # additional special checks
             if s.type is Attribute.Enumerated:
+
                 for v in vals:
 
+                    # check if the enum is in the group defined in the schema
+                    if v.group != s.group:
+                        raise Exceptions.SchemaError (
+                            _('enumerated item %s/%d should be in %s') % (
+                            v.group, v.id, s.group))
+
+                    # check for the enum existence
                     try:
                         self.enum [v.group] [v.id]
                         
                     except KeyError:
                         raise Exceptions.SchemaError (
-                            _('invalid enumerated item %s/%d') % (v.group, v.id))
-                    
+                            _('invalid enumerated item %s/%d') % (
+                            v.group, v.id))
             
         return entry
+
+    def _enum_use_check (self, group, key):
+        
+        """ Check if an enum can be safely removed """
+        
+        to_check = []
+        # get the attributes that contain the enums of interest
+        for s in self.schema.values ():
+            if s.type is not Attribute.Enumerated: continue
+            if s.group != group: continue
+
+            to_check.append (s.id)
+
+
+        for v in self.itervalues ():
+            for name in to_check:
+                try:
+                    attrs = v [name]
+                except KeyError:
+                    continue
+                
+                for attr in attrs:
+                    if attr.id != key: continue
+                    
+                    raise Exceptions.ConstraintError \
+                          (_('enum %s/%d still used in item %d') % (
+                        group, key, v.key))
+
+        return
 
     def xmlwrite (self, fd):
         """ Output a database in XML format """
@@ -659,7 +696,7 @@ class DatabaseParse (sax.handler.ContentHandler):
 
         if name == 'entry':
             if self._rs is None:
-                self.db.add (self._entry, id = self._ekey)
+                self.db.add (self._entry, key = self._ekey)
                 self._entry = None
             return
 

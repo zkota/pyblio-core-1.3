@@ -25,7 +25,7 @@ import cPickle as pickle
 
 from bsddb3 import db
 
-from Pyblio import Store, Schema, Callback, Attribute, Exceptions
+from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools
 
 _pl = pickle.loads
 _ps = pickle.dumps
@@ -216,13 +216,7 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
         v = self._enum.get (self._group)
 
         vid, data = _pl (v)
-
-        # Key is the key that will be used for the entry, id is
-        # the current serial (which can be different)
-        if key:
-            if key > vid: vid = key
-        else:
-            key = vid
+        vid, key  = Tools.id_make (vid, key)
 
         v = copy.deepcopy (item)
         v.id    = key
@@ -230,7 +224,7 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
         
         data [key] = v
         
-        self._enum.put (self._group, _ps ((vid + 1, data)))
+        self._enum.put (self._group, _ps ((vid, data)))
         
         return key
 
@@ -246,16 +240,7 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
     
     def __delitem__ (self, k):
 
-        for v in self._db.itervalues ():
-            for attrs in v.values ():
-                for attr in attrs:
-                    if not isinstance (attr, Attribute.Enumerated):
-                        break
-
-                    if (attr.id, attr.group) == (k, self._group):
-                        raise Exceptions.ConstraintError \
-                              (_('enum %s/%d used in item %d') % (
-                            self._group, k, v.key))
+        self._db._enum_use_check (self._group, k)
 
         v = _pl (self._enum.get (self._group))
         del v [1] [k]
@@ -399,7 +384,7 @@ class Database (Store.Database, Callback.Publisher):
         return
 
 
-    def add (self, val, id = None):
+    def add (self, val, key = None):
 
         val = self.validate (val)
 
@@ -409,15 +394,11 @@ class Database (Store.Database, Callback.Publisher):
         try:
             serial = int (self._meta.get ('serial'))
 
-            if id:
-                if id > serial: serial = id
-            else:
-                id = serial
+            serial, key = Tools.id_make (serial, key)
             
-            self._meta.put ('serial', str (serial + 1),
-                            txn = txn)
+            self._meta.put ('serial', str (serial), txn = txn)
             
-            key = Store.Key (self._insert (id, val, txn))
+            key = Store.Key (self._insert (key, val, txn))
 
         except:
             txn.abort ()
