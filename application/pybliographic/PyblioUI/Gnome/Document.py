@@ -24,7 +24,7 @@ from xml.sax.saxutils import escape
 
 from Pyblio.Callback import Publisher
 
-from PyblioUI.Gnome import Glade, Index
+from PyblioUI.Gnome import Glade, Index, Entry
 from PyblioUI import Document as LogicDoc
 
 
@@ -63,21 +63,7 @@ class Document (Glade.Window, Publisher):
         s.connect ('changed', self._on_entry_select)
 
         # Configure the text view
-        self._text = self._w_view.get_buffer ()
-
-        self._tag = {}
-        
-        self._tag ['title'] = \
-                  self._text.create_tag ('title',
-                                         weight = pango.WEIGHT_BOLD)
-        self._tag ['field'] = \
-                  self._text.create_tag ('field',
-                                         indent = -20,
-                                         style = pango.STYLE_OBLIQUE)
-        self._tag ['body'] = \
-                  self._text.create_tag ('body',
-                                         left_margin = 20)
-
+        self._text = Entry.Entry (self._w_view)
 
         # Configure the Result Set List
         col = gtk.TreeViewColumn ('', gtk.CellRendererText (), markup = 1)
@@ -136,44 +122,6 @@ class Document (Glade.Window, Publisher):
         return
 
 
-    def display (self, entry):
-        """ Full text display of an entry """
-        
-        if entry is None:
-            self._text.set_text ('')
-            return
-
-        # Display this entry
-        self._text.delete (self._text.get_start_iter (),
-                           self._text.get_end_iter ())
-        
-        iter = self._text.get_start_iter ()
-        
-        fields = entry.keys ()
-        fields.sort ()
-        
-        
-        for k in fields:
-
-            desc = self._l.db.schema [k]
-
-            si = iter.get_offset ()
-            
-            self._text.insert (iter, desc.name + '\n')
-
-            mi = iter.get_offset ()
-
-            for f in entry [k]:
-                self._text.insert (iter, str (f) + '\n')
-            
-            si = self._text.get_iter_at_offset (si)
-            mi = self._text.get_iter_at_offset (mi)
-                
-            self._text.apply_tag (self._tag ['body'],  si, iter)
-            self._text.apply_tag (self._tag ['field'], si, mi)
-
-            self._text.insert (iter, '\n')
-        return
 
 
     def close (self):
@@ -238,9 +186,10 @@ class Document (Glade.Window, Publisher):
         sel.selected_foreach (get)
 
         if len (current) != 1:
-            self.display (None)
+            self._text.display (None, self._l.db)
             return
         
-        self.display (self._l.db [current [0]])
+        self._text.display (self._l.db [current [0]],
+                            self._l.db)
         return
     

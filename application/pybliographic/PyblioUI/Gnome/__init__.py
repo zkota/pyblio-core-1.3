@@ -25,7 +25,7 @@
 import PyblioUI
 import sys
 
-sys.argv = sys.argv [:2] + ['--'] + sys.argv [2:]
+sys.argv = sys.argv [:1] + ['--'] + sys.argv [1:]
 
 # import the required modules so that they get initialized
 import pygtk
@@ -38,7 +38,7 @@ import gnome.ui
 gnome.init ('Pybliographic', PyblioUI.version)
 
 # clean up our garbage
-sys.argv = sys.argv [:2] + sys.argv [3:]
+sys.argv = sys.argv [:1] + sys.argv [2:]
 
 del sys
 
