@@ -740,20 +740,27 @@ class Database (Store.Database, Callback.Publisher):
 
     
 def dbdestroy (path, nobackup = False):
-    shutil.rmtree (path + '.db')
+    # sanity checks
+    if not os.path.isdir (path):
+        raise ValueError ('%s is not a directory' % path)
+
+    if not os.path.exists (os.path.join (path, 'pybliographer')):
+        raise ValueError ('%s is not a pybliographer database' % path)
+    
+    shutil.rmtree (path)
     return
 
     
 def dbcreate (path, schema):
     
-    return Database (path   = path + '.db',
+    return Database (path   = path,
                      schema = schema, create = True)
 
 
 def dbopen (path):
 
     try:
-        return Database (path = path + '.db', create = False)
+        return Database (path = path, create = False)
     
     except db.DBNoSuchFileError, msg:
         raise Store.StoreError (_("cannot open '%s': %s") % (
@@ -762,7 +769,7 @@ def dbopen (path):
 
 def dbimport (target, source):
 
-    db = Database (path   = target + '.db',
+    db = Database (path   = target,
                    schema = None, create = True)
 
     handler = Store.DatabaseParse (db)
