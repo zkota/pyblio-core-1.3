@@ -168,7 +168,7 @@ class TestContent (pybut.TestCase):
 
             for w, r in zip (('a', 'b', 'c'), res):
 
-                rs = map (None, self.db.query (w, 'title'))
+                rs = map (None, self.db.query (w))
                 assert rs == r, \
                        'for %s: expected %s, got %s' % (w, r, rs)
             return
@@ -277,7 +277,7 @@ class TestContent (pybut.TestCase):
 
         # Search the occurences of every word
         for w in words:
-            rs = self.db.query (w, 'title')
+            rs = self.db.query (w)
 
             vals = []
             for v in rs:
@@ -351,8 +351,59 @@ class TestContent (pybut.TestCase):
         pybut.fileeq (f, 'ut_database/enumerate.xml')
         os.unlink (f)
         return
-    
 
+
+    def testNamedResultSet (self):
+
+        e = Store.Entry ()
+
+        e ['title'] = [Attribute.Text ('a sample')]
+        for i in range (5):
+            self.db.add (e)
+        
+        e ['title'] = [Attribute.Text ('youyou')]
+        for i in range (5):
+            self.db.add (e)
+
+        rs = self.db.query ('youyou', name = u'my set')
+
+        def integrity (rs):
+            i = 0
+            for k in rs:
+                assert self.db [k] ['title'] [0] == 'youyou'
+                i = i + 1
+
+            assert i == 5, 'obtained %d' % i
+            return
+
+        integrity (rs)
+        integrity (self.db.rs [u'my set'])
+        
+        self.db.save ()
+        self.db = self.hd.dbopen (self.name)
+
+        integrity (self.db.rs [u'my set'])
+
+        # Once removed, the rs should not exist anymore
+        del self.db.rs [u'my set']
+
+        try:
+            r = self.db.rs [u'my set']
+            assert False, 'the result set should not exist anymore'
+
+        except KeyError: pass
+
+        self.db.save ()
+        self.db = self.hd.dbopen (self.name)
+
+        try:
+            r = self.db.rs [u'my set']
+            assert False, 'the result set should not exist anymore'
+
+        except KeyError: pass
+        return
+
+    
 fmts = ('bsddb', 'file')
 
 global fmt

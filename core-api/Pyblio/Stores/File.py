@@ -49,9 +49,10 @@ class Database (Store.Database):
         return
 
 
-    def query (self, word, sort, name = None):
+    def query (self, word, name = None):
 
-        res = []
+        res = Store.ResultSet (name)
+        
         for entry in self.itervalues ():
 
             found = False
@@ -65,16 +66,11 @@ class Database (Store.Database):
                 
             if not found: continue
 
-            res.append ((entry [sort] [0].sort (), entry.key))
+            res.append (entry.key)
 
-        def zipsort (a, b):
-            return cmp (a [0], b [0])
+        if name: self.rs [name] = res
 
-        res.sort (zipsort)
-
-        if not res: return res
-        
-        return apply (zip, res) [1]
+        return res
         
     
     def save (self):

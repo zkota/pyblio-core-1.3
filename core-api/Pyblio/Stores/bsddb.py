@@ -74,7 +74,7 @@ class DBIterItems (DBIterBase):
 class ResultSet:
 
     def __init__ (self, env, rs, id, name = None):
-        self.name    = name
+        self.name = name
 
         self._db = env
         self._rs = rs
@@ -82,6 +82,8 @@ class ResultSet:
         
         self._cursor = rs.cursor ()
         self._data   = self._cursor.first ()
+
+        self._permanent = self.name is not None
         return
 
     def __iter__ (self):
@@ -90,23 +92,35 @@ class ResultSet:
 
     def next (self):
         if self._data is None:
+            self._data = self._cursor.first ()
             raise StopIteration ()
 
         data = self._data
         self._data = self._cursor.next ()
         
-        return int (data [1], 16)
+        return int (data [0], 16)
 
 
     def __del__ (self):
-        if self.name:
-            # This is a long-lived result set
-            return
-
         self._rs.close ()
 
+        if self._permanent: return
+
+        # physically destroy the database
         _db = db.DB (self._db)
-        _db.remove ('rs', self._id)
+
+        try: _db.remove ('rs', self._id)
+        except db.DBNoSuchFileError: pass
+        
+        return
+
+
+class ResultSetStore (Store.ResultSetStore):
+
+    def __delitem__ (self, k):
+
+        self [k]._permanent = False
+        dict.__delitem__ (self, k)
         return
     
     
@@ -179,8 +193,6 @@ class EnumStore (Store.EnumStore):
         
         return key
 
-
-
 # --------------------------------------------------
     
 class Database (Store.Database):
@@ -214,14 +226,34 @@ class Database (Store.Database):
         self._meta  = db.DB (self._env)
         self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag)
 
+        self.rs = ResultSetStore ()
+
         if create:
             self.schema = schema
             self._meta.put ('schema', pickle.dumps (schema))
-            self._meta.put ('rs', '0')
+            self._meta.put ('rs', pickle.dumps ((0, {})))
             self._meta.put ('serial', '1')
         else:
             self.schema = pickle.loads (self._meta.get ('schema'))
+            id, store = pickle.loads (self._meta.get ('rs'))
 
+            for k, v in store.items ():
+                d = db.DB (self._env)
+
+                try:
+                    d.open ('rs', v, db.DB_HASH)
+                    
+                except db.DBNoSuchFileError:
+                    del store [k]
+                    continue
+                
+                rs = ResultSet (self._env, d, v, k)
+                self.rs [k] = rs
+
+            # store the updated rs list
+            self._meta.put ('rs', pickle.dumps ((id, store)))
+
+        
         # Full text indexing DB
         self._idx = db.DB (self._env)
         self._idx.set_flags (db.DB_DUP)
@@ -230,7 +262,9 @@ class Database (Store.Database):
         # Store for Enumerated values
         self.enum = EnumStore (self._env)
 
+        # No header in this db yet
         self.header = None
+
         return
 
 
@@ -256,9 +290,10 @@ class Database (Store.Database):
             else:
                 id = serial
             
-            self._meta.put ('serial', str (serial + 1))
+            self._meta.put ('serial', str (serial + 1),
+                            txn = txn)
             
-            key = int (self._insert (id, val), 16)
+            key = int (self._insert (id, val, txn), 16)
 
         except:
             txn.abort ()
@@ -276,8 +311,8 @@ class Database (Store.Database):
         txn = self._env.txn_begin ()
 
         try:
-            self._idxdel ('%.16x' % key)
-            self._insert (key, val)
+            self._idxdel ('%.16x' % key, txn)
+            self._insert (key, val, txn)
 
         except:
             txn.abort ()
@@ -293,8 +328,8 @@ class Database (Store.Database):
         txn = self._env.txn_begin ()
 
         try:
-            self._idxdel (id)
-            self._db.delete (id)
+            self._idxdel (id, txn)
+            self._db.delete (id, txn)
 
         except:
             txn.abort ()
@@ -317,10 +352,10 @@ class Database (Store.Database):
         return True
 
 
-    def _idxdel (self, id):
+    def _idxdel (self, id, txn):
         """ Remove any secondary index belonging to the entry """
 
-        cursor = self._idx.cursor ()
+        cursor = self._idx.cursor (txn)
         data   = cursor.first ()
         
         while 1:
@@ -333,40 +368,47 @@ class Database (Store.Database):
         return
 
 
-    def _idxadd (self, id, val):
+    def _idxadd (self, id, val, txn):
         
         for attribs in val.values ():
             for attrib in attribs:
                 
                 for idx in attrib.index ():
                     idx = idx.encode ('utf-8')
-                    self._idx.put (idx, id)
+                    self._idx.put (idx, id, txn = txn)
         return
 
     
-    def _insert (self, key, val):
+    def _insert (self, key, val, txn):
         
         id  = '%.16x' % key
         
-        self._idxadd (id, val)
+        self._idxadd (id, val, txn)
 
         val = copy.copy (val)
         val.key = key
         
         val = pickle.dumps (val)
         
-        self._db.put (id, val)
+        self._db.put (id, val, txn = txn)
         return id
 
 
-    def query (self, word, sort, name = None):
+    def query (self, word, name = None):
 
+        txn = self._env.txn_begin ()
+        
         # get the next rs id
-        rsid = self._meta.get ('rs')
-        self._meta.put ('rs', '%d' % (int (rsid) + 1))
+        (rsid, avail) = pickle.loads (self._meta.get ('rs'))
+
+        if name: avail [name] = str (rsid)
+
+        self._meta.put ('rs', pickle.dumps ((rsid + 1, avail)))
+
+        rsid = str (rsid)
         
         rs = db.DB (self._env)
-        rs.open ('rs', rsid, db.DB_BTREE, db.DB_CREATE)
+        rs.open ('rs', rsid, db.DB_HASH, db.DB_CREATE)
         
         cursor = self._idx.cursor ()
 
@@ -379,17 +421,15 @@ class Database (Store.Database):
         while 1:
             if data is None: break
 
-            key   = data [1]
-            entry = pickle.loads (self._db.get (key))
-            
-            # Insert the new value in a table according to the sort key
-            
-            sortkey = entry [sort] [0].sort ().encode ('utf-8')
-            rs.put (sortkey, key)
-
+            rs.put (data [1], '', txn = txn)
             data = cursor.next_dup ()
 
-        return ResultSet (self._env, rs, rsid, name)
+        txn.commit ()
+
+        rs = ResultSet (self._env, rs, rsid, name)
+        if name: self.rs [name] = rs
+
+        return rs
     
     
     def __getitem__ (self, key):

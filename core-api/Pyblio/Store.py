@@ -108,21 +108,43 @@ class Entry (dict):
         fd.write (' </entry>\n')
         return
 
+# --------------------------------------------------
 
-class ResultSet:
+class ResultSet (list):
 
     """ This class defines a result set, which is the product of a
     query on the database. ResultSets can be named and are then
     persistent. """
 
-    def __init__ (self, name = None):
+    def __init__ (self, name):
+
+        list.__init__ (self)
+        
         self.name = name
         return
+    
 
-    def __iter__ (self):
-        raise NotImplemented ('please override')
+    def xmlwrite (self, fd):
+
+        fd.write (' <resultset name="%s">\n' %
+                  quoteattr (self.name.encode ('utf-8')))
+        
+        for v in self:
+            fd.write ('  <entry ref="%d">\n' % v)
+        fd.write (' </resultset>\n' % self.name)
+        return
 
 
+class ResultSetStore (dict):
+
+    """ Interface to the stored result sets """
+
+    pass
+
+    
+
+# --------------------------------------------------
+    
 class EnumItem:
 
     """ Definition of an enumerated item. This item can then be reused
@@ -218,6 +240,7 @@ class EnumStore (dict):
 
         return key
     
+# --------------------------------------------------
 
 class Database (dict):
 
@@ -237,6 +260,7 @@ class Database (dict):
         
         self.header = None
         self.enum   = EnumStore ()
+        self.rs     = ResultSetStore ()
         
         self._id = 1
 
@@ -248,7 +272,7 @@ class Database (dict):
 
             except ValueError, msg:
                 raise StoreError (_("cannot open '%s': %s") % (file, msg))
-                                  
+
 	return
 
 
@@ -293,16 +317,7 @@ class Database (dict):
         return
 
 
-    def rs_get (self):
-        """ Return the available Result Sets """
-        return []
-
-
-    def rs_del (self, name):
-        return
-
-
-    def query (self, word, sort, name = None):
+    def query (self, word, name = None):
         raise NotImplemented ('please override')
     
     
@@ -324,6 +339,9 @@ class Database (dict):
         
         for v in self.itervalues ():
             v.xmlwrite (fd)
+
+        for rs in self.rs.items ():
+            rs.xmlwrite (rs)
         
         fd.write ('</pyblio-db>\n')
         return
