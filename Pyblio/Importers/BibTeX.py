@@ -36,7 +36,8 @@ from gettext import gettext as _
 # ==================================================
 
 tokens = ('AT', 'RBRACE', 'LBRACE', 'SPACE', 'COMMA', 'LITERAL',
-          'EQUALS', 'SHARP', 'QUOTE', 'ESCAPE', 'SYMBOL', 'NUMBER')
+          'EQUALS', 'SHARP', 'QUOTE', 'ESCAPE', 'SYMBOL', 'NUMBER',
+          'COMMENT', 'NEWLINE')
 
 def t_AT (t):
     r'@'
@@ -46,13 +47,28 @@ t_RBRACE  = r'\}'
 t_LBRACE  = r'\{'
 
 def t_SPACE (t):
-    r'[\t\n ]+'
+    r'[\t ]+'
 
     t.value = ' '
     return t
 
+def t_NEWLINE (t):
+    r'\n+'
+    t.value = '\n'
+    return t
+
+
 t_COMMA   = r','
-t_LITERAL = r'\w[\w\d]*'
+
+def t_LITERAL (t):
+    r'\w[\w\d]*'
+    
+    if t.value.lower () == 'comment':
+        t.type = 'COMMENT'
+        
+    return t
+
+
 t_EQUALS  = r'='
 t_SHARP   = r'\#'
 t_QUOTE   = r'"'
@@ -108,8 +124,46 @@ def p_object (t):
     t [0] = t [3]
     return
 
-def p_at_object (t):
+def p_at_object_entry (t):
     ''' at_object : entry '''
+    t [0] = t [1]
+    return
+
+def p_at_object_comment (t):
+    ''' at_object : COMMENT comment NEWLINE '''
+    t [0] = ('%', t [2])
+    return
+
+def p_at_object_empty_comment (t):
+    ''' at_object : COMMENT NEWLINE '''
+    t [0] = ''
+    return
+
+def p_comment (t):
+    ''' comment : comment comment_data '''
+    t [0] = t [1] + t [2]
+    return
+
+def p_single_comment (t):
+    ''' comment : comment_data '''
+    t [0] = t [1]
+    return
+
+
+def p_comment_data (t):
+    ''' comment_data : AT
+                | RBRACE
+                | LBRACE
+                | SPACE
+                | COMMA
+                | LITERAL
+                | EQUALS
+                | SHARP
+                | QUOTE
+                | ESCAPE
+                | SYMBOL
+                | NUMBER
+                | COMMENT '''
     t [0] = t [1]
     return
 
@@ -221,7 +275,9 @@ def p_misc_data (t):
                    | NUMBER
                    | SYMBOL
                    | SPACE
+                   | NEWLINE
                    | COMMA
+                   | COMMENT
                    | escaped '''
     t [0] = t [1]
     return
@@ -234,6 +290,7 @@ def p_escaped (t):
                 | ESCAPE LBRACE
                 | ESCAPE ESCAPE
                 | ESCAPE AT
+                | ESCAPE COMMENT
                 | ESCAPE SHARP
                 | ESCAPE SYMBOL '''
     t [0] = Command (t [2])
@@ -241,10 +298,26 @@ def p_escaped (t):
 
 
 def p_opt_space (t):
-    ''' opt_space : SPACE
+    ''' opt_space : spaces
                   | empty '''
     t [0] = t [1]
     return
+
+
+def p_space (t):
+    ''' space : SPACE
+              | NEWLINE '''
+    
+    t [0] = t [1]
+    return
+
+def p_spaces (t):
+    ''' spaces : space
+               | spaces space '''
+    
+    t [0] = t [1]
+    return
+
 
 def p_empty (t):
     'empty :'
@@ -403,10 +476,29 @@ def _tostring (tp, key, data):
 
 def file_import (file, encoding, db, ** kargs):
     
-    data = yacc.parse (open (file).read ())
+    datalist = yacc.parse (open (file).read (), debug = 0)
 
-    for tp, key, val in data:
+    in_head  = True
+    header   = []
+    
+    for data in datalist:
 
+        if data [0] == '%':
+            # this is a comment. skip.
+            if not in_head: continue
+
+            header.append (data [1].strip ().decode (encoding))
+            continue
+
+        if in_head:
+            # we are leaving the header.
+            in_head = False
+            
+            if header:
+                db.header = string.join (header, '\n')
+            
+        tp, key, val = data
+        
         try:
             schema = db.schema [tp]
 

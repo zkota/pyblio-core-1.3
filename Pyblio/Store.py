@@ -141,7 +141,8 @@ class Database (dict):
 	''' Create a new empty database with the specified schema '''
 
         self.schema = schema
-
+        self.header = None
+        
         if file:
             handler = DatabaseParse (self)
 
@@ -183,6 +184,9 @@ class Database (dict):
         if schema:
             self.schema.xmlwrite (fd, embedded = True)
 
+        if self.header:
+            fd.write ('<header>%s</header>\n' % escape (self.header))
+        
         for v in self.itervalues ():
             v.xmlwrite (fd)
         
@@ -255,6 +259,10 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._error (_("this is not a pybliographer database"))
 
         # --------------------------------------------------
+        if name == 'header':
+            self._tdata = ''
+            return
+        
         if name == 'entry':
             id = self._attr ('id', attrs)
             tp = self._attr ('type', attrs)
@@ -368,6 +376,11 @@ class DatabaseParse (sax.handler.ContentHandler):
             else:
                 self._sparse.endElement (name)
                 
+            return
+
+        if name == 'header':
+            self.db.header = self._tdata
+            self._tdata = None
             return
 
         if name == 'entry':

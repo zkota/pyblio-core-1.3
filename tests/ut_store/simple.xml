@@ -34,6 +34,7 @@
  </document>
 
 </pyblio-schema>
+<header>Hi, I'm a database description</header>
  <entry id="entry 1" type="sample">
   <attribute id="author">
    <person last="Last 1"/>

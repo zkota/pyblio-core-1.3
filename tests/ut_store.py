@@ -55,6 +55,8 @@ class TestStore (pybut.TestCase):
         
         db [k] = e
 
+        db.header = u"Hi, I'm a database description"
+        
         fd = open (',,t3.xml', 'w')
         db.xmlwrite (fd)
         fd.close ()
@@ -68,7 +70,7 @@ class TestStore (pybut.TestCase):
         """ A database can be read and saved again identically """
         
         db = Store.Database (file = 'ut_store/simple.xml')
-        
+
         fd = open (',,t4.xml', 'w')
         db.xmlwrite (fd)
         fd.close ()

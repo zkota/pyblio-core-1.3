@@ -12,7 +12,7 @@ class TestBibTeX (pybut.TestCase):
     
     def testSimple (self):
         ''' Read a bibtex file with simple properties '''
-        
+
         f = ',,t1.xml'
         
         s = Schema.Schema ('../Schemas/bibtex.xml')
@@ -28,6 +28,24 @@ class TestBibTeX (pybut.TestCase):
         pybut.fileeq (f, 'ut_bibtex/simple.xml')
         os.unlink (f)
         return
-    
+
+    def testComment (self):
+
+        f = ',,t2.xml'
+        
+        s = Schema.Schema ('../Schemas/bibtex.xml')
+        
+        db = Store.Database (schema = s)
+
+        BibTeX.file_import ('ut_bibtex/comment.bib', 'latin-1', db)
+
+        fd = open (f, 'w')
+        db.xmlwrite (fd, schema = False)
+        fd.close ()
+
+        pybut.fileeq (f, 'ut_bibtex/comment.xml')
+        os.unlink (f)
+        return
+
     
 pybut.run (pybut.makeSuite (TestBibTeX, 'test'))

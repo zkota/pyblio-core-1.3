@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<header>This is a comment
+This is a { comment too
+{mee too}</header>
+ <entry id="toto" type="article">
+
+ <native type="bibtex">@article{toto,
+   author = {Gobry, Frederic and First Last},
+   journal = "My journal",
+   note = {a \{ and a \}},
+   number = 123,
+   title = {This is a title}
+}</native>
+
+  <attribute id="author">
+   <person first="Frederic" last="Gobry"/>
+   <person first="First" last="Last"/>
+  </attribute>
+  <attribute id="journal">
+   <text>My journal</text>
+  </attribute>
+  <attribute id="note">
+   <text>a { and a }</text>
+  </attribute>
+  <attribute id="number">
+   <text>123</text>
+  </attribute>
+  <attribute id="title">
+   <text>This is a title</text>
+  </attribute>
+ </entry>
+</pyblio-db>
