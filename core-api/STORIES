@@ -1,47 +1,63 @@
 -*- outline -*-
 
-* [ ] Import the XML into any Store
+* TO DO
+
+** [X] Manually add / remove items in a result set
+
+Create an empty result set. Add items in it and remove them. It is not
+possible to duplicate items in a result set.
+
+** [ ] Refine the content of a result set
+
+Create a result set. Perform a query on its content. All queries
+available on a full database must be available on a result set.
+
+** [ ] Merge two result sets
+
+Create two result sets A and B. Merge the content of B into A. There
+are no duplicates in A, and B is left unchanged.
+
+** [ ] It is possible to search on a specific attribute
+
+Queries are dependent on the type of the attribute being searched (for
+instance, dates can be searched by intervals,...). It is possible to
+search on indexed and non-indexed attributes.
+
+** [ ] Specific attributes can be indexed
+
+Index information is part of the schema. These indexes are used when
+searching for a specific attribute value.
+
+** [ ] Import the XML into any Store
 
 Create an empty Store of every existing type. Import an existing XML
 database into it, with no loss.
 
-* [X] BibTeX keys and document classes are attributes.
-
-The BibTeX key is an attribute of type ID that is part of the entry
-description.  Similarly, the Document Class is an Enumerated value.
-
-* [ ] It is possible to search on a specific attribute
-
-Queries are dependent on the type of the attribute being searched (for
-instance, dates can be searched by intervals,...)
-
-* [ ] Multiple users accesses cannot corrupt a DB3 database
+** [ ] Multiple users accesses cannot corrupt a DB3 database
 
 Serial IDs are delivered atomically, and updates are transactional.
 
-* [ ] Support "shortcuts" for persons and texts
+** [ ] Support "shortcuts" for persons and texts
 
 When a phrase or person name is repeated frequently, a shortcut can be
 defined, and used in place of the corresponding attribute. When the
 shortcut content is updated, all the entries that used it are also
 updated.
 
-* [ ] Search for several words in the global query
-
-The query can accept several words as a logical AND
-
-* [ ] Manipulate result sets
-
-Result sets can be merged together, entries can be removed or
-added,...
-
-* [ ] There are Permanent Result Sets.
-
-They are stored in the XML format and in the storages.
-
-* [ ] Schemas contain information about attributes (type, cardinality,...)
+** [ ] Schemas contain information about attributes (type, cardinality,...)
 
 So that an attribute can have exactly one occurence, O..N, 1..N,
 ... Inserting/updating an entry in the database cannot occur if the
 entry does not match the schema definition.
+
+* DONE
+
+** [X] BibTeX keys and document classes are attributes.
+
+The BibTeX key is an attribute of type ID that is part of the entry
+description.  Similarly, the Document Class is an Enumerated value.
+
+** [X] There are Permanent Result Sets.
+
+They are stored in the XML format and in the storages.
 

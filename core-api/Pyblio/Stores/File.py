@@ -66,7 +66,7 @@ class Database (Store.Database):
                 
             if not found: continue
 
-            res.append (entry.key)
+            res.add (entry.key)
 
         if name: self.rs [name] = res
 

@@ -144,19 +144,20 @@ class ID (unicode):
 class Enumerated:
 
     def __init__ (self, item):
-        self._item = item
+        self.group = item.group
+        self.id    = item.id
         return
     
     def xmlwrite (self, fd):
         fd.write ('<enumerated group="%s" id="%d"/>' % (
-            self._item.group, self._item.id))
+            self.group, self.id))
         return
 
     def index (self):
-        return [ '%s/%d' % (self._item.group, self._item.id) ]
+        return [ '%s/%d' % (self.group, self.id) ]
     
     def sort (self):
-        return self._item.name
+        return '%s/%d' % (self.group, self.id)
     
 
 

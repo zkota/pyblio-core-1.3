@@ -42,7 +42,10 @@ class StoreError (Exception):
 
 class Key (int):
 
-    ''' A key uniquely identifies an entry in a database '''
+    ''' A key uniquely identifies an entry in a database.
+
+    SHARED BY ALL STORES
+    '''
 
     pass
 
@@ -57,14 +60,13 @@ class Entry (dict):
     The entry.key is an instance of Core.Key, and has to be unique
     over the database.
 
-    The entry.type is an instance of Schema.Document. It links the
-    field names with their type.
-
     The entry.native is a 2-uplet (format, native_content)
 
     For each attribute, it is possible that the returned value is
     lossy compared with the native data, if some information was not
     properly translated. This is known by calling self.has_loss (key)
+
+    SHARED BY ALL STORES
     """
 
     def __init__ (self):
@@ -110,18 +112,30 @@ class Entry (dict):
 
 # --------------------------------------------------
 
-class ResultSet (list):
+class ResultSet (dict):
 
-    """ This class defines a result set, which is the product of a
-    query on the database. ResultSets can be named and are then
-    persistent. """
+    """ This class defines a result set. ResultSets can be named and
+    are then persistent.
 
-    def __init__ (self, name):
+    DERIVED BY ALL STORES
+    """
 
-        list.__init__ (self)
+    def __init__ (self, rs_name):
+
+        dict.__init__ (self)
         
-        self.name = name
+        self.name = rs_name
         return
+
+
+    def add (self, k):
+        
+        self [k] = 1
+        return
+
+    
+    def __iter__ (self):
+        return self.iterkeys ()
     
 
     def xmlwrite (self, fd):
@@ -131,16 +145,28 @@ class ResultSet (list):
         
         for v in self:
             fd.write ('  <entry ref="%d"/>\n' % v)
+            
         fd.write (' </resultset>\n')
         return
 
 
 class ResultSetStore (dict):
 
-    """ Interface to the stored result sets """
+    """ Interface to the stored result sets.
 
-    pass
+    DERIVED BY ALL STORES
+    """
 
+    def add (self, rs_name = None):
+        """ Create an empty result set """
+
+        rs = ResultSet (rs_name)
+        
+        if rs_name:
+            self [rs_name] = rs
+        
+        return rs
+        
     
 
 # --------------------------------------------------
@@ -148,7 +174,10 @@ class ResultSetStore (dict):
 class EnumItem:
 
     """ Definition of an enumerated item. This item can then be reused
-    as the argument for Attribute.Enumerated creation."""
+    as the argument for Attribute.Enumerated creation.
+
+    SHARED BY ALL STORES
+    """
 
     def __init__ (self):
 
@@ -182,7 +211,10 @@ class EnumItem:
 
 class EnumGroup (dict):
 
-    """ Definition of a group of enumerated items """
+    """ Definition of a group of enumerated items.
+
+    DERIVED BY ALL STORES
+    """
 
     def xmlwrite (self, fd):
 
@@ -198,7 +230,10 @@ class EnumGroup (dict):
 class EnumStore (dict):
 
     """ This class is the interface via which Enumerated items can be
-    manipulated. """
+    manipulated.
+
+    DERIVED BY ALL STORES
+    """
 
     def __init__ (self):
 
@@ -251,6 +286,9 @@ class Database (dict):
     read-only. Modifications MUST be performed on a copy of the entry,
     and the resulting Entry MUST be set again in the database for the
     modification to be kept.
+
+
+    DERIVED BY ALL STORES
     '''
 
     def __init__ (self, schema = None, file = None):
@@ -461,7 +499,7 @@ class DatabaseParse (sax.handler.ContentHandler):
         if name == 'entry':
             if self._rs is not None:
                 id = self._attr ('ref', attrs)
-                self._rs.append (Key (id))
+                self._rs.add (Key (id))
                 
             else:
                 id = self._attr ('id', attrs)
