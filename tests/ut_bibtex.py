@@ -57,5 +57,12 @@ class TestBibTeX (pybut.TestCase):
         
         self._check ('empty')
         return
+
+    def testShqrp (self):
+        """ Support concatenation """
+        
+        self._check ('sharp')
+        return
+
     
 pybut.run (pybut.makeSuite (TestBibTeX, 'test'))
