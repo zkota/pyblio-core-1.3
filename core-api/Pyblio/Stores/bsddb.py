@@ -158,9 +158,14 @@ class View (Store.View):
             # create the new view
             
             self._v = db.DB (self._env)
-            self._v.set_flags (db.DB_DUP)
+            self._v.set_flags (db.DB_RECNUM)
             
             self._v.open ('view', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
+
+            # Create the index for the view
+            self._vi = db.DB (self._env)
+            self._vi.open ('viewidx', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
+
 
             # fill the view with the current content of the result set
             for e in rs.itervalues ():
@@ -171,7 +176,22 @@ class View (Store.View):
                     
                 except KeyError:
                     value = ''
+
+                # In order to store multiple values in a DB_RECNUM
+                # BTree, it is necessary to "cheat" a bit, and
+                # disambiguate between the duplicates; this is done by
+                # maintaining a counter by key, which holds the number
+                # of similar keys. This counter is appended to each
+                # entry.
                 
+                last = self._vi.get (value)
+                
+                if last is None: last = 0
+                else:            last = int (last)
+                
+                self._vi.put (value, str (last + 1), txn = txn)
+
+                value = value + '\0%d' % last
                 self._v.put (value, str (e.key), txn = txn)
             
         except:
@@ -197,7 +217,13 @@ class View (Store.View):
         return
 
     __iter__ = iterkeys
+
+
+    def __getitem__ (self, idx):
+
+        return Store.Key (self._v.get (idx + 1) [1])
     
+        
     def __del__ (self):
 
         if self._id is None: return
@@ -216,8 +242,10 @@ class View (Store.View):
             self._meta.put ('view', _ps ((serial, meta, revert)), txn = txn)
             
             self._v.close ()
+            self._vi.close ()
             
             db.DB (self._env).remove ('view', str (self._id))
+            db.DB (self._env).remove ('viewidx', str (self._id))
             
         except:
             # exceptions in __del__ methods are not reported by default
@@ -389,6 +417,10 @@ class ResultSet (Store.ResultSet):
 
         txn.commit ()
         return
+
+    def __len__ (self):
+
+        return self._rs.stat () ['nkeys']
 
 
     def _on_delete (self, key, txn = None):

@@ -52,4 +52,12 @@
    <text>CDE</text>
   </attribute>
  </entry>
+ <entry id="4">
+  <attribute id="enum">
+   <enumerated group="type" id="2"/>
+  </attribute>
+  <attribute id="text">
+   <text>ABC</text>
+  </attribute>
+ </entry>
 </pyblio-db>

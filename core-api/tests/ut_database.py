@@ -746,12 +746,24 @@ class TestView (pybut.TestCase):
             v = rs.view ('text')
 
             res = list (v)
-            assert res == [1, 2, 3], 'got %s' % res
+            assert res in ([1, 4, 2, 3],
+                           [4, 1, 2, 3]), 'got %s' % res
 
         return
-    
-            
+
+
+    def testIndexed (self):
+
+        v = self.rs.view ('text')
+
+        res = []
+        for i in range (len (self.rs)):
+            res.append (v [i])
+
+        assert res == list (v), 'got %s and %s' % (
+            res, list (v))
         
+        return
 
 if os.environ.has_key ('STORES'):
     fmts = os.environ ['STORES'].split (':')

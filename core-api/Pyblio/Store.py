@@ -138,6 +138,10 @@ class View (object):
 
     def __len__ (self):
         raise NotImplemented ('please override')
+
+    def __getitem__ (self, idx):
+        raise NotImplemented ('please override')
+
         
 
 # --------------------------------------------------
