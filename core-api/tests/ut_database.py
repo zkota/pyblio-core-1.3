@@ -661,7 +661,7 @@ class TestContent (pybut.TestCase):
 
     def testTxoDel (self):
 
-        """ Forbid the removal of an Txo definition that is in use """
+        """ Forbid the removal of a Txo definition that is in use """
 
         from Pyblio import Exceptions
         
@@ -695,7 +695,35 @@ class TestContent (pybut.TestCase):
 
         return
 
+    def testTxoDelLeaf (self):
 
+        """ Forbid the removal of a Txo definition that is not a leaf """
+
+        from Pyblio import Exceptions
+        
+        g = self.db.enum.add ('group')
+
+        a = g.add (Store.TxoItem ())
+        
+        b = Store.TxoItem ()
+        b.parent = a
+
+        b = g.add (b)
+        
+        try:
+            del g [a]
+            assert False, 'should not succeed'
+            
+        except Exceptions.ConstraintError:
+            pass
+
+
+        del g [b]
+        del g [a]
+        
+        return
+
+    
     def testTxoSingle (self):
 
         from Pyblio import Exceptions

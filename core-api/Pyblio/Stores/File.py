@@ -52,6 +52,15 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
 
     def __delitem__ (self, k):
 
+        # Internal check for coherency: is the entry used as a parent
+        # for someone ?
+        for v in self.values ():
+
+            if v.parent == k:
+                raise Exceptions.ConstraintError \
+                      (_('txo %s is parent of %s') % (
+                    `k`, `v.id`))
+
         self.emit ('delete', self._group, k)
 
         dict.__delitem__ (self, k)

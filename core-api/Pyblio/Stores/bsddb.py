@@ -710,6 +710,13 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
     
     def __delitem__ (self, k):
 
+        for v in self.values ():
+
+            if v.parent == k:
+                raise Exceptions.ConstraintError \
+                      (_('txo %s is parent of %s') % (
+                    `k`, `v.id`))
+        
         self.emit ('delete', self._group, k)
 
         txn = self._env.txn_begin ()
