@@ -100,6 +100,26 @@ class Tagged (object):
         self._evstack.append (ev)
         return
 
+    def record_start (self):
+        self.push (self.EV_RECORD_START)
+        return
+    
+    def record_end (self):
+        self.push (self.EV_RECORD_END)
+        return
+    
+    def field_start (self, tag, line):
+        self.push (self.EV_FIELD_START, tag, line)
+        return
+    
+    def field_end (self):
+        self.push (self.EV_FIELD_END)
+        return
+    
+    def field_data (self, data):
+        self.push (self.EV_FIELD_DATA, data)
+        return
+    
 
     def unread (self, line, count):
 
@@ -132,7 +152,7 @@ class Tagged (object):
                 return None
 
             if ev == self.EV_RECORD_END:
-                if self.state == self.ST_OUTSIDE:
+                if self.state != self.ST_IN_RECORD:
                     raise SyntaxError (_('line %d: unexpected end of record') % self._ln)
                 self.state = self.ST_OUTSIDE
                 return record
