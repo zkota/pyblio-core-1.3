@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import os, pybut, sys
 
 from Pyblio import Store, Schema, Attribute
@@ -50,10 +52,10 @@ class TestStore (pybut.TestCase):
 
         e = Store.Entry ()
 
-        e ['author'] = [ Attribute.Person (last = 'Last 1'),
+        e ['author'] = [ Attribute.Person (last = u'Last 1é'),
                          Attribute.Person (last = 'Last 2')]
         e ['url']    = [ Attribute.URL ('http://pybliographer.org') ]
-        e ['text']   = [ Attribute.Text (u'sample text') ]
+        e ['text']   = [ Attribute.Text (u'sample text é') ]
         e ['date']   = [ Attribute.Date (year = 2003) ]
         
         db.add (e)

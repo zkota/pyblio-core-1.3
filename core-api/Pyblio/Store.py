@@ -261,7 +261,7 @@ class TxoItem (object):
                 lang = ''
             
             fd.write ('   %s<name%s>%s</name>\n' % (
-                space, lang, escape (v)))
+                space, lang, escape (v.encode ('utf-8'))))
         
         return
     
