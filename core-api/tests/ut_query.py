@@ -65,6 +65,15 @@ class TestSimpleQuery (pybut.TestCase):
                 `got`, `res`)
 
         return
+
+    def textHasFieldQuery (self):
+
+        db = self.hd.dbimport (self.name, 'ut_query/hasfield.xml')
+
+        got = self._res (db.query (Query.HasField ('a')))
+
+        assert got == [1, 3, 4], 'got %s' % got
+        return
     
 
     def testFullTextQuery (self):

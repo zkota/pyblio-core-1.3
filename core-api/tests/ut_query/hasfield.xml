@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="a" type="text">
+  <name>A</name>
+ </attribute>
+ <attribute id="b" type="url">
+  <name>B</name>
+ </attribute>
+</pyblio-schema>
+
+ <entry id="1">
+  <attribute id="a">
+   <text>Toto</text>
+  </attribute>
+ </entry>
+
+ <entry id="2">
+  <attribute id="b">
+   <url href="toto"/>
+  </attribute>
+ </entry>
+
+ <entry id="3">
+  <attribute id="a">
+   <text>Toto</text>
+  </attribute>
+  <attribute id="b">
+   <url href="toto"/>
+  </attribute>
+ </entry>
+
+ <entry id="4">
+  <attribute id="a">
+   <text></text>
+  </attribute>
+ </entry>
+
+</pyblio-db>

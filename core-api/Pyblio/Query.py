@@ -95,6 +95,23 @@ class AnyWord (Constraint):
         return
     
 
+class HasField (Constraint):
+
+    def __init__ (self, field):
+        self.field = field
+        return
+
+    def validate (self, schema):
+
+        try:
+            t = schema [self.field]
+
+        except KeyError:
+            raise Exceptions.InvalidQuery ('unknown field: %s' % self.field)
+
+        return
+    
+
 class Txo (Constraint):
 
     """ Search items that belong to the corresponding txo """
@@ -191,6 +208,17 @@ class Queryable (object):
         return
 
 
+    def _q_hasfield (self, q, res):
+
+        for e in self.entries.itervalues ():
+
+            try: fs = e [q.field]
+            except KeyError: continue
+
+            res.add (e.key)
+
+        return
+    
     def _q_txo (self, q, res):
 
         full = self.txo [q.txo.group].expand (q.txo.id)
