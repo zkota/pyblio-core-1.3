@@ -721,6 +721,7 @@ class Exporter (object):
             Attribute.Person: self.person_add,
             Attribute.URL:    self.url_add,
             Attribute.Date:   self.date_add,
+            Attribute.ID:     self.id_add,
             }
         return
 
@@ -734,6 +735,13 @@ class Exporter (object):
         
         # by default, new lines and multiple spaces are not significant in bibtex fields
         data = self._collapse.sub (' ', data)
+        
+        self.field [field] = '{%s}' % data
+        return
+
+    def id_add (self, field, data):
+
+        data = self._escape ('; '.join (data))
         
         self.field [field] = '{%s}' % data
         return
