@@ -215,6 +215,9 @@ class SchemaParse (XML.Parser):
             return
         
         if name == 'attribute':
+            if self.schema.has_key (self._attribute.id):
+                self._error ('duplicate attribute %s' %  `self._attribute.id`)
+                
             self.schema [self._attribute.id] = self._attribute
             self._attribute = None
             return

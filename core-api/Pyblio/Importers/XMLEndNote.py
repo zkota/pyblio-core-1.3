@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string, re
+import string, re, StringIO
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -164,8 +164,8 @@ class Exporter (object):
 
     def header_add (self, key, reftype):
         
-        self.fd.write ('<REFNUM>%d</REFNUM>' % key)
         self.fd.write ('<REFERENCE_TYPE>%d</REFERENCE_TYPE>' % reftype)
+        self.fd.write ('<REFNUM>%d</REFNUM>' % key)
         return
 
     
@@ -175,17 +175,23 @@ class Exporter (object):
     
     def write (self, fd, rs, db):
 
-        self.fd = fd
+        self.db = db
         
         fd.write ('<XML><RECORDS>')
 
         for r in rs.itervalues ():
 
-            fd.write ('<RECORD>')
+            self.fd = StringIO.StringIO ()
 
             self.record_parse (r)
+
+            record = self.fd.getvalue ().strip ()
             
-            fd.write ('</RECORD>')
+            self.fd.close ()
+
+            if not record: continue
+            
+            fd.write ('<RECORD>%s</RECORD>' % record)
             
         fd.write ('</RECORDS></XML>\n')
         return

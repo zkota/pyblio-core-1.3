@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string
+import string, re
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -145,6 +145,8 @@ class Importer (XML.Parser):
 
 class SimpleImporter (Importer):
 
+    _date_re = re.compile (r'(.*)(\d{4,})')
+    
     def __init__ (self, mapping):
 
         self._logical  = mapping
@@ -184,7 +186,14 @@ class SimpleImporter (Importer):
         f = self.record.get (field, [])
 
         # heuristic to match a date
-        f.append (Attribute.Date (year = int (value)))
+        d = self._date_re.match (value)
+
+        if d is None:
+            raise Exceptions.ParserError ('unknown date %s' % `value`)
+
+        year = int (d.group (2))
+        
+        f.append (Attribute.Date (year = year))
         
         self.record [field] = f
         return

@@ -66,6 +66,16 @@ class TestSchema (pybut.TestCase):
         except Schema.sax.SAXException, msg:
             pass
 
+    def testDuplicate (self):
+        """ Forbid field duplication """
+
+        try:
+            Schema.Schema ('ut_schema/duplicate.xml')
+            assert False
+            
+        except Schema.sax.SAXException, msg:
+            pass
+
     def testWrite (self):
         """ Writing does not modify the file """
 
