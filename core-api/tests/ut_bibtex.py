@@ -119,6 +119,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('authors')
         return
 
+    def testInitialsPlusName (self):
+        """ Parse names like F. Gobry """
+        
+        self._check ('initials')
+        return
+
 
 class TestBibTeXExport (pybut.TestCase):
 

@@ -576,10 +576,18 @@ class Importer (object):
 
         ''' Parse a stream of tokens as a series of person names '''
 
-        # Person names are separated by 'and' keywords
-        avail  = []
         stream = list (stream.subst ())
 
+        # Merge dots with their preceding name, to recreate initials
+        os, stream = stream, []
+        for s in os:
+            if s == '.':
+                stream [-1] = Text (stream [-1] + '.')
+            else:
+                stream.append (s)
+            
+        # Person names are separated by 'and' keywords
+        avail  = []
         while 1:
             try:
                 i = stream.index ('and')
@@ -603,13 +611,16 @@ class Importer (object):
                 # Use the number of segments in the name
                 stream = map (lambda x: x.flat (self.charset).strip (), stream)
 
-                if len (stream) == 1:
+                ls = len (stream)
+                if ls == 1:
                     return Attribute.Person (last = stream [0])
 
-                if len (stream) == 2:
+                elif ls == 2:
                     return Attribute.Person (first = stream [0],
                                              last  = stream [1])
-
+                else:
+                    raise Exceptions.ParserError ("don't know how to handle this name properly: %s" % repr (stream))
+                    
             elif comma == 1:
                 i = stream.index (',')
 
