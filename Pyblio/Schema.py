@@ -37,9 +37,13 @@ from Pyblio.Attribute import N_to_C, C_to_N
 
 class Schema:
 
-    def __init__ (self):
+    def __init__ (self, file = None):
 
         self.documents = {}
+
+        if file:
+            handler = SchemaParse (self)
+            sax.parse (file, handler)
         return
 
 
@@ -317,11 +321,3 @@ class SchemaParse (sax.handler.ContentHandler):
         return
 
 
-
-def open (file):
-    s = Schema ()
-    
-    handler = SchemaParse (s)
-    sax.parse (file, handler)
-
-    return s

@@ -78,12 +78,21 @@ class Entry (dict):
     def xmlwrite (self, fd):
         fd.write (' <entry id=%s type=%s>\n' %
                   (quoteattr (self.key), quoteattr (self.type.id)))
+
+        if self.native:
+            fd.write ('\n <native type=%s>%s</native>\n\n' %
+                      (quoteattr (self.native [0]),
+                       escape (self.native [1].encode ('utf-8'))))
         
         keys = self.keys ()
         keys.sort ()
 
         for k in keys:
-            fd.write ('  <attribute id=%s>\n' % quoteattr (k))
+            if self.has_loss (k): lossy = ' loss="1"'
+            else:                 lossy = ''
+            
+            fd.write ('  <attribute id=%s%s>\n' % (quoteattr (k), lossy))
+            
             for v in self [k]:
                 fd.write ('   ')
                 v.xmlwrite (fd)
@@ -101,9 +110,14 @@ class Database (dict):
     looks like a dictionnary, linking a Core.Key with a Core.Entry.'''
 
 
-    def __init__ (self, schema):
+    def __init__ (self, schema = None, file = None):
 	''' Create a new empty database with the specified schema '''
         self.schema = schema
+
+        if file:
+            handler = DatabaseParse (self)
+            sax.parse (file, handler)
+        
 	return
 
     def xmlwrite (self, fd):
@@ -124,9 +138,9 @@ class Database (dict):
 
 class DatabaseParse (sax.handler.ContentHandler):
 
-    def __init__ (self):
+    def __init__ (self, db):
 
-        self.db = Database (None)
+        self.db = db
         
         self._schema = Schema.Schema ()
         self._sparse = Schema.SchemaParse (self._schema)
@@ -146,6 +160,7 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._entry = None
         self._attribute = None
         self._tdata = None
+        self._ntype = None
         return
 
 
@@ -195,6 +210,14 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._entry = Entry (id, tp)
             return
 
+        if name == 'native':
+            if self._entry is None:
+                self._error (_("tag 'native' must be in an 'entry'"))
+
+            self._ntype = self._attr ('type', attrs)
+            self._tdata = ''
+            return
+        
         if name == 'attribute':
             if self._entry is None:
                 self._error (_("tag 'attribute' must be in an 'entry'"))
@@ -209,6 +232,15 @@ class DatabaseParse (sax.handler.ContentHandler):
                              (id, self._entry.type.name))
 
             self._attribute = (id, tp.type)
+
+            # Add loss information to the entry
+            loss = attrs.get ('loss', '0')
+            try:
+                if int (loss) != 0:
+                    self._entry.loss_set (id, True)
+            except ValueError:
+                pass
+
             return
 
         if name in Attribute.N_to_C.keys ():
@@ -285,6 +317,13 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._entry = None
             return
 
+        if name == 'native':
+            self._entry.native = (self._ntype, self._tdata)
+            self._ntype = None
+            self._tdata = None
+            return
+        
+            
         if name in Attribute.N_to_C.keys ():
 
             if name == 'text':
@@ -301,11 +340,3 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._o = None
             
         return
-
-
-def open (file):
-    
-    handler = DatabaseParse ()
-    sax.parse (file, handler)
-    
-    return handler.db

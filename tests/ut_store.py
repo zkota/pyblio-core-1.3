@@ -9,8 +9,8 @@ class TestStore (pybut.TestCase):
     def testEmpty (self):
         """ Create an empty database with a schema """
         
-        schema = Schema.open ('ut_store/s:simple.xml')
-        db = Store.Database (schema)
+        schema = Schema.Schema ('ut_store/s:simple.xml')
+        db = Store.Database (schema = schema)
 
         assert len (db) == 0
 
@@ -26,7 +26,7 @@ class TestStore (pybut.TestCase):
     def testReadEmpty (self):
         """ A schema in a database is equivalent to outside the database """
         
-        db = Store.open ('ut_store/empty.xml')
+        db = Store.Database (file = 'ut_store/empty.xml')
 
         file = open (',,t2.xml', 'w')
         db.schema.xmlwrite (file)
@@ -38,9 +38,10 @@ class TestStore (pybut.TestCase):
         return
 
     def testWrite (self):
-
-        schema = Schema.open ('ut_store/s:full.xml')
-        db = Store.Database (schema)
+        """ A new database can be saved with its schema """
+        
+        schema = Schema.Schema ('ut_store/s:full.xml')
+        db = Store.Database (schema = schema)
 
         e = Store.Entry (Store.Key ('entry 1'),
                         schema.documents ['sample'])
@@ -64,8 +65,9 @@ class TestStore (pybut.TestCase):
         return
 
     def testRead (self):
-
-        db = Store.open ('ut_store/simple.xml')
+        """ A database can be read and saved again identically """
+        
+        db = Store.Database (file = 'ut_store/simple.xml')
         
         fd = open (',,t4.xml', 'w')
         db.xmlwrite (fd)
@@ -76,5 +78,44 @@ class TestStore (pybut.TestCase):
         os.unlink (',,t4.xml')
         return
 
+    def testNativeWrite (self):
+
+        """ Native data is stored in the database, along with loss information """
+        
+        schema = Schema.Schema ('ut_store/s:full.xml')
+        db = Store.Database (schema = schema)
+
+        e = Store.Entry (Store.Key ('entry_1'),
+                        schema.documents ['sample'])
+
+        e ['author'] = [ Attribute.Person (last = 'LastName') ]
+        e.loss_set ('author', True)
+        
+        e.native = ('bibtex', '@article{entry_1,\nauthor = {LastName}}')
+
+        db [e.key] = e
+
+        fd = open (',,t5.xml', 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (',,t5.xml', 'ut_store/native.xml')
+
+        os.unlink (',,t5.xml')
+        return
+        
+    def testNativeRead (self):
+
+        """ Native data is also read back from file """
+        
+        db = Store.Database (file = 'ut_store/native.xml')
+
+        e = db ['entry_1']
+        
+        assert e.native == ('bibtex',
+                            '@article{entry_1,\nauthor = {LastName}}')
+
+        assert e.has_loss ('author')
+        return
     
 pybut.run (pybut.makeSuite (TestStore, 'test'))

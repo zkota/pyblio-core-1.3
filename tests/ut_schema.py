@@ -16,14 +16,14 @@ class TestSchema (pybut.TestCase):
     def testEmpty (self):
         """ Open an empty document """
         
-        s = Schema.open ('ut_schema/empty.xml')
+        s = Schema.Schema ('ut_schema/empty.xml')
         assert s.documents == {}
 
 
     def testSimple (self):
         """ Open a simple document """
         
-        s = Schema.open ('ut_schema/simple.xml')
+        s = Schema.Schema ('ut_schema/simple.xml')
         assert s.documents.has_key ('article')
 
         a = s.documents ['article']
@@ -41,7 +41,7 @@ class TestSchema (pybut.TestCase):
     def testDefaultName (self):
         """ Check that the default names are used when no locale is specified """
 
-        a = Schema.open ('ut_schema/simple.xml').documents ['article']
+        a = Schema.Schema ('ut_schema/simple.xml').documents ['article']
 
         assert a.name == 'Article'
         assert a.mandatory ['author'].name == 'Author'
@@ -55,7 +55,7 @@ class TestSchema (pybut.TestCase):
 
         locale.setlocale (locale.LC_MESSAGES, 'en_US')
         
-        a = Schema.open ('ut_schema/simple.xml').documents ['article']
+        a = Schema.Schema ('ut_schema/simple.xml').documents ['article']
 
         assert a.name == 'Article (en)'
         assert a.mandatory ['author'].name == 'Author (en)'
@@ -66,7 +66,7 @@ class TestSchema (pybut.TestCase):
         """ Forbid nested documents """
 
         try:
-            Schema.open ('ut_schema/spurrious.xml')
+            Schema.Schema ('ut_schema/spurrious.xml')
             assert False
             
         except Schema.sax.SAXException, msg:
@@ -78,7 +78,7 @@ class TestSchema (pybut.TestCase):
         file = ',,t1.xml'
         
         import sys
-        a = Schema.open ('ut_schema/simple.xml')
+        a = Schema.Schema ('ut_schema/simple.xml')
 
         out = open (file, 'w')
         a.xmlwrite (out)
@@ -99,7 +99,7 @@ class TestSchema (pybut.TestCase):
         file = ',,t2.xml'
         
         import sys
-        a = Schema.open ('ut_schema/complex.xml')
+        a = Schema.Schema ('ut_schema/complex.xml')
 
         out = open (file, 'w')
         a.xmlwrite (out)
@@ -119,7 +119,7 @@ class TestSchema (pybut.TestCase):
 
         from Pyblio import Attribute
         
-        s = Schema.open ('ut_schema/types.xml')
+        s = Schema.Schema ('ut_schema/types.xml')
         a = s.documents ['sample']
 
         assert a.mandatory ['url'].type is Attribute.URL

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="ref" type="reference">
+  <name>Reference</name>
+ </attribute>
+
+ <attribute id="text" type="text">
+  <name>Text</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+ <document id="sample">
+  <name>Sample</name>
+
+  <mandatory id="author"/>
+  <mandatory id="date"/>
+  <mandatory id="ref"/>
+  <mandatory id="text"/>
+  <mandatory id="url"/>
+
+ </document>
+
+</pyblio-schema>
+ <entry id="entry_1" type="sample">
+
+ <native type="bibtex">@article{entry_1,
+author = {LastName}}</native>
+
+  <attribute id="author" loss="1">
+   <person last="LastName"/>
+  </attribute>
+ </entry>
+</pyblio-db>
