@@ -733,7 +733,38 @@ class TestView (pybut.TestCase):
             
         return
 
+    def testIterView (self):
 
+        
+        for rs in (self.rs, self.db.entries):
+            
+            v = rs.view ('text')
+            r = []
+            
+            for k in v.iterkeys (): r.append (k)
+
+            assert r in ([1, 4, 2, 3],
+                         [4, 1, 2, 3]), 'got %s' % res
+
+            r = []
+            for k, x in v.iteritems ():
+                r.append (k)
+                assert self.db [k] == x, 'got %s' % repr (x)
+
+            assert r in ([1, 4, 2, 3],
+                         [4, 1, 2, 3]), 'got %s' % res
+
+            r = []
+            for x in v.itervalues ():
+                r.append (x.key)
+                assert self.db [x.key] == x
+                
+            assert r in ([1, 4, 2, 3],
+                         [4, 1, 2, 3]), 'got %s' % res
+
+        return
+
+        
     def testViewText (self):
 
         for rs in (self.rs, self.db.entries):

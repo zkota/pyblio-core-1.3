@@ -235,6 +235,31 @@ class View (Store.View):
 
     __iter__ = iterkeys
 
+    def iteritems (self):
+
+        c = self._v.cursor ()
+        d = c.first ()
+        
+        while d:
+            key = d [1]
+            yield Store.Key (key), _pl (self._db.get (key))
+
+            d = c.next ()
+            
+        return
+
+    def itervalues (self):
+
+        c = self._v.cursor ()
+        d = c.first ()
+        
+        while d:
+            key = d [1]
+            yield _pl (self._db.get (key))
+
+            d = c.next ()
+            
+        return
 
     def __getitem__ (self, idx):
 

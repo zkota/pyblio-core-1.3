@@ -162,8 +162,22 @@ class View (object):
     def __iter__ (self):
 
         return iter (self._view)
-    
 
+    def iterkeys (self):
+
+        return iter (self._view)
+    
+    def iteritems (self):
+
+        for i in self._view:
+            yield (i, self._src._dict [i])
+            
+    def itervalues (self):
+
+        for i in self._view:
+            yield self._src._dict [i]
+
+    
 class Viewable (object):
 
     def view (self, criterion):
