@@ -715,7 +715,8 @@ yacc.yacc (tabmodule = (_pth, _mod))
 # ==================================================
 # BibTeX interface
 # ==================================================
-
+_lf_re = re.compile ('N+I+')
+_fl_re = re.compile ('I+N+')
 
 class Importer (object):
 
@@ -856,21 +857,22 @@ class Importer (object):
                     return Attribute.Person (last = stream [0])
 
                 else:
-                    tt = _typetag (stream)
+                    tt = ''.join (_typetag (stream))
 
-                    if tt in (['N', 'I'],
-                              ['N', 'I', 'I'],
-                              ['N', 'I', 'I', 'I']):
-                        return Attribute.Person (first = ' '.join (stream [1:]),
-                                                 last  = stream [0])
+                    if _lf_re.match (tt):
+                        idx = tt.index ('I')
+                        return Attribute.Person (first = ' '.join (stream [idx:]),
+                                                 last  = ' '.join (stream [:idx]))
+                        
 
-
-                    if tt in (['N', 'N'],
-                              ['I', 'N'],
-                              ['I', 'I', 'N'],
-                              ['I', 'I', 'I', 'N']):
-                        return Attribute.Person (first = ' '.join (stream [0:-1]),
-                                                 last  = stream [-1])
+                    if tt == 'NN':
+                        return Attribute.Person (first = stream [0],
+                                                 last  = stream [1])
+                    
+                    if _fl_re.match (tt):
+                        idx = tt.index ('N')
+                        return Attribute.Person (first = ' '.join (stream [:idx]),
+                                                 last  = ' '.join (stream [idx:]))
 
                     try:
                         von = tt.index ('L')
@@ -880,6 +882,12 @@ class Importer (object):
                         
                     except ValueError:
                         pass
+
+                    # As a fallback, consider that the last name is the last component
+                    if tt == 'NNN':
+                        return Attribute.Person (first = ' '.join (stream [:-1]),
+                                                 last  = stream [-1])
+                    
                     
                     raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
                         repr (stream), repr (tt)))
