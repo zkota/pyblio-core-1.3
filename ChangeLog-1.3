@@ -2,6 +2,558 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2004-01-27 23:24:06 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-62
+
+    Summary:
+      moved away the old code
+    Revision:
+      pybliographer--devel--1.3--patch-62
+
+    Now, the tree is much cleaner and understandable
+    
+
+    new files:
+     legacy/.arch-ids/=id
+
+    modified files:
+     ChangeLog-1.3
+
+    renamed files:
+     .arch-ids/AUTHORS.id
+       ==> legacy/.arch-ids/AUTHORS.id
+     .arch-ids/COPYING.id
+       ==> legacy/.arch-ids/COPYING.id
+     .arch-ids/INSTALL.id
+       ==> legacy/.arch-ids/INSTALL.id
+     .arch-ids/Makefile.am.id
+       ==> legacy/.arch-ids/Makefile.am.id
+     .arch-ids/NEWS.id
+       ==> legacy/.arch-ids/NEWS.id
+     .arch-ids/README.id
+       ==> legacy/.arch-ids/README.id
+     .arch-ids/ROADMAP.id
+       ==> legacy/.arch-ids/ROADMAP.id
+     .arch-ids/TODO.id
+       ==> legacy/.arch-ids/TODO.id
+     .arch-ids/autogen.sh.id
+       ==> legacy/.arch-ids/autogen.sh.id
+     .arch-ids/configure.ac.id
+       ==> legacy/.arch-ids/configure.ac.id
+     .arch-ids/pybliographer.py.id
+       ==> legacy/.arch-ids/pybliographer.py.id
+     .arch-ids/pybliographer.sodipodi.id
+       ==> legacy/.arch-ids/pybliographer.sodipodi.id
+     .arch-ids/pybliographer.spec.id
+       ==> legacy/.arch-ids/pybliographer.spec.id
+     .arch-ids/pybliographic-logo.png.id
+       ==> legacy/.arch-ids/pybliographic-logo.png.id
+     .arch-ids/pybliographic.desktop.id
+       ==> legacy/.arch-ids/pybliographic.desktop.id
+     .arch-ids/pybliographic.keys.in.id
+       ==> legacy/.arch-ids/pybliographic.keys.in.id
+     .arch-ids/pybliographic.mime.id
+       ==> legacy/.arch-ids/pybliographic.mime.id
+     .arch-ids/pybliographic.png.id
+       ==> legacy/.arch-ids/pybliographic.png.id
+     .arch-ids/pybrc.py.id
+       ==> legacy/.arch-ids/pybrc.py.id
+     .arch-ids/setup-check.py.id
+       ==> legacy/.arch-ids/setup-check.py.id
+     AUTHORS
+       ==> legacy/AUTHORS
+     COPYING
+       ==> legacy/COPYING
+     INSTALL
+       ==> legacy/INSTALL
+     Makefile.am
+       ==> legacy/Makefile.am
+     NEWS
+       ==> legacy/NEWS
+     Pyblio/.arch-ids/=id
+       ==> legacy/Pyblio/.arch-ids/=id
+     Pyblio/.arch-ids/Autoload.py.id
+       ==> legacy/Pyblio/.arch-ids/Autoload.py.id
+     Pyblio/.arch-ids/Connector.py.id
+       ==> legacy/Pyblio/.arch-ids/Connector.py.id
+     Pyblio/.arch-ids/Formatter.py.id
+       ==> legacy/Pyblio/.arch-ids/Formatter.py.id
+     Pyblio/.arch-ids/Help.py.id
+       ==> legacy/Pyblio/.arch-ids/Help.py.id
+     Pyblio/.arch-ids/LyX.py.id
+       ==> legacy/Pyblio/.arch-ids/LyX.py.id
+     Pyblio/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/.arch-ids/Makefile.am.id
+     Pyblio/.arch-ids/Open.py.id
+       ==> legacy/Pyblio/.arch-ids/Open.py.id
+     Pyblio/.arch-ids/Query.py.id
+       ==> legacy/Pyblio/.arch-ids/Query.py.id
+     Pyblio/.arch-ids/Search.py.id
+       ==> legacy/Pyblio/.arch-ids/Search.py.id
+     Pyblio/.arch-ids/Selection.py.id
+       ==> legacy/Pyblio/.arch-ids/Selection.py.id
+     Pyblio/.arch-ids/Sort.py.id
+       ==> legacy/Pyblio/.arch-ids/Sort.py.id
+     Pyblio/.arch-ids/TextUI.py.id
+       ==> legacy/Pyblio/.arch-ids/TextUI.py.id
+     Pyblio/.arch-ids/Utils.py.id
+       ==> legacy/Pyblio/.arch-ids/Utils.py.id
+     Pyblio/.arch-ids/__init__.py.id
+       ==> legacy/Pyblio/.arch-ids/__init__.py.id
+     Pyblio/.arch-ids/recode.py.id
+       ==> legacy/Pyblio/.arch-ids/recode.py.id
+     Pyblio/.arch-ids/version.py.in.id
+       ==> legacy/Pyblio/.arch-ids/version.py.in.id
+     Pyblio/ConfDir/.arch-ids/=id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/=id
+     Pyblio/ConfDir/.arch-ids/Base.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Base.py.id
+     Pyblio/ConfDir/.arch-ids/BibTeX+.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/BibTeX+.py.id
+     Pyblio/ConfDir/.arch-ids/BibTeX.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/BibTeX.py.id
+     Pyblio/ConfDir/.arch-ids/Gnome.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Gnome.py.id
+     Pyblio/ConfDir/.arch-ids/GnomeUI.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/GnomeUI.py.id
+     Pyblio/ConfDir/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Makefile.am.id
+     Pyblio/ConfDir/.arch-ids/Medline.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Medline.py.id
+     Pyblio/ConfDir/.arch-ids/Ovid.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Ovid.py.id
+     Pyblio/ConfDir/.arch-ids/Refer.py.id
+       ==> legacy/Pyblio/ConfDir/.arch-ids/Refer.py.id
+     Pyblio/Format/.arch-ids/=id
+       ==> legacy/Pyblio/Format/.arch-ids/=id
+     Pyblio/Format/.arch-ids/BibTeX.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/BibTeX.py.id
+     Pyblio/Format/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/Format/.arch-ids/Makefile.am.id
+     Pyblio/Format/.arch-ids/Medline.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/Medline.py.id
+     Pyblio/Format/.arch-ids/Ovid.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/Ovid.py.id
+     Pyblio/Format/.arch-ids/OvidLike.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/OvidLike.py.id
+     Pyblio/Format/.arch-ids/Refer.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/Refer.py.id
+     Pyblio/Format/.arch-ids/__init__.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/__init__.py.id
+     Pyblio/Format/.arch-ids/isifile.py.id
+       ==> legacy/Pyblio/Format/.arch-ids/isifile.py.id
+     Pyblio/GnomeUI/.arch-ids/=id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/=id
+     Pyblio/GnomeUI/.arch-ids/Config.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Config.py.id
+     Pyblio/GnomeUI/.arch-ids/Document.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Document.py.id
+     Pyblio/GnomeUI/.arch-ids/Editor.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Editor.py.id
+     Pyblio/GnomeUI/.arch-ids/Entry.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Entry.py.id
+     Pyblio/GnomeUI/.arch-ids/Fields.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Fields.py.id
+     Pyblio/GnomeUI/.arch-ids/FieldsInfo.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/FieldsInfo.py.id
+     Pyblio/GnomeUI/.arch-ids/FileSelector.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/FileSelector.py.id
+     Pyblio/GnomeUI/.arch-ids/Format.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Format.py.id
+     Pyblio/GnomeUI/.arch-ids/Index.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Index.py.id
+     Pyblio/GnomeUI/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Makefile.am.id
+     Pyblio/GnomeUI/.arch-ids/Medline.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Medline.py.id
+     Pyblio/GnomeUI/.arch-ids/Mime.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Mime.py.id
+     Pyblio/GnomeUI/.arch-ids/Pybliographic.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Pybliographic.py.id
+     Pyblio/GnomeUI/.arch-ids/Search.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Search.py.id
+     Pyblio/GnomeUI/.arch-ids/Sort.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Sort.py.id
+     Pyblio/GnomeUI/.arch-ids/Utils.py.id
+       ==> legacy/Pyblio/GnomeUI/.arch-ids/Utils.py.id
+     Pyblio/Output/.arch-ids/=id
+       ==> legacy/Pyblio/Output/.arch-ids/=id
+     Pyblio/Output/.arch-ids/LaTeX.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/LaTeX.py.id
+     Pyblio/Output/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/Output/.arch-ids/Makefile.am.id
+     Pyblio/Output/.arch-ids/__init__.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/__init__.py.id
+     Pyblio/Output/.arch-ids/html.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/html.py.id
+     Pyblio/Output/.arch-ids/latexutils.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/latexutils.py.id
+     Pyblio/Output/.arch-ids/raw.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/raw.py.id
+     Pyblio/Output/.arch-ids/text.py.id
+       ==> legacy/Pyblio/Output/.arch-ids/text.py.id
+     Pyblio/Style/.arch-ids/=id
+       ==> legacy/Pyblio/Style/.arch-ids/=id
+     Pyblio/Style/.arch-ids/Generic.py.id
+       ==> legacy/Pyblio/Style/.arch-ids/Generic.py.id
+     Pyblio/Style/.arch-ids/Makefile.am.id
+       ==> legacy/Pyblio/Style/.arch-ids/Makefile.am.id
+     Pyblio/Style/.arch-ids/Parser.py.id
+       ==> legacy/Pyblio/Style/.arch-ids/Parser.py.id
+     Pyblio/Style/.arch-ids/Utils.py.id
+       ==> legacy/Pyblio/Style/.arch-ids/Utils.py.id
+     Pyblio/Style/.arch-ids/__init__.py.id
+       ==> legacy/Pyblio/Style/.arch-ids/__init__.py.id
+     Pyblio/Style/.arch-ids/apa4e.py.id
+       ==> legacy/Pyblio/Style/.arch-ids/apa4e.py.id
+     README
+       ==> legacy/README
+     ROADMAP
+       ==> legacy/ROADMAP
+     Styles/.arch-ids/=id
+       ==> legacy/Styles/.arch-ids/=id
+     Styles/.arch-ids/Abbrev.xml.id
+       ==> legacy/Styles/.arch-ids/Abbrev.xml.id
+     Styles/.arch-ids/Alpha.xml.id
+       ==> legacy/Styles/.arch-ids/Alpha.xml.id
+     Styles/.arch-ids/Makefile.am.id
+       ==> legacy/Styles/.arch-ids/Makefile.am.id
+     Styles/.arch-ids/apa4e.xml.id
+       ==> legacy/Styles/.arch-ids/apa4e.xml.id
+     Styles/.arch-ids/bibstyle.dtd.id
+       ==> legacy/Styles/.arch-ids/bibstyle.dtd.id
+     TODO
+       ==> legacy/TODO
+     autogen.sh
+       ==> legacy/autogen.sh
+     configure.ac
+       ==> legacy/configure.ac
+     debian/.arch-ids/=id
+       ==> legacy/debian/.arch-ids/=id
+     debian/.arch-ids/README.debian.id
+       ==> legacy/debian/.arch-ids/README.debian.id
+     debian/.arch-ids/changelog.id
+       ==> legacy/debian/.arch-ids/changelog.id
+     debian/.arch-ids/control.id
+       ==> legacy/debian/.arch-ids/control.id
+     debian/.arch-ids/copyright.id
+       ==> legacy/debian/.arch-ids/copyright.id
+     debian/.arch-ids/menu.id
+       ==> legacy/debian/.arch-ids/menu.id
+     debian/.arch-ids/postinst.id
+       ==> legacy/debian/.arch-ids/postinst.id
+     debian/.arch-ids/prerm.id
+       ==> legacy/debian/.arch-ids/prerm.id
+     debian/.arch-ids/rules.id
+       ==> legacy/debian/.arch-ids/rules.id
+     doc/.arch-ids/=id
+       ==> legacy/doc/.arch-ids/=id
+     doc/.arch-ids/Makefile.am.id
+       ==> legacy/doc/.arch-ids/Makefile.am.id
+     doc/C/.arch-ids/=id
+       ==> legacy/doc/C/.arch-ids/=id
+     doc/C/.arch-ids/Makefile.am.id
+       ==> legacy/doc/C/.arch-ids/Makefile.am.id
+     doc/C/.arch-ids/config.sgml.id
+       ==> legacy/doc/C/.arch-ids/config.sgml.id
+     doc/C/.arch-ids/database.sgml.id
+       ==> legacy/doc/C/.arch-ids/database.sgml.id
+     doc/C/.arch-ids/edit.png.id
+       ==> legacy/doc/C/.arch-ids/edit.png.id
+     doc/C/.arch-ids/entry.sgml.id
+       ==> legacy/doc/C/.arch-ids/entry.sgml.id
+     doc/C/.arch-ids/format.png.id
+       ==> legacy/doc/C/.arch-ids/format.png.id
+     doc/C/.arch-ids/gui.sgml.id
+       ==> legacy/doc/C/.arch-ids/gui.sgml.id
+     doc/C/.arch-ids/iterator.sgml.id
+       ==> legacy/doc/C/.arch-ids/iterator.sgml.id
+     doc/C/.arch-ids/key.sgml.id
+       ==> legacy/doc/C/.arch-ids/key.sgml.id
+     doc/C/.arch-ids/main.png.id
+       ==> legacy/doc/C/.arch-ids/main.png.id
+     doc/C/.arch-ids/open.png.id
+       ==> legacy/doc/C/.arch-ids/open.png.id
+     doc/C/.arch-ids/pyblio.sgml.id
+       ==> legacy/doc/C/.arch-ids/pyblio.sgml.id
+     doc/C/.arch-ids/script.sgml.id
+       ==> legacy/doc/C/.arch-ids/script.sgml.id
+     doc/C/.arch-ids/search.png.id
+       ==> legacy/doc/C/.arch-ids/search.png.id
+     doc/C/.arch-ids/selection.sgml.id
+       ==> legacy/doc/C/.arch-ids/selection.sgml.id
+     doc/C/.arch-ids/sort.png.id
+       ==> legacy/doc/C/.arch-ids/sort.png.id
+     doc/C/.arch-ids/sort.sgml.id
+       ==> legacy/doc/C/.arch-ids/sort.sgml.id
+     doc/C/.arch-ids/styles.sgml.id
+       ==> legacy/doc/C/.arch-ids/styles.sgml.id
+     doc/C/.arch-ids/template.sgml.id
+       ==> legacy/doc/C/.arch-ids/template.sgml.id
+     doc/C/.arch-ids/tester.sgml.id
+       ==> legacy/doc/C/.arch-ids/tester.sgml.id
+     doc/C/.arch-ids/topic.dat.id
+       ==> legacy/doc/C/.arch-ids/topic.dat.id
+     doc/C/.arch-ids/url.sgml.id
+       ==> legacy/doc/C/.arch-ids/url.sgml.id
+     doc/it/.arch-ids/=id
+       ==> legacy/doc/it/.arch-ids/=id
+     doc/it/.arch-ids/Makefile.am.id
+       ==> legacy/doc/it/.arch-ids/Makefile.am.id
+     doc/it/.arch-ids/config.sgml.id
+       ==> legacy/doc/it/.arch-ids/config.sgml.id
+     doc/it/.arch-ids/database.sgml.id
+       ==> legacy/doc/it/.arch-ids/database.sgml.id
+     doc/it/.arch-ids/edit.png.id
+       ==> legacy/doc/it/.arch-ids/edit.png.id
+     doc/it/.arch-ids/entry.sgml.id
+       ==> legacy/doc/it/.arch-ids/entry.sgml.id
+     doc/it/.arch-ids/gui.sgml.id
+       ==> legacy/doc/it/.arch-ids/gui.sgml.id
+     doc/it/.arch-ids/iterator.sgml.id
+       ==> legacy/doc/it/.arch-ids/iterator.sgml.id
+     doc/it/.arch-ids/key.sgml.id
+       ==> legacy/doc/it/.arch-ids/key.sgml.id
+     doc/it/.arch-ids/main.png.id
+       ==> legacy/doc/it/.arch-ids/main.png.id
+     doc/it/.arch-ids/open.png.id
+       ==> legacy/doc/it/.arch-ids/open.png.id
+     doc/it/.arch-ids/pyblio.sgml.id
+       ==> legacy/doc/it/.arch-ids/pyblio.sgml.id
+     doc/it/.arch-ids/script.sgml.id
+       ==> legacy/doc/it/.arch-ids/script.sgml.id
+     doc/it/.arch-ids/search.png.id
+       ==> legacy/doc/it/.arch-ids/search.png.id
+     doc/it/.arch-ids/selection.sgml.id
+       ==> legacy/doc/it/.arch-ids/selection.sgml.id
+     doc/it/.arch-ids/sort.png.id
+       ==> legacy/doc/it/.arch-ids/sort.png.id
+     doc/it/.arch-ids/styles.sgml.id
+       ==> legacy/doc/it/.arch-ids/styles.sgml.id
+     doc/it/.arch-ids/topic.dat.id
+       ==> legacy/doc/it/.arch-ids/topic.dat.id
+     doc/it/.arch-ids/url.sgml.id
+       ==> legacy/doc/it/.arch-ids/url.sgml.id
+     etc/.arch-ids/=id
+       ==> legacy/etc/.arch-ids/=id
+     etc/.arch-ids/installer.in.id
+       ==> legacy/etc/.arch-ids/installer.in.id
+     glade/.arch-ids/=id
+       ==> legacy/glade/.arch-ids/=id
+     glade/.arch-ids/Makefile.am.id
+       ==> legacy/glade/.arch-ids/Makefile.am.id
+     glade/.arch-ids/config1.glade.id
+       ==> legacy/glade/.arch-ids/config1.glade.id
+     glade/.arch-ids/config1.gladep.id
+       ==> legacy/glade/.arch-ids/config1.gladep.id
+     glade/.arch-ids/format.glade.id
+       ==> legacy/glade/.arch-ids/format.glade.id
+     glade/.arch-ids/format.gladep.id
+       ==> legacy/glade/.arch-ids/format.gladep.id
+     glade/.arch-ids/medline.glade.id
+       ==> legacy/glade/.arch-ids/medline.glade.id
+     glade/.arch-ids/medline.gladep.id
+       ==> legacy/glade/.arch-ids/medline.gladep.id
+     glade/.arch-ids/pyblio.glade.id
+       ==> legacy/glade/.arch-ids/pyblio.glade.id
+     glade/.arch-ids/pyblio.gladep.id
+       ==> legacy/glade/.arch-ids/pyblio.gladep.id
+     glade/.arch-ids/search.glade.id
+       ==> legacy/glade/.arch-ids/search.glade.id
+     glade/.arch-ids/search.gladep.id
+       ==> legacy/glade/.arch-ids/search.gladep.id
+     glade/.arch-ids/sort.glade.id
+       ==> legacy/glade/.arch-ids/sort.glade.id
+     glade/.arch-ids/sort.gladep.id
+       ==> legacy/glade/.arch-ids/sort.gladep.id
+     po/.arch-ids/=id
+       ==> legacy/po/.arch-ids/=id
+     po/.arch-ids/ChangeLog.id
+       ==> legacy/po/.arch-ids/ChangeLog.id
+     po/.arch-ids/Makefile.am.id
+       ==> legacy/po/.arch-ids/Makefile.am.id
+     po/.arch-ids/POTFILES.in.id
+       ==> legacy/po/.arch-ids/POTFILES.in.id
+     po/.arch-ids/README.i18n.id
+       ==> legacy/po/.arch-ids/README.i18n.id
+     po/.arch-ids/az.po.id
+       ==> legacy/po/.arch-ids/az.po.id
+     po/.arch-ids/cs.po.id
+       ==> legacy/po/.arch-ids/cs.po.id
+     po/.arch-ids/da.po.id
+       ==> legacy/po/.arch-ids/da.po.id
+     po/.arch-ids/de.po.id
+       ==> legacy/po/.arch-ids/de.po.id
+     po/.arch-ids/fi.po.id
+       ==> legacy/po/.arch-ids/fi.po.id
+     po/.arch-ids/fr.po.id
+       ==> legacy/po/.arch-ids/fr.po.id
+     po/.arch-ids/hu.po.id
+       ==> legacy/po/.arch-ids/hu.po.id
+     po/.arch-ids/it.po.id
+       ==> legacy/po/.arch-ids/it.po.id
+     po/.arch-ids/ja.po.id
+       ==> legacy/po/.arch-ids/ja.po.id
+     po/.arch-ids/nl.po.id
+       ==> legacy/po/.arch-ids/nl.po.id
+     po/.arch-ids/no.po.id
+       ==> legacy/po/.arch-ids/no.po.id
+     po/.arch-ids/pt_BR.po.id
+       ==> legacy/po/.arch-ids/pt_BR.po.id
+     po/.arch-ids/ru.po.id
+       ==> legacy/po/.arch-ids/ru.po.id
+     po/.arch-ids/sk.po.id
+       ==> legacy/po/.arch-ids/sk.po.id
+     po/.arch-ids/sr.po.id
+       ==> legacy/po/.arch-ids/sr.po.id
+     po/.arch-ids/sr@Latn.po.id
+       ==> legacy/po/.arch-ids/sr@Latn.po.id
+     po/.arch-ids/sv.po.id
+       ==> legacy/po/.arch-ids/sv.po.id
+     po/.arch-ids/tr.po.id
+       ==> legacy/po/.arch-ids/tr.po.id
+     po/.arch-ids/uk.po.id
+       ==> legacy/po/.arch-ids/uk.po.id
+     pybliographer.py
+       ==> legacy/pybliographer.py
+     pybliographer.sodipodi
+       ==> legacy/pybliographer.sodipodi
+     pybliographer.spec
+       ==> legacy/pybliographer.spec
+     pybliographic-logo.png
+       ==> legacy/pybliographic-logo.png
+     pybliographic.desktop
+       ==> legacy/pybliographic.desktop
+     pybliographic.keys.in
+       ==> legacy/pybliographic.keys.in
+     pybliographic.mime
+       ==> legacy/pybliographic.mime
+     pybliographic.png
+       ==> legacy/pybliographic.png
+     pybrc.py
+       ==> legacy/pybrc.py
+     scripts/.arch-ids/=id
+       ==> legacy/scripts/.arch-ids/=id
+     scripts/.arch-ids/Makefile.am.id
+       ==> legacy/scripts/.arch-ids/Makefile.am.id
+     scripts/.arch-ids/pybcheck.py.id
+       ==> legacy/scripts/.arch-ids/pybcheck.py.id
+     scripts/.arch-ids/pybcompact.py.id
+       ==> legacy/scripts/.arch-ids/pybcompact.py.id
+     scripts/.arch-ids/pybconvert.py.id
+       ==> legacy/scripts/.arch-ids/pybconvert.py.id
+     scripts/.arch-ids/pybformat.py.id
+       ==> legacy/scripts/.arch-ids/pybformat.py.id
+     scripts/.arch-ids/pybliographic.py.id
+       ==> legacy/scripts/.arch-ids/pybliographic.py.id
+     scripts/.arch-ids/pybscript.in.id
+       ==> legacy/scripts/.arch-ids/pybscript.in.id
+     scripts/.arch-ids/pybtex.py.id
+       ==> legacy/scripts/.arch-ids/pybtex.py.id
+     setup-check.py
+       ==> legacy/setup-check.py
+     tests/.arch-ids/=id
+       ==> legacy/tests/.arch-ids/=id
+     tests/.arch-ids/Makefile.am.id
+       ==> legacy/tests/.arch-ids/Makefile.am.id
+     tests/.arch-ids/bibtex.bib.id
+       ==> legacy/tests/.arch-ids/bibtex.bib.id
+     tests/.arch-ids/bibtex.text.id
+       ==> legacy/tests/.arch-ids/bibtex.text.id
+     tests/.arch-ids/broken.bib.id
+       ==> legacy/tests/.arch-ids/broken.bib.id
+     tests/.arch-ids/compact.aux.id
+       ==> legacy/tests/.arch-ids/compact.aux.id
+     tests/.arch-ids/compact.bib.id
+       ==> legacy/tests/.arch-ids/compact.bib.id
+     tests/.arch-ids/compact.id
+       ==> legacy/tests/.arch-ids/compact.id
+     tests/.arch-ids/convert.id
+       ==> legacy/tests/.arch-ids/convert.id
+     tests/.arch-ids/document.aux.id
+       ==> legacy/tests/.arch-ids/document.aux.id
+     tests/.arch-ids/document.bbl.ref.id
+       ==> legacy/tests/.arch-ids/document.bbl.ref.id
+     tests/.arch-ids/document.tex.id
+       ==> legacy/tests/.arch-ids/document.tex.id
+     tests/.arch-ids/format.html.id
+       ==> legacy/tests/.arch-ids/format.html.id
+     tests/.arch-ids/format.id
+       ==> legacy/tests/.arch-ids/format.id
+     tests/.arch-ids/format.latex.id
+       ==> legacy/tests/.arch-ids/format.latex.id
+     tests/.arch-ids/format.py.id
+       ==> legacy/tests/.arch-ids/format.py.id
+     tests/.arch-ids/format.raw.id
+       ==> legacy/tests/.arch-ids/format.raw.id
+     tests/.arch-ids/format.text.id
+       ==> legacy/tests/.arch-ids/format.text.id
+     tests/.arch-ids/import-export.id
+       ==> legacy/tests/.arch-ids/import-export.id
+     tests/.arch-ids/import-export.py.id
+       ==> legacy/tests/.arch-ids/import-export.py.id
+     tests/.arch-ids/medline.bib.id
+       ==> legacy/tests/.arch-ids/medline.bib.id
+     tests/.arch-ids/medline.med.id
+       ==> legacy/tests/.arch-ids/medline.med.id
+     tests/.arch-ids/ovid.ovid.id
+       ==> legacy/tests/.arch-ids/ovid.ovid.id
+     tests/.arch-ids/pubmed.bib.id
+       ==> legacy/tests/.arch-ids/pubmed.bib.id
+     tests/.arch-ids/pubmed.med.id
+       ==> legacy/tests/.arch-ids/pubmed.med.id
+     tests/.arch-ids/pybformat.id
+       ==> legacy/tests/.arch-ids/pybformat.id
+     tests/.arch-ids/pybtex.id
+       ==> legacy/tests/.arch-ids/pybtex.id
+     tests/.arch-ids/refer.refer.id
+       ==> legacy/tests/.arch-ids/refer.refer.id
+     tests/.arch-ids/reorder.py.id
+       ==> legacy/tests/.arch-ids/reorder.py.id
+     tests/.arch-ids/test-pybcheck.id
+       ==> legacy/tests/.arch-ids/test-pybcheck.id
+     tests/.arch-ids/testing.sh.id
+       ==> legacy/tests/.arch-ids/testing.sh.id
+
+    new directories:
+     legacy legacy/.arch-ids legacy/Pyblio/.arch-ids
+     legacy/Pyblio/ConfDir/.arch-ids legacy/Pyblio/Format/.arch-ids
+     legacy/Pyblio/GnomeUI/.arch-ids legacy/Pyblio/Output/.arch-ids
+     legacy/Pyblio/Style/.arch-ids legacy/Styles/.arch-ids
+     legacy/debian/.arch-ids legacy/doc/.arch-ids
+     legacy/doc/C/.arch-ids legacy/doc/it/.arch-ids
+     legacy/etc/.arch-ids legacy/glade/.arch-ids
+     legacy/po/.arch-ids legacy/scripts/.arch-ids
+     legacy/tests/.arch-ids
+
+    removed directories:
+     Pyblio/.arch-ids Pyblio/ConfDir/.arch-ids
+     Pyblio/Format/.arch-ids Pyblio/GnomeUI/.arch-ids
+     Pyblio/Output/.arch-ids Pyblio/Style/.arch-ids
+     Styles/.arch-ids debian/.arch-ids doc/.arch-ids
+     doc/C/.arch-ids doc/it/.arch-ids etc/.arch-ids glade/.arch-ids
+     po/.arch-ids scripts/.arch-ids tests/.arch-ids
+
+    renamed directories:
+     Pyblio
+       ==> legacy/Pyblio
+     Styles
+       ==> legacy/Styles
+     debian
+       ==> legacy/debian
+     doc
+       ==> legacy/doc
+     etc
+       ==> legacy/etc
+     glade
+       ==> legacy/glade
+     po
+       ==> legacy/po
+     scripts
+       ==> legacy/scripts
+     tests
+       ==> legacy/tests
+
+
 2004-01-27 22:50:32 GMT	Frederic Gobry <gobry@pybliographer.org>	patch-61
 
     Summary:
