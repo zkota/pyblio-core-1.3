@@ -26,7 +26,7 @@ class TestBibTeX (pybut.TestCase):
         g = db.enum.add ('doctype')
         
         for t in ('Article',):
-            dt = Store.EnumItem ()
+            dt = Store.TxoItem ()
             dt.names [''] = t
 
             g.add (dt)

@@ -105,7 +105,7 @@ class TestStore (pybut.TestCase):
         pybut.fileeq (self.f, 'ut_store/native.xml')
         return
         
-    def testEnumRead (self):
+    def testTxoRead (self):
         """ A database with enumerated fields can be read and saved again identically """
         
         db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
@@ -187,7 +187,7 @@ class TestStore (pybut.TestCase):
         # Check that unknown enumerates are rejected
         e = Store.Entry ()
 
-        enu = Store.EnumItem ()
+        enu = Store.TxoItem ()
 
         enu.id    = 1
         enu.group = 'b'
@@ -204,7 +204,7 @@ class TestStore (pybut.TestCase):
         # check that unexpected enums are rejected
         g = db.enum.add ('c')
 
-        i = Store.EnumItem ()
+        i = Store.TxoItem ()
         i.names [''] = 'youou'
         i = g.add (i)
         

@@ -221,7 +221,7 @@ class ResultSetStore (object):
 
 # --------------------------------------------------
     
-class EnumItem (object):
+class TxoItem (object):
 
     """ Definition of an enumerated item. This item can then be reused
     as the argument for Attribute.Enumerated creation.
@@ -231,9 +231,10 @@ class EnumItem (object):
 
     def __init__ (self):
 
-        self.id = None
-        self.group = None
-
+        self.id     = None
+        self.group  = None
+        self.parent = None
+        
         self.names = {}
         return
 
@@ -246,7 +247,7 @@ class EnumItem (object):
 
     def xmlwrite (self, fd):
 
-        fd.write ('  <enum-item id="%d">\n' % self.id)
+        fd.write ('  <txo-item id="%d">\n' % self.id)
 
         keys = self.names.keys ()
         keys.sort ()
@@ -261,11 +262,11 @@ class EnumItem (object):
             fd.write ('   <name%s>%s</name>\n' % (
                 lang, escape (v)))
         
-        fd.write ('  </enum-item>\n')
+        fd.write ('  </txo-item>\n')
         return
     
 
-class EnumGroup (object):
+class TxoGroup (object):
 
     """ Definition of a group of enumerated items.
 
@@ -298,7 +299,7 @@ class EnumGroup (object):
         return
 
 
-class EnumStore (object):
+class TxoStore (object):
 
     """ This class is the interface via which Enumerated items can be
     manipulated.
@@ -325,9 +326,9 @@ class EnumStore (object):
         keys.sort ()
 
         for k in keys:
-            fd.write (' <enum-group id="%s">\n' % k)
+            fd.write (' <txo-group id="%s">\n' % k)
             self [k].xmlwrite (fd)
-            fd.write (' </enum-group>\n\n')
+            fd.write (' </txo-group>\n\n')
             
         return
 
@@ -541,8 +542,8 @@ class DatabaseParse (sax.handler.ContentHandler):
         self._tdata = None
         self._ntype = None
 
-        self._enumi = None
-        self._enumg = None
+        self._txoi = None
+        self._txog = None
 
         self._rs = None
         
@@ -585,25 +586,25 @@ class DatabaseParse (sax.handler.ContentHandler):
             self._error (_("this is not a pybliographer database"))
 
         # --------------------------------------------------
-        if name == 'enum-group':
-            if self._enumg is not None:
-                self._error (_('nested "enum-group" are not supported'))
+        if name == 'txo-group':
+            if self._txog is not None:
+                self._error (_('nested "txo-group" are not supported'))
 
             name = self._attr ('id', attrs).encode ('ascii')
-            self._enumg = self.db.enum.add (name)
+            self._txog = self.db.enum.add (name)
             return
 
-        if name == 'enum-item':
-            if self._enumg is None:
-                self._error (_('missing "enum-group"'))
+        if name == 'txo-item':
+            if self._txog is None:
+                self._error (_('missing "txo-group"'))
 
-            self._enumi = EnumItem ()
-            self._enumi.id = int (self._attr ('id', attrs))
+            self._txoi = TxoItem ()
+            self._txoi.id = int (self._attr ('id', attrs))
             return
 
         if name == 'name':
-            if self._enumi is None:
-                self._error (_('missing "enum-item"'))
+            if self._txoi is None:
+                self._error (_('missing "txo-item"'))
             self._tdata = ''
             self._lang = attrs.get ('lang', '')
             return
@@ -747,13 +748,13 @@ class DatabaseParse (sax.handler.ContentHandler):
                 
             return
 
-        if name == 'enum-group':
-            self._enumg = None
+        if name == 'txo-group':
+            self._txog = None
             return
         
-        if name == 'enum-item':
-            self._enumg.add (self._enumi, key = self._enumi.id)
-            self._enumi = None
+        if name == 'txo-item':
+            self._txog.add (self._txoi, key = self._txoi.id)
+            self._txoi = None
             return
         
         if name == 'header':
@@ -778,7 +779,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
         
         if name == 'name':
-            self._enumi.names [self._lang] = self._tdata
+            self._txoi.names [self._lang] = self._tdata
             self._tdata = None
             return
         

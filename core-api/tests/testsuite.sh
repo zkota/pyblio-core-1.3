@@ -4,4 +4,4 @@ PYTHON=${PYTHON:-python}
 
 ${PYTHON} testsuite.py
 
-test -z ,,* || rm -rf ,,*
+rm -rf ,,*

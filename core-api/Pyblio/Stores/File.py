@@ -25,7 +25,7 @@ import os, copy, string
 from Pyblio import Store, Callback, Attribute, Exceptions, Tools
 
 
-class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
+class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
 
     def __init__ (self, group):
 
@@ -58,7 +58,7 @@ class EnumGroup (dict, Store.EnumGroup, Callback.Publisher):
         return
     
 
-class EnumStore (dict, Store.EnumStore):
+class TxoStore (dict, Store.TxoStore):
 
     def __init__ (self, db):
 
@@ -72,7 +72,7 @@ class EnumStore (dict, Store.EnumStore):
             raise Exceptions.ConstraintError \
                   (_('group %s exists') % `group`)
         
-        gp = EnumGroup (group)
+        gp = TxoGroup (group)
         gp.register ('delete', self._db._enum_use_check)
         
         self [group] = gp
@@ -275,7 +275,7 @@ class Database (Store.Database, Callback.Publisher):
         self.schema = schema
         
         self.header = None
-        self.enum   = EnumStore (self)
+        self.enum   = TxoStore (self)
         self.rs     = ResultSetStore (self)
         
         self._id = 1

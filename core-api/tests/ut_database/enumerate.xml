@@ -23,14 +23,14 @@
  </attribute>
 
 </pyblio-schema>
- <enum-group id="a">
-  <enum-item id="1">
+ <txo-group id="a">
+  <txo-item id="1">
    <name>A / 1</name>
-  </enum-item>
-  <enum-item id="2">
+  </txo-item>
+  <txo-item id="2">
    <name>A / 2</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
  <entry id="1">
   <attribute id="enum-a">

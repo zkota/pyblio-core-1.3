@@ -19,14 +19,14 @@
  </attribute>
 
 </pyblio-schema>
- <enum-group id="type">
-  <enum-item id="1">
+ <txo-group id="type">
+  <txo-item id="1">
    <name>Journal</name>
-  </enum-item>
-  <enum-item id="2">
+  </txo-item>
+  <txo-item id="2">
    <name>Book</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
  <entry id="1">
   <attribute id="enum">

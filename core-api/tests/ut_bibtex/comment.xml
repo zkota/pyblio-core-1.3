@@ -31,11 +31,11 @@
  </attribute>
 
 </pyblio-schema>
- <enum-group id="doctype">
-  <enum-item id="1">
+ <txo-group id="doctype">
+  <txo-item id="1">
    <name>Article</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
 <header>This is a comment
 This is a { comment too

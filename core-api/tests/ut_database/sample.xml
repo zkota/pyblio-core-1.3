@@ -15,23 +15,23 @@
  </attribute>
 
 </pyblio-schema>
- <enum-group id="journal">
-  <enum-item id="3">
+ <txo-group id="journal">
+  <txo-item id="3">
    <name>Journal 1</name>
-  </enum-item>
-  <enum-item id="4">
+  </txo-item>
+  <txo-item id="4">
    <name>Journal 2</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
- <enum-group id="type">
-  <enum-item id="1">
+ <txo-group id="type">
+  <txo-item id="1">
    <name>Journal</name>
-  </enum-item>
-  <enum-item id="2">
+  </txo-item>
+  <txo-item id="2">
    <name>Book</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
  <entry id="1">
   <attribute id="doctype">

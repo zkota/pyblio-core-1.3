@@ -20,7 +20,7 @@
 
 """ Exhaustive display of a bibliographic record """
 
-import gtk, gobject, pango
+import gtk, gobject, pango, gnome
 
 from Pyblio import Attribute
 
@@ -51,7 +51,8 @@ class Entry (object):
                                          left_margin = 20)
 
         self._map = {
-            Attribute.Enumerated: self._show_enum
+            Attribute.Enumerated: self._show_enum,
+            Attribute.URL:        self._show_url
             }
         
         return
@@ -71,6 +72,26 @@ class Entry (object):
         return
 
 
+    def _show_url (self, iter, attr, db):
+        
+        anchor = self._text.create_child_anchor (iter)
+
+        button = gtk.Button (label = str (attr))
+        button.set_relief (gtk.RELIEF_NONE)
+        
+        button.show ()
+
+        def url_open (w, url):
+            gnome.url_show (url)
+            return
+                
+        button.connect ('clicked', url_open, str (attr))
+            
+        self._view.add_child_at_anchor (button, anchor)
+        self._text.insert (iter, '\n')
+        return
+
+    
     def display (self, entry, db):
 
         """ Display a record taken from a database. If the record is

@@ -658,7 +658,7 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
     
 # --------------------------------------------------
 
-class EnumGroup (Store.EnumGroup, Callback.Publisher):
+class TxoGroup (Store.TxoGroup, Callback.Publisher):
 
 
     def __init__ (self, env, enum, group):
@@ -735,7 +735,7 @@ class EnumGroup (Store.EnumGroup, Callback.Publisher):
 
 
 
-class EnumStore (Store.EnumStore, Callback.Publisher):
+class TxoStore (Store.TxoStore, Callback.Publisher):
 
     def __init__ (self, env, txn):
 
@@ -756,7 +756,7 @@ class EnumStore (Store.EnumStore, Callback.Publisher):
     
     def __getitem__ (self, group):
 
-        g = EnumGroup (self._env, self._enum, group)
+        g = TxoGroup (self._env, self._enum, group)
         g.register ('delete', self._on_delete)
         
         return g
@@ -800,7 +800,7 @@ class EnumStore (Store.EnumStore, Callback.Publisher):
         if v is not None:
             raise Exceptions.ConstraintError (_('group %s exists') % `group`)
         
-        g = EnumGroup (self._env, self._enum, group)
+        g = TxoGroup (self._env, self._enum, group)
         g.register ('delete', self._on_delete)
         
         return g
@@ -866,7 +866,7 @@ class Database (Store.Database, Callback.Publisher):
             self._idx.open ('index', 'full', db.DB_HASH, flag, txn = txn)
 
             # Store for Enumerated values
-            self.enum = EnumStore (self._env, txn)
+            self.enum = TxoStore (self._env, txn)
             self.enum.register ('delete', self._enum_use_check)
 
         except:

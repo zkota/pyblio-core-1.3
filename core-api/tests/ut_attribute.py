@@ -71,11 +71,11 @@ class TestAttribute (pybut.TestCase):
         return
 
 
-    def testEnum (self):
+    def testTxo (self):
 
-        from Pyblio.Store import EnumItem
+        from Pyblio.Store import TxoItem
 
-        i = EnumItem ()
+        i = TxoItem ()
         i.id = 123
         i.group = 'a'
 

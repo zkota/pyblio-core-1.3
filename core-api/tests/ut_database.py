@@ -342,12 +342,12 @@ class TestContent (pybut.TestCase):
         return
 
 
-    def testEnumAdd (self):
+    def testTxoAdd (self):
 
         """ Check for enum addition in the database """
         
         # add some enums to the database
-        i = Store.EnumItem ()
+        i = Store.TxoItem ()
 
         a  = []
         va = ['A / 1', 'A / 2']
@@ -373,12 +373,12 @@ class TestContent (pybut.TestCase):
         assert na == va
         return
 
-    def testEnumInDB (self):
+    def testTxoInDB (self):
 
-        """ Use Enums in database entries """
+        """ Use Txos in database entries """
         
         # add some enums to the database
-        i = Store.EnumItem ()
+        i = Store.TxoItem ()
 
         a  = []
         va = ['A / 1', 'A / 2']
@@ -659,15 +659,15 @@ class TestContent (pybut.TestCase):
         return
 
 
-    def testEnumDel (self):
+    def testTxoDel (self):
 
-        """ Forbid the removal of an Enum definition that is in use """
+        """ Forbid the removal of an Txo definition that is in use """
 
         from Pyblio import Exceptions
         
         # Create two enums, one that will be used, the other not. Try
         # to remove both.
-        i = Store.EnumItem ()
+        i = Store.TxoItem ()
 
         a  = []
         va = ['A / 1', 'A / 2']
@@ -696,7 +696,7 @@ class TestContent (pybut.TestCase):
         return
 
 
-    def testEnumSingle (self):
+    def testTxoSingle (self):
 
         from Pyblio import Exceptions
         
