@@ -65,9 +65,11 @@ class Schema:
         return
 
 
-    def xmlwrite (self, fd):
+    def xmlwrite (self, fd, embedded = False):
 
-        fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
+        if not embedded:
+            fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
+        
         fd.write ('<pyblio-schema>\n')
 
         # Collect all the attributes
@@ -108,6 +110,15 @@ class Document:
         self.optional  = {}
         return
 
+    def typeof (self, attr):
+
+        try:
+            return self.mandatory [attr]
+        except KeyError:
+            pass
+
+        return self.optional [attr]
+    
     def xmlwrite (self, fd):
 
         fd.write (' <document id="%s">\n' % self.id)
