@@ -54,9 +54,10 @@ class Person (object):
         return
     
     def index (self):
-        idx = sum ([x.split () for x in (self.first, self.last) if x], [])
-        idx = map (string.lower,idx)
-                    
+        idx = []
+        for x in (self.first, self.last):
+            if x: idx = idx + map (string.lower, x.split ())
+            
         return filter (None, idx)
     
 

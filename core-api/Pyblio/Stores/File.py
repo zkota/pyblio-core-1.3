@@ -176,6 +176,9 @@ class Database (dict, Store.Database, Callback.Publisher):
 
             except ValueError, msg:
                 raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
+
+            except IOError, msg:
+                raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
             
         return
 
@@ -237,11 +240,15 @@ class Database (dict, Store.Database, Callback.Publisher):
             found = False
             
             for attrs in entry.values ():
-                idx = sum (map (lambda x: x.index (), attrs), [])
+
+                for attr in attrs:
+                    idx = attr.index ()
                 
-                if word in idx:
-                    found = True
-                    break
+                    if word in idx:
+                        found = True
+                        break
+
+                if found: break
                 
             if not found: continue
 
