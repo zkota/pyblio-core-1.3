@@ -54,7 +54,7 @@ class DBIter (DBIterBase):
     """ Iterate over the keys """
     def _content (self, data):
 
-        return data [0]
+        return int (data [0], 16)
 
 class DBIterValues (DBIterBase):
     """ Iterate over the values """
@@ -66,7 +66,7 @@ class DBIterItems (DBIterBase):
     """ Iterate over (key, value) pairs """
     def _content (self, data):
 
-        return data [0], pickle.loads (data [1])
+        return int (data [0], 16), pickle.loads (data [1])
 
 
 # --------------------------------------------------
@@ -95,7 +95,7 @@ class ResultSet:
         data = self._data
         self._data = self._cursor.next ()
         
-        return data [1]
+        return int (data [1], 16)
 
 
     def __del__ (self):
@@ -178,7 +178,7 @@ class Database:
         if id: serial = max (serial, id)
         self._meta.put ('serial', str (serial + 1))
 
-        return self._insert (serial, val)
+        return int (self._insert (serial, val), 16)
     
 
     def __setitem__ (self, key, val):
@@ -186,6 +186,12 @@ class Database:
         self._insert (key, val)
         return
 
+
+    def __delitem__ (self, key):
+
+        self._db.delete ('%.16x' % key)
+        return
+    
 
     def has_key (self, k):
 
@@ -195,9 +201,9 @@ class Database:
             self._db.get (id)
             
         except db.DBNotFoundError:
-            return True
+            return False
 
-        return False
+        return True
 
 
     def _insert (self, key, val):
@@ -252,7 +258,7 @@ class Database:
     
     def __getitem__ (self, key):
         
-        return pickle.loads (self._db.get (key))
+        return pickle.loads (self._db.get ('%.16x' % key))
 
     def __iter__ (self):
         

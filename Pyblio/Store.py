@@ -25,7 +25,7 @@ in order to provide a specific database _storage_.
 By itself, this base classes provide the XML import and export layers.
 '''
 
-import os, string
+import os, string, copy
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -172,24 +172,29 @@ class Database (dict):
             v = int (id)
             if v >= self._id:
                 self._id = v + 1
-            
         else:
             id = Key (self._id)
             self._id = self._id + 1
 
-        assert not self.has_key (id), _("a duplicate key has been generated")
+        assert not self.has_key (id), \
+               _("a duplicate key has been generated: %d") % id
 
+        value = copy.deepcopy (value)
         value.key = id
+        
         dict.__setitem__ (self, id, value)
         return id
     
 
     def __setitem__ (self, key, value):
+
         # Ensure the key is not added, only updated.
         assert self.has_key (key), \
                _("use self.add () to add a new entry")
 
+        value = copy.deepcopy (value)
         value.key = key
+        
         dict.__setitem__ (self, key, value)
         return
 

@@ -1,0 +1,22 @@
+-*- outline -*-
+
+* The database queries must remain coherent after modifications
+
+Changing an entry that has not been updated in the DB should not
+change a query result. Updating the DB should change the result.
+
+* Import the XML into any Store
+
+Create an empty Store of every existing type. Import an existing XML
+database into it, with no loss.
+
+* BibTeX keys are attributes.
+
+The BibTeX key is an attribute that is part of the entry description.
+Upon import, the importer is told which attribute name should hold
+this information.
+
+* Multiple users accesses cannot corrupt a DB3 database
+
+Serial IDs are delivered atomically, and updates are transactional.
+

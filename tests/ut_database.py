@@ -4,7 +4,7 @@ from Pyblio import Store, Schema, Attribute
 
 class TestDatabase (pybut.TestCase):
 
-    """ Perform tests on the Pyblio.Stores modules """
+    """ Perform tests on the Pyblio.Stores main functions """
 
     def setUp (self):
         self.fmt = fmt
@@ -71,26 +71,87 @@ class TestDatabase (pybut.TestCase):
     
 class TestContent (pybut.TestCase):
 
-    """ Perform tests on the Pyblio.Stores modules """
+    """ Perform data manipulation tests """
 
     count = 0
 
     def setUp (self):
-        self.fmt = fmt
-        self.hd  = Store.get (self.fmt)
-
+        self.fmt  = fmt
+        self.hd   = Store.get (self.fmt)
+        self.name = ',,db-%d' % self.count
+        
         TestContent.count = self.count + 1
 
         sc = Schema.Schema ('ut_database/schema.xml')
-        self.db = self.hd.dbcreate (',,db-%d' % self.count, sc)
+        self.db = self.hd.dbcreate (self.name, sc)
 
         return
 
     def tearDown (self):
 
-        self.hd.dbdestroy (',,db-%d' % self.count, nobackup = True)
+        self.hd.dbdestroy (self.name, nobackup = True)
         return
 
+    def testInsertRemove (self):
+        """ Check the db behavior upon insertion/suppression """
+
+        import copy
+        
+        e = Store.Entry (self.db.schema ['article'])
+
+        content = {}
+
+        def checkpoint ():
+
+            def subcheck ():
+                seen = []
+                for k, v in self.db.iteritems ():
+                    seen.append (k)
+                    assert v == content [k]
+
+                keys = content.keys ()
+            
+                keys.sort ()
+                seen.sort ()
+
+                assert keys == seen
+                return
+
+            subcheck ()
+            
+            self.db.save ()
+            self.db = self.hd.dbopen (self.name)
+
+            subcheck ()
+            return
+        
+        for i in xrange (0, 10):
+            k = self.db.add (e)
+            
+            v = copy.deepcopy (e)
+            content [k] = v
+
+        checkpoint ()
+
+        # Remove some entries
+        
+        for k in [2, 4, 6, 8]:
+            del self.db [k]
+            del content [k]
+
+        checkpoint ()
+
+        # Modify one entry
+        e ['title'] = [ Attribute.Text ('A title') ]
+        self.db [1] = e
+
+        content [1] = copy.deepcopy (e)
+
+        assert content [1] != content [3]
+        
+        checkpoint ()
+        return
+    
     
     def testIterate (self):
         """ Loop over the db content """
