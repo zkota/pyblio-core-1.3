@@ -1,5 +1,3 @@
-<?xml version="1.0"?>
-
 <!ELEMENT pyblio-schema (attribute*, document*)>
 
 <!ELEMENT attribute (name+)>
