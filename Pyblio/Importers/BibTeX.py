@@ -413,8 +413,9 @@ def file_import (file, encoding, db, ** kargs):
         except KeyError:
             raise Exceptions.SchemaError (
                 _("document '%s' is unknown") % tp)
-        
-        e = Store.Entry (Store.Key (key), schema)
+
+        ek = Store.Key (key)
+        e  = Store.Entry (schema)
 
         for k, v in val.iteritems ():
 
@@ -432,6 +433,6 @@ def file_import (file, encoding, db, ** kargs):
 
         e.native = ('bibtex', _tostring (tp, key, val).decode ('latin-1'))
         
-        db [e.key] = e
+        db [ek] = e
         
     return db

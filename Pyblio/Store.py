@@ -66,9 +66,10 @@ class Entry (dict):
     properly translated. This is known by calling self.has_loss (key)
     """
 
-    def __init__ (self, key, type):
+    def __init__ (self, type):
 	self.type   = type
-	self.key    = key
+        
+	self.key    = None
         self.native = None
 
         self._loss = {}
@@ -137,6 +138,12 @@ class Database (dict):
                 raise StoreError (_("cannot open '%s': %s") % (file, msg))
                                   
 	return
+
+    def __setitem__ (self, key, value):
+        value.key = key
+        dict.__setitem__ (self, key, value)
+        return
+    
 
     def save (self):
         return
@@ -229,7 +236,8 @@ class DatabaseParse (sax.handler.ContentHandler):
             except KeyError:
                 self._error (_("document type '%s' is unsupported") % tp)
 
-            self._entry = Entry (id, tp)
+            self._entry = Entry (tp)
+            self._ekey  = Key (id)
             return
 
         if name == 'native':
@@ -335,7 +343,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'entry':
-            self.db [self._entry.key] = self._entry
+            self.db [self._ekey] = self._entry
             self._entry = None
             return
 

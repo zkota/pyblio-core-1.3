@@ -43,8 +43,8 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        e = Store.Entry (Store.Key ('entry 1'),
-                        schema ['sample'])
+        k = Store.Key ('entry 1')
+        e = Store.Entry (schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'Last 1'),
                          Attribute.Person (last = 'Last 2')]
@@ -53,7 +53,7 @@ class TestStore (pybut.TestCase):
         e ['date']   = [ Attribute.Date (year = 2003) ]
         e ['ref']    = [ Attribute.Reference (Store.Key ('ref')) ]
         
-        db [e.key] = e
+        db [k] = e
 
         fd = open (',,t3.xml', 'w')
         db.xmlwrite (fd)
@@ -85,15 +85,15 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema ('ut_store/s:full.xml')
         db = Store.Database (schema = schema)
 
-        e = Store.Entry (Store.Key ('entry_1'),
-                        schema ['sample'])
+        k = Store.Key ('entry_1')
+        e = Store.Entry (schema ['sample'])
 
         e ['author'] = [ Attribute.Person (last = 'LastName') ]
         e.loss_set ('author', True)
         
         e.native = ('bibtex', '@article{entry_1,\nauthor = {LastName}}')
 
-        db [e.key] = e
+        db [k] = e
 
         fd = open (',,t5.xml', 'w')
         db.xmlwrite (fd)

@@ -17,11 +17,11 @@ class TestDatabase (pybut.TestCase):
         sc = Schema.Schema ('ut_database/schema.xml')
         db = self.hd.dbcreate (',,db', sc)
 
-        e = Store.Entry (key  = Store.Key ('a'),
-                         type = db.schema ['article'])
+        k = Store.Key ('a')
+        e = Store.Entry (db.schema ['article'])
 
         e ['title'] = [ Attribute.Text ('title') ]
-        db [e.key] = e
+        db [k] = e
         
         db.save ()
 
@@ -52,7 +52,7 @@ class TestDatabase (pybut.TestCase):
         return
     
 
-fmts = ('file',)
+fmts = ('bsddb', 'file')
 
 global fmt
 
