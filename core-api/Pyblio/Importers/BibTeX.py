@@ -687,12 +687,12 @@ class Exporter (object):
         
     def text_add (self, field, data):
 
-        data = ' '.join (data)
+        data = ' '.join (data).encode ('latex')
 
         # by default, new lines and multiple spaces are not significant in bibtex fields
         data = self._collapse.sub (' ', data)
         
-        return '{%s}' % (data.encode ('latex'))
+        return '{%s}' % data
 
     def _single_person (self, person):
 
@@ -705,11 +705,11 @@ class Exporter (object):
 
     def url_add (self, field, data):
 
-        return ''
+        return '{%s}' % (', '.join (map (lambda x: x.encode ('latex'), data)))
 
     def date_add (self, field, data):
 
-        return ''
+        return '%s' % data [0].year
 
     
     def write (self, fd, rs, db):
