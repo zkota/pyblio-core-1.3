@@ -100,6 +100,9 @@ class Block (object):
 
         return r
 
+    def join (self):
+        return list (self._d)
+    
     def __repr__ (self):
         return 'Block (%s, %s, %s)' % (`self._o`,
                                        `self._c`,
@@ -131,6 +134,13 @@ class Join (list):
             v = v + data.subst ()
         
         return v
+
+    def join (self):
+        r = []
+        for v in self:
+            r += v.join ()
+        return r
+        
 
     def flat (self, charset):
         return string.join (map (lambda x: x.flat (charset), self), '')
@@ -580,44 +590,16 @@ class Importer (object):
 
         ''' Parse a stream of tokens as a series of person names '''
 
-        stream = [x.decode (self.charset) for x in stream.subst ()]
+        # The first level of the parsing is of interest, as non-person
+        # names can be written for instance:
+        # author = "{Name of a Company} and {Another One}"
 
-        # Ensure the stream is a sequence of complete words (ie,
-        # concatenate successive text parts and space parts).  The
-        # comma must remain on its own, as it serves as a separator.
-        # The dot is always appended to the previous word.
-        
-        in_space = True
-        os, stream = stream, []
-        
-        while os:
-            s = os.pop (0)
+        # Join joins, ie strings written as {toto} # {tutu}
+        stream = stream.join ()
 
-            if s == '.':
-                stream [-1] += '.'
-                continue
-            
-            is_space = s in (' ', '\n')
-
-            if in_space:
-                if not is_space:
-                    stream.append (s)
-                    in_space = False
-                continue
-            
-            else:
-                if is_space:
-                    in_space = True
-                else:
-                    if s == ',':
-                        stream.append (s)
-                        in_space = True
-                    else:
-                        stream [-1] += s
-                    
-            
-        # Person names are separated by 'and' keywords
+        # These high-level groups are separated by 'and' keywords
         avail  = []
+        
         while 1:
             try:
                 i = stream.index ('and')
@@ -630,6 +612,45 @@ class Importer (object):
         if stream:
             avail.append (stream)
 
+        def _wordify (stream):
+
+            stream = [x.decode (self.charset) for x in stream.subst ()]
+
+            # Ensure the stream is a sequence of complete words (ie,
+            # concatenate successive text parts and space parts).  The
+            # comma must remain on its own, as it serves as a separator.
+            # The dot is always appended to the previous word.
+
+            in_space = True
+            os, stream = stream, []
+
+            while os:
+                s = os.pop (0)
+
+                if s == '.':
+                    stream [-1] += '.'
+                    continue
+
+                is_space = s in (' ', '\n')
+
+                if in_space:
+                    if not is_space:
+                        stream.append (s)
+                        in_space = False
+                    continue
+
+                else:
+                    if is_space:
+                        in_space = True
+                    else:
+                        if s == ',':
+                            stream.append (s)
+                            in_space = True
+                        else:
+                            stream [-1] += s
+                    
+            return stream
+    
         def _typetag (stream):
             """ For each element of the string, return a list that
             indicates if the corresponding element is :
@@ -653,6 +674,11 @@ class Importer (object):
             return tags
         
         def _person_decode (stream):
+
+            if len (stream) == 1 and isinstance (stream [0], Block):
+                return Attribute.Person (last = stream [0].flat (self.charset))
+            
+            stream = _wordify (Block ('', '', stream))
 
             # Check for ',' syntax for names
             comma = stream.count (',')

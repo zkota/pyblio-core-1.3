@@ -48,4 +48,15 @@
    <id value="Sample"/>
   </attribute>
  </entry>
+ <entry id="2">
+  <attribute id="author">
+   <person last="Conf Bidule"/>
+  </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="1"/>
+  </attribute>
+  <attribute id="id">
+   <id value="Sample"/>
+  </attribute>
+ </entry>
 </pyblio-db>
