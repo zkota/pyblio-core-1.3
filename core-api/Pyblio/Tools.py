@@ -33,3 +33,34 @@ def id_make (last, proposed = None):
     return last, proposed
 
        
+def format (string, width, first, next):
+
+    ''' Format a string on a given width '''
+
+    out = []
+    current = first
+
+    # if the entry does not fit the current width
+    while len (string) > width - current:
+	    
+        pos = width - current - 1
+
+	# search a previous space
+	while pos > 0 and string [pos] <> ' ':
+	    pos = pos - 1
+
+	# if there is no space before...
+	if pos == 0:
+	    pos = width - current
+	    taille = len (string)
+	    while pos < taille and string [pos] <> ' ':
+	        pos = pos + 1
+
+	out.append (' ' * current + string [0:pos])
+	string = string [pos+1:]
+	current = next
+
+    out.append (' ' * current + string)
+
+    return '\n'.join (out).rstrip ()
+

@@ -38,15 +38,6 @@
  </txo-group>
 
  <entry id="1">
-
- <native type="bibtex">@article{toto,
-   author = {Gobry, Frederic and First Last},
-   journal = "My journal",
-   note = {a \{ and a \}},
-   number = 123,
-   title = {This is a title}
-}</native>
-
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>
    <person first="First" last="Last"/>
@@ -71,15 +62,6 @@
   </attribute>
  </entry>
  <entry id="2">
-
- <native type="bibtex">@article{toto2,
-   author = {Gobry, Frederic and First Last},
-   journal = "My journal",
-   note = {a \{ and a \}},
-   number = 123,
-   title = {This is a title}
-}</native>
-
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>
    <person first="First" last="Last"/>

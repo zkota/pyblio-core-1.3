@@ -13,4 +13,7 @@
  <attribute id="date" type="date">
   <name>Date</name>
  </attribute>
+ <attribute id="id" type="id">
+  <name>ID</name>
+ </attribute>
 </pyblio-schema>

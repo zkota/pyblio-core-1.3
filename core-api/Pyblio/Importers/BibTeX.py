@@ -26,7 +26,7 @@ import re, os, string
 
 from Pyblio.Importers import lex, yacc
 
-from Pyblio import Attribute, Store, Exceptions
+from Pyblio import Attribute, Store, Exceptions, Tools
 
 from gettext import gettext as _
 
@@ -499,151 +499,259 @@ _mod = string.join (__name__.split ('.') [:-1] + [_mod], '.')
 yacc.yacc (tabmodule = (_pth, _mod))
 
 
-# ==================================================
-# BibTeX conversion routines
-# ==================================================
-
-def _textify (stream, encoding):
-
-    return [Attribute.Text (stream.flat (encoding))]
-
-
-def _persify (stream, encoding):
-    ''' Parse a stream of tokens as a series of person names '''
-
-    # Person names are separated by 'and' keywords
-    avail  = []
-    stream = list (stream.subst ())
-    
-    while 1:
-        try:
-            i = stream.index ('and')
-        except ValueError:
-            break
-
-        avail.append (stream [0:i])
-        stream = stream [i+1:]
-
-    if stream:
-        avail.append (stream)
-
-    def _person_decode (stream):
-
-        stream = filter (lambda x: x != ' ', stream)
-        
-        # Check for ',' syntax for names
-        comma = stream.count (',')
-        
-        if comma == 0:
-            # Use the number of segments in the name
-            stream = map (lambda x: x.flat (encoding), stream)
-
-            if len (stream) == 1:
-                return Attribute.Person (last = stream [0])
-
-            if len (stream) == 2:
-                return Attribute.Person (first = stream [0],
-                                         last  = stream [1])
-
-        elif comma == 1:
-            i = stream.index (',')
-
-            return Attribute.Person \
-                   (last  = Block ('{','}', stream [:i]).flat (encoding),
-                    first = Block ('{','}', stream [i+1:]).flat (encoding))
-        
-        return Attribute.Person ()
-    
-    return map (_person_decode, avail)
-
-
-def _urlify (stream, encoding):
-
-    return [Attribute.URL (stream.flat (encoding))]
-
-
-def _dateify (stream, encoding):
-
-    return [Attribute.Date ()]
-
-
-_mapping = {
-    Attribute.Text:   _textify,
-    Attribute.Person: _persify,
-    Attribute.URL:    _urlify,
-    Attribute.Date:   _dateify,
-    }
-
-
-def _tostring (tp, key, data):
-
-    ret = '@%s{%s,\n' % (tp, key)
-
-    attrs = []
-    keys  = data.keys ()
-    keys.sort ()
-    
-    for k in keys:
-        v = data [k]
-        attrs.append ('   %s = %s' % (k, v.tobib ()))
-
-    return ret + string.join (attrs, ',\n') + '\n}'
 
 # ==================================================
 # BibTeX interface
 # ==================================================
 
-def file_import (file, encoding, db, ** kargs):
+
+class Importer (object):
+
+    def __init__ (self, charset = 'ISO8859-1'):
+
+        self.charset = charset
+
+        self._mapping = {
+            Attribute.Text:   self.text_add,
+            Attribute.Person: self.person_add,
+            Attribute.URL:    self.url_add,
+            Attribute.Date:   self.date_add,
+            }
+        return
+
+    def url_add (self, field, stream):
+
+        self.record [field] = [Attribute.URL (stream.flat (self.charset))]
+        return
+
+
+    def date_add (self, field, stream):
+
+        self.record [field] = [Attribute.Date ()]
+        return
     
-    datalist = yacc.parse (open (file).read (), debug = 0)
 
-    in_head  = True
-    header   = []
-
-    doctype = {}
-    for v in db.txo ['doctype'].values ():
-        doctype [v.names [''].lower ()] = v
-
-    for data in datalist:
-
-        if isinstance (data, Comment):
-            # this is a comment. skip.
-            if not in_head: continue
-
-            header.append (data.strip ().decode (encoding))
-            continue
-
-        if in_head:
-            # we are leaving the header.
-            in_head = False
-            
-            if header:
-                db.header = string.join (header, '\n')
-            
-        tp, key, val = data.type, data.key, data
+    def text_add (self, field, stream):
         
-        e = Store.Entry ()
+        self.record [field] = [Attribute.Text (stream.flat (self.charset))]
+        return
+
+    def person_add (self, field, stream):
+
+        ''' Parse a stream of tokens as a series of person names '''
+
+        # Person names are separated by 'and' keywords
+        avail  = []
+        stream = list (stream.subst ())
+
+        while 1:
+            try:
+                i = stream.index ('and')
+            except ValueError:
+                break
+
+            avail.append (stream [0:i])
+            stream = stream [i+1:]
+
+        if stream:
+            avail.append (stream)
+
+        def _person_decode (stream):
+
+            stream = filter (lambda x: x != ' ', stream)
+
+            # Check for ',' syntax for names
+            comma = stream.count (',')
+
+            if comma == 0:
+                # Use the number of segments in the name
+                stream = map (lambda x: x.flat (self.charset), stream)
+
+                if len (stream) == 1:
+                    return Attribute.Person (last = stream [0])
+
+                if len (stream) == 2:
+                    return Attribute.Person (first = stream [0],
+                                             last  = stream [1])
+
+            elif comma == 1:
+                i = stream.index (',')
+
+                return Attribute.Person \
+                       (last  = Block ('{','}', stream [:i]).flat (self.charset),
+                        first = Block ('{','}', stream [i+1:]).flat (self.charset))
+
+            return Attribute.Person ()
+
+        self.record [field] = map (_person_decode, avail)
+        return 
+
+    
+    def comment_add (self, stream):
+
+        # by default, we drop comments
+        return
+
+
+    def id_add (self, data):
+
+        self.record ['id'] = [Attribute.ID (data)]
+        return
+
+    def type_add (self, data):
+
+        self.record ['doctype'] = [Attribute.Txo (self.doctype [data])]
+        return
+
+    def record_begin (self):
+
+        pass
+
+    def record_end (self):
+
+        pass
+
+    def record_parse (self, data):
+
+        self.record = Store.Entry ()
+        self.record_begin ()
+        
+        tp, key, val = data.type, data.key, data
 
         for k, v in val.iteritems ():
 
             k = k.lower ()
-            
+
             try:
-                attp = db.schema [k]
+                attp = self.db.schema [k]
 
             except KeyError:
                 raise Exceptions.SchemaError (
                     _("no attribute '%s' in document '%s'") % (
                     k, tp))
 
-            e [k] = _mapping [attp.type] (v, encoding)
-
-        e.native = ('bibtex', _tostring (tp, key, val).decode (encoding))
+            self._mapping [attp.type] (k, v)
 
         # Add the key and document type
-        e ['id'] = [Attribute.ID (key.decode (encoding))]
-        e ['doctype'] = [Attribute.Txo (doctype [tp])]
+        self.id_add (key.decode (self.charset))
+        self.type_add (tp)
         
-        db.add (e)
+        self.record_end ()
+
+        if self.record:
+            self.db.add (self.record)
+
+        return
+    
+    
+    def parse (self, fd, db):
+
+        self.db = db
         
-    return db
+        datalist = yacc.parse (fd.read (), debug = 0)
+
+        self.doctype = {}
+
+        for v in db.txo ['doctype'].values ():
+            self.doctype [v.names [''].lower ()] = v
+
+        for data in datalist:
+
+            if isinstance (data, Comment):
+                self.comment_add (data.decode (self.charset))
+                continue
+
+            self.record_parse (data)
+            
+        return db
+
+
+class Exporter (object):
+
+    _collapse = re.compile (r'[\s\n]+', re.MULTILINE)
+    
+    def __init__ (self, charset = 'ISO8859-1'):
+
+        import Recode
+
+        self.charset = charset
+
+        self._mapping = {
+            Attribute.Text:   self.text_add,
+            Attribute.Person: self.person_add,
+            Attribute.URL:    self.url_add,
+            Attribute.Date:   self.date_add,
+            }
+        return
+
+        
+    def text_add (self, field, data):
+
+        data = ' '.join (data)
+
+        # by default, new lines and multiple spaces are not significant in bibtex fields
+        data = self._collapse.sub (' ', data)
+        
+        return '{%s}' % (data.encode ('latex'))
+
+    def _single_person (self, person):
+
+        return '%s, %s' % (person.last, person.first)
+    
+    def person_add (self, field, data):
+
+        return '{%s}' % (' and '.join (map (self._single_person, data)).encode ('latex'))
+
+
+    def url_add (self, field, data):
+
+        return ''
+
+    def date_add (self, field, data):
+
+        return ''
+
+    
+    def write (self, fd, rs, db):
+
+        """ Write a result set to a given file descriptor """
+
+        self.doctype = {}
+
+        for v in db.txo ['doctype'].values ():
+            self.doctype [v.names [''].lower ()] = v
+
+        for e in rs.itervalues ():
+
+            key = e ['id'] [0]
+            tp  = e ['doctype'] [0]
+            
+            tp = db.txo [tp.group][tp.id].names ['']
+            
+            ret = '@%s{%s,\n' % (tp, key)
+
+            attrs = []
+            keys  = e.keys ()
+            keys.sort ()
+
+            keys.remove ('id')
+            keys.remove ('doctype')
+
+            maxlen = 0
+            for k in keys:
+                l = len (k)
+                if l > maxlen: maxlen = l
+            
+            for k in keys:
+                v = e [k]
+                
+                v = self._mapping [db.schema [k].type] (k, e [k])
+
+                left = '   %s%s = ' % (k, ' ' * (maxlen - len (k)))
+
+                attrs.append (left + Tools.format (v, 75, 0, len (left)))
+
+            fd.write (ret + ',\n'.join (attrs) + '\n}\n')
+
+        return
+    

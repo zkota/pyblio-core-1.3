@@ -57,6 +57,7 @@ class TestStore (pybut.TestCase):
         e ['url']    = [ Attribute.URL ('http://pybliographer.org') ]
         e ['text']   = [ Attribute.Text (u'sample text é') ]
         e ['date']   = [ Attribute.Date (year = 2003) ]
+        e ['id']     = [ Attribute.ID ('Hehe') ]
         
         db.add (e)
 

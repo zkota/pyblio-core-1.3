@@ -37,19 +37,7 @@
   </txo-item>
  </txo-group>
 
-<header>This is a comment
-This is a { comment too
-{mee too}</header>
  <entry id="1">
-
- <native type="bibtex">@article{toto,
-   author = {Gobry, Frederic and First Last},
-   journal = "My journal",
-   note = {a \{ and a \}},
-   number = 123,
-   title = {This is a title}
-}</native>
-
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>
    <person first="First" last="Last"/>

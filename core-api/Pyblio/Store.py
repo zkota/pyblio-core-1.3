@@ -793,6 +793,9 @@ class DatabaseParse (sax.handler.ContentHandler):
                 
                 self._o = Attribute.Txo (item)
 
+            elif name == 'id':
+                self._o = Attribute.ID (self._attr ('value', attrs))
+                
             else:
                 self._error (_("unexpected tag: %s") % name)
 

@@ -2,6 +2,214 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2004-09-30 14:55:55 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-100
+
+    Summary:
+      refactored the bibtex module
+    Revision:
+      pybliographer--devel--1.3--patch-100
+
+     - provides functions to be derived (person_add, text_add,...)
+     - provides an exporter which uses Recodec
+    
+
+    new files:
+     core-api/Recodec/.arch-ids/=id
+     core-api/Recodec/.arch-ids/Makefile.id
+     core-api/Recodec/.arch-ids/NEWS.id
+     core-api/Recodec/.arch-ids/PKG-INFO.id
+     core-api/Recodec/.arch-ids/README.id
+     core-api/Recodec/.arch-ids/TODO.id
+     core-api/Recodec/.arch-ids/recodec.id
+     core-api/Recodec/.arch-ids/setup.py.id core-api/Recodec/NEWS
+     core-api/Recodec/PKG-INFO core-api/Recodec/README
+     core-api/Recodec/Recode/.arch-ids/=id
+     core-api/Recodec/Recode/.arch-ids/__init__.py.id
+     core-api/Recodec/Recode/.arch-ids/african.py.id
+     core-api/Recodec/Recode/.arch-ids/afrtran.py.id
+     core-api/Recodec/Recode/.arch-ids/ascii_bs.py.id
+     core-api/Recodec/Recode/.arch-ids/atarist.py.id
+     core-api/Recodec/Recode/.arch-ids/bangbang.py.id
+     core-api/Recodec/Recode/.arch-ids/base64.py.id
+     core-api/Recodec/Recode/.arch-ids/builtin.py.id
+     core-api/Recodec/Recode/.arch-ids/cdcnos.py.id
+     core-api/Recodec/Recode/.arch-ids/charname.py.id
+     core-api/Recodec/Recode/.arch-ids/dump.py.id
+     core-api/Recodec/Recode/.arch-ids/endline.py.id
+     core-api/Recodec/Recode/.arch-ids/flat.py.id
+     core-api/Recodec/Recode/.arch-ids/fr_charname.py.id
+     core-api/Recodec/Recode/.arch-ids/graph.py.id
+     core-api/Recodec/Recode/.arch-ids/html.py.id
+     core-api/Recodec/Recode/.arch-ids/ibmpc.py.id
+     core-api/Recodec/Recode/.arch-ids/java.py.id
+     core-api/Recodec/Recode/.arch-ids/juca.py.id
+     core-api/Recodec/Recode/.arch-ids/latex.py.id
+     core-api/Recodec/Recode/.arch-ids/libiconv.py.id
+     core-api/Recodec/Recode/.arch-ids/listings.py.id
+     core-api/Recodec/Recode/.arch-ids/main.py.id
+     core-api/Recodec/Recode/.arch-ids/next.py.id
+     core-api/Recodec/Recode/.arch-ids/permute.py.id
+     core-api/Recodec/Recode/.arch-ids/preset.py.id
+     core-api/Recodec/Recode/.arch-ids/qnx.py.id
+     core-api/Recodec/Recode/.arch-ids/quoted.py.id
+     core-api/Recodec/Recode/.arch-ids/recode.py.id
+     core-api/Recodec/Recode/.arch-ids/rfc1345.py.id
+     core-api/Recodec/Recode/.arch-ids/strip.py.id
+     core-api/Recodec/Recode/.arch-ids/testdump.py.id
+     core-api/Recodec/Recode/.arch-ids/texinfo.py.id
+     core-api/Recodec/Recode/.arch-ids/texte.py.id
+     core-api/Recodec/Recode/.arch-ids/ucs.py.id
+     core-api/Recodec/Recode/.arch-ids/utf16.py.id
+     core-api/Recodec/Recode/.arch-ids/utf7.py.id
+     core-api/Recodec/Recode/.arch-ids/utf8.py.id
+     core-api/Recodec/Recode/.arch-ids/varia.py.id
+     core-api/Recodec/Recode/.arch-ids/version.py.id
+     core-api/Recodec/Recode/.arch-ids/vietnam.py.id
+     core-api/Recodec/Recode/__init__.py
+     core-api/Recodec/Recode/african.py
+     core-api/Recodec/Recode/afrtran.py
+     core-api/Recodec/Recode/ascii_bs.py
+     core-api/Recodec/Recode/atarist.py
+     core-api/Recodec/Recode/bangbang.py
+     core-api/Recodec/Recode/base64.py
+     core-api/Recodec/Recode/builtin.py
+     core-api/Recodec/Recode/cdcnos.py
+     core-api/Recodec/Recode/charname.py
+     core-api/Recodec/Recode/dump.py
+     core-api/Recodec/Recode/endline.py
+     core-api/Recodec/Recode/flat.py
+     core-api/Recodec/Recode/fr_charname.py
+     core-api/Recodec/Recode/graph.py
+     core-api/Recodec/Recode/html.py
+     core-api/Recodec/Recode/ibmpc.py
+     core-api/Recodec/Recode/java.py
+     core-api/Recodec/Recode/juca.py
+     core-api/Recodec/Recode/latex.py
+     core-api/Recodec/Recode/libiconv.py
+     core-api/Recodec/Recode/listings.py
+     core-api/Recodec/Recode/main.py
+     core-api/Recodec/Recode/next.py
+     core-api/Recodec/Recode/permute.py
+     core-api/Recodec/Recode/preset.py
+     core-api/Recodec/Recode/qnx.py
+     core-api/Recodec/Recode/quoted.py
+     core-api/Recodec/Recode/recode.py
+     core-api/Recodec/Recode/rfc1345.py
+     core-api/Recodec/Recode/strip.py
+     core-api/Recodec/Recode/testdump.py
+     core-api/Recodec/Recode/texinfo.py
+     core-api/Recodec/Recode/texte.py
+     core-api/Recodec/Recode/ucs.py
+     core-api/Recodec/Recode/utf16.py
+     core-api/Recodec/Recode/utf7.py
+     core-api/Recodec/Recode/utf8.py
+     core-api/Recodec/Recode/varia.py
+     core-api/Recodec/Recode/version.py
+     core-api/Recodec/Recode/vietnam.py core-api/Recodec/TODO
+     core-api/Recodec/data/.arch-ids/=id
+     core-api/Recodec/data/.arch-ids/NomsSeulsfinal.lst.id
+     core-api/Recodec/data/.arch-ids/charsets.def.id
+     core-api/Recodec/data/.arch-ids/control.def.id
+     core-api/Recodec/data/.arch-ids/encodings.def.id
+     core-api/Recodec/data/.arch-ids/encodings_aix.def.id
+     core-api/Recodec/data/.arch-ids/encodings_dos.def.id
+     core-api/Recodec/data/.arch-ids/encodings_local.def.id
+     core-api/Recodec/data/.arch-ids/encodings_osf1.def.id
+     core-api/Recodec/data/.arch-ids/encodings_recode.def.id
+     core-api/Recodec/data/.arch-ids/iso10646.def.id
+     core-api/Recodec/data/.arch-ids/other.def.id
+     core-api/Recodec/data/.arch-ids/rfc1345.txt.id
+     core-api/Recodec/data/NomsSeulsfinal.lst
+     core-api/Recodec/data/charsets.def
+     core-api/Recodec/data/control.def
+     core-api/Recodec/data/encodings.def
+     core-api/Recodec/data/encodings_aix.def
+     core-api/Recodec/data/encodings_dos.def
+     core-api/Recodec/data/encodings_local.def
+     core-api/Recodec/data/encodings_osf1.def
+     core-api/Recodec/data/encodings_recode.def
+     core-api/Recodec/data/iso10646.def
+     core-api/Recodec/data/other.def
+     core-api/Recodec/data/rfc1345.txt core-api/Recodec/recodec
+     core-api/Recodec/setup.py core-api/Recodec/test/.arch-ids/=id
+     core-api/Recodec/test/.arch-ids/bigauto.py-output.id
+     core-api/Recodec/test/.arch-ids/bigauto.py.id
+     core-api/Recodec/test/.arch-ids/common.py.id
+     core-api/Recodec/test/.arch-ids/suite.py.id
+     core-api/Recodec/test/.arch-ids/t_african.py.id
+     core-api/Recodec/test/.arch-ids/t_base64.py.id
+     core-api/Recodec/test/.arch-ids/t_combine.py.id
+     core-api/Recodec/test/.arch-ids/t_dumps.py.id
+     core-api/Recodec/test/.arch-ids/t_flat.py.id
+     core-api/Recodec/test/.arch-ids/t_listings.py.id
+     core-api/Recodec/test/.arch-ids/t_methods.py.id
+     core-api/Recodec/test/.arch-ids/t_minisuite.py.id
+     core-api/Recodec/test/.arch-ids/t_names.py.id
+     core-api/Recodec/test/.arch-ids/t_quoted.py.id
+     core-api/Recodec/test/.arch-ids/t_testdump.py.id
+     core-api/Recodec/test/.arch-ids/t_utf7.py.id
+     core-api/Recodec/test/.arch-ids/t_utf8.py.id
+     core-api/Recodec/test/bigauto.py
+     core-api/Recodec/test/bigauto.py-output
+     core-api/Recodec/test/common.py core-api/Recodec/test/suite.py
+     core-api/Recodec/test/t_african.py
+     core-api/Recodec/test/t_base64.py
+     core-api/Recodec/test/t_combine.py
+     core-api/Recodec/test/t_dumps.py
+     core-api/Recodec/test/t_flat.py
+     core-api/Recodec/test/t_listings.py
+     core-api/Recodec/test/t_methods.py
+     core-api/Recodec/test/t_minisuite.py
+     core-api/Recodec/test/t_names.py
+     core-api/Recodec/test/t_quoted.py
+     core-api/Recodec/test/t_testdump.py
+     core-api/Recodec/test/t_utf7.py
+     core-api/Recodec/test/t_utf8.py
+     core-api/Recodec/tools/.arch-ids/=id
+     core-api/Recodec/tools/.arch-ids/builtin-py.py.id
+     core-api/Recodec/tools/.arch-ids/charname-h.py.id
+     core-api/Recodec/tools/.arch-ids/common.py.id
+     core-api/Recodec/tools/.arch-ids/libiconv-h.py.id
+     core-api/Recodec/tools/.arch-ids/preset-py.py.id
+     core-api/Recodec/tools/.arch-ids/rfc1345-h.py.id
+     core-api/Recodec/tools/.arch-ids/strip-c.py.id
+     core-api/Recodec/tools/.arch-ids/subsets.py.id
+     core-api/Recodec/tools/.arch-ids/tables-py.py.id
+     core-api/Recodec/tools/builtin-py.py
+     core-api/Recodec/tools/charname-h.py
+     core-api/Recodec/tools/common.py
+     core-api/Recodec/tools/libiconv-h.py
+     core-api/Recodec/tools/preset-py.py
+     core-api/Recodec/tools/rfc1345-h.py
+     core-api/Recodec/tools/strip-c.py
+     core-api/Recodec/tools/subsets.py
+     core-api/Recodec/tools/tables-py.py
+     core-api/tests/ut_bibtex/.arch-ids/exp-simple.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/exp-simple.xml.id
+     core-api/tests/ut_bibtex/exp-simple.bib
+     core-api/tests/ut_bibtex/exp-simple.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX.py
+     core-api/Pyblio/Store.py core-api/Pyblio/Tools.py
+     core-api/tests/ut_bibtex.py
+     core-api/tests/ut_bibtex/comment.xml
+     core-api/tests/ut_bibtex/empty.xml
+     core-api/tests/ut_bibtex/nested.xml
+     core-api/tests/ut_bibtex/sharp.xml
+     core-api/tests/ut_bibtex/simple.xml core-api/tests/ut_store.py
+     core-api/tests/ut_store/native.xml
+     core-api/tests/ut_store/s:full.xml
+     core-api/tests/ut_store/simple.xml
+
+    new directories:
+     core-api/Recodec core-api/Recodec/.arch-ids
+     core-api/Recodec/Recode core-api/Recodec/Recode/.arch-ids
+     core-api/Recodec/data core-api/Recodec/data/.arch-ids
+     core-api/Recodec/test core-api/Recodec/test/.arch-ids
+     core-api/Recodec/tools core-api/Recodec/tools/.arch-ids
+
+
 2004-07-27 16:12:02 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-99
 
     Summary:

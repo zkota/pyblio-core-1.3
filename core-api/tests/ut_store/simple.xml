@@ -10,6 +10,10 @@
   <name>Date</name>
  </attribute>
 
+ <attribute id="id" type="id">
+  <name>ID</name>
+ </attribute>
+
  <attribute id="text" type="text">
   <name>Text</name>
  </attribute>
@@ -27,6 +31,9 @@
   </attribute>
   <attribute id="date">
    <date year="2003"/>
+  </attribute>
+  <attribute id="id">
+   <id value="Hehe"/>
   </attribute>
   <attribute id="text">
    <text>sample text é</text>
