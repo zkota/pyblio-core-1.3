@@ -22,7 +22,7 @@ from gettext import gettext as _
 
 import os, copy, string
 
-from Pyblio import Store, Callback, Attribute, Exceptions, Tools
+from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query
 
 
 class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
@@ -293,7 +293,7 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
 # --------------------------------------------------
 
-class Database (Store.Database, Callback.Publisher):
+class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
     def __init__ (self, schema = None, file = None,
                   create = False):
@@ -412,32 +412,6 @@ class Database (Store.Database, Callback.Publisher):
         return self._dict [key]
 
 
-    def query (self, word, permanent = False):
-
-        res = self.rs.add (permanent)
-        
-        for entry in self.entries.itervalues ():
-
-            found = False
-            
-            for attrs in entry.values ():
-
-                for attr in attrs:
-                    idx = attr.index ()
-                
-                    if word in idx:
-                        found = True
-                        break
-
-                if found: break
-                
-            if not found: continue
-
-            res.add (entry.key)
-
-        return res
-        
-    
     def save (self):
 
         try:

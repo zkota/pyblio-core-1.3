@@ -33,3 +33,9 @@ class SchemaError (Exception):
 class ConstraintError (Exception):
 
     pass
+
+class InvalidQuery (Exception):
+
+    """ Raised if an ill-typed query is attempted """
+    
+    pass

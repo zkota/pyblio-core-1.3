@@ -1,6 +1,6 @@
 import os, pybut, sys, string
 
-from Pyblio import Store, Schema, Attribute
+from Pyblio import Store, Schema, Attribute, Query
 
 
 class TestDatabase (pybut.TestCase):
@@ -218,7 +218,9 @@ class TestContent (pybut.TestCase):
 
             for w, r in zip (('a', 'b', 'c'), res):
 
-                rs = map (None, self.db.query (w))
+                q = Query.AnyWord (w)
+
+                rs = map (None, self.db.query (q))
                 assert rs == r, \
                        'for %s: expected %s, got %s' % (w, r, rs)
             return
@@ -327,7 +329,8 @@ class TestContent (pybut.TestCase):
 
         # Search the occurences of every word
         for w in words:
-            rs = self.db.query (w)
+            
+            rs = self.db.query (Query.AnyWord (w))
 
             vals = []
             for v in rs:
@@ -419,7 +422,7 @@ class TestContent (pybut.TestCase):
         for i in range (5):
             self.db.add (e)
 
-        rs = self.db.query ('youyou', permanent = True)
+        rs = self.db.query (Query.AnyWord ('youyou'), permanent = True)
         rs.name = u'my set'
         
         def integrity (rs):

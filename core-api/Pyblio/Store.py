@@ -405,12 +405,13 @@ class Database (object):
         raise NotImplemented ('please override')
         
 
-    def query (self, word, permanent = False):
+    def query (self, query, permanent = False):
         raise NotImplemented ('please override')
     
     
     def save (self):
         raise NotImplemented ('please override')
+
 
     def validate (self, entry):
         """ Check an entry for conformance against the Schema. This

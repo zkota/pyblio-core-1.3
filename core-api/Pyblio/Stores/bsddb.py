@@ -62,7 +62,7 @@ import cPickle as pickle
 
 from bsddb3 import db
 
-from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools
+from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools, Query
 
 _pl = pickle.loads
 _ps = pickle.dumps
@@ -862,7 +862,7 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
 
 # --------------------------------------------------
     
-class Database (Store.Database, Callback.Publisher):
+class Database (Query.Queryable, Store.Database, Callback.Publisher):
     """ A Pyblio database stored in a Berkeley DB engine """
     
     def __init__ (self, path, schema = None, create = False):
@@ -1102,7 +1102,7 @@ class Database (Store.Database, Callback.Publisher):
         return id
 
 
-    def query (self, word, permanent = False):
+    def fulltextquery (self, word, permanent = False):
 
         txn = self._env.txn_begin ()
 
