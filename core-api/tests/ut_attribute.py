@@ -64,14 +64,6 @@ class TestAttribute (pybut.TestCase):
                      u'<url href="http://pybliographer.org/"/>')
         return
 
-    def testReference (self):
-
-        from Pyblio.Store import Key
-        
-        self._check (Attribute.Reference (Key (123)),
-                     u'<reference ref="123"/>')
-        return
-
     def testID (self):
 
         self._check (Attribute.ID (u'87657ejh#{[|é<'),
@@ -108,9 +100,6 @@ class TestAttribute (pybut.TestCase):
 
         assert Attribute.Date (year = 2003).index () == []
         
-        from Pyblio.Store import Key
-        
-        assert Attribute.Reference (Key (314)).index () == []
         return
 
     def testSort (self):
@@ -132,10 +121,6 @@ class TestAttribute (pybut.TestCase):
         coll = Attribute.URL ('http://pybliographer.org/FAQ/').sort ()
         assert coll == 'http://pybliographer.org/FAQ/'
 
-        from Pyblio.Store import Key
-        
-        coll = Attribute.Reference (Key (456)).sort ()
-        assert coll == '456'
         return
 
 

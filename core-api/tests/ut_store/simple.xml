@@ -10,10 +10,6 @@
   <name>Date</name>
  </attribute>
 
- <attribute id="ref" type="reference">
-  <name>Reference</name>
- </attribute>
-
  <attribute id="text" type="text">
   <name>Text</name>
  </attribute>
@@ -31,9 +27,6 @@
   </attribute>
   <attribute id="date">
    <date year="2003"/>
-  </attribute>
-  <attribute id="ref">
-   <reference ref="1"/>
   </attribute>
   <attribute id="text">
    <text>sample text</text>

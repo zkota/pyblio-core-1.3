@@ -119,7 +119,6 @@ class TestSchema (pybut.TestCase):
         assert s ['text'].type is Attribute.Text
         assert s ['author'].type is Attribute.Person
         assert s ['date'].type is Attribute.Date
-        assert s ['ref'].type is Attribute.Reference
         assert s ['id'].type is Attribute.ID
         assert s ['enum'].type is Attribute.Enumerated
 

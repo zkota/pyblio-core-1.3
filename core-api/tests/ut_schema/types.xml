@@ -13,9 +13,6 @@
  <attribute id="date" type="date">
   <name>Date</name>
  </attribute>
- <attribute id="ref" type="reference">
-  <name>Reference</name>
- </attribute>
  <attribute id="id" type="id">
   <name>Identifier</name>
  </attribute>

@@ -160,32 +160,11 @@ class Enumerated:
         return '%s/%d' % (self.group, self.id)
     
 
-
-class Reference (str):
-    ''' Holder for a reference to a bibliographic entry (which can be
-    a crossref, a link to related entries, ... '''
-
-    def __init__ (self, key):
-
-        self.key = key
-        return
-
-    def xmlwrite (self, fd):
-        fd.write ('<reference ref=%s/>' % quoteattr (str (self.key).encode ('utf-8')))
-        return
-
-    def index (self):
-        return []
-    
-    def sort (self):
-        return self
-
 N_to_C = {
     'person'    : Person,
     'date'      : Date,
     'text'      : Text,
     'url'       : URL,
-    'reference' : Reference,
     'id'        : ID,
     'enumerated': Enumerated,
     }

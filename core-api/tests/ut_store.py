@@ -62,7 +62,6 @@ class TestStore (pybut.TestCase):
         e ['url']    = [ Attribute.URL ('http://pybliographer.org') ]
         e ['text']   = [ Attribute.Text (u'sample text') ]
         e ['date']   = [ Attribute.Date (year = 2003) ]
-        e ['ref']    = [ Attribute.Reference (Store.Key (1)) ]
         
         db.add (e)
 

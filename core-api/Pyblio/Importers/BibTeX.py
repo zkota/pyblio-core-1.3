@@ -567,17 +567,11 @@ def _dateify (stream, encoding):
     return [Attribute.Date ()]
 
 
-def _refify (stream, encoding):
-
-    return [Attribute.Reference (stream.flat (encoding))]
-
-
 _mapping = {
     Attribute.Text:   _textify,
     Attribute.Person: _persify,
     Attribute.URL:    _urlify,
     Attribute.Date:   _dateify,
-    Attribute.Reference: _refify,
     }
 
 
