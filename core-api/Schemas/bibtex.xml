@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-schema>
+ <attribute id="id" type="id">
+  <name>BibTeX Key</name>
+ </attribute>
+
+ <attribute id="doctype" type="enumerated" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
  <attribute id="crossref" type="reference">
   <name>Crossref</name>
  </attribute>

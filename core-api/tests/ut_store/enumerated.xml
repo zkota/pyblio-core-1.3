@@ -35,10 +35,10 @@
 
  <entry id="1">
   <attribute id="doctype">
-   <enumerated id="1"/>
+   <enumerated group="type" id="1"/>
   </attribute>
   <attribute id="journal">
-   <enumerated id="4"/>
+   <enumerated group="journal" id="4"/>
   </attribute>
   <attribute id="text">
    <text>Youyou</text>

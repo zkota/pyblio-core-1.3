@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-db>
+ <enum-group id="doctype">
+  <enum-item id="1">
+   <name>Article</name>
+  </enum-item>
+ </enum-group>
+
  <entry id="1">
 
  <native type="bibtex">@article{toto,
@@ -14,6 +20,12 @@
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>
    <person first="First" last="Last"/>
+  </attribute>
+  <attribute id="doctype">
+   <enumerated group="doctype" id="1"/>
+  </attribute>
+  <attribute id="id">
+   <id value="toto"/>
   </attribute>
   <attribute id="journal">
    <text>My journal</text>
@@ -41,6 +53,12 @@
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>
    <person first="First" last="Last"/>
+  </attribute>
+  <attribute id="doctype">
+   <enumerated group="doctype" id="1"/>
+  </attribute>
+  <attribute id="id">
+   <id value="toto2"/>
   </attribute>
   <attribute id="journal">
    <text>My journal</text>

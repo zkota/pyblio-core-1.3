@@ -21,6 +21,14 @@ class TestBibTeX (pybut.TestCase):
         s = Schema.Schema ('../Schemas/bibtex.xml')
         
         db = Store.Database (schema = s)
+
+        # Add a few document types
+        for t in ('Article',):
+            dt = Store.EnumItem ()
+            dt.names [''] = t
+
+            db.enum.add ('doctype', dt)
+        
         
         BibTeX.file_import ('ut_bibtex/%s.bib' % base, 'latin-1', db)
 

@@ -83,10 +83,12 @@ class TestAttribute (pybut.TestCase):
 
         from Pyblio.Store import EnumItem
 
-        i = EnumItem (123, 'group')
-        
+        i = EnumItem ()
+        i.id = 123
+        i.group = 'a'
+
         self._check (Attribute.Enumerated (i),
-                     u'<enumerated id="123"/>')
+                     u'<enumerated group="a" id="123"/>')
         return
 
     

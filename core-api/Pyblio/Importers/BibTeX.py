@@ -606,6 +606,10 @@ def file_import (file, encoding, db, ** kargs):
     in_head  = True
     header   = []
 
+    doctype = {}
+    for v in db.enum ['doctype'].values ():
+        doctype [v.names [''].lower ()] = v
+
     for data in datalist:
 
         if isinstance (data, Comment):
@@ -640,7 +644,11 @@ def file_import (file, encoding, db, ** kargs):
 
             e [k] = _mapping [attp.type] (v, encoding)
 
-        e.native = ('bibtex', _tostring (tp, key, val).decode ('latin-1'))
+        e.native = ('bibtex', _tostring (tp, key, val).decode (encoding))
+
+        # Add the key and document type
+        e ['id'] = [Attribute.ID (key.decode (encoding))]
+        e ['doctype'] = [Attribute.Enumerated (doctype [tp])]
         
         db.add (e)
         

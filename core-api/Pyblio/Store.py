@@ -125,10 +125,10 @@ class ResultSet:
 
 class EnumItem:
 
-    def __init__ (self, id, group):
+    def __init__ (self):
 
-        self.id = id
-        self.group = group
+        self.id = None
+        self.group = None
 
         self.name  = None
         self.names = {}
@@ -149,7 +149,7 @@ class EnumItem:
                 lang = ''
             
             fd.write ('   <name%s>%s</name>\n' % (
-                lang, escape (self.name)))
+                lang, escape (v)))
         
         fd.write ('  </enum-item>\n')
         return
@@ -416,8 +416,8 @@ class DatabaseParse (sax.handler.ContentHandler):
             if not self._enumg:
                 self._error (_('missing "enum-group"'))
 
-            self._enumi = EnumItem (int (self._attr ('id', attrs)),
-                                    self._enumg)
+            self._enumi = EnumItem ()
+            self._enumi.id = int (self._attr ('id', attrs))
             return
 
         if name == 'name':

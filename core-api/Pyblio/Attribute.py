@@ -148,7 +148,8 @@ class Enumerated:
         return
     
     def xmlwrite (self, fd):
-        fd.write ('<enumerated id="%d"/>' % self._item.id)
+        fd.write ('<enumerated group="%s" id="%d"/>' % (
+            self._item.group, self._item.id))
         return
 
     def index (self):
