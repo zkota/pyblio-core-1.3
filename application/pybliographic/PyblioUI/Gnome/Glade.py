@@ -85,7 +85,16 @@ class Window (object):
             
         return
 
-    def size_save (self):
+    def size_save (self, * args):
+
+        """ Save the window size, and optional additional
+        parameters. This parameters must be passed as extra 2-uples
+        like:
+
+           widget.size_save (('name', size), ('other', size))
+           
+        """
+        
         root = self.xml.get_widget (self.gladeinfo ['root'])
         cfg  = self.gladeinfo ['name']
 
@@ -93,5 +102,19 @@ class Window (object):
 
         Config.int_set (cfg + '/width',  w)
         Config.int_set (cfg + '/height', h)
+
+        for k, v in args:
+            Config.int_set (cfg + '/%s' % k, v)
+            
         return
+
+    def size_get (self, arg, default = -1):
+
+        """ Return the value of an extra parameter, or the supplied
+        default value if the parameter has not been saved yet. """
+        
+        
+        cfg = self.gladeinfo ['name']
+
+        return Config.int_get (cfg + '/' + arg) or default
     

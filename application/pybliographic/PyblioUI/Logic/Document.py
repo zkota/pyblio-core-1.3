@@ -18,18 +18,40 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+import os
+
+from gettext import gettext as _
+
 from Pyblio import Store
 
-def open (file, format):
-    ''' Open a database of a given format '''
 
-    da = Store.get (format)
+def format_guess (filename):
 
-    return da.dbopen (file)
-
-
-
-def create (file, format):
-    ''' Create a database of a given format '''
+    f, x = os.path.splitext (filename)
     
-    pass
+    if x == '.pbl': return 'file'
+
+    raise RuntimeError (_('unknown file format'))
+
+
+class Document (object):
+
+    def __init__ (self, filename, format = None):
+
+        self._db = None
+        
+        assert filename is not None
+
+        if format is None: format = format_guess (filename)
+        
+        self._filename = filename
+        self._format   = format
+
+        da = Store.get (self._format)
+
+        self._db = da.dbopen   (self._filename)
+        return
+    
+    def __len__ (self):
+
+        return len (self._db)

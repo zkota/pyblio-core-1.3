@@ -48,8 +48,12 @@ gtk.glade.bindtextdomain ("pybliographer", PyblioUI.localedir)
 
 
 # Provide a simple "run" function
-def run ():
-    import gtk
+import gtk
 
+def run ():
     gtk.main ()
+    return
+
+def exit ():
+    gtk.mainquit ()
     return

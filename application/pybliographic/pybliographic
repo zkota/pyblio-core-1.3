@@ -19,6 +19,10 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+""" Main module for pybliographic.
+
+This module handles the set of opened documents.
+"""
 
 import sys
 
@@ -26,12 +30,29 @@ from PyblioUI.Gnome import Document
 
 files = sys.argv [2:]
 
+docs = []
+
+def reaper (doc):
+
+    docs.remove (doc)
+    if not docs: Gnome.exit ()
+
+    return
+
+
 if files:
     for f in files:
-        Document.open (f)
+        d = Document.Document ()
+        d.open (f, None)
+        d.register ('close', reaper)
+        
+        docs.append (d)
 
 else:
-    Document.create ()
+    d = Document.Document ()
+    d.register ('close', reaper)
+    
+    docs.append (d)
 
 
 from PyblioUI import Gnome
