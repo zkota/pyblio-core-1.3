@@ -4,7 +4,7 @@
 import sys, os, time
 
 import unittest
-from unittest import makeSuite, TestCase, TestSuite
+from unittest import makeSuite, TestSuite
 
 # Setup the system so that we import the current python files
 srcdir = os.environ.get ('srcdir', '.')
@@ -12,6 +12,13 @@ sys.path.insert (0, os.path.join (srcdir, '..'))
 
 assert os.path.isdir (os.path.join (srcdir, '..', 'Pyblio'))
 
+
+class TestCase (unittest.TestCase):
+
+    def tearDown (self):
+        cleanup ()
+        return
+    
 
 class _WritelnDecorator:
     """Used to decorate file-like objects with a handy 'writeln' method"""

@@ -16,7 +16,7 @@ class TestTagged (pybut.TestCase):
         import StringIO
 
         self.fd = StringIO.StringIO ()
-        self.t  = Tagged.Tagged (self.fd)
+        self.t  = Tagged.Parser (self.fd)
         
         return
 
@@ -185,7 +185,7 @@ class TestRISTransport (pybut.TestCase):
         fd = StringIO.StringIO (txt)
         rt = []
 
-        ris = RIS.Transport (fd)
+        ris = RIS.RISParser (fd)
         
         while 1:
             d = ris.next ()
@@ -235,12 +235,12 @@ ER  - \r
 
         r = self.parsingOk ('''
 TY  - TYPE\r
-A1  - Gobry, \r
+A1  - Gobry,\r
       Frederic\r
 ER  - \r
 
 TY  - TYPE\r
-A1  - Gobry 2, \r
+A1  - Gobry 2,\r
       Frederic\r
 ER  - \r
 ''')
@@ -251,7 +251,9 @@ ER  - \r
                       (8, 'A1', u'Gobry 2, Frederic')]], \
                       'obtained %s' % `r`
         return
-    
+
+
+
 
 pybut.run (pybut.makeSuite (TestTagged, 'test'),
            pybut.makeSuite (TestRISTransport, 'test'))

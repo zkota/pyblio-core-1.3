@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="abstract" type="text">
+  <name>Abstract</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="city" type="text">
+  <name>City</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="doctype" type="enumerated" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>External Identifier</name>
+ </attribute>
+
+ <attribute id="isbn" type="text">
+  <name>ISBN</name>
+ </attribute>
+
+ <attribute id="issn" type="text">
+  <name>ISSN</name>
+ </attribute>
+
+ <attribute id="issue" type="text">
+  <name>Issue</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal</name>
+ </attribute>
+
+ <attribute id="note" type="text">
+  <name>Note</name>
+ </attribute>
+
+ <attribute id="pages" type="text">
+  <name>Pages</name>
+ </attribute>
+
+ <attribute id="publisher" type="text">
+  <name>Publisher</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+ <attribute id="volume" type="text">
+  <name>Volume</name>
+ </attribute>
+
+</pyblio-schema>
+ <entry id="1">
+  <attribute id="abstract">
+   <text>Adult Fisher 344 rats were subjected to a unilateral impact to the dorsal cortex above the hippocampus at 3.5 m/sec with a 2 mm cortical depression. This caused severe cortical damage and neuronal loss in hippocampus subfields CA1, CA3 and hilus. Breakdown of the blood-brain barrier (BBB) was assessed by injecting the protein horseradish peroxidase (HRP) 5 minutes prior to or at various times following injury (5 minutes, 1, 2, 6, 12 hours, 1, 2, 5, and 10 days).Animals were killed 1 hour after HRP injection and brain sections were reacted with diaminobenzidine to visualize extravascular accumulation of the protein. Maximum staining occurred in animals injected with HRP 5 minutes prior to or 5 minutes after cortical contusion. Staining at these time points was observed in the ipsilateral hippocampus. Some modest staining occurred in the dorsal contralateral cortex near the superior sagittal sinus. Cortical HRP stain gradually decreased at increasing time intervals postinjury. By 10 days, no HRP stain was observed in any area of the brain. In the ipsilateral hippocampus, HRP stain was absent by 3 hours postinjury and remained so at the 6- and 12- hour time points. Surprisingly, HRP stain was again observed in the ipsilateral hippocampus 1 and 2 days following cortical contusion, indicating a biphasic opening of the BBB following head trauma and a possible second wave of secondary brain damage days after the contusion injury. These data indicate regions not initially destroyed by cortical impact, but evidencing BBB breach, may be accessible to neurotrophic factors administered intravenously both immediately and days after brain trauma.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="S.A." last="Baldwin"/>
+   <person first="I." last="Fugaccia"/>
+   <person first="D.R." last="Brown"/>
+   <person first="L.V." last="Brown"/>
+   <person first="S.W." last="Scheff"/>
+  </attribute>
+  <attribute id="date">
+   <date year="1996"/>
+  </attribute>
+  <attribute id="journal">
+   <text>J.Neurosurg.</text>
+  </attribute>
+  <attribute id="title">
+   <text>Blood-brain barrier breach following cortical contusion in the rat</text>
+  </attribute>
+  <attribute id="volume">
+   <text>85</text>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="abstract">
+   <text>A method is disclosed for detecting the presence of HTLV III infected cells in a medium. The method comprises contacting the medium with monoclonal antibodies against an antigen produced as a result of the infection and detecting the binding of the antibodies to the antigen. The antigen may be a gene product of the HTLV III virus or may be bound to such gene product. On the other hand the antigen may not be a viral gene product but may be produced as a result of the infection and may further be bound to a lymphocyte. The medium may be a human body fluid or a culture medium. A particular embodiment of the present method involves a method for determining the presence of a AIDS virus in a person. The method comprises combining a sample of a body fluid from the person with a monoclonal antibody that binds to an antigen produced as a result of the infection and detecting the binding of the monoclonal antibody to the antigen. The presence of the binding indicates the presence of a AIDS virus infection. Also disclosed are novel monoclonal antibodies, noval compositions of matter, and novel diagnostic kits</text>
+  </attribute>
+  <attribute id="author">
+   <person first="D.R." last="Burger"/>
+   <person first="A.S." last="Goldstein"/>
+  </attribute>
+  <attribute id="city">
+   <text>OR</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1990" month="2" day="27"/>
+  </attribute>
+  <attribute id="issue">
+   <text>4,904,581</text>
+  </attribute>
+  <attribute id="publisher">
+   <text>4,629,783</text>
+  </attribute>
+  <attribute id="title">
+   <text>Method of detecting AIDS virus infection</text>
+  </attribute>
+  <attribute id="volume">
+   <text>877609</text>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="author">
+   <person first="J." last="Barlow"/>
+  </attribute>
+  <attribute id="city">
+   <text>Nordwijk, Holland</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1990"/>
+  </attribute>
+  <attribute id="publisher">
+   <text>Meeting of the Scientific Committee of the International Whaling Commission</text>
+  </attribute>
+  <attribute id="title">
+   <text>An assessment of the status of harbour porpoise populations in California</text>
+  </attribute>
+  <attribute id="volume">
+   <text>SC/42/SM6</text>
+  </attribute>
+ </entry>
+ <entry id="4">
+  <attribute id="author">
+   <person first="J." last="Esparza"/>
+  </attribute>
+  <attribute id="city">
+   <text>San Francisco CA</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1990"/>
+  </attribute>
+  <attribute id="publisher">
+   <text>UC Berkeley</text>
+  </attribute>
+  <attribute id="title">
+   <text>Report of a WHO workshop on the measurement and significance of neutralizing antibody to HIV and SIV, London, 3-5 October 1988</text>
+  </attribute>
+  <attribute id="volume">
+   <text>4</text>
+  </attribute>
+ </entry>
+ <entry id="5">
+  <attribute id="author">
+   <person first="L.M." last="Franks"/>
+  </attribute>
+  <attribute id="city">
+   <text>Berkeley CA</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1991"/>
+  </attribute>
+  <attribute id="issn">
+   <text>0-679-40110-5</text>
+  </attribute>
+  <attribute id="publisher">
+   <text>Berkeley Press</text>
+  </attribute>
+  <attribute id="title">
+   <text>Preface by an AIDS Victim</text>
+  </attribute>
+  <attribute id="volume">
+   <text>10</text>
+  </attribute>
+ </entry>
+ <entry id="6">
+  <attribute id="author">
+   <person first="A." last="Cary"/>
+   <person first="W." last="Friedenrich"/>
+  </attribute>
+  <attribute id="city">
+   <text>ATLA Law Reporter</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1988" month="10" day="7"/>
+  </attribute>
+  <attribute id="issue">
+   <text>32</text>
+  </attribute>
+  <attribute id="note">
+   <text>Raped inmate can press case against officials for contracting AIDS</text>
+  </attribute>
+  <attribute id="publisher">
+   <text>San Diego County 45th Judicial District, California</text>
+  </attribute>
+  <attribute id="title">
+   <text>Redman v. State of California</text>
+  </attribute>
+  <attribute id="volume">
+   <text>201</text>
+  </attribute>
+ </entry>
+</pyblio-db>
