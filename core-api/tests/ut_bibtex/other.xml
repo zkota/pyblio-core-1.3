@@ -38,27 +38,14 @@
  </txo-group>
 
  <entry id="1">
-  <attribute id="author">
-   <person first="Frederic" last="Gobry"/>
-   <person first="First" last="Last"/>
-  </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
   </attribute>
   <attribute id="id">
-   <id value="toto"/>
-  </attribute>
-  <attribute id="journal">
-   <text>My journal</text>
-  </attribute>
-  <attribute id="note">
-   <text></text>
-  </attribute>
-  <attribute id="number">
-   <text></text>
+   <id value="Floreano:1999"/>
   </attribute>
   <attribute id="title">
-   <text>This is a title</text>
+   <text>.-#()</text>
   </attribute>
  </entry>
 </pyblio-db>

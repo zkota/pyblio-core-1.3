@@ -201,11 +201,12 @@ t_EQUALS  = r'='
 t_SHARP   = r'\#'
 t_QUOTE   = r'"'
 t_ESCAPE  = r'\\'
-t_SYMBOL  = r'[^@{},#"\w\d\s=\\()_-]'
+t_SYMBOL  = r'[^@{},#"\w\d\s=\\()_]'
 t_NUMBER  = r'\d+'
 
 def t_error (t):
-    raise RuntimeError ('lexer error')
+    c = t.value [0]
+    raise RuntimeError ('unknown symbol: %s [%d]' % (`c`, ord (c)))
 
 
 lex.lex ()
@@ -215,6 +216,9 @@ lex.lex ()
 # BibTeX parser
 # ==================================================
 
+precedence = (
+    ('left', 'SYMBOL', 'LITERAL'),
+    )
 
 def p_empty_file (t):
     ''' file : opt_space '''
@@ -289,11 +293,30 @@ def p_comment_data (t):
     return
 
 
+def p_key (t):
+    ''' key : keypart key '''
+    t [0] = t [1] + t [2]
+    return
+
+def p_key_simple (t):
+    ''' key : keypart '''
+    t [0] = t [1]
+    return
+    
+def p_keypart (t):
+    ''' keypart : LITERAL
+                | SYMBOL
+                | NUMBER
+                | LPAREN
+                | RPAREN '''
+    t [0] = t [1]
+    return
+
 def p_entry (t):
-    ''' entry : LITERAL opt_space LBRACE opt_space LITERAL opt_space COMMA opt_space assignment_list RBRACE
-              | LITERAL opt_space LBRACE opt_space LITERAL opt_space COMMA opt_space assignment_list COMMA opt_space RBRACE
-              | LITERAL opt_space LPAREN opt_space LITERAL opt_space COMMA opt_space assignment_list RPAREN
-              | LITERAL opt_space LPAREN opt_space LITERAL opt_space COMMA opt_space assignment_list COMMA opt_space RPAREN '''
+    ''' entry : LITERAL opt_space LBRACE opt_space key opt_space COMMA opt_space assignment_list RBRACE
+              | LITERAL opt_space LBRACE opt_space key opt_space COMMA opt_space assignment_list COMMA opt_space RBRACE
+              | LITERAL opt_space LPAREN opt_space key opt_space COMMA opt_space assignment_list RPAREN
+              | LITERAL opt_space LPAREN opt_space key opt_space COMMA opt_space assignment_list COMMA opt_space RPAREN '''
 
     e = Record (t [1].lower (), t [5])
     e.update (t [9])
@@ -318,6 +341,15 @@ def p_assignment_list (t):
     ret = {}
     ret.update (t [1])
     ret.update (t [4])
+
+    t [0] = ret
+    return
+
+def p_assignment_bad_list (t):
+    ''' assignment_list : assignment_list opt_space assignment '''
+    ret = {}
+    ret.update (t [1])
+    ret.update (t [3])
 
     t [0] = ret
     return
@@ -391,9 +423,13 @@ def p_sub_brace_data_empty (t):
     return
     
 def p_brace_data (t):
-    ''' brace_data : misc_data
-                   | QUOTE '''
+    ''' brace_data : misc_data '''
     t [0] = (t [1],)
+    return
+
+def p_brace_data_quote (t):
+    ''' brace_data :  QUOTE '''
+    t [0] = (Text (t [1]),)
     return
 
 def p_single_quote_data_list (t):
@@ -611,29 +647,32 @@ class Importer (object):
 
         pass
 
+    def record_dispatch (self, tp, k, v):
+
+        try:
+            attp = self.db.schema [k]
+            
+        except KeyError:
+            raise Exceptions.SchemaError (
+                _("no attribute '%s' in document '%s'") % (
+                k, tp))
+        
+        self._mapping [attp.type] (k, v)
+        return
+    
     def record_parse (self, data):
 
         self.record = Store.Record ()
         self.record_begin ()
-        
+
         tp, key, val = data.type, data.key, data
 
-        for k, v in val.iteritems ():
-
-            k = k.lower ()
-
-            try:
-                attp = self.db.schema [k]
-
-            except KeyError:
-                raise Exceptions.SchemaError (
-                    _("no attribute '%s' in document '%s'") % (
-                    k, tp))
-
-            self._mapping [attp.type] (k, v)
-
-        # Add the key and document type
         self.id_add (key.decode (self.charset))
+        
+        for k, v in val.iteritems ():
+            self.record_dispatch (tp, k.lower (), v)
+            
+        # Add the document type
         self.type_add (tp)
         
         self.record_end ()
@@ -653,7 +692,7 @@ class Importer (object):
         self.doctype = {}
 
         for v in db.txo ['doctype'].values ():
-            self.doctype [v.names [''].lower ()] = v
+            self.doctype [v.names ['C'].lower ()] = v
 
         for data in datalist:
 
@@ -664,6 +703,9 @@ class Importer (object):
             self.record_parse (data)
             
         return db
+
+
+# --------------------------------------------------
 
 
 class Exporter (object):

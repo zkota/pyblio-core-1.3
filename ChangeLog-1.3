@@ -2,6 +2,72 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2004-10-28 13:33:07 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-113
+
+    Summary:
+      merged bibtex parser improvements
+    Revision:
+      pybliographer--devel--1.3--patch-113
+
+    Patches applied:
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--base-0
+       tag of gobry@pybliographer.org--public/pybliographer--devel--1.3--patch-112
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-1
+       use version 1.5 of ply
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-2
+       add the problematic bibtex file to the testsuite
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-3
+       handle symbols in keys and in some text areas
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-4
+       allow missing commas between fields
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-5
+       use lang="C" for bibtex classes
+    
+     * gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-6
+       additional modularization of the bibtex parser
+    
+
+    new files:
+     core-api/tests/ut_bibtex/.arch-ids/ext-key.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/ext-key.xml.id
+     core-api/tests/ut_bibtex/.arch-ids/missing-comma.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/missing-comma.xml.id
+     core-api/tests/ut_bibtex/.arch-ids/other.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/other.xml.id
+     core-api/tests/ut_bibtex/ext-key.bib
+     core-api/tests/ut_bibtex/ext-key.xml
+     core-api/tests/ut_bibtex/missing-comma.bib
+     core-api/tests/ut_bibtex/missing-comma.xml
+     core-api/tests/ut_bibtex/other.bib
+     core-api/tests/ut_bibtex/other.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX.py
+     core-api/Pyblio/Importers/lex.py
+     core-api/Pyblio/Importers/yacc.py core-api/tests/ut_bibtex.py
+     core-api/tests/ut_bibtex/comment.xml
+     core-api/tests/ut_bibtex/empty.xml
+     core-api/tests/ut_bibtex/nested.xml
+     core-api/tests/ut_bibtex/sharp.xml
+     core-api/tests/ut_bibtex/simple.bib
+     core-api/tests/ut_bibtex/simple.xml
+
+    new patches:
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--base-0
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-1
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-2
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-3
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-4
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-5
+     gobry@puck.ch--local/pybliographer--mu-bibtex--1.3--patch-6
+
+
 2004-10-20 16:04:38 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-112
 
     Summary:

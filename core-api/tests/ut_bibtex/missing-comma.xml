@@ -39,50 +39,18 @@
 
  <entry id="1">
   <attribute id="author">
-   <person first="Frederic" last="Gobry"/>
-   <person first="First" last="Last"/>
+   <person first="T." last="Chapman"/>
+   <person first="A.T." last="Hayes"/>
+   <person first="M." last="Tilden"/>
   </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
   </attribute>
   <attribute id="id">
-   <id value="toto"/>
+   <id value="Chapman"/>
   </attribute>
   <attribute id="journal">
-   <text>My journal</text>
-  </attribute>
-  <attribute id="note">
-   <text>a { and a }</text>
-  </attribute>
-  <attribute id="number">
-   <text>123</text>
-  </attribute>
-  <attribute id="title">
-   <text>This is a title</text>
-  </attribute>
- </entry>
- <entry id="2">
-  <attribute id="author">
-   <person first="Frederic" last="Gobry"/>
-   <person first="First" last="Last"/>
-  </attribute>
-  <attribute id="doctype">
-   <txo group="doctype" id="1"/>
-  </attribute>
-  <attribute id="id">
-   <id value="toto2"/>
-  </attribute>
-  <attribute id="journal">
-   <text>My journal</text>
-  </attribute>
-  <attribute id="note">
-   <text>a { and a }</text>
-  </attribute>
-  <attribute id="number">
-   <text>123</text>
-  </attribute>
-  <attribute id="title">
-   <text>This is a title</text>
+   <text>Proc. of the 6th Int. Conf. on Simulation of Adaptive Behavior SAB-00</text>
   </attribute>
  </entry>
 </pyblio-db>

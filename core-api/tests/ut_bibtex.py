@@ -39,7 +39,7 @@ class TestBibTeXImport (pybut.TestCase):
         
         for t in ('Article',):
             dt = Store.TxoItem ()
-            dt.names [''] = t
+            dt.names ['C'] = t
 
             g.add (dt)
 
@@ -93,6 +93,24 @@ class TestBibTeXImport (pybut.TestCase):
         """ Support concatenation """
         
         self._check ('sharp')
+        return
+
+    def testExtendedKey (self):
+        """ Allow symbols in keys """
+        
+        self._check ('ext-key')
+        return
+
+    def testOther (self):
+        """ Allow symbols in keys """
+        
+        self._check ('other')
+        return
+
+    def testMissingComma (self):
+        """ Allow missing comma between fields """
+        
+        self._check ('missing-comma')
         return
 
 
