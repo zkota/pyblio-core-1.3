@@ -22,3 +22,14 @@ defined, and used in place of the corresponding attribute. When the
 shortcut content is updated, all the entries that used it are also
 updated.
 
+* Search for several words
+
+The query can accept several words as a logical AND
+
+* Manipulate result sets
+
+Result sets can be merged together, entries can be removed or
+added,...
+
+* There are Permanent Result Sets.
+
