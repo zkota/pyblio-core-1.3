@@ -8,25 +8,24 @@ class TestStore (pybut.TestCase):
 
     def testEmpty (self):
         """ Create an empty database with a schema """
+
+        f = ',,t1.xml'
         
         schema = Schema.Schema ('ut_store/s:simple.xml')
-        db = Store.Database (schema = schema)
 
+        db = Store.get ('file').dbcreate (f, schema)
+        db.save ()
+        
         assert len (db) == 0
 
-        file = open (',,t1.xml', 'w')
-        db.xmlwrite (file)
-        file.close ()
-
-        pybut.fileeq (',,t1.xml', 'ut_store/empty.xml')
-
-        os.unlink (',,t1.xml')
+        pybut.fileeq (f, 'ut_store/empty.xml')
+        os.unlink (f)
         return
 
     def testReadEmpty (self):
         """ A schema in a database is equivalent to outside the database """
         
-        db = Store.Database (file = 'ut_store/empty.xml')
+        db = Store.get ('file').dbopen ('ut_store/empty.xml')
 
         file = open (',,t2.xml', 'w')
         db.schema.xmlwrite (file)
@@ -39,9 +38,11 @@ class TestStore (pybut.TestCase):
 
     def testWrite (self):
         """ A new database can be saved with its schema """
+
+        f = ',,t3.xml'
         
         schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.Database (schema = schema)
+        db = Store.get ('file').dbcreate (f, schema)
 
         e = Store.Entry ()
 
@@ -55,20 +56,18 @@ class TestStore (pybut.TestCase):
         db.add (e)
 
         db.header = u"Hi, I'm a database description"
-        
-        fd = open (',,t3.xml', 'w')
-        db.xmlwrite (fd)
-        fd.close ()
 
-        pybut.fileeq (',,t3.xml', 'ut_store/simple.xml')
+        db.save ()
 
-        os.unlink (',,t3.xml')
+        pybut.fileeq (f, 'ut_store/simple.xml')
+        os.unlink (f)
         return
+
 
     def testRead (self):
         """ A database can be read and saved again identically """
         
-        db = Store.Database (file = 'ut_store/simple.xml')
+        db = Store.get ('file').dbopen ('ut_store/simple.xml')
 
         fd = open (',,t4.xml', 'w')
         db.xmlwrite (fd)
@@ -82,7 +81,7 @@ class TestStore (pybut.TestCase):
     def testEnumRead (self):
         """ A database with enumerated fields can be read and saved again identically """
         
-        db = Store.Database (file = 'ut_store/enumerated.xml')
+        db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
 
         fd = open (',,t6.xml', 'w')
         db.xmlwrite (fd)
@@ -99,7 +98,7 @@ class TestStore (pybut.TestCase):
         """ Native data is stored in the database, along with loss information """
         
         schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.Database (schema = schema)
+        db = Store.get ('file').dbcreate (',,t5.xml', schema)
 
         e = Store.Entry ()
 
@@ -109,11 +108,8 @@ class TestStore (pybut.TestCase):
         e.native = ('bibtex', '@article{entry_1,\nauthor = {LastName}}')
 
         db.add (e)
-
-        fd = open (',,t5.xml', 'w')
-        db.xmlwrite (fd)
-        fd.close ()
-
+        db.save ()
+        
         pybut.fileeq (',,t5.xml', 'ut_store/native.xml')
 
         os.unlink (',,t5.xml')
@@ -123,7 +119,7 @@ class TestStore (pybut.TestCase):
 
         """ Native data is also read back from file """
         
-        db = Store.Database (file = 'ut_store/native.xml')
+        db = Store.get ('file').dbopen ('ut_store/native.xml')
 
         e = db [1]
         

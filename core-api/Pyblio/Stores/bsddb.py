@@ -71,7 +71,7 @@ class DBIterItems (DBIterBase):
 
 # --------------------------------------------------
 
-class ResultSet:
+class ResultSet (Store.ResultSet):
 
     def __init__ (self, env, rs, id, name = None):
         self.name = name
@@ -81,24 +81,34 @@ class ResultSet:
         self._id = id
         
         self._cursor = rs.cursor ()
-        self._data   = self._cursor.first ()
-
         self._permanent = self.name is not None
+
+        self._restart ()
         return
 
     def __iter__ (self):
         return self
 
+    def _restart (self):
+        self._data   = self._cursor.first ()
+        return
+
+    def add (self, k, txn = None):
+
+        self._rs.put (str (k), '', txn = txn)
+        self._restart ()
+        return
+    
 
     def next (self):
         if self._data is None:
-            self._data = self._cursor.first ()
+            self._restart ()
             raise StopIteration ()
 
         data = self._data
         self._data = self._cursor.next ()
         
-        return int (data [0], 16)
+        return int (data [0])
 
 
     def __del__ (self):
@@ -115,24 +125,61 @@ class ResultSet:
         return
 
 
-class ResultSetStore (Store.ResultSetStore):
+class ResultSetStore (dict, Store.ResultSetStore):
+
+    def __init__ (self, env, meta):
+
+        self._env = env
+        self._meta = meta
+        return
+    
 
     def __delitem__ (self, k):
 
         self [k]._permanent = False
         dict.__delitem__ (self, k)
         return
-    
+
+
+    def __iter__ (self):
+        return self.itervalues ()
+
+
+    def add (self, name = None, txn = None):
+        """ Create an empty result set """
+
+        txn = self._env.txn_begin (parent = txn)
+        
+        # get the next rs id
+        (rsid, avail) = pickle.loads (self._meta.get ('rs'))
+
+        if name: avail [name] = str (rsid)
+
+        self._meta.put ('rs', pickle.dumps ((rsid + 1, avail)))
+
+        rsid = str (rsid)
+        
+        rs = db.DB (self._env)
+        rs.open ('rs', rsid, db.DB_HASH, db.DB_CREATE)
+        
+        txn.commit ()
+
+        rs = ResultSet (self._env, rs, rsid, name)
+        if name: self [name] = rs
+        
+        return rs
     
 # --------------------------------------------------
+
+class EnumGroup (dict, Store.EnumGroup):
+    
+    pass
 
 
 class EnumStore (Store.EnumStore):
 
 
     def __init__ (self, env):
-
-        Store.EnumStore.__init__ (self)
 
         self._env = env
 
@@ -168,7 +215,7 @@ class EnumStore (Store.EnumStore):
         v = self._enum.get (group)
 
         if v is None:
-            id, data = 1, Store.EnumGroup ()
+            id, data = 1, EnumGroup ()
         else:
             id, data = pickle.loads (v)
 
@@ -226,7 +273,7 @@ class Database (Store.Database):
         self._meta  = db.DB (self._env)
         self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag)
 
-        self.rs = ResultSetStore ()
+        self.rs = ResultSetStore (self._env, self._meta)
 
         if create:
             self.schema = schema
@@ -264,7 +311,6 @@ class Database (Store.Database):
 
         # No header in this db yet
         self.header = None
-
         return
 
 
@@ -397,18 +443,8 @@ class Database (Store.Database):
     def query (self, word, name = None):
 
         txn = self._env.txn_begin ()
-        
-        # get the next rs id
-        (rsid, avail) = pickle.loads (self._meta.get ('rs'))
 
-        if name: avail [name] = str (rsid)
-
-        self._meta.put ('rs', pickle.dumps ((rsid + 1, avail)))
-
-        rsid = str (rsid)
-        
-        rs = db.DB (self._env)
-        rs.open ('rs', rsid, db.DB_HASH, db.DB_CREATE)
+        rs = self.rs.add (name, txn = txn)
         
         cursor = self._idx.cursor ()
 
@@ -416,18 +452,15 @@ class Database (Store.Database):
             data = cursor.set (word.encode ('utf-8'))
             
         except db.DBNotFoundError:
-            return ResultSet (self._env, rs, rsid, name)
+            return rs
         
         while 1:
             if data is None: break
 
-            rs.put (data [1], '', txn = txn)
+            rs.add (int (data [1], 16), txn = txn)
             data = cursor.next_dup ()
 
         txn.commit ()
-
-        rs = ResultSet (self._env, rs, rsid, name)
-        if name: self.rs [name] = rs
 
         return rs
     

@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-db>
+<pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="doctype" type="enumerated" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>BibTeX Key</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal</name>
+ </attribute>
+
+ <attribute id="note" type="text">
+  <name>Note</name>
+ </attribute>
+
+ <attribute id="number" type="text">
+  <name>Number</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+</pyblio-schema>
  <enum-group id="doctype">
   <enum-item id="1">
    <name>Article</name>

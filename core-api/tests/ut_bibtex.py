@@ -18,9 +18,9 @@ class TestBibTeX (pybut.TestCase):
 
         TestBibTeX.count = self.count + 1
 
-        s = Schema.Schema ('../Schemas/bibtex.xml')
+        s = Schema.Schema ('ut_bibtex/schema.xml')
         
-        db = Store.Database (schema = s)
+        db = Store.get ('file').dbcreate (f, s)
 
         # Add a few document types
         for t in ('Article',):
@@ -29,15 +29,13 @@ class TestBibTeX (pybut.TestCase):
 
             db.enum.add ('doctype', dt)
         
-        
         BibTeX.file_import ('ut_bibtex/%s.bib' % base, 'latin-1', db)
 
-        fd = open (f, 'w')
-        db.xmlwrite (fd, schema = False)
-        fd.close ()
+        db.save ()
         
         pybut.fileeq (f, 'ut_bibtex/%s.xml' % base)
-        os.unlink (f)
+
+        Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
     

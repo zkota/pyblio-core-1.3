@@ -112,7 +112,7 @@ class Entry (dict):
 
 # --------------------------------------------------
 
-class ResultSet (dict):
+class ResultSet:
 
     """ This class defines a result set. ResultSets can be named and
     are then persistent.
@@ -121,22 +121,15 @@ class ResultSet (dict):
     """
 
     def __init__ (self, rs_name):
-
-        dict.__init__ (self)
-        
-        self.name = rs_name
-        return
-
+        raise NotImplemented ('please override')
 
     def add (self, k):
-        
-        self [k] = 1
-        return
-
+        """ Add a new item in the set """
+        raise NotImplemented ('please override')
     
     def __iter__ (self):
-        return self.iterkeys ()
-    
+        raise NotImplemented ('please override')
+
 
     def xmlwrite (self, fd):
 
@@ -150,24 +143,25 @@ class ResultSet (dict):
         return
 
 
-class ResultSetStore (dict):
+class ResultSetStore:
 
     """ Interface to the stored result sets.
 
     DERIVED BY ALL STORES
     """
 
-    def add (self, rs_name = None):
-        """ Create an empty result set """
+    def __getitem__ (self, k):
+        raise NotImplemented ('please override')
 
-        rs = ResultSet (rs_name)
+    def __delitem__ (self, k):
+        raise NotImplemented ('please override')
+
+    def __iter__ (self):
+        raise NotImplemented ('please override')
         
-        if rs_name:
-            self [rs_name] = rs
+    def add (self, rs_name = None):
+        raise NotImplemented ('please override')
         
-        return rs
-        
-    
 
 # --------------------------------------------------
     
@@ -209,7 +203,7 @@ class EnumItem:
         return
     
 
-class EnumGroup (dict):
+class EnumGroup:
 
     """ Definition of a group of enumerated items.
 
@@ -227,7 +221,7 @@ class EnumGroup (dict):
         return
 
 
-class EnumStore (dict):
+class EnumStore:
 
     """ This class is the interface via which Enumerated items can be
     manipulated.
@@ -235,11 +229,6 @@ class EnumStore (dict):
     DERIVED BY ALL STORES
     """
 
-    def __init__ (self):
-
-        self._id = 1
-        return
-    
 
     def xmlwrite (self, fd):
 
@@ -253,31 +242,20 @@ class EnumStore (dict):
             
         return
 
-
     def add (self, group, item, key = None):
+        raise NotImplemented ('please override')
 
-        if key:
-            if key >= self._id:
-                self._id = key + 1
-        else:
-            key = self._id
-            self._id = self._id + 1
-
-        if not self.has_key (group):
-            self [group] = EnumGroup ()
-
-        v = copy.deepcopy (item)
+    def __getitem__ (self, k):
+        raise NotImplemented ('please override')
         
-        v.id    = key
-        v.group = group
-        
-        self [group] [key] = v
+    def __delitem__ (self, k):
+        raise NotImplemented ('please override')
 
-        return key
+    
     
 # --------------------------------------------------
 
-class Database (dict):
+class Database:
 
     ''' This class represents a full bibliographic database.  It also
     looks like a dictionnary, linking a Core.Key with a Core.Entry.
@@ -291,28 +269,9 @@ class Database (dict):
     DERIVED BY ALL STORES
     '''
 
-    def __init__ (self, schema = None, file = None):
-	''' Create a new empty database with the specified schema '''
-
-        self.schema = schema
+    def __init__ (self):
+        raise NotImplemented ('please override')
         
-        self.header = None
-        self.enum   = EnumStore ()
-        self.rs     = ResultSetStore ()
-        
-        self._id = 1
-
-        if file:
-            handler = DatabaseParse (self)
-
-            try:
-                sax.parse (file, handler)
-
-            except ValueError, msg:
-                raise StoreError (_("cannot open '%s': %s") % (file, msg))
-
-	return
-
 
     def add (self, value, id = None):
         """ Insert a new entry in the database.
@@ -324,35 +283,15 @@ class Database (dict):
         proposing a key choice.
         """
 
-        if id:
-            v = int (id)
-            if v >= self._id:
-                self._id = v + 1
-        else:
-            id = Key (self._id)
-            self._id = self._id + 1
+        raise NotImplemented ('please override')
 
-        assert not self.has_key (id), \
-               _("a duplicate key has been generated: %d") % id
 
-        value = copy.deepcopy (value)
-        value.key = id
-        
-        dict.__setitem__ (self, id, value)
-        return id
-    
+    def __len__ (self):
+        raise NotImplemented ('please override')
+
 
     def __setitem__ (self, key, value):
-
-        # Ensure the key is not added, only updated.
-        assert self.has_key (key), \
-               _("use self.add () to add a new entry")
-
-        value = copy.deepcopy (value)
-        value.key = key
-        
-        dict.__setitem__ (self, key, value)
-        return
+        raise NotImplemented ('please override')
 
 
     def query (self, word, name = None):
@@ -378,7 +317,7 @@ class Database (dict):
         for v in self.itervalues ():
             v.xmlwrite (fd)
 
-        for rs in self.rs.values ():
+        for rs in self.rs:
             rs.xmlwrite (fd)
         
         fd.write ('</pyblio-db>\n')
@@ -403,6 +342,12 @@ class DatabaseParse (sax.handler.ContentHandler):
 
         self._i18n = Localize ()
         return
+
+    def parse (self, file):
+
+        sax.parse (file, self)
+        return
+    
 
     def setDocumentLocator (self, locator):
         self.locator = locator
@@ -517,7 +462,7 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'resultset':
-            self._rs = ResultSet (self._attr ('name', attrs))
+            self._rs = self.db.rs.add (self._attr ('name', attrs))
             return
         
         if name == 'attribute':
@@ -647,7 +592,6 @@ class DatabaseParse (sax.handler.ContentHandler):
             return
 
         if name == 'resultset':
-            self.db.rs [self._rs.name] = self._rs
             self._rs = None
             return
         
