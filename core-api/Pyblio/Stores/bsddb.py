@@ -417,7 +417,7 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
     def add (self, k, txn = None):
 
         if not isinstance (k, Store.Key):
-            raise ValueError ('the key must be of type Store.Key')
+            raise ValueError ('the key must be a Store.Key, not %s' % `k`)
 
         k = str (k)
         
@@ -1018,10 +1018,11 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             serial, key = Tools.id_make (serial, key)
             
             self._meta.put ('serial', str (serial), txn = txn)
-            
-            key = Store.Key (self._insert (key, val, txn))
 
+            key = Store.Key (key)
             val.key = key
+            
+            self._insert (key, val, txn)
 
             self.emit ('add', val, txn)
             
@@ -1030,6 +1031,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             raise
 
         txn.commit ()
+        
         return key
     
 
