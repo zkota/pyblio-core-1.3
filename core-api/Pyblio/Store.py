@@ -33,7 +33,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema, Attribute, Exceptions, I18n
+from Pyblio import Schema, Attribute, Exceptions, I18n, XML
 
 
 class StoreError (Exception):
@@ -578,7 +578,7 @@ class Database (object):
 # ==================================================
 
 
-class DatabaseParse (sax.handler.ContentHandler):
+class DatabaseParse (XML.Parser):
 
     def __init__ (self, db):
 
@@ -623,19 +623,6 @@ class DatabaseParse (sax.handler.ContentHandler):
         return
 
 
-    def _error (self, msg):
-        raise sax.SAXParseException (msg, None, self.locator)
-
-
-    def _attr (self, attr, attrs):
-        try:
-            val = attrs [attr]
-        except KeyError:
-            self._error (_("missing '%s' attribute") % attr)
-
-        return val
-    
-            
     def startElement (self, name, attrs):
 
         if self._in_schema:

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<collection>
+ <record>
+  <datafield tag="245" ind1="" ind2="">
+   <subfield code="a">Some recommendations on building proxy caching service</subfield>
+  </datafield>
+  <datafield tag="700" ind1="" ind2="">
+   <subfield code="a">Naumenko, Andrey</subfield>
+  </datafield>
+  <datafield tag="700" ind1="" ind2="">
+   <subfield code="a">Naumenko, Andrey</subfield>
+  </datafield>
+  <datafield tag="773" ind1="" ind2="">
+   <subfield code="p">AACE, WebNet 98 - World Conference of the WWW,Internet and Intranet</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="">
+   <subfield code="u">http://lcawww.epfl.ch/Publications/Naumenko/Naumenko98.pdf</subfield>
+  </datafield>
+ </record>
+</collection>

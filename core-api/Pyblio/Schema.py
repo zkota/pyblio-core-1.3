@@ -34,7 +34,7 @@ from xml import sax
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N
-from Pyblio import I18n
+from Pyblio import I18n, XML
 
 class Schema (dict):
 
@@ -129,7 +129,7 @@ class Attribute:
 # ==================================================
 
     
-class SchemaParse (sax.handler.ContentHandler):
+class SchemaParse (XML.Parser):
 
     """ This class parses the XML format of a Schema """
 
@@ -137,11 +137,6 @@ class SchemaParse (sax.handler.ContentHandler):
         self.schema = schema
         return
 
-    def setDocumentLocator (self, locator):
-        
-        self.locator = locator
-        return
-    
     
     def startDocument (self):
         # Start with an empty schema
@@ -155,17 +150,6 @@ class SchemaParse (sax.handler.ContentHandler):
         self._namedata = None
         return
 
-    def _error (self, msg):
-        raise sax.SAXParseException (msg, None, self.locator)
-
-    def _attr (self, attr, attrs):
-
-        try:
-            val = attrs [attr]
-        except KeyError:
-            self._error (_("missing '%s' attribute") % attr)
-
-        return val
     
     def startElement (self, name, attrs):
 

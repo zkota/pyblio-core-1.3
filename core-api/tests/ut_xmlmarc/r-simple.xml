@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="doctype" type="txo" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>BibTeX Key</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal</name>
+ </attribute>
+
+ <attribute id="note" type="text">
+  <name>Note</name>
+ </attribute>
+
+ <attribute id="number" type="text">
+  <name>Number</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+</pyblio-schema>
+ <txo-group id="doctype">
+ </txo-group>
+
+ <entry id="1">
+  <attribute id="author">
+   <person first="Andrey" last="Naumenko"/>
+   <person first="Andrey" last="Naumenko"/>
+  </attribute>
+  <attribute id="journal">
+   <text>AACE, WebNet 98 - World Conference of the WWW,Internet and Intranet</text>
+  </attribute>
+  <attribute id="title">
+   <text>Some recommendations on building proxy caching service</text>
+  </attribute>
+  <attribute id="url">
+   <url href="http://lcawww.epfl.ch/Publications/Naumenko/Naumenko98.pdf"/>
+  </attribute>
+ </entry>
+</pyblio-db>
