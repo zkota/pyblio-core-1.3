@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="ref" type="reference">
+  <name>Reference</name>
+ </attribute>
+
+ <attribute id="text" type="text">
+  <name>Text</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+ <document id="sample">
+  <name>Sample</name>
+
+  <mandatory id="author"/>
+  <mandatory id="date"/>
+  <mandatory id="ref"/>
+  <mandatory id="text"/>
+  <mandatory id="url"/>
+
+ </document>
+
+</pyblio-schema>
+ <entry id="entry 1" type="sample">
+  <attribute id="author">
+   <person last="Last 1"/>
+   <person last="Last 2"/>
+  </attribute>
+  <attribute id="date">
+   <date year=2003/>
+  </attribute>
+  <attribute id="ref">
+   <reference ref="ref"/>
+  </attribute>
+  <attribute id="text">
+   <text>sample text</text>
+  </attribute>
+  <attribute id="url">
+   <url href="http://pybliographer.org"/>
+  </attribute>
+ </entry>
+</pyblio-db>

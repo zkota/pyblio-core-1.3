@@ -18,3 +18,7 @@ def run (* args):
 
     r = unittest.TextTestRunner ()
     return r.run (full)
+
+def fileeq (a, b):
+
+    assert open (a).read () == open (b).read ()

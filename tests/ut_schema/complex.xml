@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-schema>
- <attribute id="author" type="author">
+ <attribute id="author" type="person">
   <name>Héhé &lt; Huhu</name>
  </attribute>
 

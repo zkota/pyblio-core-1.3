@@ -26,37 +26,27 @@ Please note: this is an interface definition, but it can also be used
 as a base class.
 '''
 
+from xml import sax
+from xml.sax.saxutils import escape, quoteattr
+
 from gettext import gettext as _
 
-from Pyblio.Schema import Schema
+from Pyblio import Schema
 
 
-class Key (object):
+class Key (str):
 
     ''' A key uniquely identifies an entry in a database '''
 
-    def __init__ (self, key):
-        self._key = key
-	return
-
-    def __repr__ (self):
-	return 'Key (%s)' % `self._key`
-
-    def __cmp__ (self, other):
-	return cmp (self._key, other._key)
-
-    def __hash__ (self):
-	return hash (self._key)
-
-    def xmlwrite (self, fd):
-        pass
+    pass
 
 
 class Entry (dict):
 
     """
     A database entry. It behaves like a dictionnary, which returns a
-    attribute for each key, depending on the database schema.
+    list of attributes for each key. The attributes types depend on
+    the database schema.
 
     The entry.key is an instance of Core.Key, and has to be unique
     over the database.
@@ -86,7 +76,23 @@ class Entry (dict):
         return
 
     def xmlwrite (self, fd):
-        pass
+        fd.write (' <entry id=%s type=%s>\n' %
+                  (quoteattr (self.key), quoteattr (self.type.id)))
+        
+        keys = self.keys ()
+        keys.sort ()
+
+        for k in keys:
+            fd.write ('  <attribute id=%s>\n' % quoteattr (k))
+            for v in self [k]:
+                fd.write ('   ')
+                v.xmlwrite (fd)
+                fd.write ('\n')
+            fd.write ('  </attribute>\n')
+            
+        fd.write (' </entry>\n')
+        return
+    
 
 
 class Database (dict):
@@ -105,10 +111,105 @@ class Database (dict):
         fd.write ('<pyblio-db>\n')
 
         self.schema.xmlwrite (fd, embedded = True)
-        
+
         for v in self.itervalues ():
             v.xmlwrite (fd)
         
         fd.write ('</pyblio-db>\n')
         return
+
+
+# ==================================================
+
+
+class DatabaseParse (sax.handler.ContentHandler):
+
+    def __init__ (self):
+
+        self.db = Database (None)
+        
+        self._schema = Schema.Schema ()
+        self._sparse = Schema.SchemaParse (self._schema)
+
+        self._in_schema = False
+        return
+
+    def setDocumentLocator (self, locator):
+        self.locator = locator
+        self._sparse.setDocumentLocator (locator)
+        return
     
+    
+    def startDocument (self):
+        self._started = False
+
+        self._entry = None
+        return
+
+
+    def _error (self, msg):
+        raise sax.SAXParseException (msg, None, self.locator)
+
+
+    def _attr (self, attr, attrs):
+        try:
+            val = attrs [attr]
+        except KeyError:
+            self._error (_("missing '%s' attribute") % attr)
+
+        return val
+    
+    def startElement (self, name, attrs):
+
+        if self._in_schema:
+            self._sparse.startElement (name, attrs)
+            return
+        
+
+        if name == 'pyblio-schema':
+            self._in_schema = True
+            
+            self._sparse.startDocument ()
+            self._sparse.startElement (name, attrs)
+            return
+
+        if name == 'pyblio-db' and not self._started:
+            self._started = True
+            return
+        
+        if not self._started:
+            self._error (_("this is not a pybliographer database"))
+        
+        self._error ("unknown tag '%s'" % name)
+
+
+    def characters (self, data):
+        if self._in_schema:
+            self._sparse.characters (data)
+            return
+        
+        return
+
+    def endElement (self, name):
+
+        if self._in_schema:
+            if name == 'pyblio-schema':
+                self._in_schema = False
+                self._sparse    = None
+                
+                self.db.schema = self._schema
+
+            else:
+                self._sparse.endElement (name)
+                
+            return
+        
+        return
+
+
+def open (file):
+    
+    handler = DatabaseParse ()
+    sax.parse (file, handler)
+    
+    return handler.db

@@ -2,7 +2,7 @@
 
 <pyblio-db>
 <pyblio-schema>
- <attribute id="author" type="author">
+ <attribute id="author" type="person">
   <name>Author</name>
   <name lang="en">Author (en)</name>
  </attribute>

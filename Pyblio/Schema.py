@@ -33,35 +33,13 @@ from gettext import gettext as _
 from xml import sax
 from xml.sax.saxutils import escape
 
-from Pyblio import Fields
-
-
-_mapping = {
-    'author'   : Fields.AuthorGroup,
-    'date'     : Fields.Date,
-    'text'     : Fields.Text,
-    'url'      : Fields.URL,
-    'reference': Fields.Reference,
-    }
-
-_revmap = {}
-
-for k, v in _mapping.items ():
-    _revmap [v] = k
-
-
+from Pyblio.Attribute import N_to_C, C_to_N
 
 class Schema:
 
-    def __init__ (self, file = None, template = None):
+    def __init__ (self):
 
         self.documents = {}
-
-        if not (file or template): return
-
-        handler = SchemaParse (self)
-
-        sax.parse (file, handler)
         return
 
 
@@ -166,7 +144,8 @@ class Attribute:
 
     def xmlwrite (self, fd):
 
-        fd.write (' <attribute id="%s" type="%s">\n' % (self.id, _revmap [self.type]))
+        fd.write (' <attribute id="%s" type="%s">\n' % (
+            self.id, C_to_N [self.type]))
 
         names = self.names.keys ()
         names.sort ()
@@ -178,7 +157,10 @@ class Attribute:
 
         fd.write (' </attribute>\n')
         return
-    
+
+
+# ==================================================
+
     
 class SchemaParse (sax.handler.ContentHandler):
 
@@ -230,7 +212,7 @@ class SchemaParse (sax.handler.ContentHandler):
     
     def startElement (self, name, attrs):
 
-        if name == 'pyblio-schema':
+        if name == 'pyblio-schema' and not self._started:
             self._started = True
             return
         
@@ -255,7 +237,7 @@ class SchemaParse (sax.handler.ContentHandler):
 
             tname = self._attr ('type', attrs)
             try:
-                self._attribute.type = _mapping [tname]
+                self._attribute.type = N_to_C [tname]
             except KeyError:
                 self._error ('unknown attribute type "%s"' % tname)
                 
@@ -333,4 +315,13 @@ class SchemaParse (sax.handler.ContentHandler):
             elif self._document:
                 self._document.names [self._namelang] = self._namedata
         return
+
+
+
+def open (file):
+    s = Schema ()
     
+    handler = SchemaParse (s)
+    sax.parse (file, handler)
+
+    return s
