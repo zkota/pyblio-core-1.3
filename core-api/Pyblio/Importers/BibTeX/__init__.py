@@ -26,6 +26,7 @@
 import re, os, string
 
 from Pyblio.Importers import lex, yacc
+from Pyblio.Importers.BibTeX import Reader
 
 from Pyblio import Attribute, Store, Exceptions, Tools
 
@@ -54,244 +55,7 @@ class IBibTeX:
         pass
 
 
-    
-class Symbol (str):
-    """ A literal symbol, predefined or defined by the user """
 
-    def flat (self):
-        return self
-
-    def __repr__ (self):
-        return 'Symbol (%s)' % str.__repr__ (self)
-
-    def subst (self):
-        return [self]
-
-    def tobib (self):
-        return self
-
-    def execute (self, env):
-        return env.strings [self]
-
-
-class Command (object):
-    """ A LaTeX \-command """
-    
-    def __init__ (self, cmd):
-        self._cmd = cmd
-        return
-    
-    def __repr__ (self):
-        return 'Cmd (%s)' % `self._cmd`
-
-    def flat (self):
-        return self._cmd
-
-    def subst (self):
-        return [self]
-
-    def tobib (self):
-        return '\\%s' % self._cmd
-
-
-class Text (unicode):
-
-    def flat (self):
-        return self
-    
-    def __repr__ (self):
-        return 'Text (%s)' % unicode.__repr__ (self)
-
-    def subst (self):
-        return [self]
-
-    def tobib (self):
-        return self
-    
-    def execute (self, env):
-        return self
-
-class Block (object):
-    """ A textual block, as a sequence of text and commands """
-
-    def __init__ (self, opening, closing, data = None):
-        self._o = opening
-        self._c = closing
-        self._d = data or ()
-        return
-    
-    def flat (self):
-        r = ''
-        for o in self._d:
-            r = r + o.flat ()
-
-        return r
-
-    def execute (self, env):
-        final = []
-        stack = [] + list (self._d)
-        
-        while stack:
-            d = stack.pop (0)
-            
-            if isinstance (d, Command):
-                r = env.run (d._cmd, stack)
-            else:
-                r = d.execute (env)
-
-            final.append (r)
-
-        return Block (self._o, self._c, final)
-
-
-    def join (self):
-        return list (self._d)
-    
-    def __repr__ (self):
-        return 'Block (%s, %s, %s)' % (`self._o`,
-                                       `self._c`,
-                                       `self._d`)
-
-    def subst (self):
-        r = []
-        for d in self._d:
-            try:
-                r = r + d.subst ()
-            except AttributeError:
-                print repr (d)
-        return r
-
-    def tobib (self):
-        return '%s%s%s' % (
-            self._o,
-            string.join (map (lambda x: x.tobib (), self._d), ''),
-            self._c)
-
-
-class Join (list):
-    """ A value, as a concatenation of blocks """
-    
-    def __repr__ (self):
-        return 'Join (%s)' % list.__repr__ (self)
-
-    def subst (self):
-        v = []
-        for data in self:
-            v = v + data.subst ()
-        
-        return v
-
-    def join (self):
-        r = []
-        for v in self:
-            r += v.join ()
-        return r
-
-    def execute (self, env):
-        return map (lambda x: x.execute (env), self)
-
-
-    def flat (self):
-        return string.join (map (lambda x: x.flat (), self), '')
-
-
-    def tobib (self):
-        return string.join (map (lambda x: x.tobib (), self), ' # ')
-    
-
-class Record (dict):
-    """ A bibliographic entry """
-    
-    def __init__ (self, tp, key):
-
-        self.type = tp
-        self.key  = key
-        return
-
-    def __repr__ (self):
-        return 'Record (%s, %s, %s)' % (
-            self.type, self.key, dict.__repr__ (self))
-
-
-class Comment (str):
-    """ A bibtex file comment """
-    
-    def __repr__ (self):
-        return 'Comment (%s)' % str.__repr__ (self)
-
-
-_basemap = {
-    "'": {
-    'A': Text (u"Á"),
-    'E': Text (u"É"),
-    'I': Text (u"Í"),
-    'O': Text (u"Ó"),
-    'U': Text (u"Ú"),
-    'Y': Text (u"Ý"),
-    'a': Text (u"á"),
-    'e': Text (u"é"),
-    'i': Text (u"í"),
-    'o': Text (u"ó"),
-    'u': Text (u"ú"),
-    'y': Text (u"ý"),
-    },
-    
-    "`": {
-    'A': Text (u"À"),
-    'E': Text (u"È"),
-    'I': Text (u"Ì"),
-    'O': Text (u"Ò"),
-    'U': Text (u"Ù"),
-    'a': Text (u"à"),
-    'e': Text (u"è"),
-    'i': Text (u"ì"),
-    'o': Text (u"ò"),
-    'u': Text (u"ù"),
-    },
-    
-    "^": {
-    'A': Text (u"Â"),
-    'E': Text (u"Ê"),
-    'I': Text (u"Î"),
-    'O': Text (u"Ô"),
-    'U': Text (u"Û"),
-    'a': Text (u"â"),
-    'e': Text (u"ê"),
-    'i': Text (u"î"),
-    'o': Text (u"ô"),
-    'u': Text (u"û"),
-    },
-
-    "¨": {
-    'A': Text (u"Ä"),
-    'E': Text (u"Ë"),
-    'I': Text (u"Ï"),
-    'O': Text (u"Ö"),
-    'U': Text (u"Ü"),
-    'a': Text (u"ä"),
-    'e': Text (u"ë"),
-    'i': Text (u"ï"),
-    'o': Text (u"ö"),
-    'u': Text (u"ü"),
-    'y': Text (u"ÿ"),
-    },
-
-    "c": {
-    'C': Text (u"Ç"),
-    'c': Text (u"ç"),
-    },
-
-    
-    "~": {
-    'A': Text (u"Ã"),
-    'O': Text (u"Õ"),
-    'a': Text (u"ã"),
-    'o': Text (u"õ"),
-    'n': Text (u"ñ"),
-    'N': Text (u"Ñ"),
-    },
-    
-}
 
 class Environ (object):
 
@@ -303,24 +67,24 @@ class Environ (object):
     def run (self, cmd, stack):
 
         try:
-            m = _basemap [cmd]
+            m = Reader._basemap [cmd]
         except KeyError:
             return Text ('?')
 
         # If we have a map, we need the single next character
         while 1:
-            if isinstance (stack [0], Text):
+            if isinstance (stack [0], Reader.Text):
                 tt = stack.pop (0)
 
                 if len (tt) > 1:
                     t = tt [0]
-                    stack.insert (0, Text (tt [1:]))
+                    stack.insert (0, Reader.Text (tt [1:]))
                 else:
                     t = tt
 
                 return m [t]
 
-            elif isinstance (stack [0], Block):
+            elif isinstance (stack [0], Reader.Block):
                 # Move this block back one step
                 d = list (stack.pop (0)._d)
 
@@ -718,6 +482,8 @@ yacc.yacc (tabmodule = (_pth, _mod))
 _lf_re = re.compile ('N+I+')
 _fl_re = re.compile ('I+N+')
 
+_split_re = re.compile (r'[,.]|\s+')
+
 class Importer (object):
 
     def __init__ (self, charset = 'ISO8859-1'):
@@ -730,6 +496,7 @@ class Importer (object):
             Attribute.URL:    self.url_add,
             Attribute.Date:   self.date_add,
             }
+        
         return
 
     def url_add (self, field, stream):
@@ -745,24 +512,44 @@ class Importer (object):
     
 
     def text_add (self, field, stream):
-        
         self.record [field] = [Attribute.Text (stream.flat ())]
         return
 
     def person_add (self, field, stream):
 
         ''' Parse a stream of tokens as a series of person names '''
-
+        
         # The first level of the parsing is of interest, as non-person
         # names can be written for instance:
         # author = "{Name of a Company} and {Another One}"
 
+
         # Join joins, ie strings written as {toto} # {tutu}
         stream = stream.join ()
 
+        # ...and expand the low-level text in fragment split on "," "." and space
+        stream, os = [], stream
+        for v in os:
+            if not isinstance (v, Reader.Text):
+                stream.append (v)
+                continue
+
+            i = 0
+            for m in _split_re.finditer (v):
+                s, e = m.start (0), m.end (0)
+                if i != s: stream.append (Reader.Text (v [i:s]))
+
+                sep = Reader.Text (v [s:e])
+                if sep [0] in ' \n\t': sep = Reader.Text (' ')
+                stream.append (sep)
+                
+                i = e
+
+            if i < len (v): stream.append (Reader.Text (v [i:]))
+            
         # These high-level groups are separated by 'and' keywords
         avail  = []
-        
+
         while 1:
             try:
                 i = stream.index ('and')
@@ -842,10 +629,10 @@ class Importer (object):
         
         def _person_decode (stream):
 
-            if len (stream) == 1 and isinstance (stream [0], Block):
+            if len (stream) == 1 and isinstance (stream [0], Reader.Block):
                 return Attribute.Person (last = stream [0].flat ())
 
-            stream = _wordify (Block ('', '', stream))
+            stream = _wordify (Reader.Block ('', stream))
 
             # Check for ',' syntax for names
             comma = stream.count (',')
@@ -888,7 +675,6 @@ class Importer (object):
                         return Attribute.Person (first = ' '.join (stream [:-1]),
                                                  last  = stream [-1])
                     
-                    
                     raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
                         repr (stream), repr (tt)))
                     
@@ -906,8 +692,11 @@ class Importer (object):
 
     
     def comment_add (self, stream):
-
         # by default, we drop comments
+        return
+
+    def string_add (self, stream):
+        # by default, we drop strings
         return
 
 
@@ -918,7 +707,7 @@ class Importer (object):
 
     def type_add (self, data):
 
-        self.record ['doctype'] = [Attribute.Txo (self.doctype [data])]
+        self.record ['doctype'] = [Attribute.Txo (self.doctype [data.lower ()])]
         return
 
     def record_begin (self):
@@ -942,16 +731,19 @@ class Importer (object):
         self._mapping [attp.type] (k, v)
         return
     
-    def record_parse (self, data):
+    def record_parse (self, record):
 
+        if record.key is None and len (record.fields) == 1:
+            return self.string_add (record)
+        
         self.record = Store.Record ()
         self.record_begin ()
 
-        tp, key, val = data.type, data.key, data
+        tp, key, val = record.type, record.key, record.fields
 
         self.id_add (key)
         
-        for k, v in val.iteritems ():
+        for k, v in val:
             self.record_dispatch (tp, k.lower (), v)
             
         # Add the document type
@@ -968,20 +760,18 @@ class Importer (object):
     def parse (self, fd, db):
 
         self.db = db
-        
-        datalist = yacc.parse (fd.read ().decode (self.charset), debug = 0)
 
         self.doctype = {}
 
         for v in db.txo ['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
-        for data in datalist:
+        for data in Reader.read (fd):
 
-            if isinstance (data, Comment):
+            if isinstance (data, Reader.Comment):
                 self.comment_add (data)
                 continue
-
+            
             self.record_parse (data)
             
         return db

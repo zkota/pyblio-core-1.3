@@ -4,6 +4,10 @@ import os, pybut, sys
 import StringIO
 
 from Pyblio.Importers import BibTeX
+from Pyblio.Importers.BibTeX import Reader
+
+from Pyblio.Importers.BibTeX.Reader import Record, Block, Cmd, Text, Join, Comment, ATComment
+
 from Pyblio import Store, Schema
 
 class WithComments (BibTeX.Importer):
@@ -22,6 +26,104 @@ class WithComments (BibTeX.Importer):
         return
     
 
+class TestBibTeXReader (pybut.TestCase):
+
+
+    def _cmp (self, bib, obj):
+
+        io = StringIO.StringIO (bib.encode ('utf-8'))
+        re = list (Reader.read (io))
+
+        ri = eval (obj)
+
+        assert ri == re, 'got\n\t %s\n instead of\n\t %s' % (
+            repr (re), repr (ri))
+        
+        
+    def testComment (self):
+
+        comment = u'''
+% a simple test, héhé
+
+Random comments
+'''
+        
+        io = StringIO.StringIO (comment.encode ('utf-8'))
+        re = list (Reader.read (io))
+
+        assert re == [Reader.Comment (comment)]
+
+    def testArobasComment (self):
+
+        comment = u'@comment (gronf'
+        
+        io = StringIO.StringIO (comment.encode ('utf-8'))
+        re = list (Reader.read (io))
+
+        assert re == [Reader.Comment (' (gronf')], 'got %s' % re
+
+    def testMixed (self):
+
+        c = u'''
+toto
+@comment gronf
+tutu
+'''
+        io = StringIO.StringIO (c.encode ('utf-8'))
+        re = [ type (x) for x in Reader.read (io)]
+
+        assert re == [Reader.Comment, Reader.ATComment, Reader.Comment]
+
+    def testBraces (self):
+
+        b = '''@article { toto, author = { Gobry, {F}. } }'''
+        o = """[Record (u'article', u'toto', [(u'author', [Block ('{', [ Text (u' Gobry, '),Block ('{', [Text (u'F')]),Text (u'. ')]) ])])]"""
+
+        self._cmp (b, o)
+                   
+    def testParen (self):
+
+        b = '''@article ( toto, author = { Gobry, {F}. } )'''
+        o = """[Record (u'article', u'toto', [(u'author', [Block ('{', [ Text (u' Gobry, '),Block ('{', [Text (u'F')]),Text (u'. ')]) ])])]"""
+
+        self._cmp (b, o)
+                   
+    def testQuote (self):
+
+        b = '''@article ( toto, author = " Gobry, {F}. " )'''
+        o = """[Record (u'article', u'toto', [(u'author', [Block ('\"', [ Text (u' Gobry, '),Block ('{', [Text (u'F')]),Text (u'. ')]) ])])]"""
+
+        self._cmp (b, o)
+                   
+    def testQuoteCompact (self):
+
+        b = '''@article(toto,author="Gobry,{F}.")'''
+        o = """[Record (u'article', u'toto', [(u'author', [Block ('\"', [ Text (u'Gobry,'),Block ('{', [Text (u'F')]),Text (u'.')]) ])])]"""
+
+        self._cmp (b, o)
+                   
+    def testString (self):
+        
+        b = '''@string (gobry="Gobry,{F}.")'''
+        o = """[Record (u'string', None, [(u'gobry', [Block ('\"', [ Text (u'Gobry,'),Block ('{', [Text (u'F')]),Text (u'.')]) ])])]"""
+
+        self._cmp (b, o)
+
+    def testJoin (self):
+        
+        b = '''@article(toto,gobry="Gobry,{F}." # " and Fobry, G.")'''
+        o = """[Record (u'article', u'toto', [(u'gobry', Join ([Block ('\"', [Text (u'Gobry,'), Block ('{', [Text (u'F')]), Text (u'.')]), Block ('\"', [Text (u' and Fobry, G.')])]))])]"""
+
+        self._cmp (b, o)
+
+    def testBackslash (self):
+        
+        b = '''@article(toto, gobry = \"Gobry,\\{F\\}.\" )'''
+        o = """[Record (u'article', u'toto', [(u'gobry', Join ([Block ('\"', [Text (u'Gobry,'), Cmd (u'{'), Text (u'F'), Cmd (u'}'), Text (u'.')])]))])]"""
+
+        self._cmp (b, o)
+
+        
 class TestBibTeXImport (pybut.TestCase):
 
     """ Perform tests on the Pyblio.Importers.BibTeX module """
@@ -65,11 +167,16 @@ class TestBibTeXImport (pybut.TestCase):
     def testComment (self):
         """ Parse bibtex comments """
 
-        expected = [u' This is a comment',
-                    u' This is a { comment too',
-                    u' {mee too}',
-                    u" Comments in the middle won't be kept",
-                    u' (parenthesis are also allowed)']
+        expected = [ATComment (u' This is a comment'),
+                    Comment (u'\n'),
+                    ATComment (u' This is a { comment too'),
+                    Comment (u'\n'),
+                    ATComment (u' {mee too}'),
+                    Comment (u'\n'),
+                    Comment (u'\n'),
+                    ATComment (u" Comments in the middle won't be kept"),
+                    Comment (u'\n'),
+                    ATComment (u' (parenthesis are also allowed)')]
         
         self._check ('comment')
 
@@ -174,6 +281,6 @@ class TestBibTeXExport (pybut.TestCase):
         return
     
         
-suite = pybut.suite (TestBibTeXImport, TestBibTeXExport)
+suite = pybut.suite (TestBibTeXReader, TestBibTeXImport, TestBibTeXExport)
 
 if __name__ == '__main__':  pybut.run (suite)
