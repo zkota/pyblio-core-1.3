@@ -33,7 +33,7 @@
 </pyblio-schema>
  <txo-group id="doctype">
   <txo-item id="1">
-   <name>Article</name>
+   <name lang="C">Article</name>
   </txo-item>
  </txo-group>
 
