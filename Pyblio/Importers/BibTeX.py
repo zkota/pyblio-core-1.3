@@ -152,18 +152,18 @@ def p_single_comment (t):
 
 def p_comment_data (t):
     ''' comment_data : AT
-                | RBRACE
-                | LBRACE
-                | SPACE
-                | COMMA
-                | LITERAL
-                | EQUALS
-                | SHARP
-                | QUOTE
-                | ESCAPE
-                | SYMBOL
-                | NUMBER
-                | COMMENT '''
+                     | RBRACE
+                     | LBRACE
+                     | SPACE
+                     | COMMA
+                     | LITERAL
+                     | EQUALS
+                     | SHARP
+                     | QUOTE
+                     | ESCAPE
+                     | SYMBOL
+                     | NUMBER
+                     | COMMENT '''
     t [0] = t [1]
     return
 
@@ -223,9 +223,19 @@ def p_simple_brace_value (t):
     t [0] = ('{}', t [2])
     return
 
+def p_simple_brace_value_empty (t):
+    ''' simple_value : LBRACE RBRACE '''
+    t [0] = ('{}', ())
+    return
+
 def p_simple_quote_value (t):
     ''' simple_value : QUOTE   quote_data_list  QUOTE '''
     t [0] = ('""', t [2])
+    return
+
+def p_simple_quote_value_empty (t):
+    ''' simple_value : QUOTE QUOTE '''
+    t [0] = ('""', ())
     return
 
 def p_simple_atom_value (t):
@@ -245,6 +255,15 @@ def p_brace_data_list (t):
     t [0] = t [1] + t [2]
     return
 
+def p_sub_brace_data (t):
+    ''' brace_data : LBRACE brace_data_list RBRACE '''
+    t [0] = (('{}', t [2]),)
+    return
+    
+def p_sub_brace_data_empty (t):
+    ''' brace_data : LBRACE RBRACE '''
+    t [0] = (('{}', ()),)
+    return
     
 def p_brace_data (t):
     ''' brace_data : misc_data
@@ -263,10 +282,18 @@ def p_quote_data_list (t):
     t [0] = t [1] + t [2]
     return
 
+def p_sub_quote_data (t):
+    ''' quote_data : LBRACE quote_data_list RBRACE '''
+    t [0] = (('{}', t [2]),)
+    return
+
+def p_sub_quote_data_empty (t):
+    ''' quote_data : LBRACE RBRACE '''
+    t [0] = (('{}', ()),)
+    return
+
 def p_quote_data (t):
-    ''' quote_data : misc_data
-                   | RBRACE
-                   | LBRACE '''
+    ''' quote_data : misc_data '''
     t [0] = (t [1],)
     return
 
@@ -325,7 +352,8 @@ def p_empty (t):
     return
 
 def p_error (t):
-    raise RuntimeError ('parser error: %s' % t)
+    line = t.lineno
+    raise RuntimeError ('parser error: %d: %s' % (line, t))
 
 
 
@@ -480,7 +508,7 @@ def file_import (file, encoding, db, ** kargs):
 
     in_head  = True
     header   = []
-    
+
     for data in datalist:
 
         if data [0] == '%':
