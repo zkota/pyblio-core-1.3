@@ -331,6 +331,8 @@ class Database (Store.Database):
 
     def add (self, val, id = None):
 
+        val = self.validate (val)
+
         # Be careful to always point after the last serial id used.
         txn = self._env.txn_begin ()
 
@@ -359,6 +361,8 @@ class Database (Store.Database):
 
         assert self.has_key (key), \
                _('entry %s does not exist') % `key`
+
+        val = self.validate (val)
 
         txn = self._env.txn_begin ()
 

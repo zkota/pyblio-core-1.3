@@ -32,7 +32,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema, Attribute
+from Pyblio import Schema, Attribute, Exceptions
 
 
 class StoreError (Exception):
@@ -273,7 +273,7 @@ class Database:
         raise NotImplemented ('please override')
         
 
-    def add (self, value, id = None):
+    def add (self, value, key = None):
         """ Insert a new entry in the database.
 
         New entries MUST be added with this method, not via an update
@@ -301,13 +301,49 @@ class Database:
     def save (self):
         raise NotImplemented ('please override')
 
+    def validate (self, entry):
+        """ Check an entry for conformance against the Schema. This
+        method may modify the entry to normalize certain fields."""
 
-    def xmlwrite (self, fd, schema = True):
+        for k in entry.keys ():
+
+            vals = entry [k]
+
+            if type (vals) not in (list, tuple):
+                vals      = [ vals ]
+                entry [k] = vals
+                
+            elif len (vals) == 0:
+                del entry [k]
+                continue
+
+            # check type and arity
+            try:
+                s = self.schema [k]
+                
+            except KeyError:
+                raise Exceptions.SchemaError (_('unknown attribute %s') % `k`)
+
+            for v in vals:
+                if not isinstance (v, s.type):
+                    raise Exceptions.SchemaError (_('attribute %s has an incorrect type') % k)
+
+            l = len (vals)
+            lb, ub = s.range
+            
+            if (lb is not None and l < lb) or (ub is not None and l > ub):
+                raise Exceptions.SchemaError (_('attribute %s should have %s - %s values, not %d') % (
+                    k, str (lb), str (ub), l))
+        
+        return entry
+
+    def xmlwrite (self, fd):
+        """ Output a database in XML format """
+        
         fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
         fd.write ('<pyblio-db>\n')
 
-        if schema:
-            self.schema.xmlwrite (fd, embedded = True)
+        self.schema.xmlwrite (fd, embedded = True)
 
         self.enum.xmlwrite (fd)
 

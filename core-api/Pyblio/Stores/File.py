@@ -157,6 +157,8 @@ class Database (dict, Store.Database):
 
         value = copy.deepcopy (value)
         value.key = id
+
+        value = self.validate (value)
         
         dict.__setitem__ (self, id, value)
         return id
@@ -170,6 +172,8 @@ class Database (dict, Store.Database):
 
         value = copy.deepcopy (value)
         value.key = key
+
+        value = self.validate (value)
         
         dict.__setitem__ (self, key, value)
         return

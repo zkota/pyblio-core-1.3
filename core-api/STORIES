@@ -2,6 +2,14 @@
 
 * TO DO
 
+** [X] Schemas checks
+
+Schemas contain information about attributes (type, cardinality,...),
+so that an attribute can have exactly one occurence, O..N, 1..N,
+... Inserting/updating an entry in the database cannot occur if the
+entry does not match the schema definition.
+
+
 ** [ ] Refine the content of a result set
 
 Create a result set. Perform a query on its content. All queries
@@ -38,12 +46,6 @@ When a phrase or person name is repeated frequently, a shortcut can be
 defined, and used in place of the corresponding attribute. When the
 shortcut content is updated, all the entries that used it are also
 updated.
-
-** [ ] Schemas contain information about attributes (type, cardinality,...)
-
-So that an attribute can have exactly one occurence, O..N, 1..N,
-... Inserting/updating an entry in the database cannot occur if the
-entry does not match the schema definition.
 
 * DONE
 
