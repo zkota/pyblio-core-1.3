@@ -183,13 +183,17 @@ class Database:
 
     def __setitem__ (self, key, val):
         assert self.has_key (key)
+
+        self._idxdel ('%.16x' % key)
         self._insert (key, val)
         return
 
 
     def __delitem__ (self, key):
-
-        self._db.delete ('%.16x' % key)
+        id = '%.16x' % key
+        
+        self._idxdel (id)
+        self._db.delete (id)
         return
     
 
@@ -206,10 +210,23 @@ class Database:
         return True
 
 
-    def _insert (self, key, val):
+    def _idxdel (self, id):
+        """ Remove any secondary index belonging to the entry """
+
+        cursor = self._idx.cursor ()
+        data   = cursor.first ()
         
-        id  = '%.16x' % key
-        idx = []
+        while 1:
+            if data is None: break
+            
+            if data [1] == id:
+                cursor.delete ()
+
+            data = cursor.next ()
+        return
+
+
+    def _idxadd (self, id, val):
         
         for attribs in val.values ():
             for attrib in attribs:
@@ -217,11 +234,19 @@ class Database:
                 for idx in attrib.index ():
                     idx = idx.encode ('utf-8')
                     self._idx.put (idx, id)
+        return
+
+    
+    def _insert (self, key, val):
         
+        id  = '%.16x' % key
+        
+        self._idxadd (id, val)
         val = pickle.dumps (val)
         
         self._db.put (id, val)
         return id
+
 
     def query (self, word, sort, name = None):
 

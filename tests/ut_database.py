@@ -151,8 +151,45 @@ class TestContent (pybut.TestCase):
         
         checkpoint ()
         return
+
+
+    def testIndexUpdate (self):
+        """ Check for index coherency upon modifications """
+
+        e = Store.Entry (self.db.schema ['article'])
+
+        e ['title'] = [ Attribute.Text ('a') ]
+        a = self.db.add (e)
+
+        e ['title'] = [ Attribute.Text ('b') ]
+        b = self.db.add (e)
+
+        def check (res):
+
+            for w, r in zip (('a', 'b', 'c'), res):
+
+                rs = map (None, self.db.query (w, 'title'))
+                assert rs == r, \
+                       'for %s: expected %s, got %s' % (w, r, rs)
+            return
+
+        # check initial state
+        check (([a], [b], []))
+
+        # modify an entry
+        e ['title'] = [ Attribute.Text ('c') ]
+        self.db [b] = e
+
+        check (([a], [], [b]))
+
+        # remove an entry
+        del self.db [a]
+        check (([], [], [b]))
+        
+        return
+
     
-    
+        
     def testIterate (self):
         """ Loop over the db content """
         
