@@ -18,6 +18,38 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+"""
+Store implementation on top of Berkeley DB (>= 4.1)
+
+Tables in use:
+
+* database/entries:
+
+  key:   string value of an entry key
+  value: Store.Entry as a pickled object
+
+* database/meta:
+
+  key:   a meta parameter (next available key,...)
+  value: its value
+
+* database/enum:
+
+  key:   id of the enum
+  value: pickled dict containing the values
+
+* index/full:
+
+  key:   the indexed value
+  value: the entry that contains the value
+
+* resultset/<id>
+
+  key:   string value of the entry's key
+  value: no meaning
+
+
+"""
 from gettext import gettext as _
 
 import os, shutil, copy, sys, traceback
@@ -84,19 +116,24 @@ class RSDB (object):
 
 class ResultSet (Store.ResultSet):
 
-    def __init__ (self, rs, db, env, meta, id, permanent = False):
+    def __init__ (self, _db, _env, _meta, id,
+                  permanent = False, txn = None):
+        
         # RS id as a string and as an integer
         self.id  = id
         self._id = str (id)
         
         self._name = None
 
-        self._db   = db
-        self._rs   = rs
-        self._env  = env
-        self._meta = meta
+        self._db   = _db
+        self._env  = _env
+        self._meta = _meta
         
         self._permanent = permanent
+
+        self._rs = db.DB (self._env)
+        self._rs.open ('resultset', self._id, db.DB_BTREE,
+                       db.DB_CREATE, txn = txn)
         return
 
     def _name_set (self, name):
@@ -129,13 +166,10 @@ class ResultSet (Store.ResultSet):
 
     def iterkeys (self):
         c = self._rs.cursor ()
-        c.set (self._id + '/')
+        d = c.first ()
         
-        d = c.next ()
         while d:
-            rs, key = d [0].split ('/')
-            if rs != self._id: break
-
+            key = d [0]
             yield Store.Key (key)
 
             d = c.next ()
@@ -147,12 +181,10 @@ class ResultSet (Store.ResultSet):
 
     def itervalues (self):
         c = self._rs.cursor ()
-        c.set (self._id + '/')
+        d = c.first ()
         
-        d = c.next ()
         while d:
-            rs, key = d [0].split ('/')
-            if rs != self._id: break
+            key = d [0]
 
             k = Store.Key (key)
             yield _pl (self._db.get (key))
@@ -163,14 +195,11 @@ class ResultSet (Store.ResultSet):
 
     
     def iteritems (self):
-
         c = self._rs.cursor ()
-        c.set (self._id + '/')
+        d = c.first ()
         
-        d = c.next ()
         while d:
-            rs, key = d [0].split ('/')
-            if rs != self._id: break
+            key = d [0]
 
             k = Store.Key (key)
             yield k, _pl (self._db.get (key))
@@ -185,7 +214,7 @@ class ResultSet (Store.ResultSet):
         txn = self._env.txn_begin (txn)
 
         try:
-            self._rs.put (self._id + '/' + str (k), '', txn = txn)
+            self._rs.put (str (k), '', txn = txn)
         except:
             txn.abort ()
             raise
@@ -198,7 +227,7 @@ class ResultSet (Store.ResultSet):
         txn = self._env.txn_begin (txn)
 
         try:
-            self._rs.delete (self._id + '/' + str (k), txn = txn)
+            self._rs.delete (str (k), txn = txn)
         except:
             txn.abort ()
             raise
@@ -219,24 +248,12 @@ class ResultSet (Store.ResultSet):
             if avail.has_key (self.id):
                 
                 del avail [self.id]
-            
                 self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
 
-                # ... and discard the whole set
-                c = self._rs.cursor (txn = txn)
-                c.set (self._id + '/')
+                self._rs.close ()
 
-                while 1:
-                    c.delete ()
-                    
-                    d = c.next ()
-                    if d is None: break
-                    
-                    rs, key = d [0].split ('/')
-                    if rs != self._id: break
-
-                c.close ()
-            
+                db.DB (self._env).remove ('resultset', self._id)
+                
         except:
             # exceptions in __del__ methods are not reported by default
             etype, value, tb = sys.exc_info ()
@@ -270,23 +287,28 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         self._env  = _env
         self._meta = _meta
         
-        self._rs = db.DB (self._env)
-        self._rs.open ('pybliographer', 'rs', db.DB_BTREE,
-                       db.DB_CREATE, txn = txn)
-
         (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
-        # initialize with the existing result sets
-        for rsid, data in avail.items ():
-            name, status = data
+        txn = self._env.txn_begin (parent = txn)
+
+        try:
+            # initialize with the existing result sets
+            for rsid, data in avail.items ():
+                name, status = data
             
-            rs = ResultSet (self._rs, self._db, self._env, self._meta, rsid, status)
-            rs._name = name
+                rs = ResultSet (self._db, self._env, self._meta, rsid, status, txn = txn)
+                rs._name = name
 
-            self.register ('item-delete', rs._on_delete)
+                self.register ('item-delete', rs._on_delete)
 
-            # assume some non-permanent result sets might still exist
-            if status: self [rsid] = rs
+                # assume some non-permanent result sets might still exist
+                if status: self [rsid] = rs
+
+            txn.commit ()
+
+        except:
+            txn.abort ()
+            raise
         
         return
     
@@ -343,18 +365,15 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
             
             self._meta.put ('rs', _ps ((last, avail)), txn = txn)
             
-            srsid = str (rsid) 
-
-            # the result set is simply defined by an entry with its number
-            self._rs.put (srsid + '/', '', txn = txn)
-
+            rs = ResultSet (self._db, self._env, self._meta, rsid,
+                            permanent, txn = txn)
+            
         except:
             txn.abort ()
             raise
         
         txn.commit ()
 
-        rs = ResultSet (self._rs, self._db, self._env, self._meta, rsid, permanent)
         if permanent: self [rsid] = rs
 
         self.register ('item-delete', rs._on_delete)
@@ -455,7 +474,7 @@ class EnumStore (Store.EnumStore, Callback.Publisher):
         self._env = env
 
         self._enum = db.DB (self._env)
-        self._enum.open ('pybliographer', 'enum',
+        self._enum.open ('database', 'enum',
                          db.DB_HASH, db.DB_CREATE, txn = txn)
         return
 
@@ -550,11 +569,11 @@ class Database (Store.Database, Callback.Publisher):
         try:
             # DB containing the actual entries
             self._db  = db.DB (self._env)
-            self._db.open ('pybliographer', 'db', db.DB_HASH, flag, txn = txn)
+            self._db.open ('database', 'entries', db.DB_HASH, flag, txn = txn)
 
             # DB with meta informations
             self._meta  = db.DB (self._env)
-            self._meta.open ('pybliographer', 'meta', db.DB_HASH, flag, txn = txn)
+            self._meta.open ('database', 'meta', db.DB_HASH, flag, txn = txn)
 
             if create:
                 self._schema = schema
@@ -571,7 +590,7 @@ class Database (Store.Database, Callback.Publisher):
             # Full text indexing DB
             self._idx = db.DB (self._env)
             self._idx.set_flags (db.DB_DUP)
-            self._idx.open ('pybliographer', 'idx', db.DB_HASH, flag, txn = txn)
+            self._idx.open ('index', 'full', db.DB_HASH, flag, txn = txn)
 
             # Store for Enumerated values
             self.enum = EnumStore (self._env, txn)
@@ -794,7 +813,7 @@ def dbdestroy (path, nobackup = False):
     if not os.path.isdir (path):
         raise ValueError ('%s is not a directory' % path)
 
-    if not os.path.exists (os.path.join (path, 'pybliographer')):
+    if not os.path.exists (os.path.join (path, 'database')):
         raise ValueError ('%s is not a pybliographer database' % path)
     
     shutil.rmtree (path)

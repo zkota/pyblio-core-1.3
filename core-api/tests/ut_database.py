@@ -635,6 +635,32 @@ class TestContent (pybut.TestCase):
         check (self.db.rs [rsid])
         return
 
+    def testFullRSIsReadOnly (self):
+
+        """ It is not possible to alter the database by changing Store ().entries """
+
+        try:
+            self.db.entries.add (Store.Key (123))
+            assert False, 'should be rejected'
+            
+        except AttributeError: pass
+        except RuntimeError: pass
+        
+        e = Store.Entry ()
+        e ['title'] = [Attribute.Text ('hehe')]
+            
+        k = self.db.add (e)
+            
+        try:
+            del self.db.entries [k]
+            assert False, 'should be rejected'
+            
+        except AttributeError: pass
+        except TypeError: pass
+
+        return
+
+
     def testEnumDel (self):
 
         """ Forbid the removal of an Enum definition that is in use """

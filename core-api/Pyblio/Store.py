@@ -130,6 +130,10 @@ class ResultSet (object):
         """ Add a new item in the set """
         raise NotImplemented ('please override')
     
+    def __delitem__ (self, k):
+        """ Remove an item from the Set """
+        raise NotImplemented ('please override')
+
     def __iter__ (self):
         raise NotImplemented ('please override')
 

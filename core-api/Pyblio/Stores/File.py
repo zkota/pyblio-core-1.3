@@ -119,6 +119,33 @@ class ResultSet (dict, Store.ResultSet):
         except KeyError: pass
         
         return
+
+
+class RODict (object):
+
+    """ Read-only dictionnary """
+
+    def __init__ (self, _dict):
+        self._dict = _dict
+        return
+
+    def itervalues (self):
+        
+        return self._dict.itervalues ()
+
+    def iteritems (self):
+        
+        return self._dict.iteritems ()
+
+    def iterkeys (self):
+        
+        return self._dict.iterkeys ()
+
+    __iter__ = iterkeys
+
+    def __len__ (self):
+
+        return len (self._dict)
     
 
 class ResultSetStore (dict, Store.ResultSetStore):
@@ -156,7 +183,8 @@ class Database (Store.Database, Callback.Publisher):
 
         Callback.Publisher.__init__ (self)
 
-        self._dict = {}
+        self._dict   = {}
+        self._rodict = RODict (self._dict)
         
         self.file = file
 
@@ -195,7 +223,8 @@ class Database (Store.Database, Callback.Publisher):
 
     def _entries_get (self):
         """ Return the result set that contains all the entries. """
-        return self._dict
+
+        return self._rodict
 
     entries = property (_entries_get, None)
 
