@@ -108,6 +108,9 @@ class Importer (XML.Parser):
             self._field = str (self._attr ('code', attrs))
             self._tdata = ''
 
+        elif name == 'controlfield':
+            pass
+        
         else:
             self._error ('unknown tag: %s' % `name`)
             
