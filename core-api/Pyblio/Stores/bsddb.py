@@ -104,7 +104,7 @@ class RSIter (object):
 
 class ResultSet (Store.ResultSet):
 
-    def __init__ (self, env, meta, rs, id, permanent = None):
+    def __init__ (self, env, meta, rs, id, permanent = False):
         # RS id as a string and as an integer
         self.id  = id
         self._id = str (id)
@@ -125,8 +125,9 @@ class ResultSet (Store.ResultSet):
 
         try:
             (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
-        
-            avail [int (self._id)] = name
+
+            if avail.has_key (self.id):
+                avail [self.id] = (name, self._permanent)
         
             self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
 
@@ -185,26 +186,29 @@ class ResultSet (Store.ResultSet):
         txn = self._env.txn_begin ()
 
         try:
-            c = self._rs.cursor (txn = txn)
-            c.set (self._id + '/')
-
-            while 1:
-                c.delete ()
-
-                d = c.next ()
-                if d is None: break
-
-                rs, key = d [0].split ('/')
-                if rs != self._id: break
-
-            c.close ()
-
             # remove oneself from the meta list
             (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+
+            if avail.has_key (self.id):
+                
+                del avail [self.id]
             
-            del avail [int (self._id)]
-            
-            self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
+                self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
+
+                # ... and discard the whole set
+                c = self._rs.cursor (txn = txn)
+                c.set (self._id + '/')
+
+                while 1:
+                    c.delete ()
+                    
+                    d = c.next ()
+                    if d is None: break
+                    
+                    rs, key = d [0].split ('/')
+                    if rs != self._id: break
+
+                c.close ()
             
         except:
             # exceptions in __del__ methods are not reported by default
@@ -244,13 +248,17 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
         (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
-        # initialize with the existing permanent result sets
-        for rsid, name in avail.items ():
-            rs = ResultSet (self._env, self._meta, self._rs, rsid, True)
+        # initialize with the existing result sets
+        for rsid, data in avail.items ():
+            name, status = data
+            
+            rs = ResultSet (self._env, self._meta, self._rs, rsid, status)
             rs._name = name
 
             self.register ('item-delete', rs._on_delete)
-            self [rsid] = rs
+
+            # assume some non-permanent result sets might still exist
+            if status: self [rsid] = rs
         
         return
     
@@ -262,7 +270,27 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
     def __delitem__ (self, k):
 
-        self [k]._permanent = False
+        rs = self [k]
+        rs._permanent = False
+
+        txn = self._env.txn_begin ()
+
+        try:
+            # get the rs dict
+            (last, avail) = _pl (self._meta.get ('rs', txn = txn))
+
+            # Avail contains the name of the RS, which is initially
+            # None, and the state (permanent / not permanent)
+            if avail.has_key (rs.id):
+                avail [rs.id] = (rs._name, False)
+            
+            self._meta.put ('rs', _ps ((last, avail)), txn = txn)
+
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
         dict.__delitem__ (self, k)
         return
 
@@ -281,8 +309,9 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
             (last, avail) = _pl (self._meta.get ('rs', txn = txn))
             (last, rsid)  = Tools.id_make (last, rsid)
             
-            # Avail contains the name of the RS, which is initially None
-            avail [rsid] = None
+            # Avail contains the name of the RS, which is initially
+            # None, and the state (permanent / not permanent)
+            avail [rsid] = (None, permanent)
             
             self._meta.put ('rs', _ps ((last, avail)), txn = txn)
             

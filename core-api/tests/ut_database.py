@@ -439,6 +439,8 @@ class TestContent (pybut.TestCase):
         integrity (rs)
         integrity (self.db.rs [rsid])
         
+        del rs
+        
         self.db.save ()
         self.db = self.hd.dbopen (self.name)
 
