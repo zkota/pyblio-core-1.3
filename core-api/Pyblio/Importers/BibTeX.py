@@ -578,11 +578,24 @@ class Importer (object):
 
         stream = list (stream.subst ())
 
-        # Merge dots with their preceding name, to recreate initials
+        # Merge dots with their preceding name, to recreate initials.
+        # Merge also dashes with the surrounding text
         os, stream = stream, []
-        for s in os:
+        while os:
+            s = os.pop (0)
+            
             if s == '.':
-                stream [-1] = Text (stream [-1] + '.')
+                try:
+                    stream [-1] = Text (stream [-1] + '.')
+                except IndexError:
+                    pass
+
+            elif s == '-':
+                try:
+                    stream [-1] = Text (stream [-1] + '-' + os.pop (0))
+                except IndexError:
+                    pass
+
             else:
                 stream.append (s)
             
@@ -602,7 +615,7 @@ class Importer (object):
 
         def _person_decode (stream):
 
-            stream = filter (lambda x: x != ' ', stream)
+            stream = filter (lambda x: x not in (' ', '\n'), stream)
 
             # Check for ',' syntax for names
             comma = stream.count (',')

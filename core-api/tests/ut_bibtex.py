@@ -125,6 +125,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('initials')
         return
 
+    def testSingleName (self):
+        """ A carriage return in a name """
+        
+        self._check ('carriage')
+        return
+
 
 class TestBibTeXExport (pybut.TestCase):
 

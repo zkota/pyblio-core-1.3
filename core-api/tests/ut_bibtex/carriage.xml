@@ -40,8 +40,6 @@
  <entry id="1">
   <attribute id="author">
    <person first="D." last="Floreano"/>
-   <person first="J." last="Godjevac"/>
-   <person first="J.-P." last="Dupont"/>
   </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
