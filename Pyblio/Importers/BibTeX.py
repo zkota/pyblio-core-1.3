@@ -30,6 +30,11 @@ from Pyblio import Attribute, Store, Exceptions
 
 from gettext import gettext as _
 
+
+# ==================================================
+# BibTeX lexer
+# ==================================================
+
 tokens = ('AT', 'RBRACE', 'LBRACE', 'SPACE', 'COMMA', 'LITERAL',
           'EQUALS', 'SHARP', 'QUOTE', 'ESCAPE', 'SYMBOL', 'NUMBER')
 
@@ -61,6 +66,10 @@ def t_error (t):
 
 lex.lex ()
 
+
+# ==================================================
+# BibTeX parser
+# ==================================================
 
 class Command (object):
 
@@ -120,7 +129,7 @@ def p_empty_entry (t):
     
 def p_entry_head (t):
     ''' entry_head : LITERAL opt_space LBRACE opt_space LITERAL opt_space COMMA opt_space '''
-    t [0] = (t [1], t [5])
+    t [0] = (t [1].lower (), t [5])
     return
 
 
@@ -142,7 +151,7 @@ def p_assignment_list (t):
 def p_assignment (t):
     ''' assignment : LITERAL opt_space EQUALS opt_space value opt_space '''
 
-    t [0] = { t [1] : t [5] }
+    t [0] = { t [1].lower () : t [5] }
     return 
 
 def p_value (t):
@@ -155,16 +164,20 @@ def p_single_value (t):
     t [0] = t [1]
     return
     
-def p_simple_value (t):
-    ''' simple_value : LBRACE  brace_data_list  RBRACE
-                     | QUOTE   quote_data_list  QUOTE '''
-    t [0] = t [2]
+def p_simple_brace_value (t):
+    ''' simple_value : LBRACE  brace_data_list  RBRACE '''
+    t [0] = ('{}', t [2])
+    return
+
+def p_simple_quote_value (t):
+    ''' simple_value : QUOTE   quote_data_list  QUOTE '''
+    t [0] = ('""', t [2])
     return
 
 def p_simple_atom_value (t):
     ''' simple_value : LITERAL
                      | NUMBER '''
-    t [0] = (t [1],)
+    t [0] = t [1]
     return
 
 
@@ -252,18 +265,24 @@ _mod = string.join (__name__.split ('.') [:-1] + [_mod], '.')
 yacc.yacc (tabmodule = (_pth, _mod))
 
 
+# ==================================================
+# BibTeX conversion routines
+# ==================================================
+
 def _flat (stream, encoding):
     
-    ret = ''
 
-    while stream:
-        v, stream = stream [0], stream [1:]
+    if type (stream) is type (''):
+        return stream.decode (encoding)
+
+    if isinstance (stream, Command):
+        return stream.esc
+
+    ret  = ''
+    
+    for s in stream [1]:
+        ret = ret + _flat (s, encoding)
         
-        if isinstance (v, Command):
-            ret = ret + v.esc
-        else:
-            ret = ret + v.decode (encoding)
-
     return ret
 
 
@@ -273,10 +292,11 @@ def _textify (stream, encoding):
 
 
 def _persify (stream, encoding):
-
+    ''' Parse a stream of tokens as a series of person names '''
+    
     # Person names are separated by 'and' keywords
     avail  = []
-    stream = list (stream)
+    stream = list (stream [1])
     
     while 1:
         try:
@@ -299,7 +319,7 @@ def _persify (stream, encoding):
         
         if comma == 0:
             # Use the number of segments in the name
-            stream = map (lambda x: _flat (x, encoding), stream)
+            stream = map (lambda x: _flat (('{}', x), encoding), stream)
 
             if len (stream) == 1:
                 return Attribute.Person (last = stream [0])
@@ -311,8 +331,9 @@ def _persify (stream, encoding):
         elif comma == 1:
             i = stream.index (',')
 
-            return Attribute.Person (last  = _flat (stream [:i], encoding),
-                                     first = _flat (stream [i+1:], encoding))
+            return Attribute.Person \
+                   (last  = _flat (('{}', stream [:i]), encoding),
+                    first = _flat (('{}', stream [i+1:]), encoding))
         
         return Attribute.Person ()
     
@@ -321,7 +342,8 @@ def _persify (stream, encoding):
 
 def _urlify (stream, encoding):
 
-    return [Attribute.URL ('')]
+    return [Attribute.URL (_flat (stream, encoding))]
+
 
 def _dateify (stream, encoding):
 
@@ -329,7 +351,7 @@ def _dateify (stream, encoding):
 
 def _refify (stream, encoding):
 
-    return [Attribute.Reference ('')]
+    return [Attribute.Reference (_flat (stream, encoding))]
 
 
 _mapping = {
@@ -340,21 +362,61 @@ _mapping = {
     Attribute.Reference: _refify,
     }
 
+
+def _tostring (tp, key, data):
+
+    def _bib (data):
+
+        if type (data) == type (()):
+
+            o, c = data [0][0], data [0][1]
+            
+            ret = ''
+            for d in data [1]:
+                ret = ret + _bib (d)
+                
+            return o + ret + c
+
+        if type (data) == type (''):
+            return data
+
+        if isinstance (data, Command):
+            return '\\%s' % data.esc
+
+        assert False, 'should not be reached'
+        
+    ret = '@%s{%s,\n' % (tp, key)
+
+    attrs = []
+    keys  = data.keys ()
+    keys.sort ()
+    
+    for k in keys:
+        v = data [k]
+        attrs.append ('   %s = %s' % (k, _bib (v)))
+
+    return ret + string.join (attrs, ',\n') + '\n}'
+
+# ==================================================
+# BibTeX interface
+# ==================================================
+
 def file_import (file, encoding, db, ** kargs):
     
     data = yacc.parse (open (file).read ())
 
     for tp, key, val in data:
 
-        tp = tp.lower ()
-
         try:
             schema = db.schema.documents [tp]
         except KeyError:
-            raise Exceptions.SchemaError (_("document '%s' is unknown") % tp)
+            raise Exceptions.SchemaError (
+                _("document '%s' is unknown") % tp)
         
         e = Store.Entry (Store.Key (key), schema)
 
+        print val
+        
         for k, v in val.iteritems ():
 
             k = k.lower ()
@@ -362,11 +424,14 @@ def file_import (file, encoding, db, ** kargs):
             try:
                 attp = schema.typeof (k)
             except KeyError:
-                raise Exceptions.SchemaError (_("no attribute '%s' in document '%s'") % (
+                raise Exceptions.SchemaError (
+                    _("no attribute '%s' in document '%s'") % (
                     k, schema.name))
 
             e [k] = _mapping [attp.type] (v, encoding)
 
+        e.native = ('bibtex', _tostring (tp, key, val))
+        
         db [e.key] = e
         
     return db
