@@ -2,13 +2,10 @@
 
 * TO DO
 
-** [X] Schemas checks
+** [ ] Update result sets when the database is changed.
 
-Schemas contain information about attributes (type, cardinality,...),
-so that an attribute can have exactly one occurence, O..N, 1..N,
-... Inserting/updating an entry in the database cannot occur if the
-entry does not match the schema definition.
-
+When an item is removed from the database, it must not be referenced
+in any result set anymore. Updated items must be reindexed properly.
 
 ** [ ] Refine the content of a result set
 
@@ -62,4 +59,11 @@ They are stored in the XML format and in the storages.
 
 Create an empty result set. Add items in it and remove them. It is not
 possible to duplicate items in a result set.
+
+** [X] Schemas checks
+
+Schemas contain information about attributes (type, cardinality,...),
+so that an attribute can have exactly one occurence, O..N, 1..N,
+... Inserting/updating an entry in the database cannot occur if the
+entry does not match the schema definition.
 

@@ -6,46 +6,54 @@ class TestStore (pybut.TestCase):
 
     """ Perform tests on the Pyblio.Store module """
 
+    _i = 0
+
+    def setUp (self):
+
+        self.f = ',,t%d.xml' % self._i
+        TestStore._i = self._i + 1
+
+        return
+
+    def tearDown (self):
+        
+        if os.path.exists (self.f):
+            db = Store.get ('file').dbdestroy (self.f, nobackup = True)
+
+        return
+    
+
     def testEmpty (self):
         """ Create an empty database with a schema """
 
-        f = ',,t1.xml'
-        
         schema = Schema.Schema ('ut_store/s:simple.xml')
 
-        db = Store.get ('file').dbcreate (f, schema)
+        db = Store.get ('file').dbcreate (self.f, schema)
         db.save ()
         
         assert len (db) == 0
 
-        pybut.fileeq (f, 'ut_store/empty.xml')
-
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
+        pybut.fileeq (self.f, 'ut_store/empty.xml')
         return
 
     def testReadEmpty (self):
         """ A schema in a database is equivalent to outside the database """
         
-        f = ',,t2.xml'
-
         db = Store.get ('file').dbopen ('ut_store/empty.xml')
 
-        file = open (f, 'w')
+        file = open (self.f, 'w')
         db.schema.xmlwrite (file)
         file.close ()
 
-        pybut.fileeq (f, 'ut_store/s:simple.xml')
+        pybut.fileeq (self.f, 'ut_store/s:simple.xml')
         
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
         return
 
     def testWrite (self):
         """ A new database can be saved with its schema """
 
-        f = ',,t3.xml'
-        
         schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.get ('file').dbcreate (f, schema)
+        db = Store.get ('file').dbcreate (self.f, schema)
 
         e = Store.Entry ()
 
@@ -62,53 +70,28 @@ class TestStore (pybut.TestCase):
 
         db.save ()
 
-        pybut.fileeq (f, 'ut_store/simple.xml')
-
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
+        pybut.fileeq (self.f, 'ut_store/simple.xml')
         return
 
 
     def testRead (self):
         """ A database can be read and saved again identically """
         
-        f = ',,t4.xml'
-
         db = Store.get ('file').dbopen ('ut_store/simple.xml')
 
-        fd = open (f, 'w')
+        fd = open (self.f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (f, 'ut_store/simple.xml')
-
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
+        pybut.fileeq (self.f, 'ut_store/simple.xml')
         return
-
-    def testEnumRead (self):
-        """ A database with enumerated fields can be read and saved again identically """
-        
-        f = ',,t6.xml'
-
-        db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
-
-        fd = open (f, 'w')
-        db.xmlwrite (fd)
-        fd.close ()
-
-        pybut.fileeq (f, 'ut_store/enumerated.xml')
-
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
-        return
-
 
     def testNativeWrite (self):
 
         """ Native data is stored in the database, along with loss information """
 
-        f = ',,t5.xml'
-        
         schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.get ('file').dbcreate (f, schema)
+        db = Store.get ('file').dbcreate (self.f, schema)
 
         e = Store.Entry ()
 
@@ -120,11 +103,21 @@ class TestStore (pybut.TestCase):
         db.add (e)
         db.save ()
         
-        pybut.fileeq (f, 'ut_store/native.xml')
-
-        db = Store.get ('file').dbdestroy (f, nobackup = True)
+        pybut.fileeq (self.f, 'ut_store/native.xml')
         return
         
+    def testEnumRead (self):
+        """ A database with enumerated fields can be read and saved again identically """
+        
+        db = Store.get ('file').dbopen ('ut_store/enumerated.xml')
+
+        fd = open (self.f, 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (self.f, 'ut_store/enumerated.xml')
+        return
+
     def testNativeRead (self):
 
         """ Native data is also read back from file """
@@ -138,5 +131,61 @@ class TestStore (pybut.TestCase):
 
         assert e.has_loss ('author')
         return
+
+
+    def testValidate (self):
+
+        from Pyblio.Exceptions import SchemaError
+        
+        schema = Schema.Schema ('ut_store/s:validate.xml')
+        db = Store.get ('file').dbcreate (self.f, schema)
+
+        def fail (e):
+            try:
+                db.validate (e)
+                raise False, 'should not be accepted'
+            
+            except SchemaError:
+                pass
+
+            return
+        
+        # Discard empty attributes
+        e = Store.Entry ()
+        e ['title'] = []
+
+        e = db.validate (e)
+        assert not e.has_key ('title')
+
+        # Discard unknown attributes
+        e = Store.Entry ()
+        e ['bozo'] = [ Attribute.Text ('yay') ]
+
+        fail (e)
+
+        # Check for entry types
+        e = Store.Entry ()
+        e ['text'] = [ Attribute.Text ('yay'),
+                       Attribute.Text ('yay'),
+                       Attribute.URL ('hoho'),
+                       Attribute.Text ('yay'),
+                       ]
+
+        fail (e)
+
+        # check for entry count
+        e = Store.Entry ()
+        p = Attribute.Person (last = 'gobry')
+        
+        e ['author'] = [ p, p, p, p, p ]
+        fail (e)
+
+        e = Store.Entry ()
+        u = Attribute.URL ('abc')
+        e ['author'] = [ u, u ]
+        fail (e)
+        
+        return
     
+        
 pybut.run (pybut.makeSuite (TestStore, 'test'))

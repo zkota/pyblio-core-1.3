@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-schema>
+ <attribute id="author" type="person" max="4">
+  <name>Author</name>
+ </attribute>
+ <attribute id="url" type="url" max="1">
+  <name>URL</name>
+ </attribute>
+ <attribute id="text" type="text">
+  <name>Text</name>
+ </attribute>
+</pyblio-schema>
