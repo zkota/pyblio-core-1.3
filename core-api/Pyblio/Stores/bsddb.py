@@ -537,6 +537,10 @@ class Database (Store.Database, Callback.Publisher):
         self._idx.sync ()
         return
 
+    def __len__ (self):
+
+        return self._db.stat () ['nkeys']
+    
 
     def add (self, val, key = None):
 

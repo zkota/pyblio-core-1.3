@@ -12,7 +12,7 @@ available on a full database must be available on a result set.
 Create two result sets A and B. Merge the content of B into A. There
 are no duplicates in A, and B is left unchanged.
 
-** [ ] It is possible to search on a specific attribute
+** [ ] Search on a specific attribute.
 
 Queries are dependent on the type of the attribute being searched (for
 instance, dates can be searched by intervals,...). It is possible to

@@ -115,6 +115,8 @@ class TestContent (pybut.TestCase):
                 seen.sort ()
 
                 assert keys == seen
+
+                assert len (self.db) == len (seen)
                 return
 
             subcheck ()
