@@ -285,6 +285,9 @@ class TxoGroup (object):
     def __delitem__ (self, k):
         raise NotImplemented ('please override')
 
+    def __iter__ (self, k):
+        raise NotImplemented ('please override')
+
     def keys (self):
         raise NotImplemented ('please override')
 

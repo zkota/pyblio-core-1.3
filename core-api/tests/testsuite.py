@@ -2,7 +2,7 @@ import os, sys
 import pybut
 
 
-skip = os.environ.get ('UT_SKIP').split (':')
+skip = os.environ.get ('UT_SKIP', '').split (':')
 
 if skip:
     print "warning: skipping %s" % ', '.join (skip)

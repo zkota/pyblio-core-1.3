@@ -299,12 +299,13 @@ class TestContent (pybut.TestCase):
 
         a  = []
         va = ['A / 1', 'A / 2']
+        ka = []
 
         g = self.db.txo ['a']
         
         for k in va:
             i.names [''] = k
-            g.add (i)
+            ka.append (g.add (i))
             
         b = []
         vb = ['B / 1', 'B / 2']
@@ -319,6 +320,7 @@ class TestContent (pybut.TestCase):
             na.append (v.names [''])
 
         assert na == va
+        assert list (g) == ka
         return
 
     def testTxoInDB (self):

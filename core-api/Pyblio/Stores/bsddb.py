@@ -785,7 +785,10 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         
         txn.commit ()
         return
-    
+
+    def __iter__ (self):
+
+        return iter (self.keys ())
 
     def __getitem__ (self, k):
         v = self._enum.get (self._group)
