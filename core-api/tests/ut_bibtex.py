@@ -137,6 +137,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('variants')
         return
 
+    def testLaTeXAccent (self):
+        """ Decode LaTeX-accented strings like \'e """
+        
+        self._check ('accents')
+        return
+
 
 class TestBibTeXExport (pybut.TestCase):
 

@@ -39,16 +39,19 @@
 
  <entry id="1">
   <attribute id="author">
-   <person first="D." last="Floreano"/>
-   <person first="J." last="Godjevac"/>
-   <person first="J.-P." last="Dupont"/>
-   <person first="J. P." last="Dupont"/>
+   <person first="Frédéric" last="Gobry"/>
   </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
   </attribute>
   <attribute id="id">
-   <id value="Sample"/>
+   <id value="gobry99"/>
+  </attribute>
+  <attribute id="journal">
+   <text>Journal</text>
+  </attribute>
+  <attribute id="title">
+   <text>A test</text>
   </attribute>
  </entry>
 </pyblio-db>

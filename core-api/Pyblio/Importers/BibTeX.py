@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This file is part of pybliographer
 # 
 # Copyright (C) 1998-2003 Frederic GOBRY
@@ -34,11 +35,31 @@ from gettext import gettext as _
 # Base Classes
 # ==================================================
 
+class IBibTeX:
+    def flat (self):
+        """ Return a textual version of the field, with no visible BibTeX / LaTeX markup """
+        pass
+
+    def subst (self):
+        """ Return a flattened list of the balanced expressions composing the field """
+        pass
+
+    def execute (self, environ):
+        """ Execute the known LaTeX commands forming the field,
+        substitute the known symbols, and return the resulting string"""
+        pass
+
+    def tobib (self):
+        """ Return the BibTeX version of the field """
+        pass
+
+
+    
 class Symbol (str):
     """ A literal symbol, predefined or defined by the user """
 
-    def flat (self, charset):
-        return self.decode (charset)
+    def flat (self):
+        return self
 
     def __repr__ (self):
         return 'Symbol (%s)' % str.__repr__ (self)
@@ -48,6 +69,10 @@ class Symbol (str):
 
     def tobib (self):
         return self
+
+    def execute (self, env):
+        return env.strings [self]
+
 
 class Command (object):
     """ A LaTeX \-command """
@@ -59,8 +84,8 @@ class Command (object):
     def __repr__ (self):
         return 'Cmd (%s)' % `self._cmd`
 
-    def flat (self, charset):
-        return self._cmd.decode (charset)
+    def flat (self):
+        return self._cmd
 
     def subst (self):
         return [self]
@@ -69,13 +94,13 @@ class Command (object):
         return '\\%s' % self._cmd
 
 
-class Text (str):
+class Text (unicode):
 
-    def flat (self, charset):
-        return self.decode (charset)
+    def flat (self):
+        return self
     
     def __repr__ (self):
-        return 'Text (%s)' % str.__repr__ (self)
+        return 'Text (%s)' % unicode.__repr__ (self)
 
     def subst (self):
         return [self]
@@ -83,6 +108,8 @@ class Text (str):
     def tobib (self):
         return self
     
+    def execute (self, env):
+        return self
 
 class Block (object):
     """ A textual block, as a sequence of text and commands """
@@ -93,12 +120,29 @@ class Block (object):
         self._d = data or ()
         return
     
-    def flat (self, charset):
+    def flat (self):
         r = ''
         for o in self._d:
-            r = r + o.flat (charset)
+            r = r + o.flat ()
 
         return r
+
+    def execute (self, env):
+        final = []
+        stack = [] + list (self._d)
+        
+        while stack:
+            d = stack.pop (0)
+            
+            if isinstance (d, Command):
+                r = env.run (d._cmd, stack)
+            else:
+                r = d.execute (env)
+
+            final.append (r)
+
+        return Block (self._o, self._c, final)
+
 
     def join (self):
         return list (self._d)
@@ -111,8 +155,10 @@ class Block (object):
     def subst (self):
         r = []
         for d in self._d:
-            r = r + d.subst ()
-            
+            try:
+                r = r + d.subst ()
+            except AttributeError:
+                print repr (d)
         return r
 
     def tobib (self):
@@ -140,10 +186,13 @@ class Join (list):
         for v in self:
             r += v.join ()
         return r
-        
 
-    def flat (self, charset):
-        return string.join (map (lambda x: x.flat (charset), self), '')
+    def execute (self, env):
+        return map (lambda x: x.execute (env), self)
+
+
+    def flat (self):
+        return string.join (map (lambda x: x.flat (), self), '')
 
 
     def tobib (self):
@@ -169,6 +218,119 @@ class Comment (str):
     
     def __repr__ (self):
         return 'Comment (%s)' % str.__repr__ (self)
+
+
+_basemap = {
+    "'": {
+    'A': Text (u"Á"),
+    'E': Text (u"É"),
+    'I': Text (u"Í"),
+    'O': Text (u"Ó"),
+    'U': Text (u"Ú"),
+    'Y': Text (u"Ý"),
+    'a': Text (u"á"),
+    'e': Text (u"é"),
+    'i': Text (u"í"),
+    'o': Text (u"ó"),
+    'u': Text (u"ú"),
+    'y': Text (u"ý"),
+    },
+    
+    "`": {
+    'A': Text (u"À"),
+    'E': Text (u"È"),
+    'I': Text (u"Ì"),
+    'O': Text (u"Ò"),
+    'U': Text (u"Ù"),
+    'a': Text (u"à"),
+    'e': Text (u"è"),
+    'i': Text (u"ì"),
+    'o': Text (u"ò"),
+    'u': Text (u"ù"),
+    },
+    
+    "^": {
+    'A': Text (u"Â"),
+    'E': Text (u"Ê"),
+    'I': Text (u"Î"),
+    'O': Text (u"Ô"),
+    'U': Text (u"Û"),
+    'a': Text (u"â"),
+    'e': Text (u"ê"),
+    'i': Text (u"î"),
+    'o': Text (u"ô"),
+    'u': Text (u"û"),
+    },
+
+    "¨": {
+    'A': Text (u"Ä"),
+    'E': Text (u"Ë"),
+    'I': Text (u"Ï"),
+    'O': Text (u"Ö"),
+    'U': Text (u"Ü"),
+    'a': Text (u"ä"),
+    'e': Text (u"ë"),
+    'i': Text (u"ï"),
+    'o': Text (u"ö"),
+    'u': Text (u"ü"),
+    'y': Text (u"ÿ"),
+    },
+
+    "c": {
+    'C': Text (u"Ç"),
+    'c': Text (u"ç"),
+    },
+
+    
+    "~": {
+    'A': Text (u"Ã"),
+    'O': Text (u"Õ"),
+    'a': Text (u"ã"),
+    'o': Text (u"õ"),
+    'n': Text (u"ñ"),
+    'N': Text (u"Ñ"),
+    },
+    
+}
+
+class Environ (object):
+
+    def __init__ (self):
+
+        self.strings = {}
+        return
+
+    def run (self, cmd, stack):
+
+        try:
+            m = _basemap [cmd]
+        except KeyError:
+            return Text ('?')
+
+        # If we have a map, we need the single next character
+        while 1:
+            if isinstance (stack [0], Text):
+                tt = stack.pop (0)
+
+                if len (tt) > 1:
+                    t = tt [0]
+                    stack.insert (0, Text (tt [1:]))
+                else:
+                    t = tt
+
+                return m [t]
+
+            elif isinstance (stack [0], Block):
+                # Move this block back one step
+                d = list (stack.pop (0)._d)
+
+                while d:
+                    stack.insert (0, d.pop ())
+
+            else:
+                raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, stack)))
+
+        
 
 
 # ==================================================
@@ -571,7 +733,7 @@ class Importer (object):
 
     def url_add (self, field, stream):
 
-        self.record [field] = [Attribute.URL (stream.flat (self.charset))]
+        self.record [field] = [Attribute.URL (stream.flat ())]
         return
 
 
@@ -583,7 +745,7 @@ class Importer (object):
 
     def text_add (self, field, stream):
         
-        self.record [field] = [Attribute.Text (stream.flat (self.charset))]
+        self.record [field] = [Attribute.Text (stream.flat ())]
         return
 
     def person_add (self, field, stream):
@@ -614,7 +776,8 @@ class Importer (object):
 
         def _wordify (stream):
 
-            stream = [x.decode (self.charset) for x in stream.subst ()]
+            stream = stream.execute (Environ ())
+            stream = stream.subst ()
 
             # Ensure the stream is a sequence of complete words (ie,
             # concatenate successive text parts and space parts).  The
@@ -676,8 +839,8 @@ class Importer (object):
         def _person_decode (stream):
 
             if len (stream) == 1 and isinstance (stream [0], Block):
-                return Attribute.Person (last = stream [0].flat (self.charset))
-            
+                return Attribute.Person (last = stream [0].flat ())
+
             stream = _wordify (Block ('', '', stream))
 
             # Check for ',' syntax for names
@@ -692,14 +855,18 @@ class Importer (object):
                 else:
                     tt = _typetag (stream)
 
-                    if tt == ['N', 'I']:
-                        return Attribute.Person (first = stream [1],
+                    if tt in (['N', 'I'],
+                              ['N', 'I', 'I'],
+                              ['N', 'I', 'I', 'I']):
+                        return Attribute.Person (first = ' '.join (stream [1:]),
                                                  last  = stream [0])
 
                     if tt in (['N', 'N'],
-                              ['I', 'N']):
-                        return Attribute.Person (first = stream [0],
-                                                 last  = stream [1])
+                              ['I', 'N'],
+                              ['I', 'I', 'N'],
+                              ['I', 'I', 'I', 'N']):
+                        return Attribute.Person (first = ' '.join (stream [0:-1]),
+                                                 last  = stream [-1])
                     
                     raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
                         repr (stream), repr (tt)))
@@ -761,7 +928,7 @@ class Importer (object):
 
         tp, key, val = data.type, data.key, data
 
-        self.id_add (key.decode (self.charset))
+        self.id_add (key)
         
         for k, v in val.iteritems ():
             self.record_dispatch (tp, k.lower (), v)
@@ -781,7 +948,7 @@ class Importer (object):
 
         self.db = db
         
-        datalist = yacc.parse (fd.read (), debug = 0)
+        datalist = yacc.parse (fd.read ().decode (self.charset), debug = 0)
 
         self.doctype = {}
 
@@ -791,7 +958,7 @@ class Importer (object):
         for data in datalist:
 
             if isinstance (data, Comment):
-                self.comment_add (data.decode (self.charset))
+                self.comment_add (data)
                 continue
 
             self.record_parse (data)

@@ -2,6 +2,29 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-03-21 12:45:45 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-126
+
+    Summary:
+      BibTeX parser has support for latex accents
+    Revision:
+      pybliographer--devel--1.3--patch-126
+
+    ...like \'e. The support is not exhaustive, and needs better testing and expandability.
+    
+
+    new files:
+     core-api/tests/ut_bibtex/.arch-ids/accents.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/accents.xml.id
+     core-api/tests/ut_bibtex/accents.bib
+     core-api/tests/ut_bibtex/accents.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX.py
+     core-api/Pyblio/Importers/lex.py core-api/tests/ut_bibtex.py
+     core-api/tests/ut_bibtex/initials.bib
+     core-api/tests/ut_bibtex/initials.xml
+
+
 2005-02-04 10:12:13 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-125
 
     Summary:
