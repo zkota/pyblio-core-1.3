@@ -445,7 +445,12 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         txn = self._env.txn_begin (txn)
 
         try:
-            self._rs.delete (str (k), txn = txn)
+
+            try:
+                self._rs.delete (str (k), txn = txn)
+
+            except db.DBNotFoundError:
+                raise KeyError ('unknown key %s' % str (k))
 
             # Update the views of the result set
             
@@ -458,6 +463,10 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
                 v._del (k, txn)
 
+        except KeyError:
+            txn.abort ()
+            raise
+        
         except:
             etype, value, tb = sys.exc_info ()
             traceback.print_exception (etype, value, tb)
