@@ -43,7 +43,7 @@ class TestBibTeXImport (pybut.TestCase):
 
             g.add (dt)
 
-        self.parser = WithComments (charset = 'latin-1')
+        self.parser = WithComments ('latin-1')
 
         self.parser.parse (open ('ut_bibtex/%s.bib' % base), db)
         
@@ -105,7 +105,7 @@ class TestBibTeXExport (pybut.TestCase):
         db = Store.get ('file').dbopen ('ut_bibtex/%s.xml' % base)
         fd = open (f, 'w')
         
-        self.writer = BibTeX.Exporter (charset = 'latin-1')
+        self.writer = BibTeX.Exporter ()
         
         self.writer.write (fd, db.entries, db)
 

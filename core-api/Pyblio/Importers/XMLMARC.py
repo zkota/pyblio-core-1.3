@@ -152,7 +152,8 @@ class SimpleImporter (Importer):
         self._physical = {
             Attribute.Text  : self.text_add,
             Attribute.URL   : self.url_add,
-            Attribute.Person: self.person_add
+            Attribute.Person: self.person_add,
+            Attribute.ID    : self.id_add,
             }
         return
 
@@ -168,10 +169,14 @@ class SimpleImporter (Importer):
         return Importer.parse (self, fd, db)
     
 
-    def skip (self, field, value):
+    def id_add (self, field, value):
 
-        pass
-    
+        f = self.record.get (field, [])
+        f.append (Attribute.ID (value))
+        
+        self.record [field] = f
+        return
+        
     def text_add (self, field, value):
 
         f = self.record.get (field, [])

@@ -670,11 +670,9 @@ class Exporter (object):
 
     _collapse = re.compile (r'[\s\n]+', re.MULTILINE)
     
-    def __init__ (self, charset = 'ISO8859-1'):
+    def __init__ (self):
 
         import Recode
-
-        self.charset = charset
 
         self._mapping = {
             Attribute.Text:   self.text_add,
