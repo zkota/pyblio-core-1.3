@@ -39,3 +39,4 @@ class InvalidQuery (Exception):
     """ Raised if an ill-typed query is attempted """
     
     pass
+
