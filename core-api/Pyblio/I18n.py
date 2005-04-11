@@ -44,6 +44,9 @@ class Localize (object):
         if table.has_key (self.lang_one):
             return table [self.lang_one]
 
-        return table ['']
+        if table.has_key (''):
+            return table ['']
+
+        return table ['C']
 
 lz = Localize ()

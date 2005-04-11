@@ -25,6 +25,8 @@
 import PyblioUI
 import sys
 
+_prev = sys.argv
+
 sys.argv = sys.argv [:1] + ['--'] + sys.argv [1:]
 
 # import the required modules so that they get initialized
@@ -38,7 +40,7 @@ import gnome.ui
 gnome.init ('Pybliographic', PyblioUI.version)
 
 # clean up our garbage
-sys.argv = sys.argv [:1] + sys.argv [2:]
+sys.argv = _prev
 
 del sys
 
@@ -55,5 +57,6 @@ def run ():
     return
 
 def exit ():
-    gtk.mainquit ()
+    gtk.main_quit ()
     return
+

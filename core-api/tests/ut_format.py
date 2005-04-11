@@ -112,9 +112,16 @@ class TestFormat (pybut.TestCase):
         v = join (', ') [ 'a', 'b', 'c' ] + ' ok'
         self._cmp (v, u'a, b, c ok')
 
-        # Joins skip missing values
+        # join skip missing values
         v = join (', ') [ one ('title'), one ('journal'), one ('gronf') ]
         self._cmp (v, u'My title')
+
+        # join fails when _no_ value is available
+        v = join (', ') [ one ('gronf'), one ('rasdf') ]
+        try:
+            v ()
+            assert False
+        except DSL.Missing: pass
 
         return
     

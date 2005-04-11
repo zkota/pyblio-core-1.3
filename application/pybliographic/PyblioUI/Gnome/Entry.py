@@ -51,8 +51,10 @@ class Entry (object):
                                          left_margin = 20)
 
         self._map = {
-            Attribute.Txo: self._show_txo,
-            Attribute.URL: self._show_url
+            Attribute.Txo:    self._show_txo,
+            Attribute.URL:    self._show_url,
+            Attribute.Person: self._show_person,
+            Attribute.Date:   self._show_date,
             }
         
         return
@@ -60,34 +62,59 @@ class Entry (object):
 
     def _default (self, iter, attr, db):
 
-        self._text.insert (iter, str (attr) + '\n')
+        txt = '\n'.join ([ str (x) for x in attr ])
+        
+        self._text.insert (iter, txt + '\n')
         return
 
+    def _show_person (self, iter, attr, db):
 
+        person = '; '.join ([ ', '.join (filter (None, (p.last, p.first))) for p in attr ])
+
+        self._text.insert (iter, person + '\n')
+        return
+
+    def _show_date (self, iter, attr, db):
+
+        def mkparts (d):
+            r = []
+            for p in (d.year, d.month, d.day):
+                if p is None: break
+                r.append (str (p))
+            
+            return '/'.join (r)
+        
+
+        dates = '; '.join ([ mkparts (d) for d in attr ])
+
+        self._text.insert (iter, dates + '\n')
+        return
+    
     def _show_txo (self, iter, attr, db):
 
-        e = db.txo [attr.group] [attr.id]
+        txt = ' - '.join ([db.txo [v.group] [v.id].name for v in attr])
         
-        self._text.insert (iter, e.name + '\n')
+        self._text.insert (iter, txt + '\n')
         return
 
 
-    def _show_url (self, iter, attr, db):
-        
-        anchor = self._text.create_child_anchor (iter)
+    def _show_url (self, iter, attrs, db):
 
-        button = gtk.Button (label = str (attr))
-        button.set_relief (gtk.RELIEF_NONE)
-        
-        button.show ()
+        for attr in attrs:
+            anchor = self._text.create_child_anchor (iter)
 
-        def url_open (w, url):
-            gnome.url_show (url)
-            return
-                
-        button.connect ('clicked', url_open, str (attr))
-            
-        self._view.add_child_at_anchor (button, anchor)
+            button = gtk.Button (label = str (attr))
+            button.set_relief (gtk.RELIEF_NONE)
+
+            button.show ()
+
+            def url_open (w, url):
+                gnome.url_show (url)
+                return
+
+            button.connect ('clicked', url_open, str (attr))
+
+            self._view.add_child_at_anchor (button, anchor)
         self._text.insert (iter, '\n')
         return
 
@@ -114,21 +141,19 @@ class Entry (object):
         for k in fields:
 
             desc = db.schema [k]
-
             si = iter.get_offset ()
             
             self._text.insert (iter, desc.name + '\n')
 
             mi = iter.get_offset ()
 
-            for f in entry [k]:
-                try:
-                    cmd = self._map [f.__class__]
+            try:
+                cmd = self._map [desc.type]
 
-                except KeyError:
-                    cmd = self._default
+            except KeyError:
+                cmd = self._default
 
-                cmd (iter, f, db)
+            cmd (iter, entry [k], db)
             
             si = self._text.get_iter_at_offset (si)
             mi = self._text.get_iter_at_offset (mi)
