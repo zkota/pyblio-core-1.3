@@ -46,8 +46,8 @@ class Pairs (Constraint):
 
     def apply (self, fn, * args, **kargs):
 
-        fn (self.a, * args, ** kargs)
-        fn (self.b, * args, ** kargs)
+        self.a.apply (fn, * args, ** kargs)
+        self.b.apply (fn, * args, ** kargs)
         return
 
     def __len__ (self):
