@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="abstract" type="text">
+  <name>Abstract</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="city" type="text">
+  <name>City</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="doctype" type="txo" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>External Identifier</name>
+ </attribute>
+
+ <attribute id="isbn" type="text">
+  <name>ISBN</name>
+ </attribute>
+
+ <attribute id="issn" type="text">
+  <name>ISSN</name>
+ </attribute>
+
+ <attribute id="issue" type="text">
+  <name>Issue</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal</name>
+ </attribute>
+
+ <attribute id="note" type="text">
+  <name>Note</name>
+ </attribute>
+
+ <attribute id="pages" type="text">
+  <name>Pages</name>
+ </attribute>
+
+ <attribute id="publisher" type="text">
+  <name>Publisher</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+ <attribute id="volume" type="text">
+  <name>Volume</name>
+ </attribute>
+
+</pyblio-schema>
+ <txo-group id="doctype">
+ </txo-group>
+
+ <entry id="1">
+  <attribute id="author">
+   <person first="O" last="Sauter"/>
+   <person first="S" last="Coda"/>
+   <person first="TP" last="Goodman"/>
+   <person first="MA" last="Henderson"/>
+   <person first="R" last="Behn"/>
+   <person first="A" last="Bottino"/>
+   <person first="E" last="Fable"/>
+   <person first="A" last="Martynov"/>
+   <person first="P" last="Nikkola"/>
+   <person first="C" last="Zucca"/>
+  </attribute>
+  <attribute id="title">
+   <text>Inductive current density perturbations to probe electron internal
+transport barriers in tokamaks</text>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="author">
+   <person first="H" last="Weisen"/>
+   <person first="A" last="Zabolotsky"/>
+   <person first="C" last="Angioni"/>
+   <person first="I" last="Furno"/>
+   <person first="X" last="Garbet"/>
+   <person first="C" last="Giroud"/>
+   <person first="H" last="Leggate"/>
+   <person first="P" last="Mantica"/>
+   <person first="A" last="Mazon"/>
+   <person first="J" last="Weiland"/>
+   <person first="L" last="Zabeo"/>
+   <person first="KD" last="Zastrow"/>
+  </attribute>
+  <attribute id="title">
+   <text>Collisionality and shear dependences of density peaking in JET and
+extrapolation to ITER</text>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="author">
+   <person first="JD" last="Strachan"/>
+   <person first="B" last="Alper"/>
+   <person first="G" last="Corrigan"/>
+   <person first="SK" last="Erents"/>
+   <person first="C" last="Giroud"/>
+   <person first="A" last="Korotkov"/>
+   <person first="H" last="Leggate"/>
+   <person first="GF" last="Matthews"/>
+   <person first="RA" last="Pitts"/>
+   <person first="J" last="Spence"/>
+   <person first="M" last="Stamp"/>
+  </attribute>
+  <attribute id="title">
+   <text>Methane screening in JET reverse field experiments</text>
+  </attribute>
+ </entry>
+ <entry id="4">
+  <attribute id="author">
+   <person first="P" last="Andrew"/>
+   <person first="JP" last="Coad"/>
+   <person first="Y" last="Corre"/>
+   <person first="T" last="Eich"/>
+   <person first="A" last="Herrmann"/>
+   <person first="GF" last="Matthews"/>
+   <person first="JI" last="Paley"/>
+   <person first="L" last="Pickworth"/>
+   <person first="RA" last="Pitts"/>
+   <person first="MF" last="Stamp"/>
+  </attribute>
+  <attribute id="title">
+   <text>Outer divertor target deposited layers during reversed magnetic field
+operation in JET</text>
+  </attribute>
+ </entry>
+ <entry id="5">
+  <attribute id="author">
+   <person first="RA" last="Pitts"/>
+   <person first="P" last="Andrew"/>
+   <person first="X" last="Bonnin"/>
+   <person first="AV" last="Chankin"/>
+   <person first="Y" last="Corre"/>
+   <person first="G" last="Corrigan"/>
+   <person first="D" last="Coster"/>
+   <person first="I" last="Duran"/>
+   <person first="T" last="Eich"/>
+   <person first="SK" last="Erents"/>
+   <person first="W" last="Fundamenski"/>
+   <person first="A" last="Huber"/>
+   <person first="S" last="Jachmich"/>
+   <person first="G" last="Kirnev"/>
+   <person first="M" last="Lehnen"/>
+   <person first="PJ" last="Lomas"/>
+   <person first="A" last="Loarte"/>
+   <person first="GF" last="Matthews"/>
+   <person first="J" last="Rapp"/>
+   <person first="C" last="Silva"/>
+   <person first="MF" last="Stamp"/>
+   <person first="JD" last="Strachan"/>
+   <person first="E" last="Tsitrone"/>
+  </attribute>
+  <attribute id="title">
+   <text>Edge and divertor physics with reversed toroidal field in JET</text>
+  </attribute>
+ </entry>
+ <entry id="6">
+  <attribute id="author">
+   <person first="A" last="Huber"/>
+   <person first="J" last="Rapp"/>
+   <person first="P" last="Andrew"/>
+   <person first="P" last="Coad"/>
+   <person first="G" last="Corrigan"/>
+   <person first="K" last="Erents"/>
+   <person first="W" last="Fundamenski"/>
+   <person first="LC" last="Ingesson"/>
+   <person first="S" last="Jachmich"/>
+   <person first="A" last="Korotkov"/>
+   <person first="GF" last="Matthews"/>
+   <person first="P" last="Mertens"/>
+   <person first="V" last="Philipps"/>
+   <person first="R" last="Pitts"/>
+   <person first="B" last="Schweer"/>
+   <person first="G" last="Sergienko"/>
+   <person first="M" last="Stamp"/>
+  </attribute>
+  <attribute id="title">
+   <text>The effect of field reversal on the JET MkIIGB-SRP divertor performance
+in L-mode density limit discharges</text>
+  </attribute>
+ </entry>
+ <entry id="7">
+  <attribute id="author">
+   <person first="GS" last="Kirnev"/>
+   <person first="G" last="Corrigan"/>
+   <person first="D" last="Coster"/>
+   <person first="SK" last="Erents"/>
+   <person first="W" last="Fundamenski"/>
+   <person first="GF" last="Matthews"/>
+   <person first="RA" last="Pitts"/>
+  </attribute>
+  <attribute id="title">
+   <text>EDGE2D code simulations of SOL flows and in-out divertor asymmetries in
+JET</text>
+  </attribute>
+ </entry>
+ <entry id="8">
+  <attribute id="author">
+   <person first="W" last="Fundamenski"/>
+   <person first="P" last="Andrew"/>
+   <person first="K" last="Erents"/>
+   <person first="A" last="Huber"/>
+   <person first="G" last="Kirnev"/>
+   <person first="G" last="Matthews"/>
+   <person first="R" last="Pitts"/>
+   <person first="V" last="Riccardo"/>
+   <person first="S" last="Sipila"/>
+  </attribute>
+  <attribute id="title">
+   <text>Effect of B x del B direction on SOL energy transport in JET</text>
+  </attribute>
+ </entry>
+ <entry id="9">
+  <attribute id="author">
+   <person first="T" last="Eich"/>
+   <person first="A" last="Herrmann"/>
+   <person first="G" last="Pautasso"/>
+   <person first="P" last="Andrew"/>
+   <person first="N" last="Asakura"/>
+   <person first="JA" last="Boedo"/>
+   <person first="Y" last="Corre"/>
+   <person first="ME" last="Fenstermacher"/>
+   <person first="JC" last="Fuchs"/>
+   <person first="W" last="Fundamenski"/>
+   <person first="G" last="Federici"/>
+   <person first="E" last="Gauthier"/>
+   <person first="B" last="Goncalves"/>
+   <person first="O" last="Gruber"/>
+   <person first="A" last="Kirk"/>
+   <person first="AW" last="Leonard"/>
+   <person first="A" last="Loarte"/>
+   <person first="GF" last="Matthews"/>
+   <person first="J" last="Neuhauser"/>
+   <person first="RA" last="Pitts"/>
+   <person first="V" last="Riccardo"/>
+   <person first="C" last="Silva"/>
+  </attribute>
+  <attribute id="title">
+   <text>Power deposition onto plasma facing components in poloidal divertor
+tokamaks during type-I ELMS and disruptions</text>
+  </attribute>
+ </entry>
+ <entry id="10">
+  <attribute id="author">
+   <person first="M" last="Becoulet"/>
+   <person first="G" last="Huysmans"/>
+   <person first="P" last="Thomas"/>
+   <person first="E" last="Joffrin"/>
+   <person first="F" last="Rimini"/>
+   <person first="P" last="Monier-Garbet"/>
+   <person first="A" last="Grosman"/>
+   <person first="P" last="Ghendrih"/>
+   <person first="V" last="Parail"/>
+   <person first="P" last="Lomas"/>
+   <person first="G" last="Matthews"/>
+   <person first="H" last="Wilson"/>
+   <person first="M" last="Gryaznevich"/>
+   <person first="G" last="Counsell"/>
+   <person first="A" last="Loarte"/>
+   <person first="G" last="Saibene"/>
+   <person first="R" last="Sartori"/>
+   <person first="A" last="Leonard"/>
+   <person first="P" last="Snyder"/>
+   <person first="T" last="Evans"/>
+   <person first="P" last="Gohil"/>
+   <person first="R" last="Moyer"/>
+   <person first="Y" last="Kamada"/>
+   <person first="N" last="Oyama"/>
+   <person first="T" last="Hatae"/>
+   <person first="K" last="Kamiya"/>
+   <person first="A" last="Degeling"/>
+   <person first="Y" last="Martin"/>
+   <person first="J" last="Lister"/>
+   <person first="J" last="Rapp"/>
+   <person first="C" last="Perez"/>
+   <person first="P" last="Lang"/>
+   <person first="A" last="Chankin"/>
+   <person first="T" last="Eich"/>
+   <person first="A" last="Sips"/>
+   <person first="J" last="Stober"/>
+   <person first="L" last="Horton"/>
+   <person first="A" last="Kallenbach"/>
+   <person first="W" last="Suttrop"/>
+   <person first="S" last="Saarelma"/>
+   <person first="S" last="Cowley"/>
+   <person first="J" last="Lonnroth"/>
+   <person first="M" last="Shimada"/>
+   <person first="A" last="Polevoi"/>
+   <person first="G" last="Federici"/>
+  </attribute>
+  <attribute id="title">
+   <text>Edge localized modes control: experiment and theory</text>
+  </attribute>
+ </entry>
+ <entry id="11">
+  <attribute id="author">
+   <person first="ER" last="Solano"/>
+   <person first="S" last="Jachmich"/>
+   <person first="F" last="Villone"/>
+   <person first="N" last="Hawkes"/>
+   <person first="Y" last="Corre"/>
+   <person first="RA" last="Pitts"/>
+   <person first="A" last="Loarte"/>
+   <person first="B" last="Alper"/>
+   <person first="K" last="Guenther"/>
+   <person first="A" last="Koroktov"/>
+   <person first="M" last="Stamp"/>
+   <person first="P" last="Andrew"/>
+   <person first="SA" last="Arshad"/>
+   <person first="J" last="Conboy"/>
+   <person first="T" last="Bolzonella"/>
+   <person first="E" last="Rachlew"/>
+   <person first="M" last="Kempenaars"/>
+   <person first="A" last="Cenedese"/>
+   <person first="D" last="Testa"/>
+  </attribute>
+  <attribute id="title">
+   <text>ELMS and strike point jumps</text>
+  </attribute>
+ </entry>
+</pyblio-db>

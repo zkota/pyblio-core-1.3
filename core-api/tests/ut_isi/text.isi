@@ -1,0 +1,733 @@
+FN ISI Export Format
+VR 1.0
+PT J
+AU Sauter, O
+   Coda, S
+   Goodman, TP
+   Henderson, MA
+   Behn, R
+   Bottino, A
+   Fable, E
+   Martynov, A
+   Nikkola, P
+   Zucca, C
+TI Inductive current density perturbations to probe electron internal
+   transport barriers in tokamaks
+SO PHYSICAL REVIEW LETTERS
+LA English
+DT Article
+ID BOOTSTRAP CURRENT; TCV TOKAMAK
+AB Improved electron energy confinement in tokamak plasmas, related to
+   internal transport barriers, has been linked to nonmonotonic current
+   density profiles. This is difficult to prove experimentally since
+   usually the current profiles evolve continuously and current injection
+   generally requires significant input power. New experiments are
+   presented, in which the inductive current is used to generate positive
+   and negative current density perturbations in the plasma center, with
+   negligible input power. These results demonstrate unambiguously for the
+   first time that the electron confinement can be modified significantly
+   solely by perturbing the current density profile.
+C1 EURATOM, EPFL, Confederat Suisse, Ctr Rech Phys Plasmas, CH-1015 Lausanne, Switzerland.
+RP Sauter, O, EURATOM, EPFL, Confederat Suisse, Ctr Rech Phys Plasmas, PPB
+   Stn 13, CH-1015 Lausanne, Switzerland.
+NR 17
+TC 0
+PU AMERICAN PHYSICAL SOC
+PI COLLEGE PK
+PA ONE PHYSICS ELLIPSE, COLLEGE PK, MD 20740-3844 USA
+SN 0031-9007
+J9 PHYS REV LETT
+JI Phys. Rev. Lett.
+PD MAR 18
+PY 2005
+VL 94
+IS 10
+AR 105002
+PG 4
+SC Physics, Multidisciplinary
+UT ISI:000227838900030
+ER
+
+PT J
+AU Weisen, H
+   Zabolotsky, A
+   Angioni, C
+   Furno, I
+   Garbet, X
+   Giroud, C
+   Leggate, H
+   Mantica, P
+   Mazon, A
+   Weiland, J
+   Zabeo, L
+   Zastrow, KD
+TI Collisionality and shear dependences of density peaking in JET and
+   extrapolation to ITER
+SO NUCLEAR FUSION
+LA English
+DT Letter
+ID L-MODE PLASMAS; PARTICLE PINCH; ASDEX UPGRADE; INVERSION; TOKAMAK;
+   PROFILE; SHAPE; TCV
+AB Results from an extensive database analysis of JET density profiles in
+   stationary conditions show that the density peaking factor n(e0)/<
+   n(e)> in JET H modes increases from near 1.2 at high collisionality to
+   around 1.5 as the plasma collisionality decreases towards the values
+   expected for ITER. This result confirms an earlier observation on AUG.
+   The density peaking behaviour of L modes is remarkably different from
+   that of H modes, scaling with overall plasma shear as (n(e0)/< n(e)>
+   similar to 1.5l(i)), independently of collisionality. H-mode density
+   profiles show no shear dependence, except at the lowest
+   collisionalities. No evidence for L-Te, L-Ti, rho* or beta dependences
+   has been obtained. Carbon impurity density profiles from charge
+   exchange spectroscopy are always less peaked than electron density
+   profiles and usually flat in H modes. The peaking of the electron
+   density profiles, together with the flatness of the impurity density
+   profiles, are favourable for fusion performance if they can be
+   extrapolated to ignited conditions.
+C1 Assoc Euratom Confederat Suisse, Ctr Rech Phys Plasmas, EPFL, CH-1015 Lausanne, Switzerland.
+   EURATOM, IPP, Max Planck Inst Plasmaphys, D-85748 Garching, Germany.
+   Los Alamos Natl Lab, Los Alamos, NM 87545 USA.
+   CEA, DRFC, DSM, EURATOM Assoc, Cadarache, France.
+   United Kingdom Atom Energy Author, UKAEA Euratom Fus Assoc, Abingdon, Oxon, England.
+   CNR, ENEA, EURATOM Assoc, Ist Fis Plasma, I-20133 Milan, Italy.
+   Euratom VR Assoc, Gothenburg, Sweden.
+RP Weisen, H, Assoc Euratom Confederat Suisse, Ctr Rech Phys Plasmas,
+   EPFL, CH-1015 Lausanne, Switzerland.
+NR 16
+TC 0
+PU INT ATOMIC ENERGY AGENCY
+PI VIENNA
+PA WAGRAMERSTRASSE 5, PO BOX 100, A-1400 VIENNA, AUSTRIA
+SN 0029-5515
+J9 NUCL FUSION
+JI Nucl. Fusion
+PD FEB
+PY 2005
+VL 45
+IS 2
+BP L1
+EP L4
+PG 4
+SC Physics, Fluids & Plasmas; Physics, Nuclear
+UT ISI:000227818500001
+ER
+
+PT J
+AU Strachan, JD
+   Alper, B
+   Corrigan, G
+   Erents, SK
+   Giroud, C
+   Korotkov, A
+   Leggate, H
+   Matthews, GF
+   Pitts, RA
+   Spence, J
+   Stamp, M
+TI Methane screening in JET reverse field experiments
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE carbon impurities; edge plasma; impurity screening; JET; plasma flow
+ID SCRAPE-OFF LAYER; DIII-D; IMPURITIES; TRANSPORT; DIVERTOR; PLASMAS;
+   JT-60U; EDGE
+AB JET plasmas with reverse magnetic field feature a different SOL flow
+   than those with normal field. The observed carbon fuelling efficiency
+   from injecting methane gas was similar in reverse and normal field.
+   EDGE2D modeling used an externally applied force to create the SOL
+   flows, without specifying the origin of the force. The resulting flow
+   agreed reasonably with the experimental values between the separatrix
+   and 4 cm mid-plane depth in the SOL. The effect of the flow on the
+   calculated carbon screening was 5-15% higher carbon fuelling efficiency
+   for the low flow velocity with reverse field. (c) 2004 Elsevier B.V.
+   All rights reserved.
+C1 Princeton Univ, Plasma Phys Lab, Princeton, NJ 08543 USA.
+   UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   CEA, EURATOM Assoc, F-13018 St Paul Les Durance, France.
+   Ecole Polytech Fed Lausanne, EURATOM Assoc, Confederat Suisse, CRPP, CH-1015 Lausanne, Switzerland.
+RP Strachan, JD, Princeton Univ, Plasma Phys Lab, POB 451, Princeton, NJ
+   08543 USA.
+EM jstrachan@pppl.gov
+NR 10
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 25
+EP 29
+PG 5
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500005
+ER
+
+PT J
+AU Andrew, P
+   Coad, JP
+   Corre, Y
+   Eich, T
+   Herrmann, A
+   Matthews, GF
+   Paley, JI
+   Pickworth, L
+   Pitts, RA
+   Stamp, MF
+CA JET EFDA Contributors
+TI Outer divertor target deposited layers during reversed magnetic field
+   operation in JET
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE erosion and deposition; divertor asymmetry; JET; thermography
+AB Divertor surface temperatures are significantly affected by the
+   presence of deposited surface layers. This phenomenon can be used to
+   monitor deposited layer evolution on a shot-by-shot basis. It was found
+   that during an experimental campaign where the B x del B direction was
+   reversed that the outer target, normally an erosion zone, became a
+   deposition zone. (c) 2004 Published by Elsevier B.V.
+C1 UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   EURATOM Assoc VR, KTH Phys Dept, S-10691 Stockholm, Sweden.
+   EURATOM, Max Planck Inst Plasmaphys, D-85748 Garching, Germany.
+   Blackett Lab, Plasma Phys Grp, London SW7 2AZ, England.
+   EURATOM, EPFL, CRPP Assoc, Confederat Suisse, CH-1015 Lausanne, Switzerland.
+RP Andrew, P, UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB,
+   Oxon, England.
+EM pla@jet.uk
+NR 9
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 99
+EP 103
+PG 5
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500020
+ER
+
+PT J
+AU Pitts, RA
+   Andrew, P
+   Bonnin, X
+   Chankin, AV
+   Corre, Y
+   Corrigan, G
+   Coster, D
+   Duran, I
+   Eich, T
+   Erents, SK
+   Fundamenski, W
+   Huber, A
+   Jachmich, S
+   Kirnev, G
+   Lehnen, M
+   Lomas, PJ
+   Loarte, A
+   Matthews, GF
+   Rapp, J
+   Silva, C
+   Stamp, MF
+   Strachan, JD
+   Tsitrone, E
+CA EFDA-JET workprogramme
+TI Edge and divertor physics with reversed toroidal field in JET
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE SOL; particle drifts; JET; plasma flow; divertor
+ID SCRAPE-OFF LAYER; BOUNDARY PLASMA; MODELS; TOKAMAK; SOL; ASYMMETRIES;
+   PARTICLE; DRIFTS; JT-60U; FLOW
+AB Asymmetries are a ubiquitous feature of the scrape-off layer (SOL) and
+   divertor plasmas in any tokamak and are thought to be driven primarily
+   by a variety of drift flows, the directions of which reverse with
+   reversal of the main toroidal field. The understanding of precisely how
+   these field dependent drifts combine to yield any given experimental
+   observation is still very much incomplete. A recent campaign of
+   reversed field operation at JET designed to match a variety of
+   discharges to their more frequently executed forward field counterparts
+   has been executed in an attempt to contribute to this understanding.
+   This paper summarises the most important findings from these
+   experiments and includes some new EDGE2D simulation results describing
+   the SOL flow. (c) 2004 Elsevier B.V. All rights reserved.
+C1 Ecole Polytech Fed Lausanne, Assoc Euratom Confederat Suisse, Ctr Rech Phys Plasmas, CH-1015 Lausanne, Switzerland.
+   UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   Assoc Euratom CEA, DRFC, DSM, CEA Cadarache, F-13108 St Paul Les Durance, France.
+   EURATOM, Max Planck Inst Plasmaphys, D-85748 Garching, Germany.
+   EURATOM, IPP, Inst Plasma Phys, CR, Prague, Czech Republic.
+   FZJ Julich GmbH, EURATOM, Inst Plasma Phys, TEC, D-52425 Julich, Germany.
+   EURATOM, LPP, KMS, ERM, B-1000 Brussels, Belgium.
+   RRC Kurchatov Inst, Moscow Nucl Fus Inst, Moscow 123182, Russia.
+   Max Planck Inst Plasma Phys, CSU, EFDA, D-85748 Garching, Germany.
+   EURATOM, IST, P-1049001 Lisbon, Portugal.
+   Princeton Univ, Plasma Phys Lab, Princeton, NJ 08542 USA.
+RP Pitts, RA, Ecole Polytech Fed Lausanne, Assoc Euratom Confederat
+   Suisse, Ctr Rech Phys Plasmas, Batiment PPB, CH-1015 Lausanne,
+   Switzerland.
+EM richard.pitts@epfl.ch
+NR 23
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 146
+EP 153
+PG 8
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500029
+ER
+
+PT J
+AU Huber, A
+   Rapp, J
+   Andrew, P
+   Coad, P
+   Corrigan, G
+   Erents, K
+   Fundamenski, W
+   Ingesson, LC
+   Jachmich, S
+   Korotkov, A
+   Matthews, GF
+   Mertens, P
+   Philipps, V
+   Pitts, R
+   Schweer, B
+   Sergienko, G
+   Stamp, M
+CA JET EFDA Contributors
+TI The effect of field reversal on the JET MkIIGB-SRP divertor performance
+   in L-mode density limit discharges
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE divertor asymmetry; density limit; divertor radiation; detachment;
+   bolometer tomography
+ID DIII-D; PLASMA; BEHAVIOR; PARTICLE; EDGE
+AB The effect of field reversal on the JET MkIIGB-SRP divertor performance
+   has been investigated in L-mode density limit discharges. These
+   experiments show that the direction of the magnetic field has a
+   substantial effect on divertor physics, modifying the character of
+   detachment and density limits. Reversal of the ion del B-drift
+   direction away from the X-point results in a reduction of the density
+   limit of about 15%. In contrast to forward field direction, the
+   divertor parameters such as density and temperature as well as divertor
+   radiation distribution and power at the divertor target become more
+   symmetrical in the discharges with reversed field. The influence of
+   different field configurations on the divertor performance has been
+   analysed with respect to the dependence on density and heating power.
+   The experimental observations of out-in asymmetry in target power as
+   well as in the CIII-emission distribution is consistent with EDGE2D
+   simulations, which include the effect of drifts. (c) 2004 Elsevier B.V.
+   All rights reserved.
+C1 EURATOM, Forschungszentrum Julich GmbH, Inst Plasma Phys, Trilateral Euregio Cluster, D-52425 Julich, Germany.
+   UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   FOM, Inst Plasmafys, Nieuwegein, Netherlands.
+   Ecole Polytech Fed Lausanne, Assoc Euratom Confederat Suisse, Ctr Rech Phys Plasmas, CH-1007 Lausanne, Switzerland.
+RP Huber, A, EURATOM, Forschungszentrum Julich GmbH, Inst Plasma Phys,
+   Trilateral Euregio Cluster, Postfach 1913, D-52425 Julich, Germany.
+EM a.huber@fz-juelich.de
+NR 15
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 241
+EP 245
+PG 5
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500047
+ER
+
+PT J
+AU Kirnev, GS
+   Corrigan, G
+   Coster, D
+   Erents, SK
+   Fundamenski, W
+   Matthews, GF
+   Pitts, RA
+TI EDGE2D code simulations of SOL flows and in-out divertor asymmetries in
+   JET
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE 2D modelling; parallel particle flow; divertor asymmetry; JET
+ID SCRAPE-OFF-LAYER; PLASMA-FLOW; POLOIDAL ASYMMETRIES; TARGET
+   ASYMMETRIES; TOKAMAK; TRANSPORT; JT-60U; TURBULENCE; PARTICLE; FLUXES
+AB EDGE2D simulations show that high SOL flows can be generated when an
+   additional radial convective transport is applied in the SOL and
+   pedestal region along with a 'ballooning-like' poloidal variation in
+   transport. This model produces an inward particle flux at the inboard
+   side of the plasma along with an enhanced outward flux at the outer
+   midplane. Parallel Mach numbers can be produced at the top of the
+   machine which are comparable in magnitude to those observed by the JET
+   Mach probes. For the normal toroidal magnetic field direction, the
+   parallel flow Mach number is about M = 0.32 in this case. Applying
+   these two additional mechanisms also allows experimental outer to inner
+   target power and out-in divertor line emission intensity asymmetries to
+   be qualitatively reproduced. (c) 2004 Elsevier B.V. All rights reserved.
+C1 RRC Kurchatov Inst, Nucl Fus Inst, Moscow 123182, Russia.
+   Euratom UKAEA, Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   Assoc Euratom IPP, Max Planck Inst Plasmaphys, Garching, Germany.
+   Ecole Polytech Fed Lausanne, Assoc Euratom Confederat Suisse, Ctr Rech & Phys Plasmas, CH-1015 Lausanne, Switzerland.
+RP Kirnev, GS, RRC Kurchatov Inst, Nucl Fus Inst, Kurchatov Sq 1, Moscow
+   123182, Russia.
+EM kirnev@fusion.ru
+NR 23
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 271
+EP 275
+PG 5
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500053
+ER
+
+PT J
+AU Fundamenski, W
+   Andrew, P
+   Erents, K
+   Huber, A
+   Kirnev, G
+   Matthews, G
+   Pitts, R
+   Riccardo, V
+   Sipila, S
+CA EFDA JET contributors
+TI Effect of B x del B direction on SOL energy transport in JET
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE cross-field transport; edge plasma; particle drifts; plasma flow; power
+   deposition
+ID ELMY H-MODES; DIVERTOR; PLASMA; FIELD; ASYMMETRIES; PROFILES; REVERSAL
+AB The toroidal field and plasma current were reversed in recent JET
+   experiments to yield a large number of good forward-reversed matched
+   pairs. The direction, magnitude and scaling of the poloidal energy
+   transport in the SOL can be explained by (neo-)classical drift-related
+   heat fluxes (E x B and/or B x del T) whose relative contribution scales
+   as rho(0s)/lambda(T sigma). Radial energy transport is largely
+   independent of the B x del B direction, consistent with classical ion
+   conduction. (c) 2004 Elsevier B.V. All rights reserved.
+C1 UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14 3DB, Oxon, England.
+   TEC, FZJ Julich GmbH, Euratom Inst Plasmaphys, D-52425 Julich, Germany.
+   RRC Kurchatov Inst, Moscow Nucl Fus Inst, Moscow 123182, Russia.
+   Assoc Euratom Confederat Suisse, CRPP EDFL, CH-1015 Lausanne, Switzerland.
+   Helsinki Univ Technol, Euratom Tekes Assoc, FIN-02015 Espoo, Finland.
+RP Fundamenski, W, UKAEA Euratom Fus Assoc, Culham Sci Ctr, Abingdon OX14
+   3DB, Oxon, England.
+EM wfund@jet.uk
+NR 17
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 305
+EP 309
+PG 5
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500060
+ER
+
+PT J
+AU Eich, T
+   Herrmann, A
+   Pautasso, G
+   Andrew, P
+   Asakura, N
+   Boedo, JA
+   Corre, Y
+   Fenstermacher, ME
+   Fuchs, JC
+   Fundamenski, W
+   Federici, G
+   Gauthier, E
+   Goncalves, B
+   Gruber, O
+   Kirk, A
+   Leonard, AW
+   Loarte, A
+   Matthews, GF
+   Neuhauser, J
+   Pitts, RA
+   Riccardo, V
+   Silva, C
+TI Power deposition onto plasma facing components in poloidal divertor
+   tokamaks during type-I ELMS and disruptions
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE power deposition; divertor; first wall; ELMs; disruption
+ID EDGE LOCALIZED MODES; SCRAPE-OFF LAYER; PARTICLE LOSSES; DIII-D;
+   ASDEX-UPGRADE; HEAT-FLUX; H-MODES; ENERGY; JET; ITER
+AB A comparative analysis of the spatial and temporal characteristics of
+   transient energy loads (ELMs and disruptions) on plasma facing
+   components (PFCs) in present tokamak devices and their extrapolation to
+   next step devices is presented. Type I ELMs lead to the expulsion of
+   energy by the plasma in helical structures with ballooning-like
+   features and toroidal numbers in the range n = 10-15. The plasma energy
+   is transported towards the divertor and the main chamber PFCs leading
+   to significant transient energy loads at these two locations on small
+   wetted area. The largest transient energy fluxes onto PFCs in tokamaks
+   are measured during the thermal quench of disruptions. These fluxes do
+   not exceed greatly those of large Type I ELMs, due to the much larger
+   wetted area for energy flux during the thermal quench compared to Type
+   I ELMs. The implications of these findings for the next step devices
+   are discussed. (c) 2004 Elsevier B.V. All rights reserved.
+C1 Max Planck Inst Plasma Phys, IPP, EURATOM Assoc, D-85748 Garching, Germany.
+   Culham Sci Ctr, EURATOM, UKAEA Fus Assoc, Abingdon OX14 3DB, Oxon, England.
+   Univ Calif San Diego, La Jolla, CA 92093 USA.
+   CEA, EURATOM Assoc, F-13108 St Paul Les Durance, France.
+   Lawrence Livermore Natl Lab, Livermore, CA 94551 USA.
+   Max Planck Inst Plasma Phys, ITER JWS, Garching, Germany.
+   Inst Super Tecn, EURATOM Assoc, Lisbon, Portugal.
+   Gen Atom, San Diego, CA 92186 USA.
+   Max Planck Inst Plasma Phys, CSU, EFDA, Garching, Germany.
+   EPFL, CRPP, EURATOM Assoc, CH-1015 Lausanne, Switzerland.
+RP Eich, T, Max Planck Inst Plasma Phys, IPP, EURATOM Assoc, Boltzmann Str
+   2, D-85748 Garching, Germany.
+EM thomas.eich@ipp.mpg.de
+NR 48
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 669
+EP 676
+PG 8
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500133
+ER
+
+PT J
+AU Becoulet, M
+   Huysmans, G
+   Thomas, P
+   Joffrin, E
+   Rimini, F
+   Monier-Garbet, P
+   Grosman, A
+   Ghendrih, P
+   Parail, V
+   Lomas, P
+   Matthews, G
+   Wilson, H
+   Gryaznevich, M
+   Counsell, G
+   Loarte, A
+   Saibene, G
+   Sartori, R
+   Leonard, A
+   Snyder, P
+   Evans, T
+   Gohil, P
+   Moyer, R
+   Kamada, Y
+   Oyama, N
+   Hatae, T
+   Kamiya, K
+   Degeling, A
+   Martin, Y
+   Lister, J
+   Rapp, J
+   Perez, C
+   Lang, P
+   Chankin, A
+   Eich, T
+   Sips, A
+   Stober, J
+   Horton, L
+   Kallenbach, A
+   Suttrop, W
+   Saarelma, S
+   Cowley, S
+   Lonnroth, J
+   Shimada, M
+   Polevoi, A
+   Federici, G
+TI Edge localized modes control: experiment and theory
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE ELM; ELM control; edge modelling
+ID ELMY H-MODES; MHD STABILITY ANALYSIS; ASDEX UPGRADE; I ELMS; DIII-D;
+   TRANSPORT BARRIERS; PELLET INJECTION; BOUNDARY PLASMA; PARTICLE LOSSES;
+   HIGH-DENSITY
+AB The paper reviews recent theoretical and experimental results focussing
+   on the identification of the key factors controlling ELM energy and
+   particle losses both in natural ELMs and in the presence of external
+   controlling mechanisms. Present experiment and theory pointed out the
+   benefit of the high plasma shaping, high q(95) and high pedestal
+   density in reducing the ELM affected area and conductive energy losses
+   in Type I ELMs. Small benign ELMs regimes in present machines (EDA,
+   HRS, Type II, Grassy, QH, Type III in impurity seeded discharges at
+   high delta) and their relevance for ITER are reviewed. Recent studies
+   of active control of ELMs using stochastic boundaries, small pellets
+   and edge current generation are presented. (c) 2004 Elsevier B.V. All
+   rights reserved.
+C1 CEA Cadarache, DSM, DRFC, EURATOM Assoc, F-13108 St Paul Les Durance, France.
+   Fus Culham Sci Ctr, EURATOM, UKAEA Assoc, Abingdon OX14 3EA, Oxon, England.
+   EFDA Close Support Unit, D-85748 Garching, Germany.
+   Gen Atom, San Diego, CA USA.
+   Univ Calif San Diego, La Jolla, CA 92093 USA.
+   Japan Atom Energy Res Inst, Naka, Ibaraki 3110193, Japan.
+   Ecole Polytech Fed Lausanne, Assoc Euratom Confederat Suisse, Ctr Rech Phys Plasmas, CH-1015 Lausanne, Switzerland.
+   KFA Julich GmbH, Forschungszentrum, Inst Plasma Phys, D-52425 Julich, Germany.
+   Max Planck Inst Plasma Phys, IPP, EURATOM Assoc, D-85748 Garching, Germany.
+   Helsinki Univ Technol, TEKES Assoc, EURATOM, FIN-02015 Helsinki, Finland.
+   Univ London Imperial Coll Sci Technol & Med, Dept Phys, London SW7 2BZ, England.
+   Helsinki Univ Technol, EURATOM, Tekes, Helsinki 02015, Finland.
+   ITER Int Team, Naka, Ibaraki 3110193, Japan.
+   ITER JWS Garching Coctr, D-85748 Garching, Germany.
+RP Becoulet, M, CEA Cadarache, DSM, DRFC, EURATOM Assoc, F-13108 St Paul
+   Les Durance, France.
+EM marina@drfc.cad.cea.fr
+NR 59
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 677
+EP 683
+PG 7
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500134
+ER
+
+PT J
+AU Solano, ER
+   Jachmich, S
+   Villone, F
+   Hawkes, N
+   Corre, Y
+   Pitts, RA
+   Loarte, A
+   Alper, B
+   Guenther, K
+   Koroktov, A
+   Stamp, M
+   Andrew, P
+   Arshad, SA
+   Conboy, J
+   Bolzonella, T
+   Rachlew, E
+   Kempenaars, M
+   Cenedese, A
+   Testa, D
+CA JET EFDA contributors
+TI ELMS and strike point jumps
+SO JOURNAL OF NUCLEAR MATERIALS
+LA English
+DT Article
+DE ELM; edge currents; edge plasma; edge pedestal; JET
+AB If an ELM is a peeling of flux surfaces from the plasma, due to a
+   broken separatrix, current density is lost as well as particles and
+   energy. The fast loss of a current-carrying plasma layer modifies the
+   plasma equilibrium, leading to sudden shifts in the strike points at
+   each ELM, towards the plasma centre. An experimental study of this
+   conjectured model of the ELM has been made at JET, showing that in all
+   cases of Type I ELMs studied, strike point shifts were observed. In two
+   cases studied in detail, the estimated equilibrium changes provoked by
+   flux surface peeling agree qualitatively with the observed strike point
+   shifts. (c) 2004 Elsevier B.V. All rights reserved.
+C1 CIEMAT Fus, Asociac EURATOM, E-28040 Madrid, Spain.
+   Assoc EURATOM Belgian State, LPP, KMS, ERM, B-1000 Brussels, Belgium.
+   Univ Cassino, EURATOM Assoc, DAEIMI, CREATE,ENEA, I-03043 Cassino, Italy.
+   Culham Sci Ctr, UKAEA Euratom Fus Assoc, Abingdon OX14 3DB, Oxon, England.
+   CEA Cadarache, EURATOM Assoc, CEA, DSM,DRFC, F-13108 St Paul Les Durance, France.
+   EPFL, Assoc Euratom Confederat Suisse, CRPP, CH-1015 Lausanne, Switzerland.
+   Max Planck Inst Plasma Phys, EFDA Close Support Unit, D-85748 Garching, Germany.
+   ENEA Fus, EURATOM Assoc, Consorzio RFX, I-35127 Padua, Italy.
+   KTH, Dept Phys, EURATOM, VR Assoc, S-10691 Stockholm, Sweden.
+   TEC, FOM, EURATOM Assoc, FOM Rijnhuizen, NL-3430 BE Nieuwegein, Netherlands.
+   Univ Padua, DIE, I-35131 Padua, Italy.
+RP Solano, ER, CIEMAT Fus, Asociac EURATOM, Avda Compultense 22, E-28040
+   Madrid, Spain.
+EM emilia.solano@cieniat.es
+   alberto.loarte@efda.org
+NR 8
+TC 0
+PU ELSEVIER SCIENCE BV
+PI AMSTERDAM
+PA PO BOX 211, 1000 AE AMSTERDAM, NETHERLANDS
+SN 0022-3115
+J9 J NUCL MATER
+JI J. Nucl. Mater.
+PD MAR 1
+PY 2005
+VL 337-39
+IS 1-3
+BP 747
+EP 750
+PG 4
+SC Materials Science, Multidisciplinary; Mining & Mineral Processing;
+   Nuclear Science & Technology
+UT ISI:000227789500147
+ER
+
+EF
