@@ -101,7 +101,7 @@ class Join (list):
         return r
 
     def execute (self, env):
-        return map (lambda x: x.execute (env), self)
+        return Join (map (lambda x: x.execute (env), self))
 
 
     def flat (self):

@@ -35,45 +35,12 @@ from gettext import gettext as _
 # Base Classes
 # ==================================================
 
-class Environ (object):
+class Environ (Coding.Environ):
 
     def __init__ (self):
 
         self.strings = {}
         return
-
-    def run (self, cmd, stack):
-
-        try:
-            m = Coding.basemap [cmd]
-        except KeyError:
-            return Reader.Text ('?')
-
-        # If we have a map, we need the single next character
-        while 1:
-            if isinstance (stack [0], Reader.Text):
-                tt = stack.pop (0)
-
-                if len (tt) > 1:
-                    t = tt [0]
-                    stack.insert (0, Reader.Text (tt [1:]))
-                else:
-                    t = tt
-
-                return Reader.Text (m [t])
-
-            elif isinstance (stack [0], Reader.Block):
-                # Move this block back one step
-                d = list (stack.pop (0)._d)
-
-                while d:
-                    stack.insert (0, d.pop ())
-
-            else:
-                raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, stack)))
-
-        
-
 
 
 # ==================================================
@@ -96,6 +63,8 @@ class Importer (object):
             Attribute.URL:    self.url_add,
             Attribute.Date:   self.date_add,
             }
+
+        self.env = Environ ()
         
         return
 
@@ -112,7 +81,7 @@ class Importer (object):
     
 
     def text_add (self, field, stream):
-        self.record [field] = [Attribute.Text (stream.flat ())]
+        self.record [field] = [Attribute.Text (stream.execute (self.env).flat ())]
         return
 
     def person_add (self, field, stream):
@@ -164,7 +133,7 @@ class Importer (object):
 
         def _wordify (stream):
 
-            stream = stream.execute (Environ ())
+            stream = stream.execute (self.env)
             stream = stream.subst ()
 
             # Ensure the stream is a sequence of complete words (ie,
@@ -342,7 +311,7 @@ class Importer (object):
         tp, key, val = record.type, record.key, record.fields
 
         self.id_add (key)
-        
+
         for k, v in val:
             self.record_dispatch (tp, k.lower (), v)
             
