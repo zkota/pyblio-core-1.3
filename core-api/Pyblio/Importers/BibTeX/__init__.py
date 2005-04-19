@@ -287,7 +287,7 @@ class Importer (object):
 
         pass
 
-    def record_dispatch (self, tp, k, v):
+    def record_dispatch (self, k, v):
 
         try:
             attp = self.db.schema [k]
@@ -295,7 +295,7 @@ class Importer (object):
         except KeyError:
             raise Exceptions.SchemaError (
                 _("no attribute '%s' in document '%s'") % (
-                k, tp))
+                k, self.tp))
         
         self._mapping [attp.type] (k, v)
         return
@@ -308,15 +308,15 @@ class Importer (object):
         self.record = Store.Record ()
         self.record_begin ()
 
-        tp, key, val = record.type, record.key, record.fields
+        self.tp, key, val = record.type, record.key, record.fields
 
         self.id_add (key)
 
         for k, v in val:
-            self.record_dispatch (tp, k.lower (), v)
+            self.record_dispatch (k.lower (), v)
             
         # Add the document type
-        self.type_add (tp)
+        self.type_add (self.tp)
         
         self.record_end ()
 
