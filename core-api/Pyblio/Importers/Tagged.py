@@ -238,9 +238,9 @@ class Importer (Callback.Publisher):
 
     Parser = None
 
-    def parse (self, fd, db):
+    def parse (self, fd, db, charset = 'UTF-8'):
 
-        self._fd = self.Parser (fd)
+        self._fd = self.Parser (fd, charset)
         self.db = db
 
         self.emit ('file-start')
