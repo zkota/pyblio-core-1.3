@@ -118,7 +118,8 @@ class join (object):
 
 def access (record):
 
-    """ Return two accessors (all, one) for the specified record:
+    """
+    Return two accessors (all, one) for the specified record:
 
       - all (field) : return all the values for the field
 

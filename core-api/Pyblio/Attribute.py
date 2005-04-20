@@ -18,7 +18,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-""" Basic data types that can be used as attributes for a Core.Record """
+""" Basic data types that can be used as attributes for a L{Record
+<Pyblio.Store.Record>}"""
 
 import string, re, urlparse, os
 
@@ -32,7 +33,7 @@ re_split = re.compile (r'[^\w]+', re.UNICODE)
 
 
 class Person (object):
-    ''' Description of a person identity '''
+    ''' A person name '''
 
     def __init__ (self, honorific = None, first = None, last = None, lineage = None):
 
@@ -66,7 +67,7 @@ class Person (object):
 
 
 class Date:
-    ''' Description of a date '''
+    ''' A date '''
 
     def __init__ (self, year = None, month = None, day = None):
 
@@ -96,7 +97,7 @@ class Date:
 
             
 class Text (unicode):
-    ''' This class holds all the other fields (not an Author or a Date) '''
+    ''' A textual data '''
 
     def xmlwrite (self, fd):
 
@@ -112,7 +113,7 @@ class Text (unicode):
     
 
 class URL (str):
-    ''' Holder for URL data (for example, the location of a database) '''
+    ''' An URL '''
 
     def xmlwrite (self, fd):
 
@@ -134,7 +135,7 @@ class URL (str):
 
 class ID (unicode):
 
-    ''' External Identifier (not meaningful for Pyblio) '''
+    ''' An external identifier '''
 
     def xmlwrite (self, fd):
         fd.write ('<id value=%s/>' % quoteattr (self.encode ('utf-8')))

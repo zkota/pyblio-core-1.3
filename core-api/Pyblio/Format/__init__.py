@@ -1,12 +1,14 @@
 """
-Allows the writing of citation styles like:
+Citation formatting layer.
 
-authors  = lastFirst (all ('author'))
+Allows the writing of citation styles with a convenient syntax::
 
-location = join (', ') ['vol. ' + one ('volume'),
-                        'num. ' + one ('number'), ]
+  authors  = lastFirst (all ('author'))
+
+  location = join (', ') ['vol. ' + one ('volume'),
+                          'num. ' + one ('number'), ]
                        
-citation = join (', ') [ authors , I [ one ('title') | 'untitled' ] ]
+  citation = join (', ') [ authors , I [ one ('title') | 'untitled' ] ]
 
 """
 

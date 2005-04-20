@@ -19,11 +19,16 @@
 # 
 
 
-''' This Module contains the interfaces one might want to inherit from
-in order to provide a specific database _storage_.
+'''
+Contains the base classes and interfaces used to define a database of records.
+The databases can be managed in different physical L{stores <Pyblio.Stores>}.
 
-By itself, this base classes provide the XML import and export layers,
-plus common abstractions.
+To create a new database, get a specific store implementation with the
+L{get <Pyblio.Store.get>} function, and call the provided L{dbcreate
+<Pyblio.Stores.File.dbcreate>} function::
+
+  db = get ('file').dbcreate (path, schema)
+
 '''
 
 import os, string, copy

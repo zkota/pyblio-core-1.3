@@ -18,6 +18,15 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
+"""
+Provides an in-memory store, which can read and save the database in
+Pyblio's XML format.
+
+This store is useful for relatively small databases (up to a few
+thousand entries) and that are processed in batch once for instance,
+as the reading and writing can be slow.
+"""
+
 from gettext import gettext as _
 
 import os, copy, string

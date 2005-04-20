@@ -21,39 +21,43 @@
 """
 Store implementation on top of Berkeley DB (>= 4.1)
 
-Tables in use:
-
-* database/entries [HASH]
-
-  key:   string value of an entry key
-  value: Store.Record as a pickled object
-
-* database/meta [HASH]
-
-  key:   a meta parameter (next available key,...)
-  value: its value
-
-* database/enum [HASH]
-
-  key:   id of the enum
-  value: pickled dict containing the values
-
-* index/full [HASH / DUP]
-
-  key:   the indexed value
-  value: the entry that contains the value
-
-* resultset/<id> [HASH]
-
-  key:   string value of the entry's key
-  value: no meaning
-
-* view/<id> [BTREE / RECNUM]
-
-  key:   field on which we sort
-  value: key from which the field is taken
-
+This store is suitable for large databases, or for cases where the
+startup time is more important.
 """
+
+# Tables in use:
+# 
+# * database/entries [HASH]
+# 
+#   key:   string value of an entry key
+#   value: Store.Record as a pickled object
+# 
+# * database/meta [HASH]
+# 
+#   key:   a meta parameter (next available key,...)
+#   value: its value
+# 
+# * database/enum [HASH]
+# 
+#   key:   id of the enum
+#   value: pickled dict containing the values
+# 
+# * index/full [HASH / DUP]
+# 
+#   key:   the indexed value
+#   value: the entry that contains the value
+# 
+# * resultset/<id> [HASH]
+# 
+#   key:   string value of the entry's key
+#   value: no meaning
+# 
+# * view/<id> [BTREE / RECNUM]
+# 
+#   key:   field on which we sort
+#   value: key from which the field is taken
+# 
+
 from gettext import gettext as _
 
 import os, shutil, copy, sys, traceback, string, weakref
