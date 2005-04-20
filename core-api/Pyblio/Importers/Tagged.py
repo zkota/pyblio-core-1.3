@@ -272,7 +272,7 @@ class Importer (Callback.Publisher):
         for line, tag, data in record:
 
             try:
-                cmd = getattr (self, 'do_%s' % tag)
+                cmd = getattr (self, 'do_%s' % tag.replace ('-', '_'))
 
             except AttributeError:
 
