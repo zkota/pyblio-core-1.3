@@ -240,13 +240,13 @@ class Importer (Callback.Publisher):
 
     def parse (self, fd, db, charset = 'UTF-8'):
 
-        self._fd = self.Parser (fd, charset)
+        self.parser = self.Parser (fd, charset)
         self.db = db
 
         self.emit ('file-start')
         
         while 1:
-            record = self._fd.next ()
+            record = self.parser.next ()
             
             if record is None: break
 
