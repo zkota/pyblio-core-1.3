@@ -20,15 +20,62 @@
 
 
 '''
-Contains the base classes and interfaces used to define a database of records.
-The databases can be managed in different physical L{stores <Pyblio.Stores>}.
+Overview
+========
 
-To create a new database, get a specific store implementation with the
-L{get <Pyblio.Store.get>} function, and call the provided L{dbcreate
-<Pyblio.Stores.File.dbcreate>} function::
+  Contains the base classes and interfaces used to define a database of records.
+  
+  The databases can be managed in different L{physical stores
+  <Pyblio.Stores>}.  To create a new database, get a specific store
+  implementation with the L{get <Pyblio.Store.get>} function, and call
+  the provided L{dbcreate <Pyblio.Stores.File.dbcreate>} function::
+  
+    db = get ('file').dbcreate (path, schema)
+  
+  Once this is done, the database is ready to accept L{records <Pyblio.Store.Record>}.
+  
+Adding a new record
+===================
 
-  db = get ('file').dbcreate (path, schema)
+  To add a new record r to a database db::
+  
+    r = Record ()
+    r ['title'] = Attribute.Text ('my title')
+  
+    k = db.add (r)
+  
+  When the record is added, a L{key <Pyblio.Store.Key>} is generated
+  which uniquely references the record.
 
+Accessing a record
+==================
+
+  It is possible to use the database as a dictionnary. So, given a key k::
+  
+    r = db [k]
+  
+  Alternatively, one can access all the records in a database in random
+  order::
+  
+    for k, v in db.entries.iteritems ():
+       ...
+  
+Updating a record
+=================
+
+  Simply store the record back once it is updated::
+  
+    r = db [k]
+    ... (update the record) ...
+    db [k] = r
+    
+    
+@see: L{queries <Pyblio.Query>}
+
+@attention: getting a record from the database returns a I{new copy}
+at each access. Updating this copy I{does not} change the stored
+value.
+  
 '''
 
 import os, string, copy
