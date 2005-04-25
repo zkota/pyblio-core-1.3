@@ -71,7 +71,7 @@ class TestTagged (pybut.TestCase):
         self.t.record_end ()
 
         r = self.parsingOk ()
-        assert r == [[]], 'obtained %s' % `r`
+        assert r == [('D', [])], 'obtained %s' % `r`
         return
 
     def testNoEmptyField (self):
@@ -114,11 +114,12 @@ class TestTagged (pybut.TestCase):
         self.t.record_end ()
 
         r = self.parsingOk ()
-        assert r == [[(1, 'ST', u'data')]], 'obtained %s' % `r`
+        assert r == [('D', [(1, 'ST', u'data')])], 'obtained %s' % `r`
         return
 
-    def testSingleField (self):
+    def testMeta (self):
 
+        self.t.metadata_add ('key', 'value')
         self.t.record_start ()
         self.t.field_start ('ST', 1)
         self.t.field_data ('data')
@@ -126,7 +127,20 @@ class TestTagged (pybut.TestCase):
         self.t.record_end ()
 
         r = self.parsingOk ()
-        assert r == [[(1, 'ST', u'data')]], 'obtained %s' % `r`
+        assert r == [('M', ('key', 'value')),
+                     ('D', [(1, 'ST', u'data')])], 'obtained %s' % `r`
+        return
+
+    def testNoMiddleMeta (self):
+
+        self.t.record_start ()
+        self.t.metadata_add ('key', 'value')
+        self.t.field_start ('ST', 1)
+        self.t.field_data ('data')
+        self.t.field_end ()
+        self.t.record_end ()
+
+        self.parsingFails ()
         return
 
     def testMultipleFields (self):
@@ -141,8 +155,8 @@ class TestTagged (pybut.TestCase):
         self.t.record_end ()
 
         r = self.parsingOk ()
-        assert r == [[(1, 'ST', u'data'),
-                      (2, 'UV', u'doto')]], 'obtained %s' % `r`
+        assert r == [('D', [(1, 'ST', u'data'),
+                            (2, 'UV', u'doto')])], 'obtained %s' % `r`
         return
 
     def testMultipleRecords (self):
@@ -166,11 +180,11 @@ class TestTagged (pybut.TestCase):
         self.t.record_end ()
 
         r = self.parsingOk ()
-        assert r == [[(1, 'ST', u'data'),
-                      (2, 'UV', u'doto')],
+        assert r == [('D', [(1, 'ST', u'data'),
+                            (2, 'UV', u'doto')]),
                      
-                     [(3, 'WX', u'dutu'),
-                      (4, 'YZ', u'diti')]], 'obtained %s' % `r`
+                     ('D', [(3, 'WX', u'dutu'),
+                            (4, 'YZ', u'diti')])], 'obtained %s' % `r`
         return
 
 
@@ -208,8 +222,8 @@ A1  - Gobry, Frederic\r
 ER  - \r
 ''')
 
-        assert r == [[(2, 'TY', u'TYPE'),
-                      (3, 'A1', u'Gobry, Frederic')]], \
+        assert r == [('D', [(2, 'TY', u'TYPE'),
+                            (3, 'A1', u'Gobry, Frederic')])], \
                       'obtained %s' % `r`
         return
 
@@ -224,10 +238,10 @@ A1  - Gobry 2, Frederic\r
 ER  - \r
 ''')
 
-        assert r == [[(2, 'TY', u'TYPE'),
-                      (3, 'A1', u'Gobry, Frederic')],
-                     [(5, 'TY', u'TYPE'),
-                      (6, 'A1', u'Gobry 2, Frederic')]], \
+        assert r == [('D', [(2, 'TY', u'TYPE'),
+                            (3, 'A1', u'Gobry, Frederic')]),
+                     ('D', [(5, 'TY', u'TYPE'),
+                            (6, 'A1', u'Gobry 2, Frederic')])], \
                       'obtained %s' % `r`
         return
 
@@ -245,10 +259,10 @@ A1  - Gobry 2,\r
 ER  - \r
 ''')
         
-        assert r == [[(2, 'TY', u'TYPE'),
-                      (3, 'A1', u'Gobry, Frederic')],
-                     [(7, 'TY', u'TYPE'),
-                      (8, 'A1', u'Gobry 2, Frederic')]], \
+        assert r == [('D', [(2, 'TY', u'TYPE'),
+                            (3, 'A1', u'Gobry, Frederic')]),
+                     ('D', [(7, 'TY', u'TYPE'),
+                            (8, 'A1', u'Gobry 2, Frederic')])], \
                       'obtained %s' % `r`
         return
 

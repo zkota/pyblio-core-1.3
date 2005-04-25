@@ -33,7 +33,9 @@ class Parser (object):
 
     
     EV_RECORD_START, EV_RECORD_END, EV_FIELD_START, \
-                     EV_FIELD_DATA, EV_FIELD_END, EV_FILE_END = range (6)
+                     EV_FIELD_DATA, EV_FIELD_END,   \
+                     EV_FILE_END, EV_DONE,          \
+                     EV_METADATA = range (8)
 
     # States
     ST_IN_RECORD, ST_IN_FIELD, ST_OUTSIDE = range (3)
@@ -70,6 +72,12 @@ class Parser (object):
 
         pass
 
+    def file_stopping (self):
+
+        """ Override me to be called just at the end of file """
+
+        pass
+
     def line_handler (self, line, number):
 
         """ Override me to handle each line of input and generate
@@ -103,6 +111,11 @@ class Parser (object):
         self._evstack.append (ev)
         return
 
+    def metadata_add (self, tag, value):
+        """ Call me to notify the availability of a new meta data """
+        self.push (self.EV_METADATA, tag, value)
+        return
+    
     def record_start (self):
         self.push (self.EV_RECORD_START)
         return
@@ -137,9 +150,11 @@ class Parser (object):
 
         """ Call this function to get the next record as a list of tuples
 
-            [ (tag, value), ...]
-
-            or None when there are no more records """
+            ('D', [ (tag, value), ...])
+            ('M', tag, value)
+            
+            or None when there are no more records
+        """
         
         record = []
 
@@ -148,25 +163,11 @@ class Parser (object):
 
             ev, args = ev [0], ev [1:]
 
-            if ev == self.EV_FILE_END:
-                if self.state != self.ST_OUTSIDE:
-                    raise SyntaxError (_('line %d: unexpected end of file') % self._ln)
-                self.file_stop ()
-                return None
-
-            if ev == self.EV_RECORD_END:
-                if self.state != self.ST_IN_RECORD:
-                    raise SyntaxError (_('line %d: unexpected end of record') % self._ln)
-                self.state = self.ST_OUTSIDE
-                return record
-
-            if ev == self.EV_RECORD_START:
-                if self.state == self.ST_IN_RECORD:
-                    raise SyntaxError (_('line %d: nested record') % self._ln)
-
-                self.state = self.ST_IN_RECORD
+            if ev == self.EV_FIELD_DATA:
+                if self.state != self.ST_IN_FIELD:
+                    raise SyntaxError (_('line %d: unexpected field content') % self._ln)
                 
-                record = []
+                data = data + args [0]
                 continue
 
             if ev == self.EV_FIELD_START:
@@ -182,19 +183,43 @@ class Parser (object):
                 data = ''
                 continue
             
-            if ev == self.EV_FIELD_DATA:
-                if self.state != self.ST_IN_FIELD:
-                    raise SyntaxError (_('line %d: unexpected field content') % self._ln)
-                
-                data = data + args [0]
-                continue
-
             if ev == self.EV_FIELD_END:
                 record.append ((start,) + self.field_handler (tag, data))
 
                 self.state = self.ST_IN_RECORD
                 continue
 
+            if ev == self.EV_RECORD_START:
+                if self.state == self.ST_IN_RECORD:
+                    raise SyntaxError (_('line %d: nested record') % self._ln)
+
+                self.state = self.ST_IN_RECORD
+                
+                record = []
+                continue
+
+            if ev == self.EV_RECORD_END:
+                if self.state != self.ST_IN_RECORD:
+                    raise SyntaxError (_('line %d: unexpected end of record') % self._ln)
+                self.state = self.ST_OUTSIDE
+                return ('D', record)
+
+            if ev == self.EV_FILE_END:
+                self.file_stopping ()
+                self.push (self.EV_DONE)
+                continue
+            
+            if ev == self.EV_DONE:
+                if self.state != self.ST_OUTSIDE:
+                    raise SyntaxError (_('line %d: unexpected end of file') % self._ln)
+                self.file_stop ()
+                return None
+
+            if ev == self.EV_METADATA:
+                if self.state != self.ST_OUTSIDE:
+                    raise SyntaxError (_('line %d: metadata in the middle of a record') % self._ln)
+                return ('M', args)
+            
         return
 
     def _ev_pop (self):
@@ -247,13 +272,20 @@ class Importer (Callback.Publisher):
         
         while 1:
             record = self.parser.next ()
-            
             if record is None: break
 
-            self.record_parse (record)
+            t, record = record
 
+            if t   == 'D': self.record_parse (record)
+            elif t == 'M': self.metadata_parse (record)
+            
         self.emit ('file-stop')
         return
+
+    def metadata_parse (self, meta):
+
+        pass
+    
 
     def record_begin (self):
 
