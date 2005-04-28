@@ -49,23 +49,36 @@ class Importer (object):
     def parse (self, fd, db):
 
         self.db = db
+
+        # We support both the NS-aware and non-NS aware versions of the MARC file
+        subs = {
+            'record': ('controlfield', 'datafield', 'subfield'),
+
+            '{http://www.loc.gov/MARC21/slim}record': (
+                                    '{http://www.loc.gov/MARC21/slim}controlfield',
+                                    '{http://www.loc.gov/MARC21/slim}datafield',
+                                    '{http://www.loc.gov/MARC21/slim}subfield'
+                                )
+            }
         
         for event, elem in ElementTree.iterparse (fd, events = ('end',)):
-            if elem.tag not in ("record", "{http://www.loc.gov/MARC21/slim}record"): continue
-
+            try: controlfield, datafield, subfield = subs [elem.tag]
+            except KeyError: continue
+            
             self.record = Store.Record ()
             self.record_begin ()
 
             # get all the control fields first, then the datafields
             # (as the controlfields can have an impact on the
             # datafields)
-            for ctr in elem.findall ('./controlfield'):
+            for ctr in elem.findall (controlfield):
                 self.do_control (int (ctr.attrib ['tag']), ctr.text)
 
-            for data in elem.findall ('./datafield'):
+            for data in elem.findall (datafield):
                 attrs = data.attrib
                 tag, ind1, ind2 = int (attrs ['tag']), attrs ['ind1'], attrs ['ind2']
-                values = [ (x.attrib ['code'], x.text) for x in data.findall ('./subfield') ]
+
+                values = [ (x.attrib ['code'], x.text or '') for x in data.findall (subfield) ]
 
                 fn = getattr (self, 'do_%d' % tag, self.do_default)
                 fn (tag, ind1, ind2, values)
