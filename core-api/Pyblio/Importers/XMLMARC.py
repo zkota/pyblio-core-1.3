@@ -20,15 +20,15 @@
 
 import string, re
 
-from xml import sax
 from xml.sax.saxutils import escape, quoteattr
 
-from Pyblio import Attribute, Store, Exceptions, Tools, XML
+from Pyblio import Attribute, Store, Exceptions, Tools
 
 from gettext import gettext as _
 
+import cElementTree as ElementTree
 
-class Importer (XML.Parser):
+class Importer (object):
 
     def record_begin (self):
 
@@ -46,118 +46,36 @@ class Importer (XML.Parser):
 
         pass
 
-    def record_parse (self, record):
-
-        self.record = Store.Record ()
-        self.record_begin ()
-
-        for field in record:
-
-            try:
-                (maj, ind1, ind2), values = field
-                fn = getattr (self, 'do_%d' % maj, self.do_default)
-                fn (maj, ind1, ind2, values)
-                
-            except TypeError:
-                ctrl, value = field
-                self.do_control (ctrl, value)
-            
-        self.record_end ()
-
-        if self.record is not None:
-            self.db.add (self.record)
-        
-        return
-
     def parse (self, fd, db):
 
         self.db = db
         
-        parser  = sax.make_parser ()
-        parser.setFeature (sax.handler.feature_validation, False)
-        parser.setContentHandler (self)
-        
-        parser.parse (fd)
-        return
+        for event, elem in ElementTree.iterparse (fd, events = ('end',)):
+            if elem.tag not in ("record", "{http://www.loc.gov/MARC21/slim}record"): continue
 
+            self.record = Store.Record ()
+            self.record_begin ()
 
-    def startDocument (self):
+            # get all the control fields first, then the datafields
+            # (as the controlfields can have an impact on the
+            # datafields)
+            for ctr in elem.findall ('./controlfield'):
+                self.do_control (int (ctr.attrib ['tag']), ctr.text)
 
-        self._tdata = None
+            for data in elem.findall ('./datafield'):
+                attrs = data.attrib
+                tag, ind1, ind2 = int (attrs ['tag']), attrs ['ind1'], attrs ['ind2']
+                values = [ (x.attrib ['code'], x.text) for x in data.findall ('./subfield') ]
 
-        self._tag    = None
-        self._record = None
-        self._fields = None
-        self._field  = None
-        return
+                fn = getattr (self, 'do_%d' % tag, self.do_default)
+                fn (tag, ind1, ind2, values)
 
+            self.record_end ()
 
-    def startElement (self, name, attrs):
-
-        if name == 'collection':
-            pass
-
-        elif name == 'record':
-            self._record = []
-            return
-
-        elif name == 'datafield':
-            if self._record is None:
-                self._error ('datafield must be in a record')
-
-            self._tag = (int (self._attr ('tag', attrs)),
-                         str (attrs.get ('ind1', '')),
-                         str (attrs.get ('ind2', '')))
-            self._fields = []
-            return
-
-        elif name == 'subfield':
-            self._field = str (self._attr ('code', attrs))
-            self._tdata = ''
-
-        elif name == 'controlfield':
-            if self._record is None:
-                self._error ('datafield must be in a record')
+            if self.record is not None:
+                self.db.add (self.record)
             
-            self._tag   = int (self._attr ('tag', attrs))
-            self._tdata = ''
-            
-        else:
-            self._error ('unknown tag: %s' % `name`)
-        return
-
-    def endElement (self, name):
-
-        if name == 'record':
-            self.record_parse (self._record)
-            self._record = None
-            return
-
-        elif name == 'controlfield':
-            self._record.append ((self._tag, self._tdata))
-            self._tdata = None
-            self._tag   = None
-
-        elif name == 'subfield':
-            self._fields.append ((self._field, self._tdata))
-            self._tdata = None
-            self._field = None
-            return
-
-        elif name == 'datafield':
-
-            self._record.append ((self._tag, self._fields))
-            self._tag    = None
-            self._fields = None
-            return
-
-        return
-        
-    def characters (self, data):
-
-        if self._tdata is not None:
-            self._tdata = self._tdata + data
-            
+            elem.clear()
         return
 
 

@@ -401,7 +401,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         assert not self.has_key (key), \
                _("a duplicate key has been generated: %d") % key
 
-        value = copy.deepcopy (value)
+        value = copy.copy (value)
         value.key = key
 
         value = self.validate (value)
