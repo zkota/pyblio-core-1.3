@@ -224,11 +224,22 @@ class Exporter (object):
     def begin (self):
 
         self.fd.write (' <record>\n')
-        self._fields = {}
+        self._fields  = {}
+        self._control = {}
         return
 
     def end (self):
 
+        ks = self._control.keys ()
+        ks.sort ()
+
+        for k in ks:
+            data = self._control [k]
+            if not data: continue
+
+            self.fd.write ('  <controlfield tag="%s">%s</controlfield>\n' % (
+                k, data))
+        
         ks = self._fields.keys ()
         ks.sort ()
 
@@ -277,7 +288,10 @@ class Exporter (object):
         self._fields [code] = data
         return
     
-
+    def control_add (self, code, val):
+        self._control [code] = val
+        return
+    
     def record_parse (self, record):
 
         pass
