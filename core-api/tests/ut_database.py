@@ -893,6 +893,33 @@ class TestView (pybut.TestCase):
         return
 
 
+class TestCollate (pybut.TestCase):
+
+    def setUp (self):
+
+        self.hd   = Store.get (self.fmt)
+        self.name = pybut.dbname ()
+        
+        self.db = self.hd.dbimport (self.name, 'ut_database/collate.xml')
+        self.db.save ()
+
+        return
+
+    def check (self, got, exp):
+
+        got = list (got)
+        got.sort ()
+
+        assert got == exp, "expected %s, got %s" % (
+            repr (exp), repr (got))
+        
+    def testCollateTest (self):
+
+        rss = self.db.collate (self.db.entries, 'enum')
+
+        self.check (rss [Attribute.Txo (self.db.txo ['type'][1])], [1])
+        self.check (rss [Attribute.Txo (self.db.txo ['type'][2])], [2, 3, 4])
+    
 
 class TestDatabaseFile (TestDatabase):
     fmt = 'file'
@@ -901,6 +928,9 @@ class TestContentFile (TestContent):
     fmt = 'file'
 
 class TestViewFile (TestView):
+    fmt = 'file'
+
+class TestCollateFile (TestCollate):
     fmt = 'file'
 
 class TestDatabaseDB (TestDatabase):
@@ -912,8 +942,12 @@ class TestContentDB (TestContent):
 class TestViewDB (TestView):
     fmt = 'bsddb'
 
+class TestCollateDB (TestCollate):
+    fmt = 'bsddb'
 
-suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile,
-                     TestDatabaseDB,   TestContentDB,   TestViewDB)
+
+suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile, TestCollateFile,
+                     TestDatabaseDB,   TestContentDB,   TestViewDB,   TestCollateDB,
+                     )
 
 if __name__ == '__main__':  pybut.run (suite)

@@ -42,7 +42,17 @@ class TestSimpleQuery (pybut.TestCase):
         assert res == [1, 2, 3], 'got %s' % `res`
         
         return
-    
+
+    def testNotQuery (self):
+        
+        db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        g  = db.txo ['a']
+
+        q = ~ (Query.Txo ('txo', g [2]) | Query.AnyWord ('First'))
+
+        res = self._res (db.query (q))
+        assert res == [4], 'got %s' % repr (res)
+        
 
     def testTxoQuery (self):
         """ Txo query """

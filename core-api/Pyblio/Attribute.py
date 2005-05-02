@@ -95,6 +95,17 @@ class Date:
                                  self.month or 0,
                                  self.day or 0)
 
+    def __cmp__ (self, other):
+        for x, y in ((self.year, other.year),
+                     (self.month, other.month),
+                     (self.day, other.day)):
+            a = cmp (x, y)
+            if a: return a
+
+        return 0
+
+    def __hash__ (self):
+        return hash ((self.year, self.month, self.day))
             
 class Text (unicode):
     ''' A textual data '''
@@ -176,7 +187,9 @@ class Txo:
 
         return cmp (self.group, other.group) or cmp (self.id, other.id)
 
-
+    def __hash__ (self):
+        return hash ((self.group, self.id))
+    
 N_to_C = {
     'person'    : Person,
     'date'      : Date,

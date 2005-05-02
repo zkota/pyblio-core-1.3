@@ -32,6 +32,10 @@ class Constraint (object):
         
         return ORed (self, other)
 
+    def __invert__ (self):
+
+        return NOTed (self)
+
     def apply (self, fn, * args, **kargs):
 
         fn (self, * args, ** kargs)
@@ -40,6 +44,22 @@ class Constraint (object):
     def __len__ (self):
 
         return 1
+
+
+
+class NOTed (Constraint):
+
+    def __init__ (self, a):
+
+        self.a = a
+        return
+
+    def __str__ (self):
+        return '~ %s' % str (self.a)
+
+    def apply (self, fn, * args, **kargs):
+
+        self.a.apply (fn, * args, ** kargs)
 
 
 class Pairs (Constraint):
@@ -163,6 +183,9 @@ class Queryable (object):
         if isinstance (query, ANDed):
             return self._q_and (query, permanent)
 
+        if isinstance (query, NOTed):
+            return self._q_not (query, permanent)
+
         # This must be a single query
         res = self.rs.add (permanent)
         self._q_single (query, res)
@@ -191,8 +214,19 @@ class Queryable (object):
             if rb.has_key (k): rf.add (k)
 
         return rf
-        
 
+
+    def _q_not (self, query, permanent):
+
+        rf = self.rs.add (permanent)
+        rs = self._q_run (query.a, False)
+
+        for k in self.entries.iterkeys ():
+            if k in rs: continue
+            rf.add (k)
+
+        return rf
+        
     def _q_single (self, q, res):
         
         name = q.__class__.__name__

@@ -193,7 +193,6 @@ class Viewable (object):
 
         return View (self, criterion)
         
-    
 
 class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
 

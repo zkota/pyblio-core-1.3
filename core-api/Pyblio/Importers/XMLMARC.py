@@ -238,7 +238,7 @@ class Exporter (object):
             if not data: continue
 
             self.fd.write ('  <controlfield tag="%s">%s</controlfield>\n' % (
-                k, data))
+                k, data.encode ('utf-8')))
         
         ks = self._fields.keys ()
         ks.sort ()
@@ -289,7 +289,7 @@ class Exporter (object):
         return
     
     def control_add (self, code, val):
-        self._control [code] = val
+        self._control [int (code)] = val
         return
     
     def record_parse (self, record):

@@ -237,7 +237,6 @@ class ResultSet (object):
     def view (self, criterion):
         raise NotImplemented ('please override')
         
-        
     def xmlwrite (self, fd):
 
         if self.name:
@@ -489,7 +488,28 @@ class Database (object):
     def query (self, query, permanent = False):
         raise NotImplemented ('please override')
     
+    def collate (self, rs, field):
+        """ Partition the result set in a list of sets for every value
+        taken by the specified field"""
+        
+        sets = {}
+
+        for k, rec in rs.iteritems ():
+            try: value = rec [field] [0]
+            except KeyError: value = None
+            
+            try:
+                sets [value].add (k)
+
+            except KeyError:
+                rs = self.rs.add ()
+                sets [value] = rs
+
+                rs.add (k)
+
+        return sets
     
+
     def save (self):
         raise NotImplemented ('please override')
 
