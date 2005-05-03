@@ -415,9 +415,10 @@ class Exporter (object):
         def _close_upper ():
             res.append (Reader.Block ('{', (Reader.Text (''.join (block)),)))
             del block[:]
-        
-        for c in data:
 
+        while data:
+            c, data = data [0], data [1:]
+            
             if c in '.!?':
                 if in_upper:
                     _close_upper ()
@@ -443,7 +444,8 @@ class Exporter (object):
                 beginning = False
                 continue
 
-            if not beginning and c.lower () != c:
+            if (not beginning and c.lower () != c) \
+               or (beginning and data and data [0].lower () != data [0]):
                 if in_upper:
                     block.append (c)
                 else:
@@ -451,6 +453,7 @@ class Exporter (object):
                     res.append (Reader.Text (''.join (block)))
 
                     block = [c]
+                beginning = False
                 continue
 
             if in_upper:

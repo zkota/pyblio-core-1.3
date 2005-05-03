@@ -59,7 +59,7 @@
   </attribute>
   <attribute id="title">
    <text>This is a title that should span SEveral lines because it is
-   waaaaay too long for a single line. anyway.</text>
+   waaaaay too long for a single line. anyway. GRONF.</text>
   </attribute>
  </entry>
 </pyblio-db>

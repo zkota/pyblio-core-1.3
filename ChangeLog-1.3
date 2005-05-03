@@ -2,6 +2,23 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-05-03 09:31:14 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-150
+
+    Summary:
+      cosmetic fixes in the handling of capitals for bibtex exports
+    Revision:
+      pybliographer--devel--1.3--patch-150
+
+    Instead of writing « in I{EEE} ... », which is technically ok, the exporter writes
+    « in {IEEE} ... » which is a bit more readable
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX/__init__.py
+     core-api/tests/ut_bibtex/exp-simple.bib
+     core-api/tests/ut_bibtex/exp-simple.xml
+
+
 2005-05-03 09:16:08 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-149
 
     Summary:
