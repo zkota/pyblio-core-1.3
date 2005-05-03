@@ -127,7 +127,7 @@ class Text (unicode):
         return [self]
 
     def tobib (self):
-        return self
+        return self.encode ('latex', 'replace')
     
     def execute (self, env):
         return self
@@ -167,7 +167,9 @@ class Block (object):
 
     def __init__ (self, opening, data = None):
         self._o = opening
-        self._d = data or ()
+
+        if data is None: self._d = ()
+        else:            self._d = data
         return
     
     def flat (self):
@@ -177,6 +179,9 @@ class Block (object):
 
         return r
 
+    def append (self, v):
+        return self._d.append (v)
+        
     def execute (self, env):
         final = []
         stack = [] + list (self._d)
@@ -219,8 +224,8 @@ class Block (object):
     def tobib (self):
         return '%s%s%s' % (
             self._o,
-            string.join (map (lambda x: x.tobib (), self._d), ''),
-            self._c)
+            ''.join (map (lambda x: x.tobib (), self._d)),
+            self.closer [self._o])
 
 
 class EndOfFile (Exception): pass

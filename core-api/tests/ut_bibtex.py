@@ -24,6 +24,15 @@ class WithComments (BibTeX.Importer):
 
         self.comments.append (data)
         return
+
+class WithCaseHandler (BibTeX.Exporter):
+
+    def record_parse (self, key, value):
+
+        if key in ('title',):
+            return self.capitalized_text_add (key, self.record [key])
+
+        return BibTeX.Exporter.record_parse (self, key, value)
     
 
 class TestBibTeXReader (pybut.TestCase):
@@ -266,7 +275,7 @@ class TestBibTeXExport (pybut.TestCase):
         db = Store.get ('file').dbopen ('ut_bibtex/%s.xml' % base)
         fd = open (f, 'w')
         
-        self.writer = BibTeX.Exporter ()
+        self.writer = WithCaseHandler ()
         
         self.writer.write (fd, db.entries, db)
 

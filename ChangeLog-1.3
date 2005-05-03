@@ -2,6 +2,28 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-05-03 09:16:08 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-149
+
+    Summary:
+      added support for case protection in the bibtex exporter
+    Revision:
+      pybliographer--devel--1.3--patch-149
+
+    Some bibtex styles automatically force the capitalisation of some fields, except if
+    they are protected with extra {} around the letters.
+    
+    This patch adds support for automatically protecting a text in case one does not want
+    the auto-capitalisation to work.
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX/Reader.py
+     core-api/Pyblio/Importers/BibTeX/__init__.py
+     core-api/tests/testsuite.py core-api/tests/ut_bibtex.py
+     core-api/tests/ut_bibtex/exp-simple.bib
+     core-api/tests/ut_bibtex/exp-simple.xml
+
+
 2005-05-02 10:04:42 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-148
 
     Summary:

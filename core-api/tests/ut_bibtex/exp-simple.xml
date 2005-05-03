@@ -58,8 +58,8 @@
    <text>123</text>
   </attribute>
   <attribute id="title">
-   <text>This is a title that should span several lines because it is
-   waaaaay too long for a single line</text>
+   <text>This is a title that should span SEveral lines because it is
+   waaaaay too long for a single line. anyway.</text>
   </attribute>
  </entry>
 </pyblio-db>

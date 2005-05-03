@@ -351,7 +351,7 @@ class Importer (object):
 
 class Exporter (object):
 
-    _collapse = re.compile (r'[\s\n]+', re.MULTILINE)
+    _collapse      = re.compile (r'[\s\n]+', re.MULTILINE)
     
     def __init__ (self):
 
@@ -395,6 +395,76 @@ class Exporter (object):
         data = self._collapse.sub (' ', data)
         
         self.field [field] = '{%s}' % data
+        return
+
+    def capitalized_text_add (self, field, data):
+
+        # by default, new lines and multiple spaces are not significant in bibtex fields
+        data = self._collapse.sub (' ', ' '.join (data))
+
+        # If the text contains capitals that are not at the beginning
+        # of a sentence, protect these capitals. Similarly for
+        # lowercase letters at the beginning.
+
+        res = Reader.Block ('{', [])
+
+        beginning = True
+        in_upper  = False
+        block     = []
+
+        def _close_upper ():
+            res.append (Reader.Block ('{', (Reader.Text (''.join (block)),)))
+            del block[:]
+        
+        for c in data:
+
+            if c in '.!?':
+                if in_upper:
+                    _close_upper ()
+                    in_upper = False
+                
+                beginning = True
+                block.append (c)
+                continue
+
+            if not c.isalpha ():
+                if in_upper:
+                    _close_upper ()
+                    in_upper = False
+                
+                block.append (c)
+                continue
+
+            if beginning and c.lower () == c:
+                res.append (Reader.Text (''.join (block)))
+                res.append (Reader.Block ('{', (Reader.Text (c),)))
+
+                block = []
+                beginning = False
+                continue
+
+            if not beginning and c.lower () != c:
+                if in_upper:
+                    block.append (c)
+                else:
+                    in_upper = True
+                    res.append (Reader.Text (''.join (block)))
+
+                    block = [c]
+                continue
+
+            if in_upper:
+                _close_upper ()
+                in_upper = False
+            
+            block.append (c)
+            beginning = False
+
+            
+        if in_upper: _close_upper ()
+        if block: res.append (Reader.Text (''.join (block)))
+
+        self.field [field] = res.tobib ()
         return
 
     def id_add (self, field, data):
