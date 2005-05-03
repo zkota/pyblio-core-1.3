@@ -411,7 +411,8 @@ class Exporter (object):
         beginning = True
         in_upper  = False
         block     = []
-
+        braced    = False
+        
         def _close_upper ():
             res.append (Reader.Block ('{', (Reader.Text (''.join (block)),)))
             del block[:]
@@ -434,27 +435,30 @@ class Exporter (object):
                     in_upper = False
                 
                 block.append (c)
+
+                if c == '"': braced = not braced
                 continue
 
-            if beginning and c.lower () == c:
-                res.append (Reader.Text (''.join (block)))
-                res.append (Reader.Block ('{', (Reader.Text (c),)))
-
-                block = []
-                beginning = False
-                continue
-
-            if (not beginning and c.lower () != c) \
-               or (beginning and data and data [0].lower () != data [0]):
-                if in_upper:
-                    block.append (c)
-                else:
-                    in_upper = True
+            if not braced:
+                if beginning and c.lower () == c:
                     res.append (Reader.Text (''.join (block)))
+                    res.append (Reader.Block ('{', (Reader.Text (c),)))
 
-                    block = [c]
-                beginning = False
-                continue
+                    block = []
+                    beginning = False
+                    continue
+
+                if (not beginning and c.lower () != c) \
+                   or (beginning and data and data [0].lower () != data [0]):
+                    if in_upper:
+                        block.append (c)
+                    else:
+                        in_upper = True
+                        res.append (Reader.Text (''.join (block)))
+
+                        block = [c]
+                    beginning = False
+                    continue
 
             if in_upper:
                 _close_upper ()

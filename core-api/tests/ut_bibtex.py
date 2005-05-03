@@ -289,6 +289,11 @@ class TestBibTeXExport (pybut.TestCase):
         self._check ('exp-simple')
         return
     
+    def testEmpty (self):
+
+        self._check ('exp-nested')
+        return
+    
         
 suite = pybut.suite (TestBibTeXReader, TestBibTeXImport, TestBibTeXExport)
 

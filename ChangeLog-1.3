@@ -2,6 +2,27 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-05-03 19:38:26 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-151
+
+    Summary:
+      handle the special case of "" in capitalized strings
+    Revision:
+      pybliographer--devel--1.3--patch-151
+
+    It seems that having "" inside a pair of {} makes it escape additional braces... grmbl.
+    
+
+    new files:
+     core-api/tests/ut_bibtex/.arch-ids/exp-nested.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/exp-nested.xml.id
+     core-api/tests/ut_bibtex/exp-nested.bib
+     core-api/tests/ut_bibtex/exp-nested.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX/__init__.py
+     core-api/tests/ut_bibtex.py
+
+
 2005-05-03 09:31:14 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-150
 
     Summary:
