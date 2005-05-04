@@ -780,6 +780,20 @@ class TestView (pybut.TestCase):
         return
 
 
+    def testViewDate (self):
+
+        for rs in (self.rs, self.db.entries):
+                
+            v = rs.view ('date')
+
+            assert len (v) == 4
+            
+            res = list (v)
+            assert res in ([4, 3, 1, 2],), 'got %s' % res
+
+        return
+
+
     def testIndexed (self):
 
         v = self.rs.view ('text')

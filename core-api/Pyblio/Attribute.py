@@ -96,6 +96,8 @@ class Date:
                                  self.day or 0)
 
     def __cmp__ (self, other):
+        if not isinstance (other, Date): return 1
+        
         for x, y in ((self.year, other.year),
                      (self.month, other.month),
                      (self.day, other.day)):

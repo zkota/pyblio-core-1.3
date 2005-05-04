@@ -35,6 +35,9 @@
   <attribute id="text">
    <text>ABC</text>
   </attribute>
+  <attribute id="date">
+   <date year="2000" />
+  </attribute>
  </entry>
  <entry id="2">
   <attribute id="enum">
@@ -43,6 +46,9 @@
   <attribute id="text">
    <text>BCD</text>
   </attribute>
+  <attribute id="date">
+   <date year="2000" month="12" />
+  </attribute>
  </entry>
  <entry id="3">
   <attribute id="enum">
@@ -50,6 +56,9 @@
   </attribute>
   <attribute id="text">
    <text>CDE</text>
+  </attribute>
+  <attribute id="date">
+   <date year="1999" />
   </attribute>
  </entry>
  <entry id="4">

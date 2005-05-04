@@ -143,7 +143,22 @@ class TestFormat (pybut.TestCase):
         self._cmp (v, u'a <i>simple <b>My title</b></i>')
         return
         
+    def testInitials (self):
         
+        assert Person.initials (u'Frédéric') == 'F.'
+        assert Person.initials (u'Jean-Pierre') == 'J.-P.'
+        assert Person.initials (u'Jean Pierre') == 'J.P.'
+        assert Person.initials (u'J.Pierre') == 'J.P.'
+
+    def testMissingPerson (self):
+
+        def persons ():
+            return [Attribute.Person (last = 'Gobry', first = u'Frédéric'),
+                    Attribute.Person (last = 'Fobry') ]
+
+        assert Person.initialLast (persons) () == ['F. Gobry', 'Fobry']
+        assert Person.firstLast (persons) ()   == [u'Frédéric Gobry', 'Fobry']
+        assert Person.lastFirst (persons) ()   == [u'Gobry, Frédéric', 'Fobry']
         
 suite = pybut.suite (TestFormat)
 if __name__ == '__main__':  pybut.run (suite)

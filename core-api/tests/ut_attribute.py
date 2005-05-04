@@ -50,6 +50,9 @@ class TestAttribute (pybut.TestCase):
                                      month = 12,
                                      day   = 25),
                      u'<date year="2003" month="12" day="25"/>')
+
+        assert Attribute.Date (year = 2000) > None
+        assert None < Attribute.Date (year = 2000)
         return
 
     def testText (self):
