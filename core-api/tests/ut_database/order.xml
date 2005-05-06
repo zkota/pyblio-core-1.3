@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="a" type="text">
+  <name>Text</name>
+ </attribute>
+ <attribute id="b" type="text">
+  <name>Text</name>
+ </attribute>
+
+</pyblio-schema>
+
+ <entry id="1">
+  <attribute id="a">
+   <text>ABC</text>
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="a">
+   <text>ABC</text>
+   <text>BCD</text>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+  <attribute id="b">
+   <text>XYZ</text>
+  </attribute>
+ </entry>
+ <entry id="4">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+  <attribute id="b">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="5">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="6">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="7">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+ <entry id="8">
+  <attribute id="a">
+   <text>ABC</text>
+  </attribute>
+ </entry>
+</pyblio-db>

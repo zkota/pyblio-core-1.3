@@ -1,7 +1,7 @@
 import os, pybut, sys, string
 
 from Pyblio import Store, Schema, Attribute, Query
-
+from Pyblio.Sort import OrderBy
 
 class TestDatabase (pybut.TestCase):
 
@@ -708,21 +708,18 @@ class TestContent (pybut.TestCase):
         return
 
 
-
-class TestView (pybut.TestCase):
-
-    """ Perform data manipulation tests """
-
+class BaseView (pybut.TestCase):
+    
     count = 0
-
+    
     def setUp (self):
 
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
-        TestContent.count = self.count + 1
+        BaseView.count = self.count + 1
 
-        self.db = self.hd.dbimport (self.name, 'ut_database/view.xml')
+        self.db = self.hd.dbimport (self.name, self.dbfile)
         self.db.save ()
 
         # create a RS with all the entries
@@ -730,15 +727,38 @@ class TestView (pybut.TestCase):
         
         for k in self.db.entries:
             self.rs.add (k)
-            
+
+        self.a = Store.Record ()
+        self.b = Store.Record ()
         return
+
+class TestOrdering (BaseView):
+
+    """ Perform data manipulation tests """
+
+    dbfile = 'ut_database/order.xml'
+
+    def testAscDesc (self):
+
+        v = list (self.rs.view (OrderBy ('a')))
+        assert v [-2:] == [1, 2], 'got %s' % v
+
+        v = list (self.rs.view (OrderBy ('a') & OrderBy ('b')))
+        assert v [-4:] == [4, 3, 1, 2], 'got %s' % v
+
+
+class TestView (BaseView):
+
+    """ Perform data manipulation tests """
+
+    dbfile = 'ut_database/view.xml'
 
     def testIterView (self):
 
         
         for rs in (self.rs, self.db.entries):
             
-            v = rs.view ('text')
+            v = rs.view (OrderBy ('text'))
             r = []
             
             for k in v.iterkeys (): r.append (k)
@@ -769,7 +789,7 @@ class TestView (pybut.TestCase):
 
         for rs in (self.rs, self.db.entries):
                 
-            v = rs.view ('text')
+            v = rs.view (OrderBy ('text'))
 
             assert len (v) == 4
             
@@ -784,7 +804,7 @@ class TestView (pybut.TestCase):
 
         for rs in (self.rs, self.db.entries):
                 
-            v = rs.view ('date')
+            v = rs.view (OrderBy ('date'))
 
             assert len (v) == 4
             
@@ -796,7 +816,7 @@ class TestView (pybut.TestCase):
 
     def testIndexed (self):
 
-        v = self.rs.view ('text')
+        v = self.rs.view (OrderBy ('text'))
 
         res = []
         for i in range (len (self.rs)):
@@ -811,7 +831,7 @@ class TestView (pybut.TestCase):
 
         """ A view is updated when the result set is updated """
 
-        v = self.rs.view ('text')
+        v = self.rs.view (OrderBy ('text'))
 
         e = Store.Record ()
         e ['text'] = Attribute.Text ('zzzzzzzzz')
@@ -829,7 +849,7 @@ class TestView (pybut.TestCase):
 
         """ A view of the DB is updated when the result set is updated """
 
-        v = self.db.entries.view ('text')
+        v = self.db.entries.view (OrderBy ('text'))
 
         e = Store.Record ()
         e ['text'] = Attribute.Text ('zzzzzzzzz')
@@ -845,7 +865,7 @@ class TestView (pybut.TestCase):
 
         """ A view is updated when removing from the result set  """
 
-        v = self.rs.view ('text')
+        v = self.rs.view (OrderBy ('text'))
 
         del self.rs [4]
 
@@ -865,7 +885,7 @@ class TestView (pybut.TestCase):
 
         """ A view of the DB is updated when removing from the DB """
 
-        v = self.db.entries.view ('text')
+        v = self.db.entries.view (OrderBy ('text'))
 
         del self.db [4]
 
@@ -878,7 +898,7 @@ class TestView (pybut.TestCase):
 
         """ Doing a modification in an entry is reflected in the DB views """
         
-        v = self.db.entries.view ('text')
+        v = self.db.entries.view (OrderBy ('text'))
         
         e = self.db [4]
         e ['text'] = Attribute.Text ('zzzzzzzzz')
@@ -894,7 +914,7 @@ class TestView (pybut.TestCase):
 
         """ Doing a modification in an entry is reflected in the RS views """
         
-        v = self.rs.view ('text')
+        v = self.rs.view (OrderBy ('text'))
         
         e = self.db [4]
         e ['text'] = Attribute.Text ('zzzzzzzzz')
@@ -944,6 +964,9 @@ class TestContentFile (TestContent):
 class TestViewFile (TestView):
     fmt = 'file'
 
+class TestOrderingFile (TestOrdering):
+    fmt = 'file'
+
 class TestCollateFile (TestCollate):
     fmt = 'file'
 
@@ -959,9 +982,12 @@ class TestViewDB (TestView):
 class TestCollateDB (TestCollate):
     fmt = 'bsddb'
 
+class TestOrderingDB (TestOrdering):
+    fmt = 'bsddb'
 
-suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile, TestCollateFile,
-                     TestDatabaseDB,   TestContentDB,   TestViewDB,   TestCollateDB,
+
+suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile, TestCollateFile, TestOrderingFile,
+                     TestDatabaseDB,   TestContentDB,   TestViewDB,   TestCollateDB,   TestOrderingDB,
                      )
 
 if __name__ == '__main__':  pybut.run (suite)

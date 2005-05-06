@@ -66,7 +66,7 @@ import cPickle as pickle
 
 from bsddb3 import db
 
-from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools, Query
+from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools, Query, Sort
 
 _pl = pickle.loads
 _ps = pickle.dumps
@@ -188,6 +188,19 @@ class View (Store.View):
         self._meta = _meta
         self._crit = criterion
         self._id   = None
+
+        # For the moment, it is not possible to sort according to
+        # descending criterions in bsddb, as this would require
+        # overriding the BTree sort method.
+        def _is_sortable (crit):
+            if isinstance (crit, Sort.OrderBy):
+                assert crit.asc == +1, "sorry, bsddb does not allow descending sorting"
+                return
+
+            _is_sortable (crit.a)
+            _is_sortable (crit.b)
+
+        _is_sortable (criterion)
         
         # Create the new view on top of the result set
         txn = self._env.txn_begin (txn)
@@ -307,15 +320,11 @@ class View (Store.View):
         return
 
     def _collate (self, e):
-        try:
-            value = e [self._crit]
-            value = string.join (map (lambda x: x.sort (), value), '\0')
-            value = value.encode ('utf-8')
-
-        except KeyError:
-            value = ''
-
-        return value
+        vals = [ v [1] for v in self._crit.cmp_key (e) ]
+        return '\0\0'.join ( [
+            '\0'.join ([ x.encode ('utf-8') for x in val ])
+            for val in vals
+            ])
     
     def _add (self, e, txn):
 
@@ -324,7 +333,7 @@ class View (Store.View):
         # In order to store multiple values in a DB_RECNUM BTree, it
         # is necessary to "cheat" a bit, and disambiguate between the
         # duplicates; this is done by appending the entry key to the
-        # value, separated by a null byte
+        # value, separated by null bytes
 
         value = value + '\0%d' % e.key
         self._v.put (value, str (e.key), txn = txn)

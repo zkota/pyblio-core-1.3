@@ -31,7 +31,7 @@ from gettext import gettext as _
 
 import os, copy, string
 
-from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query
+from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query, Sort
 
 
 class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
@@ -143,21 +143,11 @@ class View (object):
     
     def _update (self, key):
 
-        view = []
-        
-        for e in self._src.itervalues ():
-            try:
-                value = e [self._crit]
-                value = string.join (map (lambda x: x.sort (), value), '\0')
-                
-            except KeyError:
-                value = ''
-                
-            view.append ((value, e.key))
+        view = [ (self._crit.cmp_key (e), e.key) for e in self._src.itervalues () ]
+        view.sort (lambda a, b: Sort.compare (a [0], b [0]))
 
-        view.sort (lambda a, b: cmp (a [0], b [0]))
-
-        self._view = map (lambda x: x [1], view)
+        self._view = [ x [1] for x in view ]
+        return
 
     def __len__ (self):
 
