@@ -81,26 +81,6 @@ class TestStore (pybut.TestCase):
         pybut.fileeq (self.f, 'ut_store/simple.xml')
         return
 
-    def testNativeWrite (self):
-
-        """ Native data is stored in the database, along with loss information """
-
-        schema = Schema.Schema ('ut_store/s:full.xml')
-        db = Store.get ('file').dbcreate (self.f, schema)
-
-        e = Store.Record ()
-
-        e ['author'] = [ Attribute.Person (last = 'LastName') ]
-        e.loss_set ('author', True)
-        
-        e.native = ('bibtex', '@article{entry_1,\nauthor = {LastName}}')
-
-        db.add (e)
-        db.save ()
-        
-        pybut.fileeq (self.f, 'ut_store/native.xml')
-        return
-        
     def testTxoRead (self):
         """ A database with taxonomy fields can be read and saved again identically """
         
@@ -112,21 +92,6 @@ class TestStore (pybut.TestCase):
 
         pybut.fileeq (self.f, 'ut_store/taxonomy.xml')
         return
-
-    def testNativeRead (self):
-
-        """ Native data is also read back from file """
-        
-        db = Store.get ('file').dbopen ('ut_store/native.xml')
-
-        e = db [1]
-        
-        assert e.native == ('bibtex',
-                            '@article{entry_1,\nauthor = {LastName}}')
-
-        assert e.has_loss ('author')
-        return
-
 
     def testValidate (self):
 
