@@ -1,0 +1,10 @@
+-*- text -*-
+
+This is the core API of the pybliographer framework. It provides
+classes for managing bibliographic databases (storage, query,
+conversion, formatting,...)
+
+To get the Reference Manual, install epydoc and run
+
+  epydoc -o doc Pyblio
+

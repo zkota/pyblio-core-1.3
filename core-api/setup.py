@@ -2,10 +2,24 @@ import os, stat, sys
 
 from distutils.core import setup
 
-version = "0.1"
+def version_get ():
+
+    full = os.popen ('tla logs -r -f').readline ().strip ()
+
+    if full == '': return None, None
+
+    vid = full.split ('/') [1].split ('--')
+    numerical = '%s.%s' % (vid [2], vid [3].split ('-') [1])
+
+    return full, numerical
+
+version, vid = version_get ()
+
+if version:
+    print 'running setup on version %s [%s]' % (version, vid)
 
 setup (name = "pybliographer-core",
-       version = version,
+       version = vid,
 
        description = "Pybliographer Core API",
        author = "Frederic Gobry",
