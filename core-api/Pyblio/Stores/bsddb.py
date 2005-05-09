@@ -25,6 +25,7 @@ This store is suitable for large databases, or for cases where the
 startup time is more important.
 """
 
+
 # Tables in use:
 # 
 # * database/entries [HASH]
@@ -179,6 +180,18 @@ class RSDB (object):
     
 # --------------------------------------------------
 
+def _compare (db, a, b):
+    # orders the keys according to the criterion determined by cmp_key
+    # (). As the binary tree does not allow for multiple identical
+    # keys, use the records key to compute a strict order.
+
+    (a, ka), (b, kb) = [ x.split ('\0') for x in (a, b) ]
+    
+    r = Sort.compare (_pl (a), _pl (b))
+    if r: return r
+
+    return cmp (ka, kb)
+
 class View (Store.View):
 
     def __init__ (self, _db, _env, _meta, rs, criterion, txn = None):
@@ -189,19 +202,6 @@ class View (Store.View):
         self._crit = criterion
         self._id   = None
 
-        # For the moment, it is not possible to sort according to
-        # descending criterions in bsddb, as this would require
-        # overriding the BTree sort method.
-        def _is_sortable (crit):
-            if isinstance (crit, Sort.OrderBy):
-                assert crit.asc == +1, "sorry, bsddb does not allow descending sorting"
-                return
-
-            _is_sortable (crit.a)
-            _is_sortable (crit.b)
-
-        _is_sortable (criterion)
-        
         # Create the new view on top of the result set
         txn = self._env.txn_begin (txn)
 
@@ -222,6 +222,7 @@ class View (Store.View):
             
             self._v = db.DB (self._env)
             self._v.set_flags (db.DB_RECNUM)
+            self._v.set_bt_compare (_compare)
             
             self._v.open ('view', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
 
@@ -279,8 +280,9 @@ class View (Store.View):
         return
 
     def __getitem__ (self, idx):
-
-        return Store.Key (self._v.get (idx + 1) [1])
+        data = self._v.get (idx + 1)
+        if data is None: raise IndexError ('no such index: %d' % idx)
+        return Store.Key (data [1])
     
     def __len__ (self):
 
@@ -319,36 +321,29 @@ class View (Store.View):
         txn.commit ()
         return
 
-    def _collate (self, e):
-        vals = [ v [1] for v in self._crit.cmp_key (e) ]
-        return '\0\0'.join ( [
-            '\0'.join ([ x.encode ('utf-8') for x in val ])
-            for val in vals
-            ])
-    
-    def _add (self, e, txn):
-
-        value = self._collate (e)
-        
+    def _make_key (self, e):
         # In order to store multiple values in a DB_RECNUM BTree, it
         # is necessary to "cheat" a bit, and disambiguate between the
         # duplicates; this is done by appending the entry key to the
         # value, separated by null bytes
 
-        value = value + '\0%d' % e.key
-        self._v.put (value, str (e.key), txn = txn)
+        return _ps (self._crit.cmp_key (e)) + '\0%d' % e.key
+
+    def _add (self, e, txn):
+        
+        self._v.put (self._make_key (e), str (e.key), txn = txn)
         return
 
     def _del (self, k, txn):
 
         # To remove an entry, we have to assume the way we compute the
-        # sorting key has not changed since it has been created.
-
+        # sorting key has not changed since it has been created. It
+        # should be the case, because the update of the result sets
+        # and views is performed as the initial step of a record
+        # update.
         e = _pl (self._db.get (str (k), txn = txn))
-        
-        value = self._collate (e)
 
-        self._v.delete (value + '\0%d' % k, txn = txn)
+        self._v.delete (self._make_key (e), txn = txn)
         return
     
 # --------------------------------------------------

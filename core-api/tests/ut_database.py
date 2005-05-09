@@ -764,7 +764,7 @@ class TestView (BaseView):
             for k in v.iterkeys (): r.append (k)
 
             assert r in ([1, 4, 2, 3],
-                         [4, 1, 2, 3]), 'got %s' % res
+                         [4, 1, 2, 3]), 'got %s' % r
 
             r = []
             for k, x in v.iteritems ():
@@ -772,7 +772,7 @@ class TestView (BaseView):
                 assert self.db [k] == x, 'got %s' % repr (x)
 
             assert r in ([1, 4, 2, 3],
-                         [4, 1, 2, 3]), 'got %s' % res
+                         [4, 1, 2, 3]), 'got %s' % r
 
             r = []
             for x in v.itervalues ():
@@ -780,7 +780,7 @@ class TestView (BaseView):
                 assert self.db [x.key] == x
                 
             assert r in ([1, 4, 2, 3],
-                         [4, 1, 2, 3]), 'got %s' % res
+                         [4, 1, 2, 3]), 'got %s' % r
 
         return
 
