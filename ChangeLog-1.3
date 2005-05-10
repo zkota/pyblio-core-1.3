@@ -2,6 +2,21 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-05-10 06:54:55 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-157
+
+    Summary:
+      fixed windows incompatibility
+    Revision:
+      pybliographer--devel--1.3--patch-157
+
+    locale.LC_MESSAGES is a posix symbol, not an ANSI C one. Therefore, it should be tested
+    for existence.
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/I18n.py
+
+
 2005-05-09 11:55:14 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-156
 
     Summary:

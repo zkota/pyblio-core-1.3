@@ -29,7 +29,7 @@ class Localize (object):
     def __init__ (self):
         import locale
 
-        lang, charset = locale.getlocale (locale.LC_MESSAGES)
+        lang, charset = locale.getlocale ()
 
         self.lang = lang or ''
         self.lang_one = self.lang.split ('_') [0]
