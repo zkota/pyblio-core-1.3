@@ -5,6 +5,9 @@ from gettext import gettext as _
 
 import re, string
 
+# DEBUG
+import pprint
+
 start_re = re.compile (r'^(\w\w)\s(.*?)\r?$')
 contd_re = re.compile (r'^\s{3,3}(.*?)\r?$')
 
@@ -23,17 +26,17 @@ class ISIParser (Tagged.Parser):
 
             if tag in ('FN', 'VR', 'EF'):
                 return
-            
+
             if tag == 'PT':
                 self.record_start ()
 
             elif self.state == self.ST_IN_FIELD:
                 self.field_end ()
-                
+
             if tag == 'ER':
                 self.record_end ()
                 return
-            
+
             self.field_start (tag, count)
             self.field_data (data)
             return
@@ -44,14 +47,23 @@ class ISIParser (Tagged.Parser):
             return
 
         if line == 'EF': return
-        
+
         raise SyntaxError (_('line %d: unexpected data: %s') % (count, repr (line)))
 
 
 def _mkperson (txt):
 
-    last, first = map (string.strip, txt.split (','))
-    
+    res = map (string.strip, txt.split (','))
+    if len(res) == 1:
+        last = res[0]
+        first = None
+    else:
+       if len(res) == 2:
+          last, first = res
+       else:
+          last = txt
+          first = None
+
     return Attribute.Person (last = last, first = first)
 
 class Importer (Tagged.Importer):
@@ -63,7 +75,7 @@ class Importer (Tagged.Importer):
 
     mapping = {}
 
-    
+
     def person_add (self, field, value):
 
         ''' Parse a person name in ISI format '''
@@ -86,6 +98,6 @@ class Importer (Tagged.Importer):
             self.emit ('warning',
                        (_("line %s: unsupported tag '%s'") % (line, tag)))
             return
-        
+
         meth (self, field, data)
         return
