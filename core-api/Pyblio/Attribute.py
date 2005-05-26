@@ -66,6 +66,21 @@ class Person (object):
         return (u'%s\0%s' % (self.last or '', self.first or '')).lower ()
 
 
+    def __eq__ (self, other):
+
+        return self.last == other.last   and \
+               self.first == other.first and \
+               self.honorific == other.honorific and \
+               self.lineage == other.lineage
+
+    def __ne__ (self, other):
+
+        return self.last != other.last   or \
+               self.first != other.first or \
+               self.honorific != other.honorific or \
+               self.lineage != other.lineage
+
+    
 class Date:
     ''' A date '''
 
@@ -108,7 +123,13 @@ class Date:
 
     def __hash__ (self):
         return hash ((self.year, self.month, self.day))
-            
+
+
+    def __repr__ (self):
+
+        return 'Date (year = %s, month = %s, day = %s)' % (
+            repr (self.year), repr (self.month), repr (self.day))
+    
 class Text (unicode):
     ''' A textual data '''
 
