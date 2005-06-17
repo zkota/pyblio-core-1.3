@@ -254,6 +254,7 @@ class Importer (object):
                        (last  = ' '.join (stream [:i]),
                         first = ' '.join (stream [i+1:]))
 
+                
             return Attribute.Person ()
 
         self.record [field] = map (_person_decode, avail)

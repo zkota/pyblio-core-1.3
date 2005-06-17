@@ -180,16 +180,18 @@ class RSDB (object):
     
 # --------------------------------------------------
 
-def _compare (db, a, b):
+def _compare (a, b):
     # orders the keys according to the criterion determined by cmp_key
     # (). As the binary tree does not allow for multiple identical
     # keys, use the records key to compute a strict order.
 
-    (a, ka), (b, kb) = [ x.split ('\0') for x in (a, b) ]
-    
-    r = Sort.compare (_pl (a), _pl (b))
-    if r: return r
+    try:
+        (a, ka), (b, kb) = [ x.split ('\0') for x in (a, b) ]
+        r = Sort.compare (_pl (a), _pl (b))
 
+    except: return 0
+    
+    if r: return r
     return cmp (ka, kb)
 
 class View (Store.View):
