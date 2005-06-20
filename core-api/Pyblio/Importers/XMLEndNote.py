@@ -23,82 +23,127 @@ import string, re, StringIO
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
 
-from Pyblio import Attribute, Store, Exceptions, Tools, XML
+from Pyblio import Attribute, Store, Exceptions, Tools
+
+import cElementTree as ElementTree
 
 from gettext import gettext as _
 
+# Unofficial mapping from EndNote type codes to type names
+typemap = [
+    (0  , "Journal Article"),
+    (1  , "Book"),
+    (2  , "Thesis"),
+    (3  , "Conference Proceedings"),
+    (4  , "Personal Communication"),
+    (5  , "Newspaper Article"),
+    (6  , "Computer Program"),
+    (7  , "Book Section"),
+    (8  , "Magazine Article"),
+    (9  , "Edited Book"),
+    (10 , "Report"),
+    (11 , "Map"),
+    (12 , "Audiovisual Material"),
+    (13 , "Artwork"),
+    (15 , "Patent"),
+    (16 , "Electronic Source"),
+    (17 , "Bill"),
+    (18 , "Case"),
+    (19 , "Hearing"),
+    (20 , "Manuscript"),
+    (21 , "Film or Broadcast"),
+    (22 , "Statute"),
+    (25 , "Figure"),
+    (26 , "Chart or Table"),
+    (27 , "Equation"),
+    (31 , "Generic"),
+]
 
-class Importer (XML.Parser):
+
+class ImporterV7 (object):
+
+    id2type = dict (typemap)
+
+    def record_begin (self):
+
+        pass
+
+    def record_end (self):
+
+        pass
+
+    def do_default (self, elem):
+
+        pass
+    
+    def id_add (self, field, value):
+
+        f = self.record.get (field, [])
+        f.append (Attribute.ID (value))
+        
+        self.record [field] = f
+        return
+        
+    def text_add (self, field, value):
+
+        f = self.record.get (field, [])
+        f.append (Attribute.Text (value.text))
+        
+        self.record [field] = f
+        return
+
+    def url_add (self, field, value):
+
+        f = self.record.get (field, [])
+        f.append (Attribute.URL (value))
+        
+        self.record [field] = f
+        return
+
+    def person_add (self, field, value):
+        f = self.record.get (field, [])
+
+        def mkauthor (txt):
+            parts = map (string.strip, txt.text.split (','))
+
+            if len (parts) == 2:
+                return Attribute.Person (last  = parts [0],
+                                         first = parts [1])
+            else:
+                return Attribute.Person (last = txt.text.strip ())
+
+        f += [ mkauthor (x) for x in value.findall ('AUTHOR') ]
+        
+        self.record [field] = f
+        return
 
     def parse (self, fd, db):
 
         self.db = db
-        
-        parser  = sax.make_parser ()
-        parser.setFeature (sax.handler.feature_validation, False)
-        parser.setContentHandler (self)
-        
-        parser.parse (fd)
-        return
 
+        for event, elem in ElementTree.iterparse (fd, events = ('end',)):
+            if elem.tag != 'RECORD': continue
 
-    def startDocument (self):
+            self.record = Store.Record ()
+            self.record_begin ()
 
-        self._tdata = None
-        return
+            for field in elem.getchildren ():
+                tag = field.tag.lower ()
+                getattr (self, 'do_' + tag, self.do_default) (field)
 
+            self.record_end ()
 
-    def startElement (self, name, attrs):
-        self._error ('unknown tag: %s' % `name`)
+            if self.record is not None:
+                self.db.add (self.record)
             
+            elem.clear()
         return
 
-    def endElement (self, name):
-        
-        return
-        
-    def characters (self, data):
-
-        if self._tdata is not None:
-            self._tdata = self._tdata + data
-            
-        return
 
 
 class Exporter (object):
 
-    id2type = {
-        0  : "Journal Article",
-        1  : "Book",
-        2  : "Thesis",
-        3  : "Conference Proceedings",
-        4  : "Personal Communication",
-        5  : "Newspaper Article",
-        6  : "Computer Program",
-        7  : "Book Section",
-        8  : "Magazine Article",
-        9  : "Edited Book",
-        10 : "Report",
-        11 : "Map",
-        12 : "Audiovisual Material",
-        13 : "Artwork",
-        15 : "Patent",
-        16 : "Electronic Source",
-        17 : "Bill",
-        18 : "Case",
-        19 : "Hearing",
-        20 : "Manuscript",
-        21 : "Film or Broadcast",
-        22 : "Statute",
-        25 : "Figure",
-        26 : "Chart or Table",
-        27 : "Equation",
-        31 : "Generic",
-        }
-
-    type2id = {}
-
-    for k, v in id2type.items (): type2id [v] = k
+    type2id = dict ([ (x [1], x [0]) for x in typemap ])
 
     _charref = re.compile (r'.*&#(\d+);')
     
