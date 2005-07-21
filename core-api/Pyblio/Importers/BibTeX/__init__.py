@@ -269,6 +269,9 @@ class Importer (object):
         # by default, we drop strings
         return
 
+    def preamble_add (self, stream):
+        # by default, we drop the preamble
+        return
 
     def id_add (self, data):
 
@@ -303,8 +306,13 @@ class Importer (object):
     
     def record_parse (self, record):
 
-        if record.key is None and len (record.fields) == 1:
+        tp = record.type.lower ()
+
+        if tp == 'string':
             return self.string_add (record)
+
+        elif tp == 'preamble':
+            return self.preamble_add (record)
         
         self.record = Store.Record ()
         self.record_begin ()

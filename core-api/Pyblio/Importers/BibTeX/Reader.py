@@ -309,7 +309,7 @@ def _on_out (fd, ctx):
     assert False
 
 _brace_re  = re.compile (r'[()"{}\\]')
-_cmd_re    = re.compile (r'(\w+|\S)(.*)')
+_cmd_re    = re.compile (r'(\w+|\S| )(.*)')
 _inline_re = re.compile (r'([,#=])')
 
 def _on_open (fd, ctx):
@@ -343,8 +343,7 @@ def _on_open (fd, ctx):
             m = _cmd_re.match (l)
             
             if not m:
-                raise ParserError ('backslash at the end of a line',
-                                   fd.ln)
+                raise ParserError ('backslash at the end of a line', fd.ln)
 
             if data: curr.append (Text (data))
             curr.append (Cmd (m.group (1)))
