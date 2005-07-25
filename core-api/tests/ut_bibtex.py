@@ -19,6 +19,11 @@ class WithComments (BibTeX.Importer):
         self.comments = []
         return
 
+    def string_add (self, data):
+        # Simply fill in the provided strings
+        for key, value in data.fields:
+            self.env.strings [key] = value
+        return
     
     def comment_add (self, data):
 
@@ -265,6 +270,10 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('von')
         return
 
+    def testStringJoin (self):
+
+        self._check ('environ')
+        
 
 class TestBibTeXExport (pybut.TestCase):
 

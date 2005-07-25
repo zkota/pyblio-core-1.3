@@ -101,7 +101,16 @@ class Join (list):
         return r
 
     def execute (self, env):
-        return Join (map (lambda x: x.execute (env), self))
+        # Joining of bare Text fragments leads to a lookup in the @string environment
+        def subjoin (fragment):
+            if isinstance (fragment, Text):
+                try:
+                    return env.strings [fragment]
+                except KeyError:
+                    pass
+            return fragment.execute (env)
+                
+        return Join ([ subjoin (x) for x in self ])
 
 
     def flat (self):

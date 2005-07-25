@@ -314,10 +314,10 @@ class Importer (object):
         elif tp == 'preamble':
             return self.preamble_add (record)
         
+        self.tp, key, val = record.type, record.key, record.fields
+
         self.record = Store.Record ()
         self.record_begin ()
-
-        self.tp, key, val = record.type, record.key, record.fields
 
         self.id_add (key)
 
