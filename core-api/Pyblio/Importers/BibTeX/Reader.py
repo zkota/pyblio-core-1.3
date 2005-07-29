@@ -127,7 +127,7 @@ class Join (list):
 class Text (unicode):
 
     def flat (self):
-        return self
+        return self.replace ('~', u'\xa0')
     
     def __repr__ (self):
         return 'Text (%s)' % unicode.__repr__ (self)
