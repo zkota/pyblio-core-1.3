@@ -4,7 +4,7 @@ from distutils.core import setup
 
 def version_get ():
 
-    full = os.popen ('tla logs -r -f').readline ().strip ()
+    full = os.popen ('tla logs -r -f 2> /dev/null').read ().split ('\n') [0].strip ()
 
     if full == '': return None, None
 
