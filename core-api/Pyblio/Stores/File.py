@@ -43,6 +43,7 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         self._id = 1
         self._group = group
 
+        self._byname = {}
         return
 
     def _check (self, item):
@@ -69,7 +70,16 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         v.group = self._group
         
         dict.__setitem__ (self, key, v)
+
+        try: self._byname [v.names ['C']] = v
+        except KeyError: pass
+        
         return
+
+
+    def byname (self, key):
+
+        return self._byname [key]
 
     
     def add (self, item, key = None):
@@ -85,6 +95,9 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         
         dict.__setitem__ (self, key, v)
 
+        try: self._byname [v.names ['C']] = v
+        except KeyError: pass
+        
         return key
 
     def __delitem__ (self, k):

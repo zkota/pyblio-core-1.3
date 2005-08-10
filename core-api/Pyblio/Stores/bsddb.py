@@ -723,6 +723,15 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         self._enum = enum
         
         self._group = group
+
+        self._byname = {}
+
+        for k in self:
+            v = self [k]
+            
+            try: self._byname [v.names ['C']] = v.id
+            except KeyError: pass
+            
         return
 
     def _check (self, item):
@@ -756,7 +765,10 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
             v.group = self._group
             
             data [key] = v
-        
+
+            try: self._byname [v.names ['C']] = v.id
+            except KeyError: pass
+            
             self._enum.put (self._group, _ps ((vid, data)), txn = txn)
 
         except:
@@ -767,6 +779,9 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         
         return key
 
+    def byname (self, name):
+        i = self._byname [name]
+        return self [i]
 
     def keys (self):
 
@@ -799,6 +814,9 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
             v.group = self._group
             
             data [key] = v
+
+            try: self._byname [v.names ['C']] = v.id
+            except KeyError: pass
         
             self._enum.put (self._group, _ps ((vid, data)), txn = txn)
 

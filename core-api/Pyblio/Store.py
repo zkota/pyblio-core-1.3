@@ -273,7 +273,9 @@ class TxoItem (object):
 
 class TxoGroup (object):
 
-    """ Definition of a group of Txo items.
+    """ Definition of a group of Txo items. Items in such a group can
+    be accessed with a numeric key as a dictionnary, but also with
+    logical names.
 
     DERIVED BY ALL STORES
     """
@@ -299,6 +301,14 @@ class TxoGroup (object):
     def values (self):
         raise NotImplemented ('please override')
 
+    def byname (self, name):
+        """
+        Return the L{TxoItem} whose name in the 'C' language is passed
+        as parameter. This 'C' language is meant to be the name used
+        by programs, rather than people.
+        """
+        raise NotImplemented ('please override')
+        
 
     def _reverse (self):
 

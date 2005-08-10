@@ -2,6 +2,24 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-08-10 20:23:04 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-168
+
+    Summary:
+      method to get txo items by name 
+    Revision:
+      pybliographer--devel--1.3--patch-168
+
+    It is now possible to use a method txogroup.byname (name) to fetch txo items.
+    The name is defined in the txo item as being the name in language 'C'. This
+    language is officially promoted as the language used by (C)ode, not by people.
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Store.py
+     core-api/Pyblio/Stores/File.py core-api/Pyblio/Stores/bsddb.py
+     core-api/tests/ut_database.py
+
+
 2005-08-10 12:53:56 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-167
 
     Summary:

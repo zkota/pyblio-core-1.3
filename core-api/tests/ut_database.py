@@ -356,7 +356,25 @@ class TestContent (pybut.TestCase):
         os.unlink (f)
         return
 
+    def testTxoByName (self):
+        
+        g = self.db.txo ['a']
 
+        i = Store.TxoItem ()
+
+        r = {}
+        
+        for k in ('A', 'B', 'C'):
+            i.names ['C'] = k
+            v = g.add (i)
+
+            r [k] = v
+
+        for k in ('A', 'B', 'C'):
+            assert self.db.txo ['a'].byname (k).id == r [k]
+
+        return
+    
     def testNamedResultSet (self):
 
         e = Store.Record ()
