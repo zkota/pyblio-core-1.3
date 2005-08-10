@@ -3,7 +3,7 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, access, A, B, I, DSL
+from Pyblio.Format import Person, join, HTML, access, A, B, I, DSL, Misc, Pages
 
 class TestFormat (pybut.TestCase):
 
@@ -19,6 +19,8 @@ class TestFormat (pybut.TestCase):
             ]
 
         rec ['journal'] = [ ]
+        rec ['singlepage'] = [ Attribute.Text ('123') ]
+        rec ['pagerange'] = [ Attribute.Text ('123-134') ]
 
         self.rec = rec
         
@@ -159,6 +161,27 @@ class TestFormat (pybut.TestCase):
         assert Person.initialLast (persons) () == ['F. Gobry', 'Fobry']
         assert Person.firstLast (persons) ()   == [u'Frédéric Gobry', 'Fobry']
         assert Person.lastFirst (persons) ()   == [u'Gobry, Frédéric', 'Fobry']
+
+    def testPages (self):
+        all, one = access (self.rec)
+
+        assert Pages.pagesLong (one ('singlepage')) () == u'page\xa0123'
+        assert Pages.pagesLong (one ('pagerange')) ()  == u'pages\xa0123-134'
+
+    def testMiscPlural (self):
+
+        assert Misc.plural (DSL.T ([]),  zero = 'zero', more = 'more') () == 'zero'
+        assert Misc.plural (DSL.T ([1]), zero = 'zero', more = 'more') () == 'more'
+        assert Misc.plural (DSL.T ([1]), zero = 'zero', one = 'one',
+                            more = 'more') () == 'one'
+        
+        assert Misc.plural (DSL.T ([1,2]), zero = 'zero', one = 'one',
+                            more = 'more') () == 'more'
+        assert Misc.plural (DSL.T ([1,2]), zero = 'zero', one = 'one',
+                            two = 'two', more = 'more') () == 'two'
+        assert Misc.plural (DSL.T ([1,2,3]), zero = 'zero', one = 'one',
+                            two = 'two', more = 'more') () == 'more'
+
         
 suite = pybut.suite (TestFormat)
 if __name__ == '__main__':  pybut.run (suite)

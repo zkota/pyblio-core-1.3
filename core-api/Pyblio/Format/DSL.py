@@ -40,7 +40,13 @@ class Sum (Maybe):
         return
 
     def __call__ (self):
-        return self.a () + self.b ()
+        a = self.a ()
+        b = self.b ()
+        try:
+            return a + b
+        except TypeError, msg:
+            raise TypeError ('with %s and %s: %s' % (
+                repr (a), repr (b), msg))
 
 class Or (Maybe):
 
@@ -175,3 +181,13 @@ def lazy (fn):
 
     return _caller
 
+def expand (fn_or_txt):
+
+    """ Returns the expanded version of its argument if it is a
+    callable, or the string itself if it is already a string. Useful
+    to process arguments from a lazy function."""
+
+    if callable (fn_or_txt):
+        return fn_or_txt ()
+    
+    return fn_or_txt
