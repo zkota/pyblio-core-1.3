@@ -39,7 +39,20 @@ class Environ (Coding.Environ):
 
     def __init__ (self):
 
-        self.strings = {}
+        self.strings = {
+            'jan': Reader.Text ('January'),
+            'feb': Reader.Text ('February'),
+            'mar': Reader.Text ('March'),
+            'apr': Reader.Text ('April'),
+            'may': Reader.Text ('May'),
+            'jun': Reader.Text ('June'),
+            'jul': Reader.Text ('July'),
+            'aug': Reader.Text ('August'),
+            'sep': Reader.Text ('September'),
+            'oct': Reader.Text ('October'),
+            'nov': Reader.Text ('November'),
+            'dec': Reader.Text ('December'),
+            }
         return
 
 

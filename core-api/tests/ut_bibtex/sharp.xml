@@ -49,7 +49,7 @@
    <id value="toto"/>
   </attribute>
   <attribute id="journal">
-   <text>jan 1st</text>
+   <text>January 1st</text>
   </attribute>
   <attribute id="number">
    <text>123 456 </text>
