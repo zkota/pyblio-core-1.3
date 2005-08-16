@@ -59,8 +59,8 @@ class Environ (Coding.Environ):
 # ==================================================
 # BibTeX interface
 # ==================================================
-_lf_re = re.compile ('N+I+')
-_fl_re = re.compile ('I+N+')
+_lf_re = re.compile ('^N+I+$')
+_fl_re = re.compile ('^N*I+N+$')
 
 _split_re = re.compile (r'[,.]|\s+')
 
@@ -239,7 +239,7 @@ class Importer (object):
                                                  last  = stream [1])
                     
                     if _fl_re.match (tt):
-                        idx = tt.index ('N')
+                        idx = tt.rindex ('I') + 1
                         return Attribute.Person (first = ' '.join (stream [:idx]),
                                                  last  = ' '.join (stream [idx:]))
 
