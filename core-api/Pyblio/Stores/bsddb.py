@@ -1288,12 +1288,11 @@ def dbimport (target, source):
     db = Database (path   = target,
                    schema = None, create = True)
 
-    handler = Store.DatabaseParse (db)
 
     try:
-        handler.parse (source)
+        db.xmlread (open (source))
 
-    except ValueError, msg:
+    except IOError, msg:
 
         dbdestroy (target)
         raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))

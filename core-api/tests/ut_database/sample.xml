@@ -45,6 +45,6 @@
   </attribute>
  </entry>
  <resultset id="1" name="My Set">
-  <entry ref="1"/>
+  <ref id="1"/>
  </resultset>
 </pyblio-db>

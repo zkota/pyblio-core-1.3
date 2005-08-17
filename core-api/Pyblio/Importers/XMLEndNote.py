@@ -112,7 +112,7 @@ class ImporterV7 (object):
             else:
                 return Attribute.Person (last = txt.text.strip ())
 
-        f += [ mkauthor (x) for x in value.findall ('AUTHOR') ]
+        f += [ mkauthor (x) for x in value ]
         
         self.record [field] = f
         return
@@ -127,7 +127,7 @@ class ImporterV7 (object):
             self.record = Store.Record ()
             self.record_begin ()
 
-            for field in elem.getchildren ():
+            for field in elem:
                 tag = field.tag.lower ()
                 getattr (self, 'do_' + tag, self.do_default) (field)
 

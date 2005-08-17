@@ -3,9 +3,27 @@
 <pyblio-schema>
  <attribute id="author" type="person">
   <name>Author</name>
+  <qualifiers>
+   <attribute id="role" type="text">
+    <name>Role</name>
+   </attribute>
+  </qualifiers>
  </attribute>
  <attribute id="url" type="url">
   <name>URL</name>
+  <qualifiers>
+   <attribute id="desc" type="text">
+    <name>Description</name>
+   </attribute>
+  </qualifiers>
+ </attribute>
+ <attribute id="rich" type="text">
+  <name>Text</name>
+  <qualifiers>
+   <attribute id="comment" type="text">
+    <name>Comment</name>
+   </attribute>
+  </qualifiers>
  </attribute>
  <attribute id="text" type="text">
   <name>Text</name>

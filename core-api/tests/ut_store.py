@@ -52,10 +52,22 @@ class TestStore (pybut.TestCase):
 
         e = Store.Record ()
 
-        e ['author'] = [ Attribute.Person (last = u'Last 1é'),
-                         Attribute.Person (last = 'Last 2')]
-        e ['url']    = [ Attribute.URL ('http://pybliographer.org') ]
+        scn = Attribute.Person (last = 'Last 2')
+        scn.q ['role'] = [ Attribute.Text ('Editor') ]
+        
+        e ['author'] = [ Attribute.Person (last = u'Last 1é'), scn ]
+
+        url = Attribute.URL ('http://pybliographer.org')
+        url.q ['desc'] = [ Attribute.Text ('Main site') ]
+        
+        e ['url']    = [ url ]
+
         e ['text']   = [ Attribute.Text (u'sample text é') ]
+
+        rich = Attribute.Text (u'sample text é')
+        rich.q ['comment'] = [ Attribute.Text ('bullshit') ]
+        
+        e ['rich']   = [ rich ]
         e ['date']   = [ Attribute.Date (year = 2003) ]
         e ['id']     = [ Attribute.ID ('Hehe') ]
         
@@ -63,6 +75,11 @@ class TestStore (pybut.TestCase):
 
         db.header = u"Hi, I'm a database description"
 
+        rs = db.rs.add (permanent = True)
+        rs.name = "sample"
+
+        rs.add (1)
+        
         db.save ()
 
         pybut.fileeq (self.f, 'ut_store/simple.xml')
@@ -71,7 +88,7 @@ class TestStore (pybut.TestCase):
 
     def testRead (self):
         """ A database can be read and saved again identically """
-        
+
         db = Store.get ('file').dbopen ('ut_store/simple.xml')
 
         fd = open (self.f, 'w')
@@ -122,6 +139,36 @@ class TestStore (pybut.TestCase):
         e ['bozo'] = [ Attribute.Text ('yay') ]
 
         fail (e)
+
+        # Discard unknown qualifiers
+        e = Store.Record ()
+
+        txt = Attribute.Text ('yay')
+        txt.q ['bozo'] = [ Attribute.Text ('gronf') ]
+        
+        e ['title'] = [ txt ]
+
+        fail (e)
+
+        # Discard ill-typed qualifiers
+        e = Store.Record ()
+
+        url = Attribute.URL ('yay')
+        url.q ['info'] = [ Attribute.URL ('gronf') ]
+        
+        e ['qualified'] = [ url ]
+
+        fail (e)
+
+        # Accept well-typed qualifiers
+        e = Store.Record ()
+
+        url = Attribute.URL ('yay')
+        url.q ['info'] = [ Attribute.Text ('gronf') ]
+        
+        e ['qualified'] = [ url ]
+
+        e = db.validate (e)
 
         # Check for entry types
         e = Store.Record ()
@@ -194,7 +241,19 @@ class TestStore (pybut.TestCase):
                               Attribute.Txo (g [4]),], \
                               'got %s' % `e ['enum']`
         return
-    
+
+    def testResultSet (self):
+
+        db = Store.get ('file').dbopen ('ut_store/resultset.xml')
+
+        ks = db.rs [1]
+        assert ks.name == 'gronf'
+
+        ks = ks.keys ()
+        ks.sort ()
+
+        assert ks == [1,2], 'got %s' % repr (ks)
+
         
 suite = pybut.suite (TestStore)
 if __name__ == '__main__':  pybut.run (suite)

@@ -7,6 +7,14 @@
  <attribute id="url" type="url" max="1">
   <name>URL</name>
  </attribute>
+ <attribute id="qualified" type="url" max="1">
+  <name>URL</name>
+  <qualifiers>
+    <attribute id="info" type="text">
+      <name>Info</name>
+    </attribute>
+  </qualifiers>
+ </attribute>
  <attribute id="text" type="text">
   <name>Text</name>
  </attribute>

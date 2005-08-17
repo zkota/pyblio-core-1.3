@@ -46,6 +46,7 @@ from gettext import gettext as _
 
 from Pyblio import Schema, Attribute, Exceptions, I18n, XML
 
+from cElementTree import ElementTree, iterparse, tostring
 
 class StoreError (Exception):
     """ Generic error occuring while accessing a database storage """
@@ -84,30 +85,31 @@ class Record (dict):
 	self.key    = None
         return
 
-    def xmlwrite (self, fd):
+    def xmlwrite (self, fd, offset = 1):
         """ Export as XML.
 
         Writes the content of the record as an XML fragment.
 
         @param fd: file descriptor to write to.
         """
+
+        ws = ' ' * offset
         
-        fd.write (' <entry id=%s>\n' % quoteattr (str (self.key)))
+        fd.write (ws + '<entry id=%s>\n' % quoteattr (str (self.key)))
 
         keys = self.keys ()
         keys.sort ()
 
         for k in keys:
             
-            fd.write ('  <attribute id=%s>\n' % quoteattr (k))
+            fd.write (ws + ' <attribute id=%s>\n' % quoteattr (k))
             
             for v in self [k]:
-                fd.write ('   ')
-                v.xmlwrite (fd)
+                v.xmlwrite (fd, offset + 2)
                 fd.write ('\n')
-            fd.write ('  </attribute>\n')
+            fd.write (ws + ' </attribute>\n')
             
-        fd.write (' </entry>\n')
+        fd.write (ws + '</entry>\n')
         return
 
 # --------------------------------------------------
@@ -201,7 +203,7 @@ class ResultSet (object):
         fd.write (' <resultset id="%d"%s>\n' % (self.id, name))
         
         for v in self:
-            fd.write ('  <entry ref="%d"/>\n' % v)
+            fd.write ('  <ref id="%d"/>\n' % v)
             
         fd.write (' </resultset>\n')
         return
@@ -561,6 +563,15 @@ class Database (object):
                 del entry [k]
                 continue
 
+            for v in vals:
+                for qk, qs in v.q.items ():
+                    if type (qs) not in (list, tuple):
+                        qs       = [ qs ]
+                        v.q [qk] = qs
+                
+                    elif len (vals) == 0:
+                        del v.q [qk]
+                    
             # check type and arity
             try:
                 s = self.schema [k]
@@ -574,7 +585,14 @@ class Database (object):
                     raise Exceptions.SchemaError \
                           (_('attribute %s has an incorrect type (should be %s)') % (
                         `k`, `s.type`))
-
+                
+                for qk, qs in v.q.items ():
+                    for q in qs:
+                        if not isinstance (q, s.q [qk].type):
+                            raise Exceptions.SchemaError \
+                                  (_('qualifier %s in attribute %s has an incorrect type (should be %s)') % (
+                                `qk`, `k`, `s.q [qk].type`))
+                        
             l = len (vals)
             lb, ub = s.range
             
@@ -679,310 +697,102 @@ class Database (object):
         return
 
 
-# ==================================================
+    def xmlread (self, fd):
 
+        for event, elem in iterparse (fd, events = ('end',)):
 
-class DatabaseParse (XML.Parser):
+            t = elem.tag
 
-    def __init__ (self, db):
-
-        self.db = db
-        
-        self._schema = Schema.Schema ()
-        self._sparse = Schema.SchemaParse (self._schema)
-
-        self._in_schema = False
-
-        from Pyblio.I18n import Localize
-
-        self._i18n = Localize ()
-        return
-
-    def parse (self, file):
-
-        sax.parse (file, self)
-        return
-    
-
-    def setDocumentLocator (self, locator):
-        self.locator = locator
-        self._sparse.setDocumentLocator (locator)
-        return
-    
-    
-    def startDocument (self):
-        self._started = False
-
-        self._entry = None
-        self._attribute = None
-        self._tdata = None
-        self._ntype = None
-
-        self._txoi = []
-        self._txog = None
-
-        self._rs = None
-        
-        self._lang = None
-        return
-
-
-    def startElement (self, name, attrs):
-
-        if self._in_schema:
-            self._sparse.startElement (name, attrs)
-            return
-        
-
-        if name == 'pyblio-schema':
-            self._in_schema = True
-            
-            self._sparse.startDocument ()
-            self._sparse.startElement (name, attrs)
-            return
-
-        if name == 'pyblio-db' and not self._started:
-            self._started = True
-            return
-        
-        if not self._started:
-            self._error (_("this is not a pybliographer database"))
-
-        # --------------------------------------------------
-        if name == 'txo-group':
-            if self._txog is not None:
-                self._error (_('nested "txo-group" are not supported'))
-
-            name = self._attr ('id', attrs).encode ('ascii')
-            self._txog = self.db.txo [name]
-            return
-
-        if name == 'txo-item':
-            if self._txog is None:
-                self._error (_('missing "txo-group"'))
-
-            i = TxoItem ()
-            i.id = int (self._attr ('id', attrs))
-
-            # Already add this item as it is needed for potential children
-            self._txog.add (i, key = i.id)
-            
-            self._txoi.append (i)
-            return
-
-        if name == 'name':
-            if not self._txoi:
-                self._error (_('missing "txo-item"'))
-            self._tdata = ''
-            self._lang = attrs.get ('lang', '')
-            return
-        
-
-        if name == 'header':
-            self._tdata = ''
-            return
-        
-        if name == 'entry':
-            if self._rs is not None:
-                id = self._attr ('ref', attrs)
-                self._rs.add (Key (id))
+            if t == 'entry':
+                k = elem.attrib ['id']
+                r = Record ()
                 
-            else:
-                id = self._attr ('id', attrs)
+                for att in elem.findall ('./attribute'):
+                    aid = att.attrib ['id']
 
-                self._entry = Record ()
-                self._ekey  = Key (id)
-            return
+                    try:
+                        tp = self.schema [aid]
+                    except KeyError:
+                        raise StoreError (_("invalid attribute '%s'") % aid)
 
-        if name == 'native':
-            if self._entry is None:
-                self._error (_("tag 'native' must be in an 'entry'"))
+                    for sub in att:
+                        a = tp.type.xmlread (sub)
 
-            self._ntype = self._attr ('type', attrs)
-            self._tdata = ''
-            return
+                        # check for possible qualifiers
+                        for q in sub.findall ('./attribute'):
+                            qid = q.attrib ['id']
 
-        if name == 'resultset':
+                            try:
+                                tp = self.schema [aid].q [qid]
+                            except KeyError:
+                                raise StoreError (_("invalid attribute qualifier '%s'") % qid)
 
-            rsid = int (self._attr ('id', attrs))
-            self._rs = self.db.rs.add (permanent = True, rsid = rsid)
-            
-            try:
-                self._rs.name = attrs ['name']
+                            for subsub in q:
+                                qv = tp.type.xmlread (subsub)
+
+                                try:             a.q [qid].append (qv)
+                                except KeyError: a.q [qid] = [qv]
+                            
+                        try:             r [aid].append (a)
+                        except KeyError: r [aid] = [a]
+
+                self.add (r, key = Key (k))
                 
-            except KeyError:
-                pass
-            return
-        
-        if name == 'attribute':
-            if self._entry is None:
-                self._error (_("tag 'attribute' must be in an 'entry'"))
+                elem.clear()
 
-            id = self._attr ('id', attrs)
-
-            try:
-                tp = self._schema [id]
-
-            except KeyError:
-                self._error (_("invalid attribute '%s' in entry '%s'") %
-                             (id, self._ekey))
-
-            self._attribute = (id, tp.type)
-            return
-
-        if name in Attribute.N_to_C.keys ():
-            if self._attribute is None:
-                self._error (_("attribute '%s' must be in an 'attribute' tag") % name)
-
-            id = self._attribute [0]
-
-            if self._attribute [1] is not Attribute.N_to_C [name]:
-                self._error (_("attribute '%s' does not match type of '%s'") %
-                             (name, id))
-
-            if name == 'person':
-                self._o = Attribute.Person (honorific = attrs.get ('honorific', None),
-                                            first     = attrs.get ('first', None),
-                                            last      = attrs.get ('last', None),
-                                            lineage   = attrs.get ('lineage', None))
-            elif name == 'date':
-
-                d = []
-                for v in (attrs.get ('day', None),
-                          attrs.get ('month', None),
-                          attrs.get ('year', None)):
-                    if v: d.append (int (v))
-                    else: d.append (None)
-
-                self._o = Attribute.Date (day   = d [0],
-                                          month = d [1],
-                                          year  = d [2])
-
-            elif name == 'reference':
-                self._o = Attribute.Reference (self._attr ('ref', attrs))
-
-            elif name == 'text':
-                self._tdata = ''
-                
-            elif name == 'url':
-                self._o = Attribute.URL (self._attr ('href', attrs))
-
-            elif name == 'txo':
-                group = self._schema [self._attribute [0]].group
-                id    = int (self._attr ('id', attrs))
-
-                item  = self.db.txo [group] [id]
-                
-                self._o = Attribute.Txo (item)
-
-            elif name == 'id':
-                self._o = Attribute.ID (self._attr ('value', attrs))
-                
-            else:
-                self._error (_("unexpected tag: %s") % name)
-
-            return
-        
-        self._error ("unknown tag '%s'" % name)
-        return
-
-    def characters (self, data):
-        if self._in_schema:
-            self._sparse.characters (data)
-            return
-
-        if self._tdata is not None:
-            self._tdata = self._tdata + data
-            
-        return
-
-    def endElement (self, name):
-
-        if self._in_schema:
-            if name != 'pyblio-schema':
-                self._sparse.endElement (name)
-                return
-
-            
-            self._in_schema = False
-            self._sparse    = None
-            
-            self.db.schema = self._schema
-
-            # Finalize the link between the schema and the db:
-            #
-            #  1. create txo groups defined in the schema
-            #
-
-            for v in self.db.schema.values ():
-                if v.type is not Attribute.Txo: continue
+            if t == 'resultset':
+                rsid = int (elem.attrib ['id'])
+                rs   = self.rs.add (permanent = True, rsid = rsid)
 
                 try:
-                    self.db.txo._add (v.group)
-
-                except Exceptions.ConstraintError:
+                    rs.name = elem.attrib ['name']
+                    
+                except KeyError:
                     pass
+
+                for ref in elem.findall ('./ref'):
+                    rs.add (Key (ref.attrib ['id']))
                 
-            return
-
-        if name == 'txo-group':
-            self._txog = None
-            return
-        
-        if name == 'txo-item':
-            i = self._txoi.pop ()
-
-            if self._txoi:
-                i.parent = self._txoi [-1].id
-
-            # Update the item with its final value
-            self._txog [i.id] = i
-            return
-        
-        if name == 'header':
-            self.db.header = self._tdata
-            self._tdata = None
-            return
-
-        if name == 'entry':
-            if self._rs is None:
-                self.db.add (self._entry, key = self._ekey)
-                self._entry = None
-            return
-
-        if name == 'resultset':
-            self._rs = None
-            return
-        
-        if name == 'native':
-            self._entry.native = (self._ntype, self._tdata)
-            self._ntype = None
-            self._tdata = None
-            return
-        
-        if name == 'name':
-            self._txoi [-1].names [self._lang] = self._tdata
-            self._tdata = None
-            return
-        
-        if self._attribute and name in Attribute.N_to_C.keys ():
-
-            if name == 'text':
-                self._o = Attribute.Text (self._tdata)
-                self._tdata = None
+                elem.clear()
             
-            id = self._attribute [0]
+            if t == 'txo-group':
+                g = self.txo [elem.attrib ['id'].encode ('ascii')]
+                
+                def nesting (tree, parent):
+                    for item in tree.findall ('./txo-item'):
+                        i = TxoItem ()
+                        
+                        i.id = int (item.attrib ['id'])
+                        i.parent = parent
+
+                        for name in item.findall ('./name'):
+                            lang = name.attrib.get ('lang', '')
+                            i.names [lang] = name.text
+
+                        g.add (i, i.id)
+
+                        nesting (item, i.id)
+
+                nesting (elem, None)
+                
+                elem.clear()
             
-            try:
-                self._entry [id].append (self._o)
+            elif elem.tag == 'pyblio-schema':
+                self.schema = Schema.Schema ()
+                self.schema.xmlread (elem)
 
-            except KeyError:
-                self._entry [id] = [self._o]
+                # Finalize the link between the schema and the db by
+                # creating the txo groups defined in the schema, so
+                # that they exist when we read their content.
+                
+                for v in self.schema.values ():
+                    if v.type is not Attribute.Txo: continue
 
-            self._o = None
-            
-        return
-
+                    try: self.txo._add (v.group)
+                    except Exceptions.ConstraintError: pass
+                
+            elif t == 'header':
+                self.header = elem.text
 
 # --------------------------------------------------
 

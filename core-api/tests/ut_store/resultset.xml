@@ -4,12 +4,6 @@
 <pyblio-schema>
  <attribute id="author" type="person">
   <name>Author</name>
-
-  <qualifiers>
-   <attribute id="role" type="text">
-    <name>Role</name>
-   </attribute>
-  </qualifiers>
  </attribute>
 
  <attribute id="date" type="date">
@@ -20,28 +14,12 @@
   <name>ID</name>
  </attribute>
 
- <attribute id="rich" type="text">
-  <name>Text</name>
-
-  <qualifiers>
-   <attribute id="comment" type="text">
-    <name>Comment</name>
-   </attribute>
-  </qualifiers>
- </attribute>
-
  <attribute id="text" type="text">
   <name>Text</name>
  </attribute>
 
  <attribute id="url" type="url">
   <name>URL</name>
-
-  <qualifiers>
-   <attribute id="desc" type="text">
-    <name>Description</name>
-   </attribute>
-  </qualifiers>
  </attribute>
 
 </pyblio-schema>
@@ -49,11 +27,7 @@
  <entry id="1">
   <attribute id="author">
    <person last="Last 1é"/>
-   <person last="Last 2">
-    <attribute id="role">
-     <text>Editor</text>
-    </attribute>
-   </person>
+   <person last="Last 2"/>
   </attribute>
   <attribute id="date">
    <date year="2003"/>
@@ -61,26 +35,33 @@
   <attribute id="id">
    <id value="Hehe"/>
   </attribute>
-  <attribute id="rich">
-   <text>
-    <content>sample text é</content>
-    <attribute id="comment">
-     <text>bullshit</text>
-    </attribute>
-   </text>
+  <attribute id="text">
+   <text>sample text é</text>
+  </attribute>
+  <attribute id="url">
+   <url href="http://pybliographer.org"/>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="author">
+   <person last="Last 1é"/>
+   <person last="Last 2"/>
+  </attribute>
+  <attribute id="date">
+   <date year="2003"/>
+  </attribute>
+  <attribute id="id">
+   <id value="Hehe"/>
   </attribute>
   <attribute id="text">
    <text>sample text é</text>
   </attribute>
   <attribute id="url">
-   <url href="http://pybliographer.org">
-    <attribute id="desc">
-     <text>Main site</text>
-    </attribute>
-   </url>
+   <url href="http://pybliographer.org"/>
   </attribute>
  </entry>
- <resultset id="1" name="sample">
-  <ref id="1"/>
+ <resultset id="1" name="gronf">
+   <ref id="1" />
+   <ref id="2" />
  </resultset>
 </pyblio-db>

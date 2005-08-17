@@ -365,16 +365,11 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self.save ()
 
         else:
-            handler = Store.DatabaseParse (self)
-
             try:
-                handler.parse (file)
-
-            except ValueError, msg:
-                raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
+                self.xmlread (open (file))
 
             except IOError, msg:
-                raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
+                raise Store.StoreError (_("cannot open database: %s") % msg)
             
         return
 

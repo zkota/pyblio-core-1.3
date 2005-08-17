@@ -6,7 +6,7 @@
   <name lang="en">Author (en)</name>
  </attribute>
 
- <attribute id="url" type="url">
+ <attribute id="url" type="txo" group="toto">
   <name>URL</name>
  </attribute>
 

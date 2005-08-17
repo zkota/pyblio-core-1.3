@@ -4,6 +4,12 @@
  <attribute id="author" type="person">
   <name>Author</name>
   <name lang="en">Author (en)</name>
+
+  <qualifiers>
+   <attribute id="role" type="text">
+    <name>Role</name>
+   </attribute>
+  </qualifiers>
  </attribute>
 
  <attribute id="url" type="url">

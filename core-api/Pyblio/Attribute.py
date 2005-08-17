@@ -31,11 +31,30 @@ from gettext import gettext as _
 
 re_split = re.compile (r'[^\w]+', re.UNICODE)
 
+class Qualified (object):
+    """ Mix-in class that provides qualifiers to attributes, making
+    them behave like composite data types (but not arbitrarily nested
+    data, though)"""
+    
+    def _xmlsubwrite (self, fd, offset = 1):
+        ws = ' ' * offset
+        
+        for k, vs in self.q.items ():
+            fd.write (ws + '<attribute id=%s>\n' % quoteattr (k))
+            for v in vs:
+                v.xmlwrite (fd, offset + 1)
+                fd.write ('\n')
+            fd.write (ws + '</attribute>\n')
+        return
 
-class Person (object):
+    
+class Person (Qualified):
     ''' A person name '''
 
-    def __init__ (self, honorific = None, first = None, last = None, lineage = None):
+    def __init__ (self, honorific = None, first = None, last = None, lineage = None,
+                  xml = None):
+
+        self.q = {}
 
         self.honorific = honorific
         self.first     = first
@@ -43,15 +62,35 @@ class Person (object):
         self.lineage   = lineage
         return
 
-    def xmlwrite (self, fd):
+    def xmlread (k, xml, inside = False):
+        p = k ()
+        
+        for f in ('honorific', 'first', 'last', 'lineage'):
+            setattr (p, f, xml.attrib.get (f, None))
+
+        return p
+    
+    xmlread = classmethod (xmlread)
+    
+    def xmlwrite (self, fd, offset = 0):
+
+        ws = ' ' * offset
         
         data = []
         for f in ('honorific', 'first', 'last', 'lineage'):
             v = getattr (self, f)
             if v:
                 data.append ('%s=%s' % (f, quoteattr (v.encode ('utf-8'))))
-        
-        fd.write ('<person %s/>' % string.join (data, ' '))
+
+        data = ' '.join (data) 
+
+        if not self.q:
+            fd.write (ws + '<person %s/>' % data)
+        else:
+            fd.write (ws + '<person %s>\n'  % data)
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</person>')
+            
         return
     
     def index (self):
@@ -81,25 +120,46 @@ class Person (object):
                self.lineage != other.lineage
 
     
-class Date:
+class Date (Qualified):
     ''' A date '''
 
     def __init__ (self, year = None, month = None, day = None):
+        self.q = {}
 
         self.year  = year
         self.month = month
         self.day   = day
         return
 
-    def xmlwrite (self, fd):
+    def xmlread (k, xml):
+        d = k ()
+        
+        for f in ('year', 'month', 'day'):
+            v = xml.attrib.get (f, None)
+            if v: setattr (d, f, int (v))
+            
+        return d
+    
+    xmlread = classmethod (xmlread)
 
+
+    def xmlwrite (self, fd, offset = 0):
+
+        ws = ' ' * offset
+        
         data = []
         for f in ('year', 'month', 'day'):
             v = getattr (self, f)
             if v:
                 data.append ('%s="%d"' % (f, v))
         
-        fd.write ('<date %s/>' % string.join (data, ' '))
+        fd.write (ws + '<date %s' % string.join (data, ' '))
+        if self.q:
+            fd.write ('>\n')
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</date>')
+        else:
+            fd.write ('/>')
         return
 
     def index (self):
@@ -129,13 +189,35 @@ class Date:
 
         return 'Date (year = %s, month = %s, day = %s)' % (
             repr (self.year), repr (self.month), repr (self.day))
-    
-class Text (unicode):
+
+
+class Text (unicode, Qualified):
     ''' A textual data '''
 
-    def xmlwrite (self, fd):
+    def __init__ (self, text = u''):
+        unicode.__init__ (self, text)
+        self.q = {}
+        return
+    
+    def xmlread (k, xml):
+        content = xml.find ('./content')
+        if content is not None:
+            return k (content.text)
+        else:
+            return k (xml.text)
+    
+    xmlread = classmethod (xmlread)
 
-        fd.write ('<text>%s</text>' % escape (self.encode ('utf-8')))
+    def xmlwrite (self, fd, offset = 0):
+        ws = ' ' * offset
+
+        if self.q:
+            fd.write (ws + '<text>\n')
+            fd.write (ws + ' <content>%s</content>\n' % escape (self.encode ('utf-8')))
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</text>')
+        else:
+            fd.write (ws + '<text>%s</text>' % escape (self.encode ('utf-8')))
         return
 
     def index (self):
@@ -146,12 +228,29 @@ class Text (unicode):
         return self.lower ()
     
 
-class URL (str):
+class URL (str, Qualified):
     ''' An URL '''
 
-    def xmlwrite (self, fd):
+    def __init__ (self, text = ''):
+        self.q = {}
+        str.__init__ (self, text)
+        return
+    
+    def xmlread (k, xml):
+        return k (xml.attrib ['href'])
+    
+    xmlread = classmethod (xmlread)
+    
+    def xmlwrite (self, fd, offset = 0):
+        ws = ' ' * offset
 
-        fd.write ('<url href=%s/>' % quoteattr (self.encode ('utf-8')))
+        fd.write (ws + '<url href=%s' % quoteattr (self.encode ('utf-8')))
+        if self.q:
+            fd.write ('>\n')
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</url>')
+        else:
+            fd.write ('/>')
         return
 
     def index (self):
@@ -167,12 +266,29 @@ class URL (str):
         return self
 
 
-class ID (unicode):
+class ID (unicode, Qualified):
 
     ''' An external identifier '''
 
-    def xmlwrite (self, fd):
-        fd.write ('<id value=%s/>' % quoteattr (self.encode ('utf-8')))
+    def __init__ (self, text = u''):
+        self.q = {}
+        unicode.__init__ (self, text)
+        return
+
+    def xmlread (k, xml):
+        return k (xml.attrib ['value'])
+    
+    xmlread = classmethod (xmlread)
+    
+    def xmlwrite (self, fd, offset = 0):
+        ws = ' ' * offset
+        fd.write (ws + '<id value=%s' % quoteattr (self.encode ('utf-8')))
+        if self.q:
+            fd.write ('>\n')
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</id>')
+        else:
+            fd.write ('/>')
         return
 
     def index (self):
@@ -182,18 +298,41 @@ class ID (unicode):
         return self
 
 
-class Txo:
+class Txo (Qualified):
 
     """ Relationship to a Taxonomy """
 
-    def __init__ (self, item):
-        self.group = item.group
-        self.id    = item.id
+    def __init__ (self, item = None):
+        self.q = {}
+
+        if item:
+            self.group = item.group
+            self.id    = item.id
+        else:
+            self.group = None
+            self.id    = None
         return
+
+    def xmlread (k, xml):
+        txo = k ()
+        
+        txo.group = xml.attrib ['group']
+        txo.id    = int (xml.attrib ['id'])
+
+        return txo
     
-    def xmlwrite (self, fd):
-        fd.write ('<txo group="%s" id="%d"/>' % (
-            self.group, self.id))
+    xmlread = classmethod (xmlread)
+    
+    def xmlwrite (self, fd, offset = 0):
+        ws = ' ' * offset
+        fd.write (ws + '<txo group="%s" id="%d"' % (self.group, self.id))
+
+        if self.q:
+            fd.write ('>\n')
+            self._xmlsubwrite (fd, offset + 1)
+            fd.write (ws + '</txo>')
+        else:
+            fd.write ('/>')
         return
 
     def index (self):

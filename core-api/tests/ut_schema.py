@@ -1,4 +1,4 @@
-import os, pybut
+import os, pybut, sys
 
 from Pyblio import Schema
 
@@ -56,16 +56,6 @@ class TestSchema (pybut.TestCase):
         return
     
 
-    def testSpurrious (self):
-        """ Forbid nested documents """
-
-        try:
-            Schema.Schema ('ut_schema/spurrious.xml')
-            assert False
-            
-        except Schema.sax.SAXException, msg:
-            pass
-
     def testDuplicate (self):
         """ Forbid field duplication """
 
@@ -73,34 +63,41 @@ class TestSchema (pybut.TestCase):
             Schema.Schema ('ut_schema/duplicate.xml')
             assert False
             
-        except Schema.sax.SAXException, msg:
+        except Schema.SchemaError, msg:
             pass
 
     def testWrite (self):
         """ Writing does not modify the file """
 
-        file = ',,t1.xml'
-        
-        import sys
-        a = Schema.Schema ('ut_schema/simple.xml')
+        for sch in ('simple.xml', 'qualifiers.xml'):
+            file = pybut.dbname ()
 
-        out = open (file, 'w')
-        a.xmlwrite (out)
-        out.close ()
-        
-        # both files should be identical
-        d1 = open (file).read ()
-        d2 = open ('ut_schema/simple.xml').read ()
-        
-        assert d1 == d2
-        
-        try: os.unlink (file)
-        except OSError: pass
-            
+            schema = os.path.join ('ut_schema', sch)
+            a = Schema.Schema (schema)
+
+            out = open (file, 'w')
+            a.xmlwrite (out)
+            out.close ()
+
+            # both files should be identical
+            pybut.fileeq (schema, file)
+
+            try: os.unlink (file)
+            except OSError: pass
+
+    def testGroup (self):
+        """ Some fields have groups """
+
+        import sys
+        a = Schema.Schema ('ut_schema/group.xml')
+
+        assert a ['url'].group == 'toto'
+        return
+    
     def testComplex (self):
         """ Accents and escaping """
 
-        file = ',,t2.xml'
+        file = pybut.dbname ()
         
         import sys
         a = Schema.Schema ('ut_schema/complex.xml')
@@ -135,15 +132,6 @@ class TestSchema (pybut.TestCase):
 
         return
 
-    def testIndexed (self):
-
-        s = Schema.Schema ('ut_schema/indexed.xml')
-
-        assert s ['author'].indexed
-        assert not s ['url'].indexed
-        assert not s ['enum'].indexed
-
-        return
     
     
 suite = pybut.suite (TestSchema)

@@ -389,11 +389,12 @@ class TestContent (pybut.TestCase):
 
         rs = self.db.query (Query.AnyWord ('youyou'), permanent = True)
         rs.name = u'my set'
-        
+
         def integrity (rs):
             i = 0
             for k in rs:
-                assert self.db [k] ['title'] [0] == 'youyou'
+                v = self.db [k] ['title'] [0]
+                assert v == 'youyou', 'got %s %s' % (repr (v), repr (self.db [k]))
                 i = i + 1
 
             assert i == 5, 'obtained %d' % i

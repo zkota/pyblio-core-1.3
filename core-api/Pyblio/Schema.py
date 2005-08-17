@@ -30,24 +30,64 @@ optional fields that describe the document. These fields are typed.
 
 from gettext import gettext as _
 
-from xml import sax
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N
 from Pyblio import I18n, XML
+
+from cElementTree import ElementTree
+
+class SchemaError (Exception): pass
 
 class Schema (dict):
 
     def __init__ (self, file = None):
 
         if file:
-            handler = SchemaParse (self)
+            tree = ElementTree (file = file)
 
-            parser  = sax.make_parser ()
-            parser.setFeature (sax.handler.feature_validation, False)
-            parser.setContentHandler (handler)
+            self.xmlread (tree.getroot ())
+        return
+
+    def xmlread (self, tree):
+
+        def parseattr (attr):
+            a = Attribute (attr.attrib ['id'])
+
+            a.indexed = attr.attrib.get ('indexed', '0') == '1'
+            a.group   = attr.attrib.get ('group', None)
+
+            try:
+                mx = attr.attrib ['max']
+                a.range = (1, int (mx))
+            except KeyError: pass
             
-            parser.parse (file)
+            try:
+                a.type = N_to_C [attr.attrib ['type']]
+            except KeyError:
+                raise SchemaError ('attribute %s has an unknown type' % repr (a.id))
+
+            for name in attr.findall ('name'):
+                lang = name.attrib.get ('lang', '')
+                a.names [lang] = name.text
+
+            return a
+        
+        for attr in tree.findall ('./attribute'):
+            a = parseattr (attr)
+
+            if self.has_key (a.id):
+                raise SchemaError ('duplicate attribute %s' % repr (a.id))
+
+            for q in attr.findall ('./qualifiers/attribute'):
+                qa = parseattr (q)
+                if a.q.has_key (qa.id):
+                    raise SchemaError ('duplicate qualifier %s for attribute %s' % (
+                        repr (qa.id), repr (a.id)))
+
+                a.q [qa.id] = qa
+                
+            self [a.id] = a
         return
 
 
@@ -77,15 +117,13 @@ class Attribute:
 
         self.type  = None
 
-        # Is the attribute to be indexed ?
-        self.indexed = False
-
         # A grouping information (for Enumerated types for instance)
         self.group = None
+        self.range = (1, None)
         
         self.names = {}
 
-        self.range = (1, None)
+        self.q = {}
         return
 
     def _name_get (self):
@@ -94,25 +132,22 @@ class Attribute:
 
     name = property (_name_get)
 
-    def xmlwrite (self, fd):
+    def xmlwrite (self, fd, offset = 1):
 
-        if self.range [1] is None:
-            card = ""
-        else:
-            card = ' max="%d"' % self.range [1]
+        ws = ' ' * offset
         
-        if self.group is None:
-            group = ""
-        else:
-            group = ' group="%s"' % self.group
+        if self.group is None: group = ""
+        else:                  group = ' group="%s"' % self.group
 
-        if self.indexed:
-            idx = ' indexed="1"'
-        else:
-            idx = ''
+        if self.indexed: idx = ' indexed="1"'
+        else:            idx = ''
+
+        if self.range [1] is None: card = ""
+        else:                      card = ' max="%d"' % self.range [1]
+
         
-        fd.write (' <attribute id="%s" type="%s"%s%s%s>\n' % (
-            self.id, C_to_N [self.type], card, group, idx))
+        fd.write ('%s<attribute id="%s" type="%s"%s%s%s>\n' % (
+            ws, self.id, C_to_N [self.type], card, group, idx))
 
         names = self.names.keys ()
         names.sort ()
@@ -120,114 +155,16 @@ class Attribute:
         for k in names:
             v = escape (self.names [k].encode ('utf-8'))
             if k: k = ' lang="%s"' % k
-            fd.write ('  <name%s>%s</name>\n' % (k, v))
+            fd.write ('%s <name%s>%s</name>\n' % (ws, k, v))
 
-        fd.write (' </attribute>\n')
+        if self.q:
+            keys = self.q.keys ()
+            keys.sort ()
+
+            fd.write ('\n')
+            fd.write ('%s <qualifiers>\n' % ws)
+            for k in keys: self.q [k].xmlwrite (fd, offset = offset + 2)
+            fd.write ('%s </qualifiers>\n' % ws)
+            
+        fd.write ('%s</attribute>\n' % ws)
         return
-
-
-# ==================================================
-
-    
-class SchemaParse (XML.Parser):
-
-    """ This class parses the XML format of a Schema """
-
-    def __init__ (self, schema):
-        self.schema = schema
-        return
-
-    
-    def startDocument (self):
-        # Start with an empty schema
-        
-        self.schema.clear ()
-
-        self._attribute = None
-        self._started   = False
-        
-        self._namelang = None
-        self._namedata = None
-        return
-
-    
-    def startElement (self, name, attrs):
-
-        if name == 'pyblio-schema' and not self._started:
-            self._started = True
-            return
-        
-        if not self._started:
-            self._error (_("this is not a pybliographer schema"))
-
-        if name == 'attribute':
-            if self._attribute is not None:
-                self._error (_("'attribute' tags cannot be nested"))
-
-            id = self._attr ('id', attrs).encode ('ascii')
-            self._attribute = Attribute (id)
-
-            tname = self._attr ('type', attrs)
-            try:
-                self._attribute.type = N_to_C [tname]
-            except KeyError:
-                self._error ('unknown attribute type "%s"' % tname)
-
-            if attrs.has_key ('max'):
-                try:
-                    self._attribute.range = (1, int (attrs ['max']))
-
-                except ValueError:
-                    self._error ('invalid range value in attribute "%s"' % tname)
-
-            if attrs.has_key ('group'):
-                self._attribute.group = attrs ['group'].encode ('ascii')
-
-            if attrs.has_key ('indexed'):
-                try:
-                    v = int (attrs ['indexed'])
-                except ValueError:
-                    self._error ("invalid 'indexed' attribute")
-                
-                if v: self._attribute.indexed = True
-            return
-        
-        
-        if name == 'name':
-            if self._attribute is None and self._document is None:
-                self._error (_("'name' must be in an 'attribute'"))
-            self._namelang = attrs.get ('lang', '')
-            self._namedata = ''
-            return
-        
-        self._error ("unknown tag '%s'" % name)
-
-    def characters (self, data):
-
-        if self._namedata is not None:
-            self._namedata = self._namedata + data
-        return
-
-    def endElement (self, name):
-
-        if name == 'pyblio-schema':
-            self._started = False
-            return
-        
-        if name == 'attribute':
-            if self.schema.has_key (self._attribute.id):
-                self._error ('duplicate attribute %s' %  `self._attribute.id`)
-                
-            self.schema [self._attribute.id] = self._attribute
-            self._attribute = None
-            return
-
-        if name == 'name':
-            if self._attribute:
-                self._attribute.names [self._namelang] = self._namedata
-
-            elif self._document:
-                self._document.names [self._namelang] = self._namedata
-        return
-
-
