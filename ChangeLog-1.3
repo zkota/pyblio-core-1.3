@@ -2,6 +2,45 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-08-23 09:07:41 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-171
+
+    Summary:
+      improved windows compatibility
+    Revision:
+      pybliographer--devel--1.3--patch-171
+
+    Essentially by not using weird file names, and being a bit friendlier in the detection
+    of bsddb.
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Store.py
+     core-api/Pyblio/Stores/bsddbstore.py core-api/README
+     core-api/tests/ut_database.py core-api/tests/ut_store.py
+
+    renamed files:
+     core-api/Pyblio/Stores/.arch-ids/File.py.id
+       ==> core-api/Pyblio/Stores/.arch-ids/filestore.py.id
+     core-api/Pyblio/Stores/.arch-ids/bsddb.py.id
+       ==> core-api/Pyblio/Stores/.arch-ids/bsddbstore.py.id
+     core-api/Pyblio/Stores/File.py
+       ==> core-api/Pyblio/Stores/filestore.py
+     core-api/Pyblio/Stores/bsddb.py
+       ==> core-api/Pyblio/Stores/bsddbstore.py
+     core-api/tests/ut_store/.arch-ids/s:full.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/s_full.xml.id
+     core-api/tests/ut_store/.arch-ids/s:simple.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/s_simple.xml.id
+     core-api/tests/ut_store/.arch-ids/s:validate.xml.id
+       ==> core-api/tests/ut_store/.arch-ids/s_validate.xml.id
+     core-api/tests/ut_store/s:full.xml
+       ==> core-api/tests/ut_store/s_full.xml
+     core-api/tests/ut_store/s:simple.xml
+       ==> core-api/tests/ut_store/s_simple.xml
+     core-api/tests/ut_store/s:validate.xml
+       ==> core-api/tests/ut_store/s_validate.xml
+
+
 2005-08-17 20:04:01 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-170
 
     Summary:

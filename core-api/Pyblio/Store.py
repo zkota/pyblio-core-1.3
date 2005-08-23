@@ -805,12 +805,9 @@ for m in os.listdir (_dir):
 
     m, ext = os.path.splitext (m)
 
-    if ext != '.py': continue
+    if ext != '.py' and not ext.endswith ('store'): continue
     
-    _modules [m.lower ()] = m
-
-del _modules ['__init__']
-
+    _modules [m.lower () [:-5]] = m
 
 def get (fmt):
 

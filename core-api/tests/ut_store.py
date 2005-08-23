@@ -21,7 +21,7 @@ class TestStore (pybut.TestCase):
     def testEmpty (self):
         """ Create an empty database with a schema """
 
-        schema = Schema.Schema ('ut_store/s:simple.xml')
+        schema = Schema.Schema (os.path.join ('ut_store', 's_simple.xml'))
 
         db = Store.get ('file').dbcreate (self.f, schema)
         db.save ()
@@ -40,14 +40,14 @@ class TestStore (pybut.TestCase):
         db.schema.xmlwrite (file)
         file.close ()
 
-        pybut.fileeq (self.f, 'ut_store/s:simple.xml')
+        pybut.fileeq (self.f, os.path.join ('ut_store', 's_simple.xml'))
         
         return
 
     def testWrite (self):
         """ A new database can be saved with its schema """
 
-        schema = Schema.Schema ('ut_store/s:full.xml')
+        schema = Schema.Schema (os.path.join ('ut_store', 's_full.xml'))
         db = Store.get ('file').dbcreate (self.f, schema)
 
         e = Store.Record ()
@@ -114,7 +114,7 @@ class TestStore (pybut.TestCase):
 
         from Pyblio.Exceptions import SchemaError
         
-        schema = Schema.Schema ('ut_store/s:validate.xml')
+        schema = Schema.Schema (os.path.join ('ut_store', 's_validate.xml'))
         db = Store.get ('file').dbcreate (self.f, schema)
 
         def fail (e):

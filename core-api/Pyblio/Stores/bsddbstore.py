@@ -65,7 +65,34 @@ import os, shutil, copy, sys, traceback, string, weakref
 
 import cPickle as pickle
 
-from bsddb3 import db
+# Python ships the bsddb module as 'bsddb', whereas when fetched as a
+# standalone package it is named 'bsddb3'. For the moment, we need a
+# version that is not yet shipped.
+
+def _numver (txt):
+    v = [ int (x) for x in txt.split ('.') ]
+    v = v + [0] * (5 - len (v))
+
+    return tuple (v)
+
+_REQUIRED = (4,3,3,0,0)
+
+def _checkver (module):
+    version = _numver (module.__version__)
+    
+    if version < _REQUIRED:
+        raise ImportError ('bsddb is too old (%s instead of %s)' % (version, _REQUIRED))
+
+    return module.db
+    
+try:
+    import bsddb3
+    db = _checkver (bsddb3)
+    
+except ImportError, msg:
+
+    import bsddb
+    db = _checkver (bsddb)
 
 from Pyblio import Store, Schema, Callback, Attribute, Exceptions, Tools, Query, Sort
 

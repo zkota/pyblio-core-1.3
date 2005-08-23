@@ -8,3 +8,21 @@ To get the Reference Manual, install epydoc and run
 
   epydoc -o doc Pyblio
 
+= Requirements =
+
+ * python >= 2.3
+ * ElementTree and cElementTree (http://effbot.org/zone/element-index.htm)
+
+= Installation =
+
+Once the required dependencies are installed, please run 
+
+  * in the Recodec/ sub-directory
+  
+    python setup.py build
+    sudo python setup.py install
+
+  * in the directory containing this README
+
+    python setup.py build
+    sudo python setup.py install

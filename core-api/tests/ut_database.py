@@ -1004,9 +1004,29 @@ class TestCollateDB (TestCollate):
 class TestOrderingDB (TestOrdering):
     fmt = 'bsddb'
 
+files = [ TestDatabaseFile,
+          TestContentFile,
+          TestViewFile,
+          TestCollateFile,
+          TestOrderingFile,
+          ]
 
-suite = pybut.suite (TestDatabaseFile, TestContentFile, TestViewFile, TestCollateFile, TestOrderingFile,
-                     TestDatabaseDB,   TestContentDB,   TestViewDB,   TestCollateDB,   TestOrderingDB,
-                     )
+bsddb = [ TestDatabaseDB,
+          TestContentDB,
+          TestViewDB,
+          TestCollateDB,
+          TestOrderingDB,
+          ]
+
+# in some cases, we cannot check for bsddb (too old)
+try:
+    m = Store.get ('bsddb')
+    
+    suite = pybut.suite (* (files + bsddb))
+    
+except ImportError, msg:                         
+    print "warning: only testing the file store: %s" % msg
+
+    suite = pybut.suite (* files)
 
 if __name__ == '__main__':  pybut.run (suite)
