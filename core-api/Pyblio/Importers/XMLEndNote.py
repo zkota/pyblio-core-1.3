@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string, re, StringIO
+import string, re, StringIO, sys
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -60,24 +60,39 @@ typemap = [
 ]
 
 
-class ImporterV7 (object):
+class Importer (object):
 
     id2type = dict (typemap)
 
-    def record_begin (self):
+    def clean_tag (self, tag):
+        #dash cannot be called. convert to underscore.
+        #and assume case doesn't matter
+        return tag.lower ().replace ('-','_')
 
+    def process_children (self, elem):
+        for cont in elem.getchildren ():
+            tag = self.clean_tag (cont.tag)
+            getattr (self, 'do_' + tag, self.do_default) (cont)
+
+    def style_genocide (self, elem):
+        for ch in list(elem):
+            if ch.tag == "style":
+                if elem.text == None: elem.text = ""
+                elem.text += ch.text
+            else:
+                ch = self.style_genocide (ch)
+        return elem
+        
+    def record_begin (self):
         pass
 
     def record_end (self):
-
         pass
 
     def do_default (self, elem):
-
         pass
-    
-    def id_add (self, field, value):
 
+    def id_add (self, field, value):
         f = self.record.get (field, [])
         f.append (Attribute.ID (value))
         
@@ -85,7 +100,6 @@ class ImporterV7 (object):
         return
         
     def text_add (self, field, value):
-
         f = self.record.get (field, [])
         f.append (Attribute.Text (value.text))
         
@@ -93,7 +107,6 @@ class ImporterV7 (object):
         return
 
     def url_add (self, field, value):
-
         f = self.record.get (field, [])
         f.append (Attribute.URL (value))
         
@@ -102,10 +115,10 @@ class ImporterV7 (object):
 
     def person_add (self, field, value):
         f = self.record.get (field, [])
+        
 
         def mkauthor (txt):
             parts = map (string.strip, txt.text.split (','))
-
             if len (parts) == 2:
                 return Attribute.Person (last  = parts [0],
                                          first = parts [1])
@@ -113,34 +126,33 @@ class ImporterV7 (object):
                 return Attribute.Person (last = txt.text.strip ())
 
         f += [ mkauthor (x) for x in value ]
-        
+
         self.record [field] = f
         return
 
     def parse (self, fd, db):
-
         self.db = db
 
         for event, elem in ElementTree.iterparse (fd, events = ('end',)):
-            if elem.tag != 'RECORD': continue
+            if elem.tag != 'RECORD' and elem.tag != 'record': continue
 
             self.record = Store.Record ()
-            self.record_begin ()
-
+            self.record_begin ()            
+            
             for field in elem:
-                tag = field.tag.lower ()
+                tag = self.clean_tag (field.tag)
+                elem = self.style_genocide (field)
                 getattr (self, 'do_' + tag, self.do_default) (field)
 
             self.record_end ()
 
             if self.record is not None:
                 self.db.add (self.record)
-            
+
             elem.clear()
         return
 
-
-
+ 
 class Exporter (object):
 
     type2id = dict ([ (x [1], x [0]) for x in typemap ])
@@ -166,12 +178,14 @@ class Exporter (object):
     def text_add (self, text, tag):
 
         text = self._encode ('\n'.join (text))
+
         if not text: return
 
         self.fd.write ('<%s>%s</%s>' % (tag, text, tag))
         return
 
     def keywords_add (self, keywords):
+
 
         txts = []
         for k in keywords:
