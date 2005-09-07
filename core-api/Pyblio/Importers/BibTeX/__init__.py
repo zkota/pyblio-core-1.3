@@ -77,22 +77,21 @@ class Importer (object):
             Attribute.Date:   self.date_add,
             }
 
-        self.env = Environ ()
-        
+        self.env = Environ ()        
+        return
+
+    def id_add (self, field, data):
+        self.record [field] = [Attribute.ID (data )]
         return
 
     def url_add (self, field, stream):
-
         self.record [field] = [Attribute.URL (stream.flat ())]
         return
 
-
     def date_add (self, field, stream):
-
         self.record [field] = [Attribute.Date ()]
         return
     
-
     def text_add (self, field, stream):
         self.record [field] = [Attribute.Text (stream.execute (self.env).flat ())]
         return
@@ -286,26 +285,14 @@ class Importer (object):
         # by default, we drop the preamble
         return
 
-    def id_add (self, data):
-
-        self.record ['id'] = [Attribute.ID (data)]
-        return
-
     def type_add (self, data):
-
         self.record ['doctype'] = [Attribute.Txo (self.doctype [data.lower ()])]
         return
 
-    def record_begin (self):
-
-        pass
-
     def record_end (self):
-
         pass
 
     def record_dispatch (self, k, v):
-
         try:
             attp = self.db.schema [k]
             
@@ -327,19 +314,19 @@ class Importer (object):
         elif tp == 'preamble':
             return self.preamble_add (record)
         
-        self.tp, key, val = record.type, record.key, record.fields
+        self.tp, self.key, val = record.type, record.key, record.fields
 
         self.record = Store.Record ()
-        self.record_begin ()
 
-        self.id_add (key)
+        self.record_begin ()
 
         for k, v in val:
             self.record_dispatch (k.lower (), v)
+
             
         # Add the document type
         self.type_add (self.tp)
-        
+
         self.record_end ()
 
         if self.record:
@@ -362,7 +349,7 @@ class Importer (object):
             if isinstance (data, Reader.Comment):
                 self.comment_add (data)
                 continue
-            
+
             self.record_parse (data)
             
         return db

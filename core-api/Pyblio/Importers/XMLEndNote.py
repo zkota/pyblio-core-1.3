@@ -73,10 +73,10 @@ class Importer (object):
         for cont in elem.getchildren ():
             tag = self.clean_tag (cont.tag)
             getattr (self, 'do_' + tag, self.do_default) (cont)
-
+        
     def style_genocide (self, elem):
-        for ch in list(elem):
-            if ch.tag == "style":
+        for ch in list (elem):
+            if ch.tag == "style":                
                 if elem.text == None: elem.text = ""
                 elem.text += ch.text
             else:

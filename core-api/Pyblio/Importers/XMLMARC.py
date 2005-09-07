@@ -271,7 +271,7 @@ class Exporter (object):
         self.fd.write (' </record>\n')
         return
 
-    def single (self, rec, field):
+    def single (self, rec, field):      
 
         return rec.get (field, [None]) [0]
     
@@ -289,7 +289,7 @@ class Exporter (object):
         return
     
     def control_add (self, code, val):
-        self._control [int (code)] = val
+        self._control ["%03d" % int (code)] = val
         return
     
     def record_parse (self, record):

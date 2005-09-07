@@ -119,7 +119,9 @@ class Person (Qualified):
                self.honorific != other.honorific or \
                self.lineage != other.lineage
 
-    
+    def __repr__ (self):
+        return "Person (%s, %s)" % (repr(self.last), repr(self.first))
+        
 class Date (Qualified):
     ''' A date '''
 
