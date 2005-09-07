@@ -154,6 +154,23 @@ class TestSimpleQueryDB (TestSimpleQuery):
     fmt = 'bsddb'
 
 
-suite = pybut.suite (TestSimpleQueryFile, TestSimpleQueryDB)
+files = [
+    TestSimpleQueryFile
+    ]
+
+bsddb = [
+    TestSimpleQueryDB
+    ]
+
+# in some cases, we cannot check for bsddb (too old)
+try:
+    m = Store.get ('bsddb')
+    
+    suite = pybut.suite (* (files + bsddb))
+    
+except ImportError, msg:                         
+    print "warning: only testing the file store: %s" % msg
+
+    suite = pybut.suite (* files)
 
 if __name__ == '__main__':  pybut.run (suite)

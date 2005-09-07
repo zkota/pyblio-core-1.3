@@ -809,6 +809,8 @@ for m in os.listdir (_dir):
     
     _modules [m.lower () [:-5]] = m
 
+_cache = {}
+
 def get (fmt):
 
     """ Return the methods provided by a specific storage layer.
@@ -832,12 +834,28 @@ def get (fmt):
     backends, L{Pyblio.Stores.File} and L{Pyblio.Stores.bsddb}.
     """
 
-    parts = ('Pyblio', 'Stores', _modules [fmt])
+    try:
+        module = _cache [fmt]
 
-    module = __import__ (string.join (parts, '.'))
+        if module is None:
+            raise ImportError ("store '%s' is not available" % fmt)
 
-    for comp in parts [1:]:
-        module = getattr (module, comp)
+        return module
+
+    except KeyError:
+        parts = ('Pyblio', 'Stores', _modules [fmt])
+
+        try:
+            module = __import__ (string.join (parts, '.'))
+
+        except ImportError, msg:
+            _cache [fmt] = None
+            raise
+
+        for comp in parts [1:]:
+            module = getattr (module, comp)
+
+        _cache [fmt] = module
         
     return module
 
