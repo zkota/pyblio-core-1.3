@@ -30,6 +30,11 @@ class WithComments (BibTeX.Importer):
         self.comments.append (data)
         return
 
+    def record_begin (self):
+
+        self.id_add ('id', self.key)
+        
+
 class WithCaseHandler (BibTeX.Exporter):
 
     def record_parse (self, key, value):

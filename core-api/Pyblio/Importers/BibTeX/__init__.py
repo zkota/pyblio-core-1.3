@@ -289,6 +289,9 @@ class Importer (object):
         self.record ['doctype'] = [Attribute.Txo (self.doctype [data.lower ()])]
         return
 
+    def record_begin (self):
+        pass
+
     def record_end (self):
         pass
 
