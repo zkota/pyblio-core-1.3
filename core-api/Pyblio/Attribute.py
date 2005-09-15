@@ -121,6 +121,9 @@ class Person (Qualified):
 
     def __repr__ (self):
         return "Person (%s, %s)" % (repr(self.last), repr(self.first))
+
+    def __hash__ (self):
+        return hash ((self.last, self.first, self.lineage, self.honorific))
         
 class Date (Qualified):
     ''' A date '''
