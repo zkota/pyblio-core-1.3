@@ -42,7 +42,7 @@ class SchemaError (Exception): pass
 class Schema (dict):
 
     def __init__ (self, file = None):
-
+        
         if file:
             tree = ElementTree (file = file)
 
@@ -53,7 +53,6 @@ class Schema (dict):
 
         def parseattr (attr):
             a = Attribute (attr.attrib ['id'])
-
             a.indexed = attr.attrib.get ('indexed', '0') == '1'
             a.group   = attr.attrib.get ('group', None)
 

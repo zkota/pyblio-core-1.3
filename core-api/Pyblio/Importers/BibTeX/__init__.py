@@ -85,14 +85,13 @@ class Importer (object):
         return
 
     def url_add (self, field, stream):
-        self.record [field] = [Attribute.URL (stream.flat ())]
-        return
-
+        add = Attribute.URL (stream.flat ())
+        self.record.setdefault (field, []).append (add)
+        
     def date_add (self, field, stream):
         self.record [field] = [Attribute.Date ()]
-        return
     
-    def text_add (self, field, stream):
+    def text_add (self, field, stream):        
         self.record [field] = [Attribute.Text (stream.execute (self.env).flat ())]
         return
 
@@ -103,7 +102,6 @@ class Importer (object):
         # The first level of the parsing is of interest, as non-person
         # names can be written for instance:
         # author = "{Name of a Company} and {Another One}"
-
 
         # Join joins, ie strings written as {toto} # {tutu}
         stream = stream.join ()
@@ -209,7 +207,7 @@ class Importer (object):
             return tags
         
         def _person_decode (stream):
-
+            
             if len (stream) == 1 and isinstance (stream [0], Reader.Block):
                 return Attribute.Person (last = stream [0].flat ())
 
@@ -303,7 +301,7 @@ class Importer (object):
             raise Exceptions.SchemaError (
                 _("no attribute '%s' in document '%s'") % (
                 k, self.tp))
-        
+
         self._mapping [attp.type] (k, v)
         return
     

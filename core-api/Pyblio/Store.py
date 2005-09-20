@@ -700,7 +700,6 @@ class Database (object):
     def xmlread (self, fd):
 
         for event, elem in iterparse (fd, events = ('end',)):
-
             t = elem.tag
 
             if t == 'entry':
@@ -757,7 +756,6 @@ class Database (object):
             
             if t == 'txo-group':
                 g = self.txo [elem.attrib ['id'].encode ('ascii')]
-                
                 def nesting (tree, parent):
                     for item in tree.findall ('./txo-item'):
                         i = TxoItem ()
@@ -784,12 +782,16 @@ class Database (object):
                 # Finalize the link between the schema and the db by
                 # creating the txo groups defined in the schema, so
                 # that they exist when we read their content.
-                
-                for v in self.schema.values ():
-                    if v.type is not Attribute.Txo: continue
 
+                def add_to_txo (v):
+                    if v.type is not Attribute.Txo: return
                     try: self.txo._add (v.group)
-                    except Exceptions.ConstraintError: pass
+                    except Exceptions.ConstraintError: pass                    
+
+                for k, v in self.schema.items ():
+                    add_to_txo (v)
+                    for qv in self.schema [k].q.values ():
+                        add_to_txo (qv)
                 
             elif t == 'header':
                 self.header = elem.text

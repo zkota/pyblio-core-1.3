@@ -163,10 +163,13 @@ class SimpleImporter (Importer):
         self.record [field] = f
         return
 
-    def url_add (self, field, value):
-
+    def url_add (self, field, value, q={}):
         f = self.record.get (field, [])
-        f.append (Attribute.URL (value))
+        attrib = Attribute.URL (value)
+        #TODO: all types can have qualifiers....
+        attrib.q.update (q)
+        
+        f.append (attrib)
         
         self.record [field] = f
         return

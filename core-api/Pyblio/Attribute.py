@@ -240,7 +240,7 @@ class URL (str, Qualified):
         self.q = {}
         str.__init__ (self, text)
         return
-    
+        
     def xmlread (k, xml):
         return k (xml.attrib ['href'])
     
@@ -309,7 +309,6 @@ class Txo (Qualified):
 
     def __init__ (self, item = None):
         self.q = {}
-
         if item:
             self.group = item.group
             self.id    = item.id
@@ -320,7 +319,6 @@ class Txo (Qualified):
 
     def xmlread (k, xml):
         txo = k ()
-        
         txo.group = xml.attrib ['group']
         txo.id    = int (xml.attrib ['id'])
 

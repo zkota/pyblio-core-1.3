@@ -42,7 +42,6 @@ class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
         
         self._id = 1
         self._group = group
-
         self._byname = {}
         return
 
@@ -125,8 +124,7 @@ class TxoStore (dict, Store.TxoStore):
         return
     
 
-    def _add (self, group):
-
+    def _add (self, group):        
         if self.has_key (group):
             raise Exceptions.ConstraintError \
                   (_('group %s exists') % `group`)
@@ -343,7 +341,6 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self._id = 1
 
         if create:
-
             for v in self.schema.values ():
                 if v.type is not Attribute.Txo: continue
 
