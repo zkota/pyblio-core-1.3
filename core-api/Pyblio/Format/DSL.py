@@ -136,12 +136,26 @@ def access (record):
     class accessor (Maybe):
         def __init__ (self, field):
             self._f = field
+            
+            parts = field.split ('.')
+            if len (parts) == 1:
+                f = parts [0]
+                def _fetch ():
+                    return record [f]
+                self._fetch = _fetch
+            else:
+                f, q = parts [:2]
+                def _fetch ():
+                    return record [f] [0].q [q]
+                self._fetch = _fetch
+
+            return
 
             
     class all (accessor):
         def __call__ (self):
             try:
-                v = record [self._f]
+                v = self._fetch ()
             except KeyError, msg:
                 raise Missing ('no field %s in record' % repr (self._f))
             
@@ -152,7 +166,7 @@ def access (record):
         
     class one (accessor):
         def __call__ (self):
-            try: return record [self._f] [0]
+            try: return self._fetch () [0]
             except (KeyError, IndexError), msg:
                 raise Missing ('no field %s in record' % repr (self._f))
 

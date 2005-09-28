@@ -90,9 +90,12 @@ class Importer (object):
         
     def date_add (self, field, stream):
         self.record [field] = [Attribute.Date ()]
-    
+
+    def to_text (self, stream):
+        return Attribute.Text (stream.execute (self.env).flat ())
+        
     def text_add (self, field, stream):        
-        self.record [field] = [Attribute.Text (stream.execute (self.env).flat ())]
+        self.record [field] = [ self.to_text (stream) ]
         return
 
     def person_add (self, field, stream):

@@ -22,6 +22,12 @@ class TestFormat (pybut.TestCase):
         rec ['singlepage'] = [ Attribute.Text ('123') ]
         rec ['pagerange'] = [ Attribute.Text ('123-134') ]
 
+        nest = Attribute.Text ('principal')
+        nest.q ['sub'] = [ Attribute.Text ('1'),
+                           Attribute.Text ('2') ]
+
+        rec ['nest'] = [ nest ]
+        
         self.rec = rec
         
         return
@@ -58,6 +64,9 @@ class TestFormat (pybut.TestCase):
 
         assert one ('title')  () == self.rec ['title']  [0]
         assert one ('author') () == self.rec ['author'] [0]
+
+        self.failUnlessEqual (all ('nest.sub') (), self.rec ['nest'] [0].q ['sub'])
+        self.failUnlessEqual (one ('nest.sub') (), self.rec ['nest'] [0].q ['sub'] [0])
         return
 
 
