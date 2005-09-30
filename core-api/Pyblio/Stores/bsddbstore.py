@@ -1027,16 +1027,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
 
             if create and schema:
-                for v in self.schema.values ():
-                    if v.type is not Attribute.Txo: continue
-
-                    try:
-                        self.txo._add (v.group)
-
-                    except Exceptions.ConstraintError:
-                        pass
-                # for
-            # if
+                self._txo_create ()
             
         except:
             txn.abort ()

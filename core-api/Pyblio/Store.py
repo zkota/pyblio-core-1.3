@@ -583,15 +583,15 @@ class Database (object):
             for v in vals:
                 if not isinstance (v, s.type):
                     raise Exceptions.SchemaError \
-                          (_('attribute %s has an incorrect type (should be %s)') % (
-                        `k`, `s.type`))
+                          (_('%s: attribute %s has an incorrect type (should be %s but is %s)') % (
+                        entry.key, `k`, `s.type`, repr (v)))
                 
                 for qk, qs in v.q.items ():
                     for q in qs:
                         if not isinstance (q, s.q [qk].type):
                             raise Exceptions.SchemaError \
-                                  (_('qualifier %s in attribute %s has an incorrect type (should be %s)') % (
-                                `qk`, `k`, `s.q [qk].type`))
+                                  (_('%s: qualifier %s in attribute %s has an incorrect type (should be %s but is %s)') % (
+                                entry.key, `qk`, `k`, `s.q [qk].type`, repr (q)))
                         
             l = len (vals)
             lb, ub = s.range
@@ -722,12 +722,12 @@ class Database (object):
                             qid = q.attrib ['id']
 
                             try:
-                                tp = self.schema [aid].q [qid]
+                                stp = self.schema [aid].q [qid]
                             except KeyError:
                                 raise StoreError (_("invalid attribute qualifier '%s'") % qid)
 
                             for subsub in q:
-                                qv = tp.type.xmlread (subsub)
+                                qv = stp.type.xmlread (subsub)
 
                                 try:             a.q [qid].append (qv)
                                 except KeyError: a.q [qid] = [qv]
@@ -779,23 +779,28 @@ class Database (object):
                 self.schema = Schema.Schema ()
                 self.schema.xmlread (elem)
 
-                # Finalize the link between the schema and the db by
-                # creating the txo groups defined in the schema, so
-                # that they exist when we read their content.
-
-                def add_to_txo (v):
-                    if v.type is not Attribute.Txo: return
-                    try: self.txo._add (v.group)
-                    except Exceptions.ConstraintError: pass                    
-
-                for k, v in self.schema.items ():
-                    add_to_txo (v)
-                    for qv in self.schema [k].q.values ():
-                        add_to_txo (qv)
+                self._txo_create ()
                 
             elif t == 'header':
                 self.header = elem.text
 
+    def _txo_create (self):
+        # Finalize the link between the schema and the db by
+        # creating the txo groups defined in the schema, so
+        # that they exist when we read their content.
+
+        def add_to_txo (v):
+            if v.type is not Attribute.Txo: return
+            try: self.txo._add (v.group)
+            except Exceptions.ConstraintError: pass                    
+
+        for k, v in self.schema.items ():
+            add_to_txo (v)
+            for qv in v.q.values ():
+                add_to_txo (qv)
+
+        return
+    
 # --------------------------------------------------
 
 _dir = os.path.normpath (os.path.join (

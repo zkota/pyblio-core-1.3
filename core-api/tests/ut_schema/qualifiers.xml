@@ -14,6 +14,15 @@
 
  <attribute id="url" type="url">
   <name>URL</name>
+
+  <qualifiers>
+   <attribute id="desc" type="text">
+    <name>Description</name>
+   </attribute>
+   <attribute id="lang" type="txo" group="language">
+    <name>Language</name>
+   </attribute>
+  </qualifiers>
  </attribute>
 
 </pyblio-schema>

@@ -28,7 +28,6 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-
 re_split = re.compile (r'[^\w]+', re.UNICODE)
 
 class Qualified (object):

@@ -41,10 +41,24 @@
    <attribute id="desc" type="text">
     <name>Description</name>
    </attribute>
+   <attribute id="lang" type="txo" group="language">
+    <name>Language</name>
+   </attribute>
   </qualifiers>
  </attribute>
 
 </pyblio-schema>
+ <txo-group id="language">
+  <txo-item id="1">
+   <name>english</name>
+   <name lang="C">EN</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>français</name>
+   <name lang="C">FR</name>
+  </txo-item>
+ </txo-group>
+
 <header>Hi, I'm a database description</header>
  <entry id="1">
   <attribute id="author">
@@ -74,6 +88,17 @@
   </attribute>
   <attribute id="url">
    <url href="http://pybliographer.org">
+    <attribute id="lang">
+     <txo group="language" id="1"/>
+    </attribute>
+    <attribute id="desc">
+     <text>Main site</text>
+    </attribute>
+   </url>
+   <url href="http://pybliographer.org">
+    <attribute id="lang">
+     <txo group="language" id="2"/>
+    </attribute>
     <attribute id="desc">
      <text>Main site</text>
     </attribute>

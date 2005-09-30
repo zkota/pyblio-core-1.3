@@ -341,15 +341,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self._id = 1
 
         if create:
-            for v in self.schema.values ():
-                if v.type is not Attribute.Txo: continue
-
-                try:
-                    self.txo._add (v.group)
-
-                except Exceptions.ConstraintError:
-                    pass
-
+            self._txo_create ()
 
             # WARNING: this code contains a race condition. This
             # exception is only here to trap blatant errors, not to

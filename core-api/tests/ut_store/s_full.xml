@@ -15,6 +15,9 @@
    <attribute id="desc" type="text">
     <name>Description</name>
    </attribute>
+   <attribute id="lang" type="txo" group="language">
+    <name>Language</name>
+   </attribute>
   </qualifiers>
  </attribute>
  <attribute id="rich" type="text">

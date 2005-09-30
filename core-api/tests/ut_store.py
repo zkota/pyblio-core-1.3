@@ -50,6 +50,20 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema (os.path.join ('ut_store', 's_full.xml'))
         db = Store.get ('file').dbcreate (self.f, schema)
 
+        ln = db.txo ['language']
+
+        l = Store.TxoItem ()
+        l.names ['C'] = 'EN'
+        l.names [''] = 'english'
+
+        ln.add (l)
+        
+        l = Store.TxoItem ()
+        l.names ['C'] = 'FR'
+        l.names [''] = u'français'
+        
+        ln.add (l)
+        
         e = Store.Record ()
 
         scn = Attribute.Person (last = 'Last 2')
@@ -57,10 +71,14 @@ class TestStore (pybut.TestCase):
         
         e ['author'] = [ Attribute.Person (last = u'Last 1é'), scn ]
 
-        url = Attribute.URL ('http://pybliographer.org')
-        url.q ['desc'] = [ Attribute.Text ('Main site') ]
-        
-        e ['url']    = [ url ]
+        url1 = Attribute.URL ('http://pybliographer.org')
+        url1.q ['desc'] = [ Attribute.Text ('Main site') ]
+        url1.q ['lang'] = [ Attribute.Txo (db.txo ['language'].byname ('EN')) ]
+
+        url2 = Attribute.URL ('http://pybliographer.org')
+        url2.q ['desc'] = [ Attribute.Text ('Main site') ]
+        url2.q ['lang'] = [ Attribute.Txo (db.txo ['language'].byname ('FR')) ]
+        e ['url']    = [ url1, url2 ]
 
         e ['text']   = [ Attribute.Text (u'sample text é') ]
 

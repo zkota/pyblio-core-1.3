@@ -2,6 +2,26 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-09-30 10:59:21 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-179
+
+    Summary:
+      fixed a bug in the parsing of multiple qualifiers
+    Revision:
+      pybliographer--devel--1.3--patch-179
+
+    There was a reused variable that made the parsing fail in random ways
+    
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Attribute.py
+     core-api/Pyblio/Schema.py core-api/Pyblio/Store.py
+     core-api/Pyblio/Stores/bsddbstore.py
+     core-api/Pyblio/Stores/filestore.py
+     core-api/tests/ut_schema/qualifiers.xml
+     core-api/tests/ut_store.py core-api/tests/ut_store/s_full.xml
+     core-api/tests/ut_store/simple.xml
+
+
 2005-09-28 12:09:00 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-178
 
     Summary:

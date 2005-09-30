@@ -125,6 +125,13 @@ class Attribute:
         self.q = {}
         return
 
+    def __repr__ (self):
+
+        return 'Schema (%s, %s, %s, %s)' % (
+            repr (self.id), repr (self.type), repr (self.group),
+            repr (self.q))
+
+
     def _name_get (self):
 
         return I18n.lz.trn (self.names)
