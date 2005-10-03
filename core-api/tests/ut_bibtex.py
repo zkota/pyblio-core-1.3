@@ -279,6 +279,10 @@ class TestBibTeXImport (pybut.TestCase):
 
         self._check ('environ')
         
+    def testCharMacro (self):
+        """ Test the handling of the char macro, especially for { and } """
+        self._check ('charmacro')
+        
 
 class TestBibTeXExport (pybut.TestCase):
 

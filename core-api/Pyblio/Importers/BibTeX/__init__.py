@@ -381,8 +381,7 @@ class Exporter (object):
         return
 
     def _escape (self, text):
-
-        return text.encode ('latex', 'replace')
+        return text.encode ('latex', 'replace').replace ('\}', '\char125').replace ('\{', '\char123')
 
     def txo_add (self, field, data):
 

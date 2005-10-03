@@ -115,6 +115,11 @@ class Environ (object):
             fn, count = commands [cmd]
 
         except KeyError:
+            # The \char macro is special: \char125 -> character with ascii code 125
+            if cmd.startswith ('char'):
+                try: return Reader.Text (unichr (int (cmd [4:])))
+                except ValueError: pass
+                
             return Reader.Text (cmd)
 
         args = []

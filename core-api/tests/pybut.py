@@ -151,7 +151,11 @@ def run (full):
 
 
 def fileeq (a, b):
-
+    for f in a, b:
+        if not os.path.exists (f):
+            assert False, 'cannot diff %s and %s: %s does not exist' % (
+                repr (a), repr (b), repr (f))
+            
     if open (a).read () == open (b).read (): return
 
     os.system ("diff '%s' '%s'" % (a, b))

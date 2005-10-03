@@ -2,6 +2,32 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-10-03 11:51:23 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-180
+
+    Summary:
+      more robust handling of { and } in BibTeX
+    Revision:
+      pybliographer--devel--1.3--patch-180
+
+    The \{ and \} are special in BibTeX and cannot be used if unbalanced. In order to
+    avoid misterious conversion issues, they are represented by \char123 and \char125.
+    
+    The general \char... form is also managed by the Importer.
+    
+
+    new files:
+     core-api/tests/ut_bibtex/.arch-ids/charmacro.bib.id
+     core-api/tests/ut_bibtex/.arch-ids/charmacro.xml.id
+     core-api/tests/ut_bibtex/charmacro.bib
+     core-api/tests/ut_bibtex/charmacro.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Importers/BibTeX/Coding.py
+     core-api/Pyblio/Importers/BibTeX/__init__.py
+     core-api/tests/pybut.py core-api/tests/ut_bibtex.py
+     core-api/tests/ut_bibtex/exp-nested.bib
+
+
 2005-09-30 10:59:21 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-179
 
     Summary:
