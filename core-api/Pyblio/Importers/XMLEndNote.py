@@ -59,9 +59,9 @@ typemap = [
     (31 , "Generic"),
 ]
 
-
+        
 class Importer (object):
-
+    
     id2type = dict (typemap)
 
     def clean_tag (self, tag):
@@ -92,26 +92,37 @@ class Importer (object):
     def do_default (self, elem):
         pass
 
+    def _type_add (self, field, value, attribute_type):
+        if field.find ('.') != -1:
+            supfield, subfield = field.split ('.')
+            f = self.record.get (supfield, None)
+
+            assert f, "errrrrr: You tried to set '%s' (value: %s), " \
+                   "but '%s' isn't set yet." % (field, value, supfield)
+
+            assert len (f)==1, "errrrrr: You tried to set '%s' (value: " \
+                   "%s), but '%s' has multiple entries. I don't know " \
+                   "which one i should access. type_add won't work!\n %s" % \
+                   (field, value, supfield, fs)
+
+            li = f [0].q.get (subfield, [])
+            li.append (attribute_type(value))
+            f [0].q [subfield] = li            
+
+        else:
+            f = self.record.get (field, [])            
+            f.append (attribute_type (value))
+            self.record [field] = f
+
+    
     def id_add (self, field, value):
-        f = self.record.get (field, [])
-        f.append (Attribute.ID (value))
-        
-        self.record [field] = f
-        return
+        self._type_add (field, value, Attribute.ID)
         
     def text_add (self, field, value):
-        f = self.record.get (field, [])
-        f.append (Attribute.Text (value.text))
-        
-        self.record [field] = f
-        return
+        self._type_add (field, value.text, Attribute.Text)
 
     def url_add (self, field, value):
-        f = self.record.get (field, [])
-        f.append (Attribute.URL (value))
-        
-        self.record [field] = f
-        return
+        self._type_add (field, value, Attribute.URL)
 
     def person_add (self, field, value):
         f = self.record.get (field, [])
