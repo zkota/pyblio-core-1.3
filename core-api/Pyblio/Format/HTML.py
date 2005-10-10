@@ -14,6 +14,9 @@ def _do_b (t):
     
 def _do_a (t):
     return '<a href="%s">' % (t.attributes ['href']) + ''.join (map (generate, t.children)) + '</a>'
+
+def _do_br (t):
+    return '<br>'
     
 
 _map = {
@@ -21,6 +24,7 @@ _map = {
     'i' : _do_i,
     'b' : _do_b,
     'a' : _do_a,
+    'br': _do_br,
     }
 
 

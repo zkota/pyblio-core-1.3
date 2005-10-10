@@ -13,5 +13,5 @@ Allows the writing of citation styles with a convenient syntax::
 """
 
 from Pyblio.Format.DSL import access, join
-from Pyblio.Format.Tags import A, B, I, T
+from Pyblio.Format.Tags import A, B, I, T, BR
 

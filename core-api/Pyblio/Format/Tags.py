@@ -107,6 +107,5 @@ glob = globals ()
 for t in ('A', 'B', 'I', 'T'):
     glob [t] = Proto (t)
 
-
-
+BR = Proto ('BR') ['']
 

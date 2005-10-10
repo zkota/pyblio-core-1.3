@@ -3,7 +3,7 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, access, A, B, I, DSL, Misc, Pages
+from Pyblio.Format import Person, join, HTML, access, A, B, I, BR, DSL, Misc, Pages
 
 class TestFormat (pybut.TestCase):
 
@@ -152,6 +152,9 @@ class TestFormat (pybut.TestCase):
 
         v = 'a ' + I [ 'simple ', B [ one ('title') ] ]
         self._cmp (v, u'a <i>simple <b>My title</b></i>')
+
+        v = 'a ' + BR + 'in the middle of a phrase'
+        self._cmp (v, u'a <br>in the middle of a phrase')
         return
         
     def testInitials (self):
