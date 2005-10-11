@@ -2,7 +2,7 @@
 
 import os, pybut, sys
 
-from Pyblio import Store, Schema, Attribute
+from Pyblio import Store, Schema, Attribute, Exceptions
 
 class TestStore (pybut.TestCase):
 
@@ -272,6 +272,132 @@ class TestStore (pybut.TestCase):
 
         assert ks == [1,2], 'got %s' % repr (ks)
 
+
+    def testAddSimple (self):
+        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')
+
+        rec = Store.Record ()
         
+        rec.add ('id', 'myid is here', Attribute.ID)
+        rec.add ('text', 'some stupid comment', Attribute.Text)
+        rec.add ('url', 'www.mehfleysch.ch', Attribute.URL)
+        rec.add ('date', {'year':2005, 'month':9}, Attribute.Date)
+        rec.add ('author', {'last':'Karlen', 'first':'Michael'}, Attribute.Person) 
+        
+        db.add (rec)
+
+        sol = Store.Record ()
+        sol ['id']  = [ Attribute.ID ('myid is here') ]
+        sol ['text'] = [ Attribute.Text ('some stupid comment') ]
+        sol ['url'] = [ Attribute.URL ('www.mehfleysch.ch') ]
+        sol ['date'] = [ Attribute.Date (2005, 9) ]
+        sol ['author'] = [ Attribute.Person (None, 'Michael', 'Karlen') ]
+
+        assert sol.deep_equal (rec), "\n%s\n not equal to \n%s\n (Think of non-displayed" \
+               " qualifiers, if you can't see any difference.)" % (sol, rec)
+
+
+    def testAddTextQualifiersBizarrOrder (self):
+        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        rec = Store.Record ()
+        
+        rec.add ('text.qtext', 'some stuff', Attribute.Text)
+        rec.add ('text', 'some stupid comment', Attribute.Text)
+        rec.add ('text.qtext', 'even more stuff', Attribute.Text)
+        rec.add ('text', 'another comment', Attribute.Text)
+        rec.add ('text.qtext', 'stuff for another comment', Attribute.Text)
+        
+        db.add (rec)
+
+        sol = Store.Record ()
+
+        at = Attribute.Text ('some stupid comment')
+        at.q = { 'qtext': [
+            Attribute.Text ('some stuff'),
+            Attribute.Text ('even more stuff')] }
+
+        at2 = Attribute.Text ('another comment')
+        at2.q = {'qtext': [ Attribute.Text ('stuff for another comment')]}
+        sol ['text'] = [ at, at2 ]
+
+        assert sol.deep_equal (rec), "\n%s\n not equal to \n%s\n (Think of non-displayed" \
+               " qualifiers, if you can't see any difference.)" % (sol, rec)
+
+
+    def testAddAuthorQualifiers (self):
+        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        rec = Store.Record ()
+
+        rec.add ('author', {'last':'Karlen', 'first':'Michael'}, Attribute.Person)                
+        rec.add ('author.qtext', 'some stuff', Attribute.Text)
+        rec.add ('author.qperson', {'last':'Karlen', 'first':'Mum'}, Attribute.Person)                        
+        
+        db.add (rec)
+
+        sol = Store.Record ()
+
+        at =  Attribute.Person (None, 'Michael', 'Karlen') 
+
+        at.q = {
+            'qtext': [ Attribute.Text ('some stuff')],
+            'qperson': [ Attribute.Person (None, 'Mum', 'Karlen') ],
+            }        
+        
+        sol ['author'] = [ at ]
+
+        assert sol.deep_equal (rec), "\n%s\n not equal to \n%s\n (Think of non-displayed" \
+               " qualifiers, if you can't see any difference.)" % (sol, rec)
+
+
+    def testAddQualifiersFirst (self):
+        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        rec = Store.Record ()
+        
+        rec.add ('text.qtext', 'some stuff', Attribute.Text)
+        rec.add ('text.qtext', 'even more stuff', Attribute.Text)
+        rec.add ('text', 'some stupid comment', Attribute.Text)
+        
+        db.add (rec)
+
+        sol = Store.Record ()
+
+        at = Attribute.Text ('some stupid comment')
+        at.q = { 'qtext': [
+            Attribute.Text ('some stuff'),
+            Attribute.Text ('even more stuff')] }
+        sol ['text'] = [ at ]
+
+        assert sol.deep_equal (rec), "\n%s\n not equal to \n%s\n (Think of non-displayed" \
+               " qualifiers, if you can't see any difference.)" % (sol, rec)
+
+
+    def testAddOnlyQualifiers (self):
+        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        rec = Store.Record ()
+
+        rec.add ('text.qtext', 'some stuff', Attribute.Text)
+        rec.add ('text.qtext', 'even more stuff', Attribute.Text)
+
+        try:
+            db.add (rec)
+        except Exceptions.SchemaError:
+            pass
+        else:
+            assert 0, 'db.add should not be allowed as there is ' \
+                   'Attribute.UnknownContent in rec'
+                    
+        sol = Store.Record ()
+
+        at = Attribute.UnknownContent ()
+        at.q = { 'qtext': [
+            Attribute.Text ('some stuff'),
+            Attribute.Text ('even more stuff')] }
+        sol ['text'] = [ at ]
+
+        assert sol.deep_equal (rec), "\n%s\n not equal to \n%s\n (Think of non-displayed" \
+               " qualifiers, if you can't see any difference.)" % (sol, rec)
+
+
 suite = pybut.suite (TestStore)
 if __name__ == '__main__':  pybut.run (suite)
+ 

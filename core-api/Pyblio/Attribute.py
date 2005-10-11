@@ -30,6 +30,7 @@ from gettext import gettext as _
 
 re_split = re.compile (r'[^\w]+', re.UNICODE)
 
+
 class Qualified (object):
     """ Mix-in class that provides qualifiers to attributes, making
     them behave like composite data types (but not arbitrarily nested
@@ -46,7 +47,38 @@ class Qualified (object):
             fd.write (ws + '</attribute>\n')
         return
 
-    
+    def deep_equal (self, other):
+        for k in self.q:
+            if not k in other.q or not len (self.q [k]) == len (other.q [k]):
+                return False
+            
+            for x, y in zip (self.q [k], other.q [k]):
+                if not x.deep_equal (y):
+                    return False
+                
+        for k in other.q:
+            if not k in self.q:
+                return False
+        return True           
+                
+                  
+class UnknownContent (Qualified):
+    """
+    This is only a temporary Type. It is used, when you add qualifiers before you
+    add the main field to a record. Trying to store it will raise an error. 
+    """
+    def __init__ (self):
+        self.q = {}
+
+    def xmlwrite (self, fd, offset = 0):
+        #TODO: add this to unit test: no host but qualifiers        
+        raise Exceptions.ParserError ("Attribute.UnknownContent has qualifiers, "\
+                                      "but is empty: %s" % self.q)
+
+    def deep_equal (self, other):
+        if not isinstance (other, UnknownContent): return False
+        return Qualified.deep_equal (self, other)
+        
 class Person (Qualified):
     ''' A person name '''
 
@@ -118,6 +150,11 @@ class Person (Qualified):
                self.honorific != other.honorific or \
                self.lineage != other.lineage
 
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, Person):
+            return False        
+        return Qualified.deep_equal (self, other)        
+    
     def __repr__ (self):
         return "Person (%s, %s)" % (repr(self.last), repr(self.first))
 
@@ -185,6 +222,12 @@ class Date (Qualified):
 
         return 0
 
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, Date):
+            return False        
+        return Qualified.deep_equal (self, other)        
+
+        
     def __hash__ (self):
         return hash ((self.year, self.month, self.day))
 
@@ -231,6 +274,11 @@ class Text (unicode, Qualified):
     def sort (self):
         return self.lower ()
     
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, Text):
+            return False        
+        return Qualified.deep_equal (self, other)        
+
 
 class URL (str, Qualified):
     ''' An URL '''
@@ -269,6 +317,11 @@ class URL (str, Qualified):
     def sort (self):
         return self
 
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, URL):
+            return False        
+        return Qualified.deep_equal (self, other)        
+
 
 class ID (unicode, Qualified):
 
@@ -300,6 +353,11 @@ class ID (unicode, Qualified):
     
     def sort (self):
         return self
+
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, ID):
+            return False        
+        return Qualified.deep_equal (self, other)        
 
 
 class Txo (Qualified):
@@ -350,6 +408,11 @@ class Txo (Qualified):
     def __cmp__ (self, other):
 
         return cmp (self.group, other.group) or cmp (self.id, other.id)
+
+    def deep_equal (self, other):
+        if not self == other or not isinstance (other, Txo):
+            return False        
+        return Qualified.deep_equal (self, other)        
 
     def __hash__ (self):
         return hash ((self.group, self.id))

@@ -2,6 +2,54 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-10-11 12:18:30 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-183
+
+    Summary:
+      new syntactic sugar for record creation: rec.add (....)
+    Revision:
+      pybliographer--devel--1.3--patch-183
+
+    This makes it easy to add elements, including field qualifiers.
+    
+    Patches applied:
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-16
+       XMLEndNote: Qualifiers for several entries supported
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-17
+       XMLEndNote improved qualifier support. auto-addition to multiple entries
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-18
+       record.add works. nott all tests written
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-19
+       messing around with store.py DO NOT MERGE
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-20
+       ut_store works. ouffffff. 
+    
+     * michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-21
+       added addsimple.xml for ut_store
+    
+
+    new files:
+     core-api/tests/ut_store/.arch-ids/addsimple.xml.id
+     core-api/tests/ut_store/addsimple.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Attribute.py
+     core-api/Pyblio/Importers/XMLEndNote.py
+     core-api/Pyblio/Store.py core-api/tests/ut_store.py
+
+    new patches:
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-16
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-17
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-18
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-19
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-20
+     michael.karlen@epfl.ch--2005/pybliographer--devel--1.3--patch-21
+
+
 2005-10-10 14:04:39 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-182
 
     Summary:

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="author" type="person">
+  <name>Author</name>
+  <qualifiers>
+    <attribute id="qtext" type="text">
+      <name>Qtext</name>
+    </attribute>
+    <attribute id="qperson" type="person">
+      <name>Qperson</name>
+    </attribute>
+  </qualifiers>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>ID</name>
+ </attribute>
+
+ <attribute id="text" type="text">
+  <name>Text</name>
+  <qualifiers>
+    <attribute id="qtext" type="text">
+      <name>Qtext</name>
+    </attribute>
+    <attribute id="qperson" type="person">
+      <name>Qperson</name>
+    </attribute>
+  </qualifiers>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+</pyblio-schema>
+</pyblio-db>

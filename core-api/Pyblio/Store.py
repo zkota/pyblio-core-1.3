@@ -85,6 +85,7 @@ class Record (dict):
 	self.key    = None
         return
 
+
     def xmlwrite (self, fd, offset = 1):
         """ Export as XML.
 
@@ -111,6 +112,73 @@ class Record (dict):
             
         fd.write (ws + '</entry>\n')
         return
+
+    def add (self, field, value, attribute_type):
+        """
+        Adds a new value to a field of this record.
+        As you should know, Record [field] is a list of Attribute.<Type>'s.
+        This function allows you to add an items to append items, typed 
+        Attribute.<Type> or String (with explpicit attribute_type).
+        The String is passed to the corresponding constructor of Attribute.<Type>.
+
+        If you specify something like 'host.pages' in fields, the pages qualifier
+        for host is set (for the last host added).
+        """        
+        def generate (value, typ):
+            """
+            Constructs type with value. Effects neccessary dict-conversion
+            operations
+            """
+            if type (value) == type ({}):
+                return typ (**value)
+            else:
+                return typ (value)
+
+        
+        if not '.' in field:
+            f = self.get (field, [])
+
+            #TODO: add this to unit-text: add a host after adding its qualifiers
+            if f and type(f [-1]) == Attribute.UnknownContent:
+                q = f [-1].q
+                f [-1] = generate (value, attribute_type)
+                f [-1].q = q        
+                return
+
+            f = self.get (field, [])
+
+            f.append (generate (value, attribute_type))
+            self [field] = f
+
+        else:        
+            main, sub = field.split ('.')
+
+            f = self.get (main, None)
+            
+            if not f:
+                self [main] = [Attribute.UnknownContent ()]
+                f = self [main]
+
+            upd = f [-1].q.get (sub, [])
+            upd.append (generate (value, attribute_type))
+            f [-1].q [sub] = upd
+
+    def deep_equal (self, other):
+        if not isinstance (other, Record): return False
+
+        for k in self:
+            if not k in other or not len (self [k]) == len (other [k]):
+                return False
+            
+            for x, y in zip (self [k], other [k]):
+                if not x.deep_equal (y):
+                    return False
+            
+        for k in other:
+            if not k in self:
+                return False
+            
+        return True
 
 # --------------------------------------------------
 
