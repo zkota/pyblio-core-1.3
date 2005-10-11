@@ -333,26 +333,14 @@ class Importer (Callback.Publisher):
         return
 
     def text_add (self, field, value):
-
-        f = self.record.get (field, [])
-        f.append (Attribute.Text (value))
-        
-        self.record [field] = f
+        self.record.add (field, value, Attribute.Text)
         return
     
     def id_add (self, field, value):
-
-        f = self.record.get (field, [])
-        f.append (Attribute.ID (value))
-        
-        self.record [field] = f
+        self.record.add (field, value, Attribute.ID)
         return
     
     def url_add (self, field, value):
-
-        f = self.record.get (field, [])
-        f.append (Attribute.URL (value))
-        
-        self.record [field] = f
+        self.record.add (field, value, Attribute.URL)
         return
     
