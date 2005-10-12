@@ -71,7 +71,6 @@ class UnknownContent (Qualified):
         self.q = {}
 
     def xmlwrite (self, fd, offset = 0):
-        #TODO: add this to unit test: no host but qualifiers        
         raise Exceptions.ParserError ("Attribute.UnknownContent has qualifiers, "\
                                       "but is empty: %s" % self.q)
 

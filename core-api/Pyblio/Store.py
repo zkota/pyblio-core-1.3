@@ -138,7 +138,6 @@ class Record (dict):
         if not '.' in field:
             f = self.get (field, [])
 
-            #TODO: add this to unit-text: add a host after adding its qualifiers
             if f and type(f [-1]) == Attribute.UnknownContent:
                 q = f [-1].q
                 f [-1] = generate (value, attribute_type)

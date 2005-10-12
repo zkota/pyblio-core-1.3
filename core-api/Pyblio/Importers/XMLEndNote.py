@@ -104,9 +104,16 @@ class Importer (object):
         return schema.type
 
     def add (self, field, value):
-        self.record.add (
-            field, value,
-            self.get_attribute_type (self, field) (value))
+        """
+        Use this function to add anything to your record. It's auto-typeing, even
+        for Txo's.
+        """
+        t = self.get_attribute_type (field)
+        
+        if t == Attribute.Txo:
+            value = self.db.txo [field].byname (value)
+
+        self.record.add (field, value, t)
         
     def id_add (self, field, value):
         """
