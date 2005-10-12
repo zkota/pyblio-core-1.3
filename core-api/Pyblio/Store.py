@@ -623,20 +623,22 @@ class Database (object):
             vals = entry [k]
 
             if type (vals) not in (list, tuple):
-                vals      = [ vals ]
-                entry [k] = vals
+                vals = [ vals ]
+
+            entry [k] = vals = [ x for x in vals if x is not None ]
                 
-            elif len (vals) == 0:
+            if len (vals) == 0:
                 del entry [k]
                 continue
 
             for v in vals:
                 for qk, qs in v.q.items ():
                     if type (qs) not in (list, tuple):
-                        qs       = [ qs ]
-                        v.q [qk] = qs
-                
-                    elif len (vals) == 0:
+                        qs = [ qs ]
+
+                    v.q [qk] = qs = [ x for x in qs if x is not None ]
+                    
+                    if len (qs) == 0:
                         del v.q [qk]
                     
             # check type and arity
@@ -671,7 +673,6 @@ class Database (object):
 
             # additional special checks
             if s.type is Attribute.Txo:
-
                 
                 for v in vals:
 

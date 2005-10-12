@@ -257,7 +257,7 @@ class TestStore (pybut.TestCase):
         
         assert e ['txo'] == [ Attribute.Txo (g [2]),
                               Attribute.Txo (g [4]),], \
-                              'got %s' % `e ['enum']`
+                              'got %s' % `e ['txo']`
         return
 
     def testResultSet (self):
