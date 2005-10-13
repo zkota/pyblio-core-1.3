@@ -48,6 +48,11 @@ class Sum (Maybe):
             raise TypeError ('with %s and %s: %s' % (
                 repr (a), repr (b), msg))
 
+
+    def __repr__ (self):
+        return 'Sum (%s, %s)' % (repr (self.a),
+                                 repr (self.b))
+    
 class Or (Maybe):
 
     def __init__ (self, a, b):
@@ -62,6 +67,10 @@ class Or (Maybe):
         except Missing: return self.b ()
 
 
+    def __repr__ (self):
+        return 'Or (%s, %s)' % (repr (self.a),
+                                repr (self.b))
+
 class T (Maybe):
 
     def __init__ (self, t):
@@ -71,6 +80,8 @@ class T (Maybe):
     def __call__ (self):
         return self.t
     
+    def __repr__ (self):
+        return 'T (%s)' % repr (self.t)
 
 
 class join (object):
@@ -93,6 +104,12 @@ class join (object):
                 return
             
             def __call__ (self):
+                if callable (self.middle): middle = self.middle ()
+                else:                      middle = self.middle
+                
+                if callable (self.last): last = self.last ()
+                else:                    last = self.last
+                
                 ls = []
                     
                 for arg in children:
@@ -112,8 +129,8 @@ class join (object):
                 r = ls.pop (0)
                 while ls:
                     l = ls.pop (0)
-                    if ls: r += self.middle
-                    else:  r += self.last
+                    if ls: r += middle
+                    else:  r += last
 
                     r += l
 

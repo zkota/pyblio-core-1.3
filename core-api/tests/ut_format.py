@@ -134,6 +134,9 @@ class TestFormat (pybut.TestCase):
             assert False
         except DSL.Missing: pass
 
+        # Join with a weird tag in the middle.
+        v = 'a ' + join (BR) [ 'toto', 'tutu' ] + ' b'
+        self._cmp (v, u'a toto<br>tutu b')
         return
     
 
@@ -155,6 +158,7 @@ class TestFormat (pybut.TestCase):
 
         v = 'a ' + BR + 'in the middle of a phrase'
         self._cmp (v, u'a <br>in the middle of a phrase')
+
         return
         
     def testInitials (self):
