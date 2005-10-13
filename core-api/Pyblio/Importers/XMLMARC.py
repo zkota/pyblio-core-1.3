@@ -281,7 +281,14 @@ class Exporter (object):
     def add (self, code, ** kval):
 
         for k, v in kval.items ():
-            if not v: del kval [k]
+            if not v:
+                del kval [k]
+                continue
+
+            if k [0] == '_':
+                del kval [k]
+                kval [k [1:]] = v
+                continue
 
         if not kval: return
 
