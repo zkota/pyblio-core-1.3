@@ -173,7 +173,7 @@ def access (record):
         def __call__ (self):
             try:
                 v = self._fetch ()
-            except KeyError, msg:
+            except (KeyError, IndexError), msg:
                 raise Missing ('no field %s in record' % repr (self._f))
             
             if not v:

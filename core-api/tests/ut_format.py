@@ -58,6 +58,16 @@ class TestFormat (pybut.TestCase):
                 assert False
             except DSL.Missing: pass
 
+            try:
+                f ('journal.zoglu') ()
+                assert False
+            except DSL.Missing: pass
+
+            try:
+                f ('title.zoglu') ()
+                assert False
+            except DSL.Missing: pass
+
         # Access modes
         assert all ('title')  () == self.rec ['title']
         assert all ('author') () == self.rec ['author']
