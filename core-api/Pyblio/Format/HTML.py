@@ -1,6 +1,7 @@
+from xml.sax.saxutils import escape
 
 def generate (t):
-    if isinstance (t, (str, unicode)): return t
+    if isinstance (t, (str, unicode)): return escape (t)
     return _map [t.tagName] (t)
     
 def _do_t (t):

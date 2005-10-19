@@ -3,7 +3,8 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, access, A, B, I, BR, DSL, Misc, Pages
+from Pyblio.Format import Person, join, HTML, access, A, B, I, BR, DSL, Misc, Pages, Text
+
 
 class TestFormat (pybut.TestCase):
 
@@ -31,6 +32,7 @@ class TestFormat (pybut.TestCase):
         self.rec = rec
         
         return
+
 
     def _cmp (self, v, s):
         r = HTML.generate (v ())
@@ -208,6 +210,69 @@ class TestFormat (pybut.TestCase):
         assert Misc.plural (DSL.T ([1,2,3]), zero = 'zero', one = 'one',
                             two = 'two', more = 'more') () == 'more'
 
+
+class TestOutput (pybut.TestCase):
+
+    def setUp (self):
+        rec = Store.Record ()
+
+        rec ['title'] = [ Attribute.Text (u'My < title &') ]
+
+        rec ['author'] = [
+            Attribute.Person (last = u'Gobry', first = u'Frédéric'),
+            Attribute.Person (last = u'Fobry', first = u'Grédéric'),
+            Attribute.Person (last = u'Dobry', first = u'Lrédéric'),
+            ]
+
+        rec ['journal'] = [ ]
+        rec ['singlepage'] = [ Attribute.Text ('123') ]
+        rec ['pagerange'] = [ Attribute.Text ('123-134') ]
+
+        nest = Attribute.Text ('principal')
+        nest.q ['sub'] = [ Attribute.Text ('1'),
+                           Attribute.Text ('2') ]
+
+        rec ['nest'] = [ nest ]
         
-suite = pybut.suite (TestFormat)
+        self.rec = rec
+        
+        return
+
+
+class TestOutputHTML (TestOutput):
+
+
+    def _cmp (self, v, s):
+        r = HTML.generate (v ())
+        
+        assert r == s, 'expected %s, got %s' % (
+            repr (s), repr (r))
+
+    
+    def testEscape (self):
+        all, one = access (self.rec)
+
+        v = one ('title') + ' ok &'
+        self._cmp (v, 'My &lt; title &amp; ok &amp;')
+
+        
+class TestOutputText (TestOutput):
+
+
+    def _cmp (self, v, s):
+        r = Text.generate (v ())
+        
+        assert r == s, 'expected %s, got %s' % (
+            repr (s), repr (r))
+
+    
+    def testEscape (self):
+        all, one = access (self.rec)
+
+        v = one ('title') + ' ok &'
+        self._cmp (v, 'My < title & ok &')
+
+
+        
+suite = pybut.suite (TestFormat, TestOutputHTML, TestOutputText)
 if __name__ == '__main__':  pybut.run (suite)
