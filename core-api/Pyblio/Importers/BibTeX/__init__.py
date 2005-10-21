@@ -559,13 +559,16 @@ class Exporter (object):
             self.field = {}
             self.type  = None
             self.key   = None
-        
+
+            self.to_delete = False
             self.record_begin ()
 
             for k, v in e.items ():
                 self.record_parse (k, v)
 
             self.record_end ()
+
+            if self.to_delete: continue
             
             ret = '@%s{%s,\n' % (self.type, self.key)
 
