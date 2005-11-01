@@ -263,11 +263,13 @@ class Exporter (object):
                 self.fd.write ('  <datafield tag="%s" ind1="%s" ind2="%s">\n' % (
                     tag, ind1, ind2))
         
-                for sub, value in kval.items ():
-                    if not value: continue
+                for sub, values in kval.items ():
+
+                    for value in values:
+                        if not value: continue
             
-                    self.fd.write ('   <subfield code="%s">%s</subfield>\n' % (
-                        sub, escape (value.encode ('utf-8'))))
+                        self.fd.write ('   <subfield code="%s">%s</subfield>\n' % (
+                            sub, escape (value.encode ('utf-8'))))
 
                 self.fd.write ('  </datafield>\n')
 
@@ -281,14 +283,22 @@ class Exporter (object):
     def add (self, code, ** kval):
 
         for k, v in kval.items ():
+            if not isinstance (v, (list, tuple)):
+                v = [v]
+
+            # Cleanup empty data
+            v = [ x for x in v if x ]
+            
             if not v:
                 del kval [k]
                 continue
 
             if k [0] == '_':
                 del kval [k]
-                kval [k [1:]] = v
-                continue
+                k = k [1:]
+
+            kval [k] = v
+
 
         if not kval: return
 
