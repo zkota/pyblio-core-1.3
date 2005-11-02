@@ -405,8 +405,12 @@ class Txo (Qualified):
         return 'Txo (%s, %s)' % (`self.group`, `self.id`)
 
     def __cmp__ (self, other):
-
-        return cmp (self.group, other.group) or cmp (self.id, other.id)
+        try:
+            return cmp (self.group, other.group) or cmp (self.id, other.id)
+        except AttributeError:
+            # If 'other' is not of the proper type, simply consider
+            # 'self' as superior.
+            return 1
 
     def deep_equal (self, other):
         if not self == other or not isinstance (other, Txo):
