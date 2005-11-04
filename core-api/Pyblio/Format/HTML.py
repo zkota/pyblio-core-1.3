@@ -14,7 +14,8 @@ def _do_b (t):
     return '<b>' + ''.join (map (generate, t.children)) + '</b>'
     
 def _do_a (t):
-    return '<a href="%s">' % (t.attributes ['href']) + ''.join (map (generate, t.children)) + '</a>'
+    attrs = ' '.join ([ '%s="%s"' % (k, v) for k, v in t.attributes.items () ])
+    return '<a %s>' % attrs + ''.join (map (generate, t.children)) + '</a>'
 
 def _do_br (t):
     return '<br>'

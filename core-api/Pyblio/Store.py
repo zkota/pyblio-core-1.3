@@ -88,6 +88,18 @@ class Record (dict):
 	self.key    = None
         return
 
+    def get (self, key, default = None):
+        """ Get a field, understanding the dotted notation of the
+        L{add} method"""
+        if '.' not in key: return dict.get (self, key, default)
+
+        l, r = key.split ('.')
+        try:
+            return self [l] [0].q [r]
+
+        except (KeyError, IndexError):
+            return default
+        
 
     def xmlwrite (self, fd, offset = 1):
         """ Export as XML.
