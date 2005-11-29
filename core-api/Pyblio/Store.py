@@ -164,10 +164,14 @@ class Record (dict):
             Constructs type with value. Effects neccessary dict-conversion
             operations
             """
-            if type (value) is dict:
-                return typ (**value)
-            else:
-                return typ (value)
+            if isinstance (value, Attribute.Qualified):
+                #is already of Attribute.XXX-type, so don't do anything.
+                return value
+            else: 
+                if type (value) is dict:
+                    return typ (**value)
+                else:
+                    return typ (value)
 
         
         if not '.' in field:
