@@ -26,6 +26,8 @@ import string, re, urlparse, os
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
 
+from Pyblio import I18n
+
 from gettext import gettext as _
 
 re_split = re.compile (r'[^\w]+', re.UNICODE)
