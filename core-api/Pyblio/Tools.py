@@ -43,7 +43,7 @@ def format (string, width, first, next):
     # if the entry does not fit the current width
     while len (string) > width - current:
 	    
-        pos = width - current - 1
+        pos = width - next - 1
 
 	# search a previous space
 	while pos > 0 and string [pos] <> ' ':

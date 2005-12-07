@@ -75,13 +75,14 @@ class Importer (object):
             Attribute.Person: self.person_add,
             Attribute.URL:    self.url_add,
             Attribute.Date:   self.date_add,
+            Attribute.ID:     self.id_add,
             }
 
         self.env = Environ ()        
         return
 
-    def id_add (self, field, data):
-        self.record [field] = [Attribute.ID (data )]
+    def id_add (self, field, stream):
+        self.record [field] = [Attribute.ID (stream.flat())]
         return
 
     def url_add (self, field, stream):
@@ -503,11 +504,14 @@ class Exporter (object):
 
     def _single_person (self, person):
 
-        return '%s, %s' % (person.last, person.first)
-    
+        if person.first:
+            return self._escape('%s, %s' % (person.last, person.first))
+        else:
+            return '{' + self._escape(person.last) + '}'
+        
     def person_add (self, field, data):
 
-        v = self._escape (' and '.join (map (self._single_person, data)))
+        v = ' and '.join (map (self._single_person, data))
 
         self.field [field] = '{%s}' % v
         return

@@ -5,11 +5,51 @@
   <name>BibTeX Key</name>
  </attribute>
 
- <attribute id="doctype" type="enumerated" group="doctype">
+ <attribute id="doctype" type="txo" group="doctype">
   <name>Document Type</name>
+
+  <txo-item id="1">
+   <name lang="C">article</name>
+  </txo-item>
+  <txo-item id="2">
+   <name lang="C">book</name>
+  </txo-item>
+  <txo-item id="3">
+   <name lang="C">booklet</name>
+  </txo-item>
+  <txo-item id="4">
+   <name lang="C">inbook</name>
+  </txo-item>
+  <txo-item id="5">
+   <name lang="C">incollection</name>
+  </txo-item>
+  <txo-item id="6">
+   <name lang="C">inproceedings</name>
+  </txo-item>
+  <txo-item id="7">
+   <name lang="C">manual</name>
+  </txo-item>
+  <txo-item id="8">
+   <name lang="C">mastersthesis</name>
+  </txo-item>
+  <txo-item id="9">
+   <name lang="C">misc</name>
+  </txo-item>
+  <txo-item id="10">
+   <name lang="C">phdthesis</name>
+  </txo-item>
+  <txo-item id="11">
+   <name lang="C">proceedings</name>
+  </txo-item>
+  <txo-item id="12">
+   <name lang="C">techreport</name>
+  </txo-item>
+  <txo-item id="13">
+   <name lang="C">unpublished</name>
+  </txo-item>
  </attribute>
 
- <attribute id="crossref" type="reference">
+ <attribute id="crossref" type="text">
   <name>Crossref</name>
  </attribute>
 
@@ -196,14 +236,5 @@
  <attribute id="url" type="url">
   <name>URL</name>
  </attribute>
-
- <txo-group id="doctype">
-  <txo-item id="1">
-   <name>A / 1</name>
-  </txo-item>
-  <txo-item id="2">
-   <name>A / 2</name>
-  </txo-item>
- </txo-group>
 
 </pyblio-schema>

@@ -52,16 +52,17 @@ class Schema (dict):
     def xmlread (self, tree):
 
         def parseattr (attr):
+            aid = attr.attrib ['id']
+            
             try:
                 atype = N_to_C [attr.attrib ['type']]
             except KeyError:
-                raise SchemaError ('attribute %s has an unknown type' % repr (a.id))
+                raise SchemaError ('attribute %s has an unknown type' % repr (aid))
 
             if atype is Txo:
-                a = GroupAttribute(attr.attrib ['id'])
-
+                a = GroupAttribute(aid)
             else:
-                a = Attribute (attr.attrib ['id'])
+                a = Attribute (aid)
 
             a.type = atype
             a.indexed = attr.attrib.get ('indexed', '0') == '1'
