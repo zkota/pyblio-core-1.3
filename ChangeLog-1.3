@@ -2,6 +2,32 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2005-12-07 10:14:50 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-197
+
+    Summary:
+      support for txo content in the schema definition
+    Revision:
+      pybliographer--devel--1.3--patch-197
+
+    It is now possible to put some txo items in the schema, so that a db created from the
+    schema contains these elements right when created.
+    
+
+    new files:
+     core-api/tests/ut_store/.arch-ids/taxoschema.xml.id
+     core-api/tests/ut_store/.arch-ids/taxoschemadb.xml.id
+     core-api/tests/ut_store/taxoschema.xml
+     core-api/tests/ut_store/taxoschemadb.xml
+
+    modified files:
+     ChangeLog-1.3 core-api/Pyblio/Attribute.py
+     core-api/Pyblio/Importers/BibTeX/__init__.py
+     core-api/Pyblio/Schema.py core-api/Pyblio/Store.py
+     core-api/Schemas/bibtex.xml core-api/TODO
+     core-api/tests/ut_schema.py core-api/tests/ut_schema/group.xml
+     core-api/tests/ut_store.py
+
+
 2005-11-29 15:41:46 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-196
 
     Summary:

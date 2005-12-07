@@ -128,6 +128,20 @@ class TestStore (pybut.TestCase):
         pybut.fileeq (self.f, 'ut_store/taxonomy.xml')
         return
 
+    def testTxoFromSchema (self):
+        """ A database with taxonomy fields in the schema can be read and saved, the txo become part of the db """
+
+        tmp = pybut.dbname()
+        s = Schema.Schema('ut_store/taxoschema.xml')
+        db = Store.get('file').dbcreate(tmp,s)
+
+        fd = open (self.f, 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (self.f, 'ut_store/taxoschemadb.xml')
+        return
+
     def testValidate (self):
 
         from Pyblio.Exceptions import SchemaError

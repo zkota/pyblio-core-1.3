@@ -32,7 +32,7 @@ from gettext import gettext as _
 
 from xml.sax.saxutils import escape
 
-from Pyblio.Attribute import N_to_C, C_to_N
+from Pyblio.Attribute import N_to_C, C_to_N, Txo, TxoItem
 from Pyblio import I18n, XML
 
 from cElementTree import ElementTree
@@ -52,24 +52,30 @@ class Schema (dict):
     def xmlread (self, tree):
 
         def parseattr (attr):
-            a = Attribute (attr.attrib ['id'])
+            try:
+                atype = N_to_C [attr.attrib ['type']]
+            except KeyError:
+                raise SchemaError ('attribute %s has an unknown type' % repr (a.id))
+
+            if atype is Txo:
+                a = GroupAttribute(attr.attrib ['id'])
+
+            else:
+                a = Attribute (attr.attrib ['id'])
+
+            a.type = atype
             a.indexed = attr.attrib.get ('indexed', '0') == '1'
-            a.group   = attr.attrib.get ('group', None)
 
             try:
                 mx = attr.attrib ['max']
                 a.range = (1, int (mx))
             except KeyError: pass
             
-            try:
-                a.type = N_to_C [attr.attrib ['type']]
-            except KeyError:
-                raise SchemaError ('attribute %s has an unknown type' % repr (a.id))
-
             for name in attr.findall ('name'):
                 lang = name.attrib.get ('lang', '')
                 a.names [lang] = name.text
 
+            a.xmlread(attr)
             return a
         
         for attr in tree.findall ('./attribute'):
@@ -108,7 +114,7 @@ class Schema (dict):
         return
     
     
-class Attribute:
+class Attribute(object):
 
     def __init__ (self, id):
 
@@ -127,9 +133,8 @@ class Attribute:
 
     def __repr__ (self):
 
-        return 'Schema (%s, %s, %s, %s)' % (
-            repr (self.id), repr (self.type), repr (self.group),
-            repr (self.q))
+        return 'Attribute (%s, %s, %s)' % (
+            repr (self.id), repr (self.type), repr (self.q))
 
 
     def _name_get (self):
@@ -138,12 +143,11 @@ class Attribute:
 
     name = property (_name_get)
 
-    def xmlwrite (self, fd, offset = 1):
-
+    def _xmlopen(self, fd, offset, **extra):
         ws = ' ' * offset
-        
-        if self.group is None: group = ""
-        else:                  group = ' group="%s"' % self.group
+
+        names = self.names.keys ()
+        names.sort ()
 
         if self.indexed: idx = ' indexed="1"'
         else:            idx = ''
@@ -151,12 +155,13 @@ class Attribute:
         if self.range [1] is None: card = ""
         else:                      card = ' max="%d"' % self.range [1]
 
+        if extra:
+            extra = ' ' + ' '.join(['%s="%s"' % x for x in extra.iteritems()])
+        else:
+            extra = ''
         
         fd.write ('%s<attribute id="%s" type="%s"%s%s%s>\n' % (
-            ws, self.id, C_to_N [self.type], card, group, idx))
-
-        names = self.names.keys ()
-        names.sort ()
+            ws, self.id, C_to_N [self.type], card, idx, extra))
 
         for k in names:
             v = escape (self.names [k].encode ('utf-8'))
@@ -171,6 +176,104 @@ class Attribute:
             fd.write ('%s <qualifiers>\n' % ws)
             for k in keys: self.q [k].xmlwrite (fd, offset = offset + 2)
             fd.write ('%s </qualifiers>\n' % ws)
-            
+
+
+    def xmlread(self, attr):
+        # We do not need to extract additional data from here
+        return
+        
+    def xmlwrite (self, fd, offset = 1):
+
+        ws = ' ' * offset
+        
+        self._xmlopen(fd, offset)
+        
         fd.write ('%s</attribute>\n' % ws)
         return
+
+
+class GroupAttribute(Attribute):
+
+    def __init__(self, id):
+        Attribute.__init__(self, id)
+
+        self.group = None
+        self.values = {}
+        return
+
+    def __repr__ (self):
+
+        return 'TxoAttribute (%s, %s, %s, %s)' % (
+            repr (self.id), repr (self.type), repr (self.group),
+            repr (self.q))
+
+    def xmlread(self, attr):
+        # fetch the possible txo-items
+        self.group = attr.attrib ['group']
+
+        def nesting (tree, parent):
+            for item in tree.findall ('./txo-item'):
+                i = TxoItem ()
+
+                i.id = int (item.attrib ['id'])
+                i.parent = parent
+
+                for name in item.findall ('./name'):
+                    lang = name.attrib.get ('lang', '')
+                    i.names [lang] = name.text
+
+                self.values[i.id] = i
+
+                nesting (item, i.id)
+
+        nesting (attr, None)
+        return
+    
+    def _reverse (self):
+        """ Create the reversed taxonomy tree """
+        
+        children = { None: [] }
+
+        for k in self.values.keys ():
+            children [k] = []
+
+        for v in self.values.values ():
+            children [v.parent].append (v.id)
+
+        return children
+
+    
+    def xmlwrite (self, fd, offset=1):
+
+        ws = ' ' * offset
+
+        self._xmlopen(fd, offset, group=self.group)
+
+        if self.values:
+            fd.write('\n')
+            
+        children = self._reverse ()
+        
+        def subwrite (node, depth = 0):
+            child = self.values [node]
+
+            space = ' ' * (offset + depth)
+            
+            fd.write (' %s<txo-item id="%d">\n' % (
+                space, child.id))
+
+            child.xmlwrite (fd, space)
+
+            for n in children [node]:
+                subwrite (n, depth + 1)
+                
+            fd.write (' %s</txo-item>\n' % space)
+            return
+
+        for n in children [None]:
+            subwrite (n)
+        
+        fd.write ('%s</attribute>\n' % ws)
+        return
+
+

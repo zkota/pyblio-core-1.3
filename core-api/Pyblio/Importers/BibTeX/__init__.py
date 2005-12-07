@@ -297,6 +297,15 @@ class Importer (object):
         pass
 
     def record_dispatch (self, k, v):
+        # Dispatch by name, on do_<fieldname> methods
+        try:
+            m = getattr(self, 'do_' + k.lower())
+            return m(v)
+        
+        except AttributeError:
+            pass
+
+        # Dispatch by type, calling <type>_add methods
         try:
             attp = self.db.schema [k]
             
@@ -305,8 +314,7 @@ class Importer (object):
                 _("no attribute '%s' in document '%s'") % (
                 k, self.tp))
 
-        self._mapping [attp.type] (k, v)
-        return
+        return self._mapping [attp.type] (k, v)
     
     def record_parse (self, record):
 

@@ -6,8 +6,15 @@
   <name lang="en">Author (en)</name>
  </attribute>
 
- <attribute id="url" type="txo" group="toto">
-  <name>URL</name>
+ <attribute id="toto" type="txo" group="toto">
+  <name>A group</name>
+
+  <txo-item id="1">
+    <name>value 1</name>
+  </txo-item>
+  <txo-item id="2">
+    <name>value 2</name>
+  </txo-item>
  </attribute>
 
 </pyblio-schema>

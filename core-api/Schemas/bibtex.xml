@@ -197,4 +197,13 @@
   <name>URL</name>
  </attribute>
 
+ <txo-group id="doctype">
+  <txo-item id="1">
+   <name>A / 1</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>A / 2</name>
+  </txo-item>
+ </txo-group>
+
 </pyblio-schema>

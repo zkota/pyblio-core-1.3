@@ -1,6 +1,6 @@
 import os, pybut, sys
 
-from Pyblio import Schema
+from Pyblio import Schema, Store
 
 
 class TestSchema (pybut.TestCase):
@@ -69,7 +69,7 @@ class TestSchema (pybut.TestCase):
     def testWrite (self):
         """ Writing does not modify the file """
 
-        for sch in ('simple.xml', 'qualifiers.xml'):
+        for sch in ('simple.xml', 'qualifiers.xml', 'group.xml'):
             file = pybut.dbname ()
 
             schema = os.path.join ('ut_schema', sch)
@@ -86,12 +86,24 @@ class TestSchema (pybut.TestCase):
             except OSError: pass
 
     def testGroup (self):
-        """ Some fields have groups """
+        """ Some fields have Txo groups."""
 
         import sys
         a = Schema.Schema ('ut_schema/group.xml')
 
-        assert a ['url'].group == 'toto'
+        assert a ['toto'].group == 'toto'
+
+        # Create a database, and check that the Txo has indeed been
+        # prefilled.
+        file = pybut.dbname()
+        
+        fmt = Store.get('file')
+        db = fmt.dbcreate(file, a)
+
+        keys = db.txo['toto'].keys()
+        keys.sort()
+
+        self.failUnlessEqual(keys, [1,2])
         return
     
     def testComplex (self):

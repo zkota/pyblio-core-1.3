@@ -359,6 +359,47 @@ class ID (unicode, Qualified):
         return Qualified.deep_equal (self, other)        
 
 
+class TxoItem (object):
+
+    """ Definition of a Txo item. This item can then be reused
+    as the argument for Attribute.Txo creation.
+    """
+
+    def __init__ (self):
+
+        self.id     = None
+        self.group  = None
+        self.parent = None
+        
+        self.names = {}
+        return
+
+    def _name_get (self):
+
+        return I18n.lz.trn (self.names)
+
+    name = property (_name_get)
+    
+
+    def xmlwrite (self, fd, space = ''):
+
+        keys = self.names.keys ()
+        keys.sort ()
+
+        for k in keys:
+            v = self.names [k]
+            if k:
+                lang = ' lang="%s"' % k
+            else:
+                lang = ''
+            
+            fd.write ('   %s<name%s>%s</name>\n' % (
+                space, lang, escape (v.encode ('utf-8'))))
+        
+        return
+    
+
+
 class Txo (Qualified):
 
     """ Relationship to a Taxonomy """

@@ -46,6 +46,8 @@ from gettext import gettext as _
 
 from Pyblio import Schema, Attribute, Exceptions, I18n, XML
 
+from Pyblio.Attribute import TxoItem
+
 from cElementTree import ElementTree, iterparse, tostring
 
 class StoreError (Exception):
@@ -337,48 +339,6 @@ class ResultSetStore (object):
 
 # --------------------------------------------------
     
-class TxoItem (object):
-
-    """ Definition of a Txo item. This item can then be reused
-    as the argument for Attribute.Txo creation.
-
-    SHARED BY ALL STORES
-    """
-
-    def __init__ (self):
-
-        self.id     = None
-        self.group  = None
-        self.parent = None
-        
-        self.names = {}
-        return
-
-    def _name_get (self):
-
-        return I18n.lz.trn (self.names)
-
-    name = property (_name_get)
-    
-
-    def xmlwrite (self, fd, space = ''):
-
-        keys = self.names.keys ()
-        keys.sort ()
-
-        for k in keys:
-            v = self.names [k]
-            if k:
-                lang = ' lang="%s"' % k
-            else:
-                lang = ''
-            
-            fd.write ('   %s<name%s>%s</name>\n' % (
-                space, lang, escape (v.encode ('utf-8'))))
-        
-        return
-    
-
 class TxoGroup (object):
 
     """ Definition of a group of Txo items. Items in such a group can
@@ -898,8 +858,15 @@ class Database (object):
 
         def add_to_txo (v):
             if v.type is not Attribute.Txo: return
-            try: self.txo._add (v.group)
-            except Exceptions.ConstraintError: pass                    
+            try:
+                g = self.txo._add (v.group)
+                # Fill in the TxoGroup with the known values
+                for key, txo in v.values.iteritems():
+                    g.add(txo, key=key)
+                    
+            except Exceptions.ConstraintError:
+                # Skip already defined txo groups
+                pass                    
 
         for k, v in self.schema.items ():
             add_to_txo (v)

@@ -1,0 +1,3 @@
+-*- text -*-
+
+The code duplicated between Store.Txo, Attribute.Txo and Schema.Txo is ugly
