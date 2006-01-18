@@ -1,5 +1,4 @@
 recursive-include Pyblio *.py
 recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris
-recursive-include Schemas *.xml *.dtd
 
 

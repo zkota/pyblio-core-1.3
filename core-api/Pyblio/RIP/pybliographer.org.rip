@@ -1,0 +1,3 @@
+[org.pybliographer/bibtex/0.1]
+
+path: %(system-rips)s/bibtex.xml

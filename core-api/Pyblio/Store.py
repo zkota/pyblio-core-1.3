@@ -44,7 +44,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema, Attribute, Exceptions, I18n, XML
+from Pyblio import Schema, Attribute, Exceptions, I18n
 
 from Pyblio.Attribute import TxoItem
 
@@ -130,7 +130,7 @@ class Record (dict):
         fd.write (ws + '</entry>\n')
         return
 
-    def add (self, field, value, constructor):
+    def add (self, field, value, constructor = None):
         """
         Adds a new value to a field of this record.
         
@@ -248,7 +248,9 @@ class View (object):
     def __getitem__ (self, idx):
         raise NotImplemented ('please override')
 
-        
+    def index(self, key):
+        raise NotImplemented ('please override')
+
 
 # --------------------------------------------------
 
@@ -856,23 +858,16 @@ class Database (object):
         # creating the txo groups defined in the schema, so
         # that they exist when we read their content.
 
-        def add_to_txo (v):
-            if v.type is not Attribute.Txo: return
+        for txo in self.schema.txo.values():
             try:
-                g = self.txo._add (v.group)
+                g = self.txo._add (txo.group)
                 # Fill in the TxoGroup with the known values
-                for key, txo in v.values.iteritems():
+                for key, txo in txo.iteritems():
                     g.add(txo, key=key)
                     
             except Exceptions.ConstraintError:
                 # Skip already defined txo groups
                 pass                    
-
-        for k, v in self.schema.items ():
-            add_to_txo (v)
-            for qv in v.q.values ():
-                add_to_txo (qv)
-
         return
     
 # --------------------------------------------------
@@ -886,7 +881,7 @@ for m in os.listdir (_dir):
 
     m, ext = os.path.splitext (m)
 
-    if ext != '.py' and not ext.endswith ('store'): continue
+    if ext != '.py' or not m.endswith ('store'): continue
     
     _modules [m.lower () [:-5]] = m
 

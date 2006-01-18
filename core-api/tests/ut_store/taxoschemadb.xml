@@ -4,27 +4,10 @@
 <pyblio-schema>
  <attribute id="doctype" type="txo" group="type">
   <name>Document Type</name>
-
-  <txo-item id="3">
-    <name>Journal 1 é</name>
-  </txo-item>
-  <txo-item id="4">
-    <name>Journal 2</name>
-  </txo-item>
  </attribute>
 
  <attribute id="journal" type="txo" group="journal">
   <name>Document Type</name>
-
-  <txo-item id="1">
-    <name>Journal</name>
-  </txo-item>
-  <txo-item id="2">
-    <name>Book</name>
-   <txo-item id="3">
-     <name>PocketBook</name>
-   </txo-item>
-  </txo-item>
  </attribute>
 
  <attribute id="text" type="text">

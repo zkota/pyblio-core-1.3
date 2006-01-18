@@ -12,6 +12,13 @@ sys.path.insert (0, os.path.join (srcdir, '..'))
 
 assert os.path.isdir (os.path.join (srcdir, '..', 'PyblioUI'))
 
+_count = 0
+
+def dbname ():
+    global _count
+
+    _count = _count + 1
+    return ',,db-%d' % _count
 
 class _WritelnDecorator:
     """Used to decorate file-like objects with a handy 'writeln' method"""
@@ -121,6 +128,11 @@ class TextTestRunner:
         else:
             self.stream.writeln("OK")
         return result
+
+
+def suite (* args):
+
+    return TestSuite (map (lambda s: makeSuite (s, 'test'), args))
 
 
 def run (* args):

@@ -3,39 +3,25 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, access, A, B, I, BR, DSL, Misc, Pages, Text
+from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch, Misc, Pages, Text
 
 
 class TestFormat (pybut.TestCase):
 
     def setUp (self):
-        rec = Store.Record ()
+        self.db = Store.get('file').dbopen('ut_format/sample.bip')
 
-        rec ['title'] = [ Attribute.Text (u'My title') ]
+        self.rec = self.db[1]
+        self.rec ['journal'] = [ ]
 
-        rec ['author'] = [
-            Attribute.Person (last = u'Gobry', first = u'Frédéric'),
-            Attribute.Person (last = u'Fobry', first = u'Grédéric'),
-            Attribute.Person (last = u'Dobry', first = u'Lrédéric'),
-            ]
-
-        rec ['journal'] = [ ]
-        rec ['singlepage'] = [ Attribute.Text ('123') ]
-        rec ['pagerange'] = [ Attribute.Text ('123-134') ]
-
-        nest = Attribute.Text ('principal')
-        nest.q ['sub'] = [ Attribute.Text ('1'),
-                           Attribute.Text ('2') ]
-
-        rec ['nest'] = [ nest ]
-        
-        self.rec = rec
-        
         return
 
 
     def _cmp (self, v, s):
-        r = HTML.generate (v ())
+        stage2 = v(self.db)
+        stage3 = stage2(self.rec)
+        
+        r = HTML.generate(stage3)
         
         assert r == s, 'expected %s, got %s' % (
             repr (s), repr (r))
@@ -43,48 +29,36 @@ class TestFormat (pybut.TestCase):
     def testAccessor (self):
         """ Check that accessors behave properly """
         
-        all, one = access (self.rec)
-
         # Failure modes are identical for both all and one
 
         for f in (all, one):
             f ('gronf')
 
             try:
-                f ('gronf') ()
+                f ('jenexistepas')(self.db)
                 assert False
-            except DSL.Missing: pass
+            except KeyError: pass
 
             try:
-                f ('journal') ()
+                f ('journal.zoglu')(self.db)
                 assert False
-            except DSL.Missing: pass
+            except KeyError: pass
 
-            try:
-                f ('journal.zoglu') ()
-                assert False
-            except DSL.Missing: pass
-
-            try:
-                f ('title.zoglu') ()
-                assert False
-            except DSL.Missing: pass
 
         # Access modes
-        assert all ('title')  () == self.rec ['title']
-        assert all ('author') () == self.rec ['author']
+        assert all ('title')(self.db)(self.rec)  == self.rec['title']
+        assert all ('author')(self.db)(self.rec) == self.rec['author']
 
-        assert one ('title')  () == self.rec ['title']  [0]
-        assert one ('author') () == self.rec ['author'] [0]
+        assert one ('title')(self.db)(self.rec) == self.rec['title'][0]
+        assert one ('author')(self.db)(self.rec) == self.rec['author'][0]
 
-        self.failUnlessEqual (all ('nest.sub') (), self.rec ['nest'] [0].q ['sub'])
-        self.failUnlessEqual (one ('nest.sub') (), self.rec ['nest'] [0].q ['sub'] [0])
+        self.failUnlessEqual(all('nest.sub')(self.db)(self.rec), self.rec ['nest'] [0].q ['sub'])
+        self.failUnlessEqual(one('nest.sub')(self.db)(self.rec), self.rec ['nest'] [0].q ['sub'] [0])
         return
 
 
     def testOneAdd (self):
         """ It is possible to add one fields together or with text """
-        all, one = access (self.rec)
 
         v = one ('title') + ' ok'
         self._cmp (v, 'My title ok')
@@ -98,7 +72,7 @@ class TestFormat (pybut.TestCase):
         # a missing field causes a delayed error
         v = 'ok ' + one ('gronf') + ' ok'
         try:
-            v ()
+            v(self.db)(self.rec)
             assert False
         except DSL.Missing: pass
         return
@@ -106,7 +80,6 @@ class TestFormat (pybut.TestCase):
     
     def testAlternate (self):
         """ When the left version fails, use the right version """
-        all, one = access (self.rec)
 
         v = one ('title') | 'success'
         self._cmp (v, 'My title')
@@ -114,14 +87,13 @@ class TestFormat (pybut.TestCase):
         v = one ('gronf') | 'success'
         self._cmp (v, 'success')
 
-        v = one ('gronf') | one ('gudule') | 'success'
+        v = one ('gronf') | one ('regronf') | 'success'
         self._cmp (v, 'success')
 
         return
 
     def testJoin (self):
         """ The join function takes lists of items and joins them """
-        all, one = access (self.rec)
 
         v = join (', ') [ Person.lastFirst (all ('author')) ]
         self._cmp (v, u'Gobry, Frédéric, Fobry, Grédéric, Dobry, Lrédéric')
@@ -140,21 +112,21 @@ class TestFormat (pybut.TestCase):
         self._cmp (v, u'My title')
 
         # join fails when _no_ value is available
-        v = join (', ') [ one ('gronf'), one ('rasdf') ]
+        v = join (', ') [ one ('gronf'), one ('regronf') ]
+        phase2 = v(self.db)
         try:
-            v ()
+            phase2(self.rec)
             assert False
         except DSL.Missing: pass
 
         # Join with a weird tag in the middle.
         v = 'a ' + join (BR) [ 'toto', 'tutu' ] + ' b'
+        
         self._cmp (v, u'a toto<br>tutu b')
         return
     
 
     def testMarkup (self):
-
-        all, one = access (self.rec)
 
         v = I [ one ('title') ]
         self._cmp (v, u'<i>My title</i>')
@@ -182,60 +154,106 @@ class TestFormat (pybut.TestCase):
 
     def testMissingPerson (self):
 
-        def persons ():
-            return [Attribute.Person (last = 'Gobry', first = u'Frédéric'),
-                    Attribute.Person (last = 'Fobry') ]
+        r = Store.Record()
+        r['author'] = [Attribute.Person (last = 'Gobry', first = u'Frédéric'),
+                       Attribute.Person (last = 'Fobry') ]
 
-        assert Person.initialLast (persons) () == ['F. Gobry', 'Fobry']
-        assert Person.firstLast (persons) ()   == [u'Frédéric Gobry', 'Fobry']
-        assert Person.lastFirst (persons) ()   == [u'Gobry, Frédéric', 'Fobry']
+        def run(fn):
+            formatter = fn(all('author'))(self.db)
+            return formatter(r)
+
+        assert run(Person.initialLast) == ['F. Gobry', 'Fobry']
+        assert run(Person.firstLast)   == [u'Frédéric Gobry', 'Fobry']
+        assert run(Person.lastFirst)   == [u'Gobry, Frédéric', 'Fobry']
 
     def testPages (self):
-        all, one = access (self.rec)
 
-        assert Pages.pagesLong (one ('singlepage')) () == u'page\xa0123'
-        assert Pages.pagesLong (one ('pagerange')) ()  == u'pages\xa0123-134'
+        assert Pages.pagesLong(one ('singlepage'))(self.db)(self.rec) == u'page\xa0123'
+        assert Pages.pagesLong(one ('pagerange'))(self.db)(self.rec)  == u'pages\xa0123-134'
 
     def testMiscPlural (self):
 
-        assert Misc.plural (DSL.T ([]),  zero = 'zero', more = 'more') () == 'zero'
-        assert Misc.plural (DSL.T ([1]), zero = 'zero', more = 'more') () == 'more'
-        assert Misc.plural (DSL.T ([1]), zero = 'zero', one = 'one',
-                            more = 'more') () == 'one'
-        
-        assert Misc.plural (DSL.T ([1,2]), zero = 'zero', one = 'one',
-                            more = 'more') () == 'more'
-        assert Misc.plural (DSL.T ([1,2]), zero = 'zero', one = 'one',
-                            two = 'two', more = 'more') () == 'two'
-        assert Misc.plural (DSL.T ([1,2,3]), zero = 'zero', one = 'one',
-                            two = 'two', more = 'more') () == 'more'
+        zm  = Misc.plural (all('gronf'),
+                           zero='zero',
+                           more='more')(self.db)
 
+        zom = Misc.plural (all('gronf'),
+                           zero='zero',
+                           one='one',
+                           more='more')(self.db)
+        zotm = Misc.plural (all('gronf'),
+                            zero='zero',
+                            one='one',
+                            two='two',
+                            more='more')(self.db)
+
+        def run(format, vals):
+            r = Store.Record()
+            r['gronf'] = vals
+
+            return Text.generate(format(r))
+        
+        self.failUnlessEqual(run(zm, []), 'zero')
+        self.failUnlessEqual(run(zm, [1]), 'more')
+        self.failUnlessEqual(run(zom, [1]), 'one')
+        self.failUnlessEqual(run(zom, [1, 2]), 'more')
+        self.failUnlessEqual(run(zotm, [1, 2]), 'two')
+        self.failUnlessEqual(run(zotm, [1, 2, 3]), 'more')
+
+    def testSwitch(self):
+        """ Test the 'switch' operator."""
+        
+        def run(c, r):
+            f = c(self.db)
+            return Text.generate(f(r))
+
+
+        def txo(name):
+            return Attribute.Txo(self.db.txo['type'].byname(name))
+        
+        # One cannot use switch on a non-txo attribute
+        citation = switch('title').default(one('title'))
+        try:
+            citation(self.db)
+            assert False, 'should not be accepted'
+        except TypeError:
+            pass
+
+        # A switch fails when the value to switch on does not exist
+        # and there is no default case.
+        citation = switch('type').case(ARTICLE=one('title'))
+
+        try:
+            run(citation, self.rec)
+            assert False, 'should not succeed'
+        except DSL.Missing:
+            pass
+
+        # With a default case, it should pass
+        citation = switch('type').case(ARTICLE=one('singlepage'))
+        citation = citation.default(one('title'))
+
+        self.failUnlessEqual(run(citation, self.rec), 'My title')
+
+        # Test with the actual value
+        self.rec['type'] = [txo('ARTICLE')]
+        self.failUnlessEqual(run(citation, self.rec), '123')
+        
+        # Another value will also return the default
+        self.rec['type'] = [txo('BOOK')]
+        self.failUnlessEqual(run(citation, self.rec), 'My title')
+        return
+    
 
 class TestOutput (pybut.TestCase):
 
     def setUp (self):
-        rec = Store.Record ()
+        self.db = Store.get('file').dbopen('ut_format/sample.bip')
 
-        rec ['title'] = [ Attribute.Text (u'My < title &') ]
+        self.rec = self.db[1]
+        self.rec ['journal'] = [ ]
+        self.rec ['title'] = [ Attribute.Text (u'My < title &') ]
 
-        rec ['author'] = [
-            Attribute.Person (last = u'Gobry', first = u'Frédéric'),
-            Attribute.Person (last = u'Fobry', first = u'Grédéric'),
-            Attribute.Person (last = u'Dobry', first = u'Lrédéric'),
-            ]
-
-        rec ['journal'] = [ ]
-        rec ['singlepage'] = [ Attribute.Text ('123') ]
-        rec ['pagerange'] = [ Attribute.Text ('123-134') ]
-
-        nest = Attribute.Text ('principal')
-        nest.q ['sub'] = [ Attribute.Text ('1'),
-                           Attribute.Text ('2') ]
-
-        rec ['nest'] = [ nest ]
-        
-        self.rec = rec
-        
         return
 
 
@@ -243,15 +261,16 @@ class TestOutputHTML (TestOutput):
 
 
     def _cmp (self, v, s):
-        r = HTML.generate (v ())
+        stage2 = v(self.db)
+        stage3 = stage2(self.rec)
+        
+        r = HTML.generate (stage3)
         
         assert r == s, 'expected %s, got %s' % (
             repr (s), repr (r))
 
     
     def testEscape (self):
-        all, one = access (self.rec)
-
         v = one ('title') + ' ok &'
         self._cmp (v, 'My &lt; title &amp; ok &amp;')
 
@@ -260,15 +279,16 @@ class TestOutputText (TestOutput):
 
 
     def _cmp (self, v, s):
-        r = Text.generate (v ())
+        stage2 = v(self.db)
+        stage3 = stage2(self.rec)
+        
+        r = Text.generate(stage3)
         
         assert r == s, 'expected %s, got %s' % (
             repr (s), repr (r))
 
     
     def testEscape (self):
-        all, one = access (self.rec)
-
         v = one ('title') + ' ok &'
         self._cmp (v, 'My < title & ok &')
 

@@ -235,8 +235,8 @@ class TestMatch (pybut.TestCase):
             except ValueError:
                 pass
         return
-    
-config = pybut.makeSuite (TestConfig, 'test')
-match  = pybut.makeSuite (TestMatch, 'test')
 
-pybut.run (pybut.TestSuite ((config, match)))
+suite = pybut.suite(TestConfig, TestMatch)
+
+if __name__ == '__main__': pybut.run (suite)
+

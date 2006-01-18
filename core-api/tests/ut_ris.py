@@ -13,7 +13,7 @@ class TestRIS (pybut.TestCase):
         fd = open (file)
 
         self.fn = pybut.dbname ()
-        s = Schema.Schema ('../Schemas/standard.xml')
+        s = Schema.Schema ('standard.xml')
         self.db = Store.get ('file').dbcreate (self.fn, s)
         
         self.p = RIS.Importer ()

@@ -846,6 +846,16 @@ class TestView (BaseView):
         
         return
 
+    def testGetIndex(self):
+        """ Check that one can get the index of a key in a given view."""
+        
+        v = self.rs.view(OrderBy('text'))
+
+        for r in self.rs.itervalues():
+            idx = v.index(r.key)
+            assert v[idx] == r.key
+        return
+    
     def testInsertRS (self):
 
         """ A view is updated when the result set is updated """

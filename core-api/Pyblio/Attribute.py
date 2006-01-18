@@ -400,6 +400,9 @@ class TxoItem (object):
         
         return
     
+    def __repr__ (self):
+
+        return 'TxoItem(%s, %s)' % (repr(self.group), repr(self.id))
 
 
 class Txo (Qualified):

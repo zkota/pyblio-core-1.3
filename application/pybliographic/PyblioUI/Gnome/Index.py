@@ -34,48 +34,72 @@ class DatabaseModel (gtk.GenericTreeModel):
 
     _columns = (gobject.TYPE_PYOBJECT,
                 gobject.TYPE_STRING)
+
+    COL_CONTENT = 1
     
     def __init__(self, vw, db):
 	gtk.GenericTreeModel.__init__(self)
 
         self._vw = vw
         self._db = db
+
+        self._db.register('record-added', self._record_added)
+        self._db.register('record-deleting', self._record_deleting)
         return
 
-    def on_get_flags (self):
+    def _record_deleting(self, key):
+        """ Called _before_ a key is about to be deleted."""
+
+        idx = self._vw.index(key)
+        path = self.on_get_path(idx)
+        
+        self.row_deleted(path)
+        return
+
+    def _record_added(self, key):
+        """ Called when the underlying model has an additional record."""
+
+        # We need to find out the place of this new record into the
+        # Store.View
+        idx = self._vw.index(key)
+
+        path = self.on_get_path(idx)
+        iter = self.get_iter(path)
+        
+        self.row_inserted(path, iter)
+        return
+    
+    def on_get_flags(self):
 	return gtk.TREE_MODEL_LIST_ONLY | gtk.TREE_MODEL_ITERS_PERSIST
 
     
-    def on_get_n_columns (self):
+    def on_get_n_columns(self):
 	'''returns the number of columns in the model'''
-	return len (self._columns)
+	return len(self._columns)
 
     
-    def on_get_column_type (self, index):
+    def on_get_column_type(self, index):
 	'''returns the type of a column in the model'''
-	return self._columns [index]
+	return self._columns[index]
     
-    def on_get_path (self, node):
+    def on_get_path(self, node):
 	'''returns the tree path. in our case, it is the first part of
 	the node tuple '''
-        
 	return (node,)
     
     def on_get_iter(self, path):
-
         '''returns the node corresponding to the given path.  In our
         case, the node is the path'''
 
-        if len (path) != 1: return None
+        if len(path) != 1: return None
 
-        n = path [0]
+        n = path[0]
         
-        if n >= len (self._vw): return None
-        
+        if n >= len(self._vw): return None
         return n
 
     
-    def on_get_value (self, node, column):
+    def on_get_value(self, node, column):
 	'''returns the value stored in a particular column for the node'''
 
         k = self._vw [node]
@@ -84,17 +108,16 @@ class DatabaseModel (gtk.GenericTreeModel):
         if column == 0: return k
 
         # column 1 is an actual description
-        e = self._db [k]
-        
+        e = self._db.db [k]
 	return Entry.summary (e)
     
-    def on_iter_next (self, node):
+    def on_iter_next(self, node):
 	'''returns the next node at this level of the tree'''
 
-        node = node + 1
-        if node < len (self._vw): return node
+        node += 1
+        if node >= len(self._vw): return None
         
-        return None
+        return node
     
     def on_iter_children(self, node):
 	'''returns the first child of this node'''
@@ -110,6 +133,7 @@ class DatabaseModel (gtk.GenericTreeModel):
         
     def on_iter_nth_child(self, node, n):
 	'''returns the nth child of this node'''
+        if node is None: return (n,)
         return None
         
     def on_iter_parent(self, node):

@@ -1,6 +1,11 @@
+# -*- coding: utf-8 -*-
 import os, stat, sys
 
-from distutils.core import setup
+try:
+   from ez_setup import use_setuptools
+   use_setuptools()
+except ImportError:
+   pass
 
 def version_get ():
 
@@ -18,24 +23,22 @@ version, vid = version_get ()
 if version:
     print 'running setup on version %s [%s]' % (version, vid)
 
-setup (name = "pybliographer-core",
-       version = vid,
+from setuptools import setup, find_packages
 
-       description = "Pybliographer Core API",
-       author = "Frederic Gobry",
-       author_email = 'gobry@pybliographer.org',
-       url = 'http://pybliographer.org/',
+setup(
+    name = "pybliographer",
+    version = vid,
+    packages = find_packages(),
 
-       license = 'GPL',
-       
-       long_description = \
-'''
-This module contains the core API of Pybliographer.
-''',
+    package_data = {
+    'Pyblio': ['RIP/*.xml', 'RIP/*.rip'],
+    },
 
-       packages = [ 'Pyblio',
-                    'Pyblio.Importers',
-                    'Pyblio.Importers.BibTeX',
-                    'Pyblio.Format',
-                    'Pyblio.Stores' ]
-       )
+    author = "Frédéric Gobry",
+    author_email = "gobry@pybliographer.org",
+    
+    description = "pybliographer core API",
+    
+    license = "LGPL",
+)
+

@@ -1,7 +1,7 @@
 
 def generate (t):
     if isinstance (t, (str, unicode)): return t
-    return _map [t.tagName] (t)
+    return _map [t.tag] (t)
     
 def _do_t (t):
     return ''.join (map (generate, t.children))

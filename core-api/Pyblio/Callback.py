@@ -1,7 +1,9 @@
-""" Provide a generic callback mechanism. Classes that wish to emit
-events inherit from Publisher. Interested clients call the 'register'
-method on the object. The publisher then calls 'emit' to emit the
-event."""
+"""
+A generic callback mechanism.
+
+Classes that wish to emit events inherit from L{Publisher}. Interested
+clients call the L{Publisher.register} method on the object. The
+publisher then calls L{Publisher.emit} to emit the event."""
 
 import weakref
 

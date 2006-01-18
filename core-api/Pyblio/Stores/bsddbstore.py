@@ -305,16 +305,24 @@ class View (Store.View):
             yield _pl (self._db.get (key))
 
             d = c.next ()
-            
         return
 
+    def index(self, key):
+        c = self._v.cursor()
+        e = _pl(self._db.get(str(key)))
+
+        c.set(self._make_key(e))
+        return c.get_recno() - 1
+    
     def __getitem__ (self, idx):
         data = self._v.get (idx + 1)
-        if data is None: raise IndexError ('no such index: %d' % idx)
+
+        if data is None:
+            raise IndexError ('no such index: %d' % idx)
         return Store.Key (data [1])
+
     
     def __len__ (self):
-
         return self._v.stat () ['nkeys']
 
         
@@ -374,6 +382,7 @@ class View (Store.View):
 
         self._v.delete (self._make_key (e), txn = txn)
         return
+
     
 # --------------------------------------------------
 
@@ -1316,3 +1325,6 @@ def dbimport (target, source):
         raise Store.StoreError (_("cannot open '%s': %s") % (file, msg))
 
     return db
+
+description = _("Berkeley DB storage")
+

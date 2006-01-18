@@ -1,3 +1,14 @@
 -*- text -*-
 
-The code duplicated between Store.Txo, Attribute.Txo and Schema.Txo is ugly
+For the initial public release:
+
+- split pybliographer and pybliographic
+
+- use Protocols to document the API of plugins, importers and
+  exporters.
+
+
+Cleanups
+
+- The code duplicated between Store.Txo, Attribute.Txo and Schema.Txo is ugly
+

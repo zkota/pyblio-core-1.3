@@ -2,6 +2,302 @@
 # arch-tag: automatic-ChangeLog--gobry@pybliographer.org--public/pybliographer--devel--1.3
 #
 
+2006-01-18 15:28:27 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-200
+
+    Summary:
+      merged the gnomeui branch with lots of improvements
+    Revision:
+      pybliographer--devel--1.3--patch-200
+
+    Patches applied:
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--base-0
+       tag of gobry@pybliographer.org--public/pybliographer--devel--1.3--patch-199
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-1
+       preliminary support for single widget editing of records
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-2
+       added a simple undo mechanism, fixed testsuite
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-3
+       completed the Undo/Redo feature and made use of the UIManager
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-4
+       added handling of File/Save and focus management between index and entry
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-5
+       it is now possible to edit all the attribute types and their qualifiers
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-6
+       added "editing" buttons in the text view
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-7
+       added extra UI menu plus copy / paste in the editor
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-8
+       added an undo stack for operations in the entry widget
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-9
+       no more use of the plus/minus buttons, as we have keyboard shortcuts
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-10
+       severe refactoring of the Entry widget
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-11
+       completed undo/redo for attribute removal
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-12
+       added a few tests for the marks handling code
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-13
+       hopefully completed the mark management code for mark deletion
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-14
+       additional fixes for the mark management code
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-15
+       added support for inserting new values
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-16
+       usability improvements
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-17
+       completed the attribute adding code
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-18
+       added support for adding a new record to the db
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-19
+       added support for record deleting
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-20
+       a bit of profiling: remove the old Gtk marks when refreshing the display
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-21
+       fixed the behavior of the close confirmation button
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-22
+       allow for closing an empty db
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-23
+       added a registry system for schemas, filters,...
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-24
+       completed the database creation process
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-25
+       robustness fixes for handling db creation errors
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-26
+       fixed location of the cursor when starting editing
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-27
+       started a few tracks (plugins, view config)
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-28
+       started working with eggs. eggs are cool :-)
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-29
+       added support for parameter handling in exporters and importers
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-30
+       list and call known plugins
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-31
+       improved core documentation a little bit, esp. for the Registry module
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-32
+       modified txo definition is schema
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-33
+       severe refactoring of the citation formatting code
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-34
+       preliminary definition of import/export protocols
+    
+     * gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-35
+       fixed a few formatting bugs when using dynamic arguments in the DSL
+    
+
+    new files:
+     application/pybliographic/.arch-ids/TODO.id
+     application/pybliographic/.arch-ids/ez_setup.py.id
+     application/pybliographic/.arch-ids/setup.py.id
+     application/pybliographic/PyblioUI/.arch-ids/Undo.py.id
+     application/pybliographic/PyblioUI/Gnome/.arch-ids/Argv.py.id
+     application/pybliographic/PyblioUI/Gnome/.arch-ids/Display.py.id
+     application/pybliographic/PyblioUI/Gnome/.arch-ids/Marks.py.id
+     application/pybliographic/PyblioUI/Gnome/.arch-ids/Storage.py.id
+     application/pybliographic/PyblioUI/Gnome/.arch-ids/ViewConfig.py.id
+     application/pybliographic/PyblioUI/Gnome/Argv.py
+     application/pybliographic/PyblioUI/Gnome/Display.py
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/argv.glade.id
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/argv.gladep.id
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/configure.glade.id
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/configure.gladep.id
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/create.glade.id
+     application/pybliographic/PyblioUI/Gnome/Glade/.arch-ids/create.gladep.id
+     application/pybliographic/PyblioUI/Gnome/Glade/argv.glade
+     application/pybliographic/PyblioUI/Gnome/Glade/argv.gladep
+     application/pybliographic/PyblioUI/Gnome/Glade/configure.glade
+     application/pybliographic/PyblioUI/Gnome/Glade/configure.gladep
+     application/pybliographic/PyblioUI/Gnome/Glade/create.glade
+     application/pybliographic/PyblioUI/Gnome/Glade/create.gladep
+     application/pybliographic/PyblioUI/Gnome/Marks.py
+     application/pybliographic/PyblioUI/Gnome/Storage.py
+     application/pybliographic/PyblioUI/Gnome/ViewConfig.py
+     application/pybliographic/PyblioUI/Undo.py
+     application/pybliographic/TODO
+     application/pybliographic/ez_setup.py
+     application/pybliographic/misc/.arch-ids/=id
+     application/pybliographic/misc/.arch-ids/more-less.svg.id
+     application/pybliographic/misc/more-less.svg
+     application/pybliographic/setup.py
+     application/pybliographic/tests/.arch-ids/testsuite.py.id
+     application/pybliographic/tests/.arch-ids/ut_marks.py.id
+     application/pybliographic/tests/.arch-ids/ut_undo.py.id
+     application/pybliographic/tests/testsuite.py
+     application/pybliographic/tests/ut_marks.py
+     application/pybliographic/tests/ut_marks/.arch-ids/=id
+     application/pybliographic/tests/ut_marks/.arch-ids/rem-author.xml.id
+     application/pybliographic/tests/ut_marks/.arch-ids/rem-authors.xml.id
+     application/pybliographic/tests/ut_marks/.arch-ids/rem-qualifier.xml.id
+     application/pybliographic/tests/ut_marks/.arch-ids/sample.pbl.id
+     application/pybliographic/tests/ut_marks/rem-author.xml
+     application/pybliographic/tests/ut_marks/rem-authors.xml
+     application/pybliographic/tests/ut_marks/rem-qualifier.xml
+     application/pybliographic/tests/ut_marks/sample.pbl
+     application/pybliographic/tests/ut_undo.py
+     core-api/.arch-ids/ez_setup.py.id
+     core-api/Pyblio/.arch-ids/Registry.py.id
+     core-api/Pyblio/Format/.arch-ids/Base.py.id
+     core-api/Pyblio/Format/.arch-ids/S2.py.id
+     core-api/Pyblio/Format/Base.py core-api/Pyblio/Format/S2.py
+     core-api/Pyblio/Importers/.arch-ids/Protocol.py.id
+     core-api/Pyblio/Importers/Protocol.py
+     core-api/Pyblio/RIP/.arch-ids/pybliographer.org.rip.id
+     core-api/Pyblio/RIP/pybliographer.org.rip
+     core-api/Pyblio/Registry.py core-api/ez_setup.py
+     core-api/tests/.arch-ids/ut_registry.py.id
+     core-api/tests/ut_format/.arch-ids/=id
+     core-api/tests/ut_format/.arch-ids/sample.bip.id
+     core-api/tests/ut_format/sample.bip
+     core-api/tests/ut_registry.py
+     core-api/tests/ut_registry/.arch-ids/=id
+     core-api/tests/ut_registry/.arch-ids/example.rip.id
+     core-api/tests/ut_registry/example.rip
+     core-api/tests/ut_store/.arch-ids/qualified.xml.id
+     core-api/tests/ut_store/qualified.xml
+
+    removed files:
+     core-api/Pyblio/.arch-ids/XML.py.id core-api/Pyblio/XML.py
+
+    modified files:
+     ChangeLog-1.3 application/pybliographic/PyblioUI/Document.py
+     application/pybliographic/PyblioUI/Gnome/Document.py
+     application/pybliographic/PyblioUI/Gnome/Entry.py
+     application/pybliographic/PyblioUI/Gnome/Glade/main.glade
+     application/pybliographic/PyblioUI/Gnome/Index.py
+     application/pybliographic/pybliographic
+     application/pybliographic/tests/pybut.py
+     application/pybliographic/tests/ut_config.py
+     application/pybliographic/tests/ut_document.py
+     application/pybliographic/tests/ut_document/sample.bip
+     core-api/MANIFEST.in core-api/Pyblio/Attribute.py
+     core-api/Pyblio/Callback.py core-api/Pyblio/Format/DSL.py
+     core-api/Pyblio/Format/Date.py core-api/Pyblio/Format/HTML.py
+     core-api/Pyblio/Format/Misc.py core-api/Pyblio/Format/Pages.py
+     core-api/Pyblio/Format/Person.py core-api/Pyblio/Format/S3.py
+     core-api/Pyblio/Format/Text.py
+     core-api/Pyblio/Format/__init__.py
+     core-api/Pyblio/RIP/bibtex.xml core-api/Pyblio/Schema.py
+     core-api/Pyblio/Store.py core-api/Pyblio/Stores/bsddbstore.py
+     core-api/Pyblio/Stores/filestore.py
+     core-api/Pyblio/__init__.py core-api/TODO core-api/setup.py
+     core-api/tests/ut_database.py core-api/tests/ut_format.py
+     core-api/tests/ut_isi.py core-api/tests/ut_ris.py
+     core-api/tests/ut_schema/group.xml
+     core-api/tests/ut_schema/simple.xml core-api/tests/ut_store.py
+     core-api/tests/ut_store/taxoschema.xml
+     core-api/tests/ut_store/taxoschemadb.xml
+     {arch}/=tagging-method
+
+    renamed files:
+     application/pybliographic/tests/ut_document/.arch-ids/sample.pbl.id
+       ==> application/pybliographic/tests/ut_document/.arch-ids/sample.bip.id
+     application/pybliographic/tests/ut_document/sample.pbl
+       ==> application/pybliographic/tests/ut_document/sample.bip
+     core-api/Pyblio/Format/.arch-ids/Tags.py.id
+       ==> core-api/Pyblio/Format/.arch-ids/S3.py.id
+     core-api/Pyblio/Format/Tags.py
+       ==> core-api/Pyblio/Format/S3.py
+     core-api/Schemas/.arch-ids/=id
+       ==> core-api/Pyblio/RIP/.arch-ids/=id
+     core-api/Schemas/.arch-ids/bibtex.xml.id
+       ==> core-api/Pyblio/RIP/.arch-ids/bibtex.xml.id
+     core-api/Schemas/.arch-ids/pyblio-schema.dtd.id
+       ==> core-api/Pyblio/RIP/.arch-ids/pyblio-schema.dtd.id
+     core-api/Schemas/.arch-ids/standard.xml.id
+       ==> core-api/tests/.arch-ids/standard.xml.id
+     core-api/Schemas/standard.xml
+       ==> core-api/tests/standard.xml
+
+    new directories:
+     application/pybliographic/misc
+     application/pybliographic/misc/.arch-ids
+     application/pybliographic/tests/ut_marks
+     application/pybliographic/tests/ut_marks/.arch-ids
+     core-api/Pyblio/RIP/.arch-ids core-api/tests/ut_format
+     core-api/tests/ut_format/.arch-ids core-api/tests/ut_registry
+     core-api/tests/ut_registry/.arch-ids
+
+    removed directories:
+     core-api/Schemas/.arch-ids
+
+    renamed directories:
+     core-api/Schemas
+       ==> core-api/Pyblio/RIP
+
+    new patches:
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--base-0
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-1
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-2
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-3
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-4
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-5
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-6
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-7
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-8
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-9
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-10
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-11
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-12
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-13
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-14
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-15
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-16
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-17
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-18
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-19
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-20
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-21
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-22
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-23
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-24
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-25
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-26
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-27
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-28
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-29
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-30
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-31
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-32
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-33
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-34
+     gobry@pybliographer.org--2005/pyblio--gnomeui--1.3--patch-35
+
+
 2005-12-07 11:20:48 GMT	Frederic Gobry <frederic.gobry@epfl.ch>	patch-199
 
     Summary:

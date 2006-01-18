@@ -1,6 +1,5 @@
 """
-This module provides the base framework for manipulating bibliographic
-databases.
+A framework for manipulating bibliographic databases.
 
 Definitions
 ===========

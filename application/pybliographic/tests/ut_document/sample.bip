@@ -2,11 +2,11 @@
 
 <pyblio-db>
 <pyblio-schema>
- <attribute id="doctype" type="enumerated" group="type">
+ <attribute id="doctype" type="txo" group="type">
   <name>Document Type</name>
  </attribute>
 
- <attribute id="journal" type="enumerated" group="journal">
+ <attribute id="journal" type="txo" group="journal">
   <name>Document Type</name>
  </attribute>
 
@@ -15,36 +15,36 @@
  </attribute>
 
 </pyblio-schema>
- <enum-group id="journal">
-  <enum-item id="3">
+ <txo-group id="journal">
+  <txo-item id="3">
    <name>Journal 1</name>
-  </enum-item>
-  <enum-item id="4">
+  </txo-item>
+  <txo-item id="4">
    <name>Journal 2</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
- <enum-group id="type">
-  <enum-item id="1">
+ <txo-group id="type">
+  <txo-item id="1">
    <name>Journal</name>
-  </enum-item>
-  <enum-item id="2">
+  </txo-item>
+  <txo-item id="2">
    <name>Book</name>
-  </enum-item>
- </enum-group>
+  </txo-item>
+ </txo-group>
 
  <entry id="1">
   <attribute id="doctype">
-   <enumerated group="type" id="1"/>
+   <txo group="type" id="1"/>
   </attribute>
   <attribute id="journal">
-   <enumerated group="journal" id="4"/>
+   <txo group="journal" id="4"/>
   </attribute>
   <attribute id="text">
    <text>Youyou</text>
   </attribute>
  </entry>
  <resultset id="1" name="My Set">
-  <entry ref="1"/>
+  <ref id="1"/>
  </resultset>
 </pyblio-db>

@@ -33,7 +33,7 @@ from gettext import gettext as _
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N, Txo, TxoItem
-from Pyblio import I18n, XML
+from Pyblio import I18n
 
 from cElementTree import ElementTree
 
@@ -42,14 +42,30 @@ class SchemaError (Exception): pass
 class Schema (dict):
 
     def __init__ (self, file = None):
+
+        self.id = None
+        self.names = {}
+        self.txo = {}
         
         if file:
             tree = ElementTree (file = file)
-
             self.xmlread (tree.getroot ())
         return
 
+    def _name_get (self):
+
+        return I18n.lz.trn (self.names)
+
+    name = property (_name_get)
+
+
     def xmlread (self, tree):
+        self.id = tree.attrib.get('id', None)
+        
+        for name in tree.findall ('./name'):
+            lang = name.attrib.get ('lang', '')
+            self.names [lang] = name.text
+
 
         def parseattr (attr):
             aid = attr.attrib ['id']
@@ -60,7 +76,7 @@ class Schema (dict):
                 raise SchemaError ('attribute %s has an unknown type' % repr (aid))
 
             if atype is Txo:
-                a = GroupAttribute(aid)
+                a = TxoAttribute(aid)
             else:
                 a = Attribute (aid)
 
@@ -76,7 +92,7 @@ class Schema (dict):
                 lang = name.attrib.get ('lang', '')
                 a.names [lang] = name.text
 
-            a.xmlread(attr)
+            a.xmlread(self, attr)
             return a
         
         for attr in tree.findall ('./attribute'):
@@ -94,6 +110,14 @@ class Schema (dict):
                 a.q [qa.id] = qa
                 
             self [a.id] = a
+
+
+        # Read the Txo groups predefined in the schema itself
+        for attr in tree.findall ('./txo-group'):
+            g = TxoGroup()
+            g.xmlread(attr)
+
+            self.txo[g.group] = g
         return
 
 
@@ -101,9 +125,28 @@ class Schema (dict):
 
         if not embedded:
             fd.write ('<?xml version="1.0" encoding="utf-8"?>\n\n')
-        
-        fd.write ('<pyblio-schema>\n')
 
+        fd.write ('<pyblio-schema')
+        if self.id:
+            fd.write(' id="%s"' % escape(self.id))
+        fd.write('>\n')
+
+
+        keys = self.names.keys ()
+        keys.sort ()
+
+        for k in keys:
+            v = self.names [k]
+            if k:
+                lang = ' lang="%s"' % k
+            else:
+                lang = ''
+            
+            fd.write (' <name%s>%s</name>\n' % (
+                lang, escape (v.encode ('utf-8'))))
+
+        if keys: fd.write('\n')
+        
         keys = self.keys ()
         keys.sort ()
 
@@ -111,6 +154,16 @@ class Schema (dict):
             self [k].xmlwrite (fd)
             fd.write ('\n')
             
+        # Write the Txo groups predefined in the schema itself, unless
+        # we are embedded, in which case the txo are stored in the db
+        # by now.
+        if not embedded:
+            ks = self.txo.keys()
+            ks.sort()
+
+            for k in ks:
+                self.txo[k].xmlwrite(fd)
+        
         fd.write ('</pyblio-schema>\n')
         return
     
@@ -123,8 +176,6 @@ class Attribute(object):
 
         self.type  = None
 
-        # A grouping information (for Enumerated types for instance)
-        self.group = None
         self.range = (1, None)
         
         self.names = {}
@@ -179,7 +230,7 @@ class Attribute(object):
             fd.write ('%s </qualifiers>\n' % ws)
 
 
-    def xmlread(self, attr):
+    def xmlread(self, schema, attr):
         # We do not need to extract additional data from here
         return
         
@@ -193,14 +244,7 @@ class Attribute(object):
         return
 
 
-class GroupAttribute(Attribute):
-
-    def __init__(self, id):
-        Attribute.__init__(self, id)
-
-        self.group = None
-        self.values = {}
-        return
+class TxoAttribute(Attribute):
 
     def __repr__ (self):
 
@@ -208,9 +252,42 @@ class GroupAttribute(Attribute):
             repr (self.id), repr (self.type), repr (self.group),
             repr (self.q))
 
-    def xmlread(self, attr):
+    def xmlread(self, schema, attr):
         # fetch the possible txo-items
         self.group = attr.attrib ['group']
+
+        g = TxoGroup()
+        g.group = self.group
+        
+        schema.txo.setdefault(self.group, g)
+        return
+    
+    def xmlwrite (self, fd, offset=1):
+
+        ws = ' ' * offset
+
+        self._xmlopen(fd, offset, group=self.group)
+
+        fd.write ('%s</attribute>\n' % ws)
+        return
+
+
+
+class TxoGroup(dict):
+
+    def __init__(self):
+        dict.__init__(self)
+
+        self.group = None
+        return
+    
+    def __repr__ (self):
+        return 'TxoGroup (%s)' % (
+            repr (self.id))
+
+    def xmlread(self, attr):
+        # fetch the possible txo-items
+        self.group = attr.attrib ['id']
 
         def nesting (tree, parent):
             for item in tree.findall ('./txo-item'):
@@ -223,22 +300,23 @@ class GroupAttribute(Attribute):
                     lang = name.attrib.get ('lang', '')
                     i.names [lang] = name.text
 
-                self.values[i.id] = i
+                self[i.id] = i
 
                 nesting (item, i.id)
 
         nesting (attr, None)
         return
+
     
     def _reverse (self):
         """ Create the reversed taxonomy tree """
         
         children = { None: [] }
 
-        for k in self.values.keys ():
+        for k in self.keys ():
             children [k] = []
 
-        for v in self.values.values ():
+        for v in self.values ():
             children [v.parent].append (v.id)
 
         return children
@@ -248,15 +326,14 @@ class GroupAttribute(Attribute):
 
         ws = ' ' * offset
 
-        self._xmlopen(fd, offset, group=self.group)
-
-        if self.values:
-            fd.write('\n')
-            
-        children = self._reverse ()
+        if not self.keys(): return
         
+        fd.write ('%s<txo-group id="%s">\n' % (ws, self.group))
+            
+        children = self._reverse()
+
         def subwrite (node, depth = 0):
-            child = self.values [node]
+            child = self [node]
 
             space = ' ' * (offset + depth)
             
@@ -274,7 +351,7 @@ class GroupAttribute(Attribute):
         for n in children [None]:
             subwrite (n)
         
-        fd.write ('%s</attribute>\n' % ws)
+        fd.write ('%s</txo-group>\n\n' % ws)
         return
 
 

@@ -8,13 +8,15 @@
 
  <attribute id="toto" type="txo" group="toto">
   <name>A group</name>
+ </attribute>
 
+ <txo-group id="toto">
   <txo-item id="1">
     <name>value 1</name>
   </txo-item>
   <txo-item id="2">
     <name>value 2</name>
   </txo-item>
- </attribute>
+ </txo-group>
 
 </pyblio-schema>

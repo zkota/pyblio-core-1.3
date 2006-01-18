@@ -187,6 +187,9 @@ class View (object):
         for i in self._view:
             yield self._src._dict [i]
 
+    def index(self, key):
+        return self._view.index(key)
+
     
 class Viewable (object):
 
@@ -481,3 +484,4 @@ def dbimport (target, source):
     return db
 
 
+description = _("Flat XML file storage")

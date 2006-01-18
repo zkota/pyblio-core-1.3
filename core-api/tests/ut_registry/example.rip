@@ -1,0 +1,13 @@
+[with-path]
+
+path: %(system-rips)s/bibtex.xml
+
+importers:
+	Extra.BibTeX.Reader
+	Extra.Marc.Reader
+
+[no-path]
+
+exporters:
+	Extra.BibTeX.Writer
+

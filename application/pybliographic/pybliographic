@@ -27,8 +27,27 @@ This module handles the set of opened documents.
 import sys
 
 from PyblioUI.Gnome import Document
+from Pyblio import Registry
 
-files = sys.argv [1:]
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("-P", "--profile", dest="profile",
+                  action="store_true", default=False,
+                  help="profile the application")
+
+(options, files) = parser.parse_args()
+
+Registry.parse(Registry.RIP_dirs['system-rips'])
+
+try:
+    Registry.parse(Registry.RIP_dirs['user-rips'])
+except OSError:
+    pass
+
+
+from PyblioUI import Gnome
+
 
 docs = []
 
@@ -41,7 +60,7 @@ def _on_close (doc):
 
 def _on_quit (doc):
 
-    for d in [] + docs:
+    for d in docs[:]:
         d.close ()
 
     return
@@ -64,7 +83,13 @@ else:
     
     docs.append (d)
 
+    d.create()
 
-from PyblioUI import Gnome
 
-Gnome.run ()
+if options.profile:
+    import hotshot
+    p = hotshot.Profile('+pybliographic.prof')
+    p.runcall(Gnome.run)
+
+else:
+    Gnome.run ()

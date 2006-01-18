@@ -128,6 +128,18 @@ class TestStore (pybut.TestCase):
         pybut.fileeq (self.f, 'ut_store/taxonomy.xml')
         return
 
+    def testQualifiedRead (self):
+        """ A database with qualified fields can be read and saved again identically """
+        
+        db = Store.get ('file').dbopen ('ut_store/qualified.xml')
+
+        fd = open (self.f, 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (self.f, 'ut_store/qualified.xml')
+        return
+
     def testTxoFromSchema (self):
         """ A database with taxonomy fields in the schema can be read and saved, the txo become part of the db """
 

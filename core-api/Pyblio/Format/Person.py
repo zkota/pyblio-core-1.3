@@ -7,15 +7,15 @@ def maybe (value, prefix = '', postfix = '', default = ''):
     if value: return prefix + value + postfix
     return default
 
-def _lastFirst (authors):
+def _lastFirst(record, authors):
     return [ '%s%s' % (x.last, maybe (x.first, prefix = ', '))
-             for x in authors () ]
+             for x in authors(record) ]
     
 lastFirst = lazy (_lastFirst)
 
-def _firstLast (authors):
+def _firstLast (record, authors):
     return [ '%s%s' % (maybe (x.first, postfix = ' '), x.last)
-             for x in authors () ]
+             for x in authors(record) ]
 
 firstLast = lazy (_firstLast)
 
@@ -37,9 +37,9 @@ def initials (name):
         
     return ''.join (res)
     
-def _initialLast (authors):
+def _initialLast (record, authors):
     return [ '%s%s' % (maybe (initials (x.first), postfix = ' '), x.last)
-             for x in authors () ]
+             for x in authors(record) ]
 
 initialLast = lazy (_initialLast)
     

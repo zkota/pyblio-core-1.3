@@ -1,6 +1,6 @@
-from Pyblio.Format.DSL import lazy, expand
+from Pyblio.Format.DSL import lazy
 
-def plural (sequence, zero = None, one = None, two = None, more = ''):
+def plural (record, sequence, zero = None, one = None, two = None, more = ''):
     """
     Generate different outputs depending on the number of items in the sequence.
     
@@ -22,15 +22,15 @@ def plural (sequence, zero = None, one = None, two = None, more = ''):
       then the default is to use the value of the L{more} parameter.
     """
 
-    l = len (sequence ())
+    l = len (sequence(record))
     
     if l == 0 and zero is not None:
-        return expand (zero)
+        return zero(record)
     elif l == 1 and one is not None:
-        return expand (one)
+        return one(record)
     elif l == 2 and two is not None:
-        return expand (two)
+        return two(record)
     else:
-        return expand (more)
+        return more(record)
 
 plural = lazy (plural)

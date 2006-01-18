@@ -16,7 +16,7 @@ class TestDocument (pybut.TestCase):
         
     def testGuess (self):
 
-        for name, format in (('gronf/toto.pbl', 'file'),):
+        for name, format in (('gronf/toto.bip', 'file'),):
             assert Document.format_guess (name) == format
 
         return
@@ -24,15 +24,14 @@ class TestDocument (pybut.TestCase):
     def testOpen (self):
         """ Open an existing database """
 
-        for format, name in (('file', 'ut_document/sample.pbl'),
-                             (None,   'ut_document/sample.pbl')):
+        for format, name in (('file', 'ut_document/sample.bip'),
+                             (None,   'ut_document/sample.bip')):
             d = Document.Document (name, format)
             
             assert len (d.db.entries) == 1
             
         return
 
-    
-document = pybut.makeSuite (TestDocument, 'test')
+suite = pybut.suite (TestDocument)
 
-pybut.run (pybut.TestSuite ((document,)))
+if __name__ == '__main__':  pybut.run (suite)

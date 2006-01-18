@@ -2,9 +2,10 @@ import re
 
 from Pyblio.Format.DSL import lazy
 
-def _pagesLong (pages):
+def _pagesLong (record, pages):
 
-    pages = pages ()
+    pages = pages(record)
+    
     if pages.find ('-') == -1:
         # no dash, a single page then
         return u'page\xa0' + pages
