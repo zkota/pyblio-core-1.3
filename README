@@ -15,7 +15,10 @@ To get the Reference Manual, install epydoc and run
 
 = Installation =
 
-Once the required dependencies are installed, please run 
+This package uses easy_install, and should fetch some dependencies
+itself (except for the ones listed above).
+
+Once the required dependencies are installed, please run
 
   * in the Recodec/ sub-directory
   
@@ -26,3 +29,4 @@ Once the required dependencies are installed, please run
 
     python setup.py build
     sudo python setup.py install
+
