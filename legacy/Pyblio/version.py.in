@@ -1,6 +1,0 @@
-# -*- python -*-
-
-prefix    = "@datapyb@"
-localedir = "@localedir@"
-version   = "@version@"
-
