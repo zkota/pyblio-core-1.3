@@ -10,7 +10,7 @@ except ImportError:
    pass
 
 from setuptools import setup, find_packages
-from distutils.command.sdist import sdist as _sdist
+from setuptools.command.sdist import sdist as _sdist
 
 class sdist(_sdist):
     def run (self):
@@ -30,6 +30,12 @@ setup(
     version = VERSION,
 
     cmdclass = { 'sdist': sdist },
+
+    # First, I need to find out how to properly handle the case of
+    # modules being installed externally (via debs or rpms for
+    # instance).
+    #
+    # install_requires = ['elementtree', 'cElementTree'],
     
     packages = find_packages(),
 

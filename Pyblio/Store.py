@@ -28,7 +28,7 @@ Overview
   The databases can be managed in different L{physical stores
   <Pyblio.Stores>}.  To create a new database, get a specific store
   implementation with the L{get <Pyblio.Store.get>} function, and call
-  the provided L{dbcreate <Pyblio.Stores.File.dbcreate>} function:
+  the provided L{dbcreate <Pyblio.Stores.filestore.dbcreate>} function:
   
     >>> db = get ('file').dbcreate (path, schema)
   
@@ -521,7 +521,7 @@ class Database (object):
     at each access. Updating this copy I{does not} change the stored
     value.
 
-    @var entries: a L{resultset <Pyblio.Store.ResultSet>} containing
+    @cvar entries: a L{resultset <Pyblio.Store.ResultSet>} containing
     all the records of the database.
     '''
 
@@ -907,7 +907,7 @@ def get (fmt):
       - dbdestroy (file): destroy a database
 
     For more information, consult the documentation for the specific
-    backends, L{Pyblio.Stores.File} and L{Pyblio.Stores.bsddb}.
+    backends, L{Pyblio.Stores.filestore} and L{Pyblio.Stores.bsddbstore}.
     """
 
     try:

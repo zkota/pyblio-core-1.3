@@ -373,7 +373,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
     entries = property (_entries_get, None)
 
 
-    def add (self, value, key = None):
+    def add (self, record, key = None):
         """ Insert a new entry in the database.
 
         New entries MUST be added with this method, not via an update
@@ -390,12 +390,12 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         assert not self.has_key (key), \
                _("a duplicate key has been generated: %d") % key
 
-        value = copy.copy (value)
-        value.key = key
+        record = copy.copy (record)
+        record.key = key
 
-        value = self.validate (value)
+        record = self.validate (record)
         
-        self._dict [key] = value
+        self._dict [key] = record
 
         self.emit ('add-item', key)
         

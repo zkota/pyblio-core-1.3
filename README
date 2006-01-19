@@ -4,21 +4,35 @@ This is the core API of the pybliographer framework. It provides
 classes for managing bibliographic databases (storage, query,
 conversion, formatting,...)
 
-To get the Reference Manual, install epydoc and run
 
-  epydoc -o doc Pyblio
+= Getting started =
 
-= Requirements =
+Once the package is installed (see below), you can use the following
+entry points to learn how it works:
 
- * python >= 2.3
- * ElementTree and cElementTree (http://effbot.org/zone/element-index.htm)
+  - the examples/ directory contains a few simple scripts with
+    comments
+
+  - the reference manual is available in HTML format in the doc/
+    directory.
+
 
 = Installation =
 
 This package uses easy_install, and should fetch some dependencies
-itself (except for the ones listed above).
+itself (except for the ones listed below).
 
-Once the required dependencies are installed, please run
+
+== Requirements ==
+
+ * python >= 2.3
+ * ElementTree and cElementTree (http://effbot.org/zone/element-index.htm)
+
+
+== Global installation ==
+
+Once the required dependencies are installed, you can install this
+package in the standard place with the following commands:
 
   * in the Recodec/ sub-directory
   
@@ -30,3 +44,14 @@ Once the required dependencies are installed, please run
     python setup.py build
     sudo python setup.py install
 
+
+== Developer mode ==
+
+If you use pybliographer for your own developments and need to modify
+pybliographer itself, you can run 
+
+   sudo python setup.py develop
+
+This will ensure that when you import Pyblio, you'll get the version
+in _your_ working directory. No need to play with your PYTHONPATH
+anymore.

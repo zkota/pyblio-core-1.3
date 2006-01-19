@@ -26,43 +26,43 @@ records are actually laid out on a page, the keys,... but rather the
 actual layout of the authors, the publication information,...
 especially given that all the records are not complete.
 
-So, this stuff is only to format _this specific part_, not to compose
-a whole page.
+So, this module is only intended to handle I{this specific aspect},
+not to compose a whole page.
 
 The code here allows the writing of citation styles with a convenient
-syntax::
+syntax:
 
-  authors  = lastFirst (all ('author'))
+  >>> authors  = lastFirst (all ('author'))
 
-  location = join (', ') ['vol. ' + one ('volume'),
-                          'num. ' + one ('number'), ]
+  >>> location = join (', ') ['vol. ' + one ('volume'),
+  ...                         'num. ' + one ('number'), ]
                        
-  citation = join (', ') [ authors , I [ one ('title') | 'untitled' ] ]
+  >>> citation = join (', ') [ authors , I [ one ('title') | 'untitled' ] ]
 
 
 Citing a reference is a multi-stage operation:
 
- * stage 1: the citation is written by the programmer in a simple
-   Domain Specific Language (DSL).
+ - B{stage 1:} the citation is written by the programmer in a
+   convenient Domain Specific Language (DSL)
 
-     citation = join(', ')['vol. ' + one('volume'),
-                           'num. ' + one('number')]
+     >>> citation = join(', ')['vol. ' + one('volume'),
+     ...                       'num. ' + one('number')]
 
- * stage 2: the formatter of stage 1 is 'compiled' on a specific
+ - B{stage 2:} the formatter of stage 1 is 'compiled' on a specific
    database (which allows for some initial checks (existence of the
    requested fields and txo for instance)
 
-     formatter = citation(db)
+     >>> formatter = citation(db)
 
- * stage 3: the compiled formatter can accept records, and return an
+ - B{stage 3:} the compiled formatter can accept records, and return an
    abstract representation of the citation, with style indications
 
-     cited = formatter(record)
+     >>> cited = formatter(record)
 
- * stage 4: the abstract representation is turned on or several
-   concrete representations (plain text, HTML,...)
+ - B{stage 4:} the abstract representation is turned into a concrete
+   representations (plain text, HTML,...)
 
-     html = HTML.generate(cited)
+     >>> html = HTML.generate(cited)
 
 
 The ideas for the syntax have been heavily borrowed from nevow's stan.

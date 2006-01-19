@@ -92,23 +92,12 @@ class Reader(object):
     def do_default (self, elem):
         pass
 
-    def get_attribute_type (self, field):
-        """
-        @return Attribute.type of self.record [field]
-        """
-        if not field in self.db.schema:
-            #TODO: raise an proper error
-            raise  UnknownFieldtypeError, field
-
-        schema = self.db.schema [field]
-        return schema.type
-
     def add (self, field, value):
         """
         Use this function to add anything to your record. It's auto-typeing, even
         for Txo's.
         """
-        t = self.get_attribute_type (field)
+        t = self.db.schema[field].type
         
         if t == Attribute.Txo:
             value = self.db.txo [field].byname (value)

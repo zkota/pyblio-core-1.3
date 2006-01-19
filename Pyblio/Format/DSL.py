@@ -149,9 +149,10 @@ class switch(Glue):
     """ The switch operator helps in bringing together multiple
     citation parts, according to the value of a Txo.
 
-       citation = switch('doctype')[('ARTICLE', article),
-                                    ('BOOK', book),
-                                    default]
+       >>> citation = switch('doctype')
+       >>> citation.case(ARTICLE=article, BOOK=book)
+       >>> citation.default(default)
+       
     """
 
     def __init__(self, switch):
