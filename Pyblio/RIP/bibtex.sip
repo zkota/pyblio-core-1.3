@@ -1,7 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!-- -*- nxml -*- -->
 
 <pyblio-schema id="org.pybliographer/bibtex/0.1">
  <name>BibTeX-compatible schema (version 0.1)</name>
+
+ <txo-group id="doctype">
+   <txo-item id="1">
+     <name lang="C">article</name>
+   </txo-item>
+   <txo-item id="2">
+     <name lang="C">book</name>
+   </txo-item>
+   <txo-item id="3">
+     <name lang="C">booklet</name>
+   </txo-item>
+   <txo-item id="4">
+     <name lang="C">inbook</name>
+   </txo-item>
+   <txo-item id="5">
+     <name lang="C">incollection</name>
+   </txo-item>
+   <txo-item id="6">
+     <name lang="C">inproceedings</name>
+   </txo-item>
+   <txo-item id="7">
+     <name lang="C">manual</name>
+   </txo-item>
+   <txo-item id="8">
+     <name lang="C">mastersthesis</name>
+   </txo-item>
+   <txo-item id="9">
+     <name lang="C">misc</name>
+   </txo-item>
+   <txo-item id="10">
+     <name lang="C">phdthesis</name>
+   </txo-item>
+   <txo-item id="11">
+     <name lang="C">proceedings</name>
+   </txo-item>
+   <txo-item id="12">
+     <name lang="C">techreport</name>
+   </txo-item>
+   <txo-item id="13">
+     <name lang="C">unpublished</name>
+   </txo-item>
+ </txo-group>
 
  <attribute id="id" type="id">
   <name>BibTeX Key</name>
@@ -9,46 +51,6 @@
 
  <attribute id="doctype" type="txo" group="doctype">
   <name>Document Type</name>
-
-  <txo-item id="1">
-   <name lang="C">article</name>
-  </txo-item>
-  <txo-item id="2">
-   <name lang="C">book</name>
-  </txo-item>
-  <txo-item id="3">
-   <name lang="C">booklet</name>
-  </txo-item>
-  <txo-item id="4">
-   <name lang="C">inbook</name>
-  </txo-item>
-  <txo-item id="5">
-   <name lang="C">incollection</name>
-  </txo-item>
-  <txo-item id="6">
-   <name lang="C">inproceedings</name>
-  </txo-item>
-  <txo-item id="7">
-   <name lang="C">manual</name>
-  </txo-item>
-  <txo-item id="8">
-   <name lang="C">mastersthesis</name>
-  </txo-item>
-  <txo-item id="9">
-   <name lang="C">misc</name>
-  </txo-item>
-  <txo-item id="10">
-   <name lang="C">phdthesis</name>
-  </txo-item>
-  <txo-item id="11">
-   <name lang="C">proceedings</name>
-  </txo-item>
-  <txo-item id="12">
-   <name lang="C">techreport</name>
-  </txo-item>
-  <txo-item id="13">
-   <name lang="C">unpublished</name>
-  </txo-item>
  </attribute>
 
  <attribute id="crossref" type="text">

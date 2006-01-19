@@ -2,7 +2,7 @@
 
 import os, pybut, sys, re
 
-from Pyblio.Importers import RIS
+from Pyblio.Parsers.Syntax import RIS
 from Pyblio import Store, Schema
 
 
@@ -16,7 +16,7 @@ class TestRIS (pybut.TestCase):
         s = Schema.Schema ('standard.xml')
         self.db = Store.get ('file').dbcreate (self.fn, s)
         
-        self.p = RIS.Importer ()
+        self.p = RIS.Reader ()
         self.p.parse (fd, self.db)
         return
     

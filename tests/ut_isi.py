@@ -2,13 +2,13 @@
 
 import os, pybut, sys, re
 
-from Pyblio.Importers import ISI, Tagged
+from Pyblio.Parsers.Syntax import ISI, Tagged
 from Pyblio import Store, Schema
 
-class Importer (ISI.Importer):
+class Reader (ISI.Reader):
 
     def __init__ (self):
-        ISI.Importer.__init__ (self)
+        ISI.Reader.__init__ (self)
         
         self.mapping = {
             'TI': (self.text_add,   'title'),
@@ -36,7 +36,7 @@ class TestISI (pybut.TestCase):
         s = Schema.Schema ('standard.xml')
         self.db = Store.get ('file').dbcreate (self.fn, s)
         
-        self.p = Importer ()
+        self.p = Reader ()
         self.p.parse (fd, self.db)
         return
     

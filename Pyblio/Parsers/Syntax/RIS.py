@@ -1,4 +1,4 @@
-from Pyblio.Importers import Tagged
+from Pyblio.Parsers.Syntax import Tagged
 from Pyblio import Attribute
 
 from gettext import gettext as _
@@ -48,7 +48,7 @@ def _mkyear (y):
     if not y: return None
     return int (y)
 
-class Importer (Tagged.Importer):
+class Reader(Tagged.Reader):
 
     """ The importer knows how to map the RIS fields to the 'standard'
     pyblio model."""
@@ -58,7 +58,7 @@ class Importer (Tagged.Importer):
 
     def __init__ (self):
 
-        Tagged.Importer.__init__ (self)
+        Tagged.Reader.__init__ (self)
         
         self.mapping = {
 

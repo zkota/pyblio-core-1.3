@@ -2,10 +2,10 @@
 
 import os, pybut, sys
 
-from Pyblio.Importers import XMLMARC
+from Pyblio.Parsers.Syntax import XMLMARC
 from Pyblio import Store, Schema
 
-SI = XMLMARC.SimpleImporter
+SI = XMLMARC.SimpleReader
 
 mapping = {
 
@@ -19,7 +19,7 @@ mapping = {
 
 class TestImport (pybut.TestCase):
 
-    """ Perform tests on the Pyblio.Importers.BibTeX module """
+    """ Perform tests on the Pyblio.Parsers.Syntax.BibTeX module """
 
     def _check (self, base):
 
@@ -29,7 +29,7 @@ class TestImport (pybut.TestCase):
         
         db = Store.get ('file').dbcreate (f, s)
 
-        self.parser =  XMLMARC.SimpleImporter (mapping)
+        self.parser =  XMLMARC.SimpleReader (mapping)
 
         self.parser.parse (open ('ut_xmlmarc/%s.xml' % base), db)
         

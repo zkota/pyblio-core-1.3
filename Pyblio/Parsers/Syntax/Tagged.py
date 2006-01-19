@@ -23,7 +23,7 @@ from gettext import gettext as _
 from Pyblio import Callback, Store, Attribute
 
 
-class Parser (object):
+class Parser(object):
 
     """ Generic Parser for 'tagged' records, to be derived by actual
     parsers. An actual subclass will need to at least override the
@@ -259,7 +259,7 @@ class Parser (object):
 
 
 
-class Importer (Callback.Publisher):
+class Reader(Callback.Publisher):
 
     Parser = None
 

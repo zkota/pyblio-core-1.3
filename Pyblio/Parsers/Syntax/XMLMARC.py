@@ -28,7 +28,7 @@ from gettext import gettext as _
 
 import cElementTree as ElementTree
 
-class Importer (object):
+class Reader(object):
 
     def record_begin (self):
 
@@ -92,7 +92,7 @@ class Importer (object):
         return
 
 
-class SimpleImporter (Importer):
+class SimpleReader(Reader):
 
     _date_re = re.compile (r'(.*)(\d{4,})')
     
@@ -124,7 +124,7 @@ class SimpleImporter (Importer):
             self._mapping [k] = (v, self._physical [attribute.type])
 
         
-        return Importer.parse (self, fd, db)
+        return Reader.parse (self, fd, db)
 
     def skip (self, field, value):
 
@@ -220,7 +220,7 @@ class SimpleImporter (Importer):
 
         return
 
-class Exporter (object):
+class Writer(object):
 
     _re_marc = re.compile ('(\d{3,})(\w)(\w)')
     

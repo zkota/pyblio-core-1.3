@@ -28,7 +28,7 @@ exporters can be reused from dynamic components like user interfaces.
 
 from protocols import Interface
 
-class IImporter(Interface):
+class IReader(Interface):
 
     def parse(self, fd, db):
         """
@@ -38,7 +38,7 @@ class IImporter(Interface):
         corresponding records.
         """
 
-class IExporter(Interface):
+class IWriter(Interface):
 
     def write(self, fd, rs, db):
         """

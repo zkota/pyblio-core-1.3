@@ -25,7 +25,7 @@
 
 import re, os, string
 
-from Pyblio.Importers.BibTeX import Reader, Coding
+from Pyblio.Parsers.Syntax.BibTeX import Parser, Coding
 
 from Pyblio import Attribute, Store, Exceptions, Tools
 
@@ -40,18 +40,18 @@ class Environ (Coding.Environ):
     def __init__ (self):
 
         self.strings = {
-            'jan': Reader.Text ('January'),
-            'feb': Reader.Text ('February'),
-            'mar': Reader.Text ('March'),
-            'apr': Reader.Text ('April'),
-            'may': Reader.Text ('May'),
-            'jun': Reader.Text ('June'),
-            'jul': Reader.Text ('July'),
-            'aug': Reader.Text ('August'),
-            'sep': Reader.Text ('September'),
-            'oct': Reader.Text ('October'),
-            'nov': Reader.Text ('November'),
-            'dec': Reader.Text ('December'),
+            'jan': Parser.Text ('January'),
+            'feb': Parser.Text ('February'),
+            'mar': Parser.Text ('March'),
+            'apr': Parser.Text ('April'),
+            'may': Parser.Text ('May'),
+            'jun': Parser.Text ('June'),
+            'jul': Parser.Text ('July'),
+            'aug': Parser.Text ('August'),
+            'sep': Parser.Text ('September'),
+            'oct': Parser.Text ('October'),
+            'nov': Parser.Text ('November'),
+            'dec': Parser.Text ('December'),
             }
         return
 
@@ -64,7 +64,7 @@ _fl_re = re.compile ('^N*I+N+$')
 
 _split_re = re.compile (r'[,.]|\s+')
 
-class Importer (object):
+class Reader(object):
 
     def __init__ (self, charset = 'ISO8859-1'):
 
@@ -82,15 +82,16 @@ class Importer (object):
         return
 
     def id_add (self, field, stream):
-        self.record [field] = [Attribute.ID (stream.flat())]
+        self.record [field] = [Attribute.ID(stream.flat())]
         return
 
     def url_add (self, field, stream):
-        add = Attribute.URL (stream.flat ())
-        self.record.setdefault (field, []).append (add)
-        
+        url = stream.flat().replace(u'\xa0', u'~')
+        self.record.add(field, url, Attribute.URL)
+        return
+    
     def date_add (self, field, stream):
-        self.record [field] = [Attribute.Date ()]
+        self.record [field] = [Attribute.Date()]
 
     def to_text (self, stream):
         return Attribute.Text (stream.execute (self.env).flat ())
@@ -113,22 +114,22 @@ class Importer (object):
         # ...and expand the low-level text in fragment split on "," "." and space
         stream, os = [], stream
         for v in os:
-            if not isinstance (v, Reader.Text):
+            if not isinstance (v, Parser.Text):
                 stream.append (v)
                 continue
 
             i = 0
             for m in _split_re.finditer (v):
                 s, e = m.start (0), m.end (0)
-                if i != s: stream.append (Reader.Text (v [i:s]))
+                if i != s: stream.append (Parser.Text (v [i:s]))
 
-                sep = Reader.Text (v [s:e])
-                if sep [0] in ' \n\t': sep = Reader.Text (' ')
+                sep = Parser.Text (v [s:e])
+                if sep [0] in ' \n\t': sep = Parser.Text (' ')
                 stream.append (sep)
                 
                 i = e
 
-            if i < len (v): stream.append (Reader.Text (v [i:]))
+            if i < len (v): stream.append (Parser.Text (v [i:]))
             
         # These high-level groups are separated by 'and' keywords
         avail  = []
@@ -212,10 +213,10 @@ class Importer (object):
         
         def _person_decode (stream):
             
-            if len (stream) == 1 and isinstance (stream [0], Reader.Block):
+            if len (stream) == 1 and isinstance (stream [0], Parser.Block):
                 return Attribute.Person (last = stream [0].flat ())
 
-            stream = _wordify (Reader.Block ('', stream))
+            stream = _wordify (Parser.Block ('', stream))
 
             # Check for ',' syntax for names
             comma = stream.count (',')
@@ -288,7 +289,7 @@ class Importer (object):
         return
 
     def type_add (self, data):
-        self.record ['doctype'] = [Attribute.Txo (self.doctype [data.lower ()])]
+        # by default, we drop the document type informatio
         return
 
     def record_begin (self):
@@ -357,9 +358,9 @@ class Importer (object):
         for v in db.txo ['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
-        for data in Reader.read (fd, self.charset):
+        for data in Parser.read (fd, self.charset):
 
-            if isinstance (data, Reader.Comment):
+            if isinstance (data, Parser.Comment):
                 self.comment_add (data)
                 continue
 
@@ -371,7 +372,7 @@ class Importer (object):
 # --------------------------------------------------
 
 
-class Exporter (object):
+class Writer(object):
 
     _collapse      = re.compile (r'[\s\n]+', re.MULTILINE)
     
@@ -427,7 +428,7 @@ class Exporter (object):
         # of a sentence, protect these capitals. Similarly for
         # lowercase letters at the beginning.
 
-        res = Reader.Block ('{', [])
+        res = Parser.Block ('{', [])
 
         beginning = True
         in_upper  = False
@@ -435,7 +436,7 @@ class Exporter (object):
         braced    = False
         
         def _close_upper ():
-            res.append (Reader.Block ('{', (Reader.Text (''.join (block)),)))
+            res.append (Parser.Block ('{', (Parser.Text (''.join (block)),)))
             del block[:]
 
         while data:
@@ -462,8 +463,8 @@ class Exporter (object):
 
             if not braced:
                 if beginning and c.lower () == c:
-                    res.append (Reader.Text (''.join (block)))
-                    res.append (Reader.Block ('{', (Reader.Text (c),)))
+                    res.append (Parser.Text (''.join (block)))
+                    res.append (Parser.Block ('{', (Parser.Text (c),)))
 
                     block = []
                     beginning = False
@@ -475,7 +476,7 @@ class Exporter (object):
                         block.append (c)
                     else:
                         in_upper = True
-                        res.append (Reader.Text (''.join (block)))
+                        res.append (Parser.Text (''.join (block)))
 
                         block = [c]
                     beginning = False
@@ -490,7 +491,7 @@ class Exporter (object):
 
             
         if in_upper: _close_upper ()
-        if block: res.append (Reader.Text (''.join (block)))
+        if block: res.append (Parser.Text (''.join (block)))
 
         self.field [field] = res.tobib ()
         return

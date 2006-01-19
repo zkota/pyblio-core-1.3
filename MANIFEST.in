@@ -1,4 +1,6 @@
+recursive-include doc *.html *.css
 recursive-include Pyblio *.py
-recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris
-
-
+recursive-include Pyblio/RIP *.rip *.sip
+recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip
+recursive-include examples *.py *.bib
+include ez_setup.py

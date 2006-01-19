@@ -2,27 +2,24 @@
 
 import os, pybut, sys
 import StringIO
+from cElementTree import ElementTree
 
-from Pyblio.Importers import BibTeX
-from Pyblio.Importers.BibTeX import Reader
+from Pyblio.Parsers.Semantic.BibTeX import Reader
+from Pyblio.Parsers.Syntax.BibTeX import Writer
 
-from Pyblio.Importers.BibTeX.Reader import Record, Block, Cmd, Text, Join, Comment, ATComment
+from Pyblio.Parsers.Syntax.BibTeX import Parser
+
+from Pyblio.Parsers.Syntax.BibTeX.Parser import Record, Block, Cmd, Text, Join, Comment, ATComment
 
 from Pyblio import Store, Schema
 
-class WithComments (BibTeX.Importer):
+class WithComments (Reader):
 
     def __init__ (self, charset):
 
-        BibTeX.Importer.__init__ (self, charset = charset)
+        Reader.__init__ (self, charset = charset)
 
         self.comments = []
-        return
-
-    def string_add (self, data):
-        # Simply fill in the provided strings
-        for key, value in data.fields:
-            self.env.strings [key] = value
         return
     
     def comment_add (self, data):
@@ -31,18 +28,18 @@ class WithComments (BibTeX.Importer):
         return
 
     def record_begin (self):
-
+        Reader.record_begin(self)
         self.id_add ('id', self.key)
         
 
-class WithCaseHandler (BibTeX.Exporter):
+class WithCaseHandler (Writer):
 
     def record_parse (self, key, value):
 
         if key in ('title',):
             return self.capitalized_text_add (key, self.record [key])
 
-        return BibTeX.Exporter.record_parse (self, key, value)
+        return Writer.record_parse (self, key, value)
     
 
 class TestBibTeXReader (pybut.TestCase):
@@ -51,7 +48,7 @@ class TestBibTeXReader (pybut.TestCase):
     def _cmp (self, bib, obj):
 
         io = StringIO.StringIO (bib.encode ('utf-8'))
-        re = list (Reader.read (io))
+        re = list (Parser.read (io))
 
         ri = eval (obj)
 
@@ -68,18 +65,18 @@ Random comments
 '''
         
         io = StringIO.StringIO (comment.encode ('utf-8'))
-        re = list (Reader.read (io))
+        re = list (Parser.read (io))
 
-        assert re == [Reader.Comment (comment)]
+        assert re == [Parser.Comment (comment)]
 
     def testArobasComment (self):
 
         comment = u'@comment (gronf'
         
         io = StringIO.StringIO (comment.encode ('utf-8'))
-        re = list (Reader.read (io))
+        re = list (Parser.read (io))
 
-        assert re == [Reader.Comment (' (gronf')], 'got %s' % re
+        assert re == [Parser.Comment (' (gronf')], 'got %s' % re
 
     def testMixed (self):
 
@@ -89,9 +86,9 @@ toto
 tutu
 '''
         io = StringIO.StringIO (c.encode ('utf-8'))
-        re = [ type (x) for x in Reader.read (io)]
+        re = [ type (x) for x in Parser.read (io)]
 
-        assert re == [Reader.Comment, Reader.ATComment, Reader.Comment]
+        assert re == [Parser.Comment, Parser.ATComment, Parser.Comment]
 
     def testBraces (self):
 
@@ -145,13 +142,13 @@ tutu
         
 class TestBibTeXImport (pybut.TestCase):
 
-    """ Perform tests on the Pyblio.Importers.BibTeX module """
+    """ Perform tests on the Pyblio.Parsers.Syntax.BibTeX module """
 
     def _check (self, base):
 
         f = pybut.dbname ()
 
-        s = Schema.Schema ('ut_bibtex/schema.xml')
+        s = Schema.Schema ('../Pyblio/RIP/bibtex.sip')
         
         db = Store.get ('file').dbcreate (f, s)
 
@@ -169,6 +166,15 @@ class TestBibTeXImport (pybut.TestCase):
         self.parser.parse (open ('ut_bibtex/%s.bib' % base), db)
         
         db.save ()
+
+        # mess a bit with the file to discard the schema
+        tree = ElementTree(file=open(f))
+        for s in tree.findall('./pyblio-schema'):
+            s.clear()
+        for s in tree.findall('./txo-group'):
+            s.clear()
+
+        tree.write(open(f, 'w'), encoding="utf-8")
         
         pybut.fileeq (f, 'ut_bibtex/%s.xml' % base)
 

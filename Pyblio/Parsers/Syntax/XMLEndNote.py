@@ -60,7 +60,7 @@ typemap = [
 ]
 
         
-class Importer (object):
+class Reader(object):
     
     id2type = dict (typemap)
 
@@ -173,7 +173,7 @@ class Importer (object):
         return
 
  
-class Exporter (object):
+class Writer(object):
 
     type2id = dict ([ (x [1], x [0]) for x in typemap ])
 

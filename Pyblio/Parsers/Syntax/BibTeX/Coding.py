@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Pyblio.Importers.BibTeX import Reader
+from Pyblio.Parsers.Syntax.BibTeX import Parser
 from Pyblio import Exceptions
 
 basemap = {
@@ -61,27 +61,27 @@ def _accent (stack, cmd, tt):
         m = basemap [cmd]
 
     except KeyError:
-        return Reader.Text ('?')
+        return Parser.Text ('?')
     
-    if isinstance (tt, Reader.Text):
+    if isinstance (tt, Parser.Text):
 
         if len (tt) > 1:
             t = tt [0]
-            stack.insert (0, Reader.Text (tt [1:]))
+            stack.insert (0, Parser.Text (tt [1:]))
         else:
             t = tt
             
-    elif isinstance (tt, Reader.Block):
+    elif isinstance (tt, Parser.Block):
         t = tt._d [0]
 
-        if isinstance (t, Reader.Text):
+        if isinstance (t, Parser.Text):
             pass
 
-        elif isinstance (t, Reader.Cmd):
+        elif isinstance (t, Parser.Cmd):
             # There are a few special cases where one wants to accent a command, like:
             #              \'{\i}
             if t._cmd == 'i':
-                t = Reader.Text ('i')
+                t = Parser.Text ('i')
             else:
                 raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
 
@@ -92,7 +92,7 @@ def _accent (stack, cmd, tt):
         raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
 
     try:
-        return Reader.Text (m [t])
+        return Parser.Text (m [t])
     except KeyError:
         raise KeyError ("cannot find %s in map %s" % (repr (t), repr (cmd)))
 
@@ -110,17 +110,16 @@ commands = {
 class Environ (object):
 
     def run (self, cmd, stack):
-
         try:
             fn, count = commands [cmd]
 
         except KeyError:
             # The \char macro is special: \char125 -> character with ascii code 125
             if cmd.startswith ('char'):
-                try: return Reader.Text (unichr (int (cmd [4:])))
+                try: return Parser.Text (unichr (int (cmd [4:])))
                 except ValueError: pass
                 
-            return Reader.Text (cmd)
+            return Parser.Text (cmd)
 
         args = []
         
@@ -136,6 +135,6 @@ class Environ (object):
         if callable (fn):
             return fn (stack, cmd, * args)
 
-        return Reader.Text (fn)
+        return Parser.Text (fn)
     
             

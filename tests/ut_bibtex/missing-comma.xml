@@ -1,53 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <pyblio-db>
-<pyblio-schema>
- <attribute id="author" type="person">
-  <name>Author</name>
- </attribute>
-
- <attribute id="doctype" type="txo" group="doctype">
-  <name>Document Type</name>
- </attribute>
-
- <attribute id="id" type="id">
-  <name>BibTeX Key</name>
- </attribute>
-
- <attribute id="journal" type="text">
-  <name>Journal</name>
- </attribute>
-
- <attribute id="note" type="text">
-  <name>Note</name>
- </attribute>
-
- <attribute id="number" type="text">
-  <name>Number</name>
- </attribute>
-
- <attribute id="title" type="text">
-  <name>Title</name>
- </attribute>
-
-</pyblio-schema>
- <txo-group id="doctype">
-  <txo-item id="1">
-   <name lang="C">Article</name>
-  </txo-item>
- </txo-group>
-
- <entry id="1">
+<pyblio-schema /><txo-group /><entry id="1">
   <attribute id="author">
-   <person first="T." last="Chapman"/>
-   <person first="A. T." last="Hayes"/>
-   <person first="M." last="Tilden"/>
+   <person first="T." last="Chapman" />
+   <person first="A. T." last="Hayes" />
+   <person first="M." last="Tilden" />
   </attribute>
   <attribute id="doctype">
-   <txo group="doctype" id="1"/>
+   <txo group="doctype" id="1" />
   </attribute>
   <attribute id="id">
-   <id value="Chapman"/>
+   <id value="Chapman" />
   </attribute>
   <attribute id="journal">
    <text>Proc. of the 6th Int. Conf. on Simulation of Adaptive Behavior SAB-00</text>

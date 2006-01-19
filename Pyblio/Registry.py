@@ -200,3 +200,10 @@ def parse(directory):
                     
     return
 
+def parse_default():
+    for d in RIP_dirs.values():
+        try:
+            parse(d)
+        except OSError:
+            pass
+    return

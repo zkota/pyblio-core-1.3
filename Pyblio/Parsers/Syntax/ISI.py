@@ -1,4 +1,4 @@
-from Pyblio.Importers import Tagged
+from Pyblio.Parsers.Syntax import Tagged
 from Pyblio import Attribute
 
 from gettext import gettext as _
@@ -66,7 +66,8 @@ def _mkperson (txt):
 
     return Attribute.Person (last = last, first = first)
 
-class Importer (Tagged.Importer):
+
+class Reader(Tagged.Reader):
 
     """ The importer knows how to map the RIS fields to the 'standard'
     pyblio model."""

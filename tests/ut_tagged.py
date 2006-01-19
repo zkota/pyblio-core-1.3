@@ -3,7 +3,7 @@
 import os, pybut, sys, re
 import StringIO
 
-from Pyblio.Importers import Tagged, Flat
+from Pyblio.Parsers.Syntax import Tagged
 from Pyblio import Store
 
 class TestTagged (pybut.TestCase):
@@ -188,7 +188,7 @@ class TestTagged (pybut.TestCase):
         return
 
 
-from Pyblio.Importers import RIS
+from Pyblio.Parsers.Syntax import RIS
 
 class TestRISTransport (pybut.TestCase):
 
