@@ -399,8 +399,10 @@ class Writer(object):
         for d in data:
             v = self.db.txo [d.group][d.id]
 
-            try: n = v.name
-            except KeyError: n = v.names.get ('C', None)
+            # Use the 'C' name by default, as it is easier to parse
+            # back.
+            try: n = v.names.get ('C', None)
+            except KeyError: n = v.name
                 
             if n: r.append (n)
 
