@@ -346,16 +346,6 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         if create:
             self._txo_create ()
 
-            # WARNING: this code contains a race condition. This
-            # exception is only here to trap blatant errors, not to
-            # avoid concurrent accesses. How does one open a file with
-            # O_CREAT, BTW ? Mabe this would not be portable at all.
-            
-            if os.path.exists (file):
-                raise Store.StoreError (_("database '%s' already exists") % file)
-            
-            self.save ()
-
         else:
             try:
                 self.xmlread (open (file))
@@ -437,6 +427,9 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
     def save (self):
 
+        if self.file is None:
+            return
+        
         try:
             os.unlink (self.file + '.bak')
         except OSError:
@@ -466,9 +459,19 @@ def dbdestroy (path, nobackup = False):
 
     
 def dbcreate (path, schema):
+    # Ensure we are the ones creating the file
+    try:
+        fd = os.open(path, os.O_CREAT|os.O_EXCL|os.O_WRONLY)
+    except OSError, msg:
+        raise Store.StoreError (_("cannot create database '%s': %s") % (
+            path, msg))
 
-    return Database (schema = schema, file = path,
-                     create = True)
+    os.close(fd)
+            
+    db = Database (schema = schema, file = path, create = True)
+    db.save ()
+    
+    return db
 
 
 def dbopen (path):

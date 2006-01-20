@@ -982,8 +982,64 @@ class TestCollate (pybut.TestCase):
 
         self.check (rss [Attribute.Txo (self.db.txo ['type'][1])], [1])
         self.check (rss [Attribute.Txo (self.db.txo ['type'][2])], [2, 3, 4])
-    
 
+
+class TestMemoryStore(pybut.TestCase):
+
+    def setUp(self):
+        self.hd = Store.get('memory')
+        self.name = pybut.dbname()
+        return
+
+    def testCreate(self):
+        sc = Schema.Schema ('ut_database/schema.xml')
+        db = self.hd.dbcreate(self.name, sc)
+
+        try:
+            os.stat(self.name)
+            assert False, 'the file should not be created'
+        except OSError:
+            pass
+
+        return
+    
+    def testImport(self):
+        db = self.hd.dbimport(self.name, 'ut_database/sample.xml')
+        try:
+            os.stat(self.name)
+            assert False, 'the file should not be created'
+        except OSError:
+            pass
+
+        nmo = pybut.dbname ()
+        
+        fd = open (nmo, 'w')
+        db.xmlwrite (fd)
+        fd.close ()
+
+        pybut.fileeq (nmo, 'ut_database/sample.xml')
+        return
+
+    def testNoSave(self):
+        db = self.hd.dbimport(self.name, 'ut_database/sample.xml')
+        db.save()
+        try:
+            os.stat(self.name)
+            assert False, 'the file should not be created'
+        except OSError:
+            pass
+
+        return
+
+    def testNoOpen(self):
+        try:
+            db = self.hd.dbopen('ut_database/sample.xml')
+            assert False, 'should not work'
+            
+        except Store.StoreError:
+            pass
+        return
+    
 class TestDatabaseFile (TestDatabase):
     fmt = 'file'
 
@@ -1019,6 +1075,7 @@ files = [ TestDatabaseFile,
           TestViewFile,
           TestCollateFile,
           TestOrderingFile,
+          TestMemoryStore,
           ]
 
 bsddb = [ TestDatabaseDB,
