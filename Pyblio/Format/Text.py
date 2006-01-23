@@ -18,6 +18,7 @@ _map = {
     't' : _do_t,
     'i' : _do_t,
     'b' : _do_t,
+    'small' : _do_t,
     'a' : _do_a,
     'br': _do_br,
     }

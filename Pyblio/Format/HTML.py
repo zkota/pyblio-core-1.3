@@ -10,6 +10,9 @@ def _do_t (t):
 def _do_i (t):
     return '<i>' + ''.join (map (generate, t.children)) + '</i>'
     
+def _do_small (t):
+    return '<small>' + ''.join (map (generate, t.children)) + '</small>'
+
 def _do_b (t):
     return '<b>' + ''.join (map (generate, t.children)) + '</b>'
     
@@ -27,6 +30,7 @@ _map = {
     'b' : _do_b,
     'a' : _do_a,
     'br': _do_br,
+    'small': _do_small,
     }
 
 

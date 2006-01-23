@@ -371,7 +371,7 @@ class _SynTag(object):
 
         return _Tag(self.tag, children, self.attributes)
 
-class _Tag(object):
+class _Tag(Glue):
 
     """ This is a layout tag after its [] marker, but before the
     compilation."""
@@ -423,7 +423,7 @@ class _Proto(str):
 
 glob = globals ()
 
-for t in ('A', 'B', 'I'):
+for t in ('A', 'B', 'I', 'Small'):
     glob[t] = _Proto(t)
 
 BR = _Proto('BR')[_S1T('')]
