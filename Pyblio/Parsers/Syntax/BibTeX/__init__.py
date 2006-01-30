@@ -62,7 +62,7 @@ class Environ (Coding.Environ):
 _lf_re = re.compile ('^N+I+$')
 _fl_re = re.compile ('^N*I+N+$')
 
-_split_re = re.compile (r'[,.]|\s+')
+_split_re = re.compile (r'[,.]|\s+|\~')
 
 class Reader(object):
 
@@ -124,7 +124,7 @@ class Reader(object):
                 if i != s: stream.append (Parser.Text (v [i:s]))
 
                 sep = Parser.Text (v [s:e])
-                if sep [0] in ' \n\t': sep = Parser.Text (' ')
+                if sep [0] in ' \n\t~': sep = Parser.Text (' ')
                 stream.append (sep)
                 
                 i = e

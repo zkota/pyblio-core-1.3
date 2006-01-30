@@ -1,0 +1,13 @@
+<pyblio-db>
+<pyblio-schema /><txo-group /><entry id="1">
+  <attribute id="author">
+   <person first="F." last="Gobry" />
+  </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="1" />
+  </attribute>
+  <attribute id="id">
+   <id value="Sample" />
+  </attribute>
+ </entry>
+</pyblio-db>

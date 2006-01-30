@@ -461,7 +461,7 @@ def dbdestroy (path, nobackup = False):
 def dbcreate (path, schema):
     # Ensure we are the ones creating the file
     try:
-        fd = os.open(path, os.O_CREAT|os.O_EXCL|os.O_WRONLY)
+        fd = os.open(path, os.O_CREAT|os.O_EXCL|os.O_WRONLY, 0666)
     except OSError, msg:
         raise Store.StoreError (_("cannot create database '%s': %s") % (
             path, msg))

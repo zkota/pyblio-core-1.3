@@ -251,6 +251,12 @@ class TestBibTeXImport (pybut.TestCase):
         self._check ('authors')
         return
 
+    def testTildaInAuthors (self):
+        """ No extra spaces around authors """
+        
+        self._check ('tilda')
+        return
+
     def testInitialsPlusName (self):
         """ Parse names like F. Gobry """
         
