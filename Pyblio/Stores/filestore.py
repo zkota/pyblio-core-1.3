@@ -208,7 +208,11 @@ class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
         self.id   = rsid
         self.name = None
 
-        self._dict = db
+        self._db   = db
+        self._dict = db._dict
+
+        self._db.register ('delete-item', self._on_db_delete)
+        self._db.register ('update-item', self._on_db_update)
         return
 
 
@@ -234,6 +238,12 @@ class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
         for k in dict.iterkeys (self):
             yield (k, self._dict [k])
 
+    def destroy(self):
+        
+        for k in list(self):
+            del self._db[k]
+
+        return
 
     def _on_db_delete (self, k):
         """ invoked when the database removes an item """
@@ -303,10 +313,7 @@ class ResultSetStore (dict, Store.ResultSetStore):
 
         (self._id, rsid) = Tools.id_make (self._id, rsid)
         
-        rs = ResultSet (rsid, self._db._dict)
-        
-        self._db.register ('delete-item', rs._on_db_delete)
-        self._db.register ('update-item', rs._on_db_update)
+        rs = ResultSet (rsid, self._db)
         
         if permanent:
             self [rs.id] = rs
@@ -314,9 +321,9 @@ class ResultSetStore (dict, Store.ResultSetStore):
         return rs
 
     def __iter__ (self):
-
         return self.itervalues ()
 
+    
 # --------------------------------------------------
 
 class Database (Query.Queryable, Store.Database, Callback.Publisher):

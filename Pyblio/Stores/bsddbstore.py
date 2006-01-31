@@ -101,6 +101,26 @@ _ps = pickle.dumps
 
 # --------------------------------------------------
 
+def _idxdel (_idx, id, txn):
+    """ Remove any secondary index belonging to the entry """
+
+    cursor = _idx.cursor (txn)
+    data   = cursor.first ()
+
+    while 1:
+        if data is None: break
+
+        if data [1] == id:
+            cursor.delete ()
+
+        data = cursor.next ()
+
+    cursor.close ()
+    return
+
+
+# --------------------------------------------------
+
 class RSDB (object):
 
     """ Virtual result set that loops over the full database """
@@ -388,8 +408,8 @@ class View (Store.View):
 
 class ResultSet (Store.ResultSet, Callback.Publisher):
 
-    def __init__ (self, _db, _env, _meta, id,
-                  permanent = False, txn = None):
+    def __init__ (self, _db, _env, _meta, _idx,
+                  id, permanent = False, txn = None):
 
         Callback.Publisher.__init__ (self)
         
@@ -402,6 +422,7 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         self._db   = _db
         self._env  = _env
         self._meta = _meta
+        self._idx  = _idx
         
         self._permanent = permanent
 
@@ -599,8 +620,20 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         txn.commit ()
         return
 
-    def __len__ (self):
+    def destroy(self):
+        txn = self._env.txn_begin ()
+        
+        for k in self:
+            k = str(k)
+            
+            _idxdel(self._idx, k, txn)
+            self._db.delete (k, txn)
 
+        txn.commit ()
+        return
+
+            
+    def __len__ (self):
         return self._rs.stat () ['nkeys']
 
 
@@ -633,13 +666,14 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
 class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
-    def __init__ (self, _db, _env, _meta, txn):
+    def __init__ (self, _db, _env, _meta, _idx, txn):
 
         Callback.Publisher.__init__ (self)
 
         self._db   = _db
         self._env  = _env
         self._meta = _meta
+        self._idx  = _idx
         
         (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
@@ -650,7 +684,8 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
             for rsid, data in avail.items ():
                 name, status = data
             
-                rs = ResultSet (self._db, self._env, self._meta, rsid, status, txn = txn)
+                rs = ResultSet(self._db, self._env, self._meta, self._idx,
+                               rsid, status, txn = txn)
                 rs._name = name
 
                 self.register ('item-delete', rs._on_delete)
@@ -719,8 +754,8 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
             
             self._meta.put ('rs', _ps ((last, avail)), txn = txn)
             
-            rs = ResultSet (self._db, self._env, self._meta, rsid,
-                            permanent, txn = txn)
+            rs = ResultSet (self._db, self._env, self._meta, self._idx,
+                            rsid, permanent, txn = txn)
             
         except:
             txn.abort ()
@@ -1020,15 +1055,15 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             else:
                 self._schema = _pl (self._meta.get ('schema', txn = txn))
 
-            # Result sets handler
-            self.rs = ResultSetStore (self._db, self._env, self._meta, txn)
-            self.register ('delete', self.rs._on_delete)
-            self.register ('update', self.rs._on_update)
-
             # Full text indexing DB
             self._idx = db.DB (self._env)
             self._idx.set_flags (db.DB_DUP)
             self._idx.open ('index', 'full', db.DB_HASH, flag, txn = txn)
+
+            # Result sets handler
+            self.rs = ResultSetStore (self._db, self._env, self._meta, self._idx, txn)
+            self.register ('delete', self.rs._on_delete)
+            self.register ('update', self.rs._on_update)
 
             # Store for Txo values
             self.txo = TxoStore (self._env, txn)
@@ -1129,7 +1164,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             # might still want to access the previous version
             self.emit ('update', key, val, txn)
             
-            self._idxdel (str (key), txn)
+            _idxdel (self._idx, str (key), txn)
             self._insert (key, val, txn)
 
         except:
@@ -1151,7 +1186,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self.emit ('delete', key, txn)
 
             # Then, remove the index and entry itself
-            self._idxdel (id, txn)
+            _idxdel (self._idx, id, txn)
             self._db.delete (id, txn)
 
         except:
@@ -1173,24 +1208,6 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             return False
 
         return True
-
-
-    def _idxdel (self, id, txn):
-        """ Remove any secondary index belonging to the entry """
-
-        cursor = self._idx.cursor (txn)
-        data   = cursor.first ()
-        
-        while 1:
-            if data is None: break
-            
-            if data [1] == id:
-                cursor.delete ()
-
-            data = cursor.next ()
-
-        cursor.close ()
-        return
 
 
     def _idxadd (self, id, val, txn):

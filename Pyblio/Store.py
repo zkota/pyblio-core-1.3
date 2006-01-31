@@ -297,6 +297,10 @@ class ResultSet (object):
     def __len__ (self):
         raise NotImplemented ('please override')
 
+    def destroy(self, k):
+        """ Delete and B{all the records} contained in the result set."""
+        raise NotImplemented ('please override')
+        
     def has_key (self):
         raise NotImplemented ('please override')
     
@@ -337,7 +341,7 @@ class ResultSetStore (object):
         
     def add (self, permanent = False, rsid = None):
         raise NotImplemented ('please override')
-        
+
 
 # --------------------------------------------------
     

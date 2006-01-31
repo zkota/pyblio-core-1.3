@@ -566,6 +566,26 @@ class TestContent (pybut.TestCase):
         
         return
 
+    def testResultSetDestroy(self):
+
+        rs = self.db.rs.add()
+        
+        for i in range(5):
+            e = Store.Record()
+            k = self.db.add(e)
+            rs.add(k)
+        
+        for i in range(2):
+            e = Store.Record()
+            k = self.db.add(e)
+            
+
+        assert len(self.db.entries) == 7
+        rs.destroy()
+        assert len(self.db.entries) == 2
+        return
+    
+            
     def testResultSetUpdate (self):
 
         """ If an item is removed from the database, it is removed

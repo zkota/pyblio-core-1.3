@@ -50,6 +50,9 @@ class Reader(object):
 
         self.db = db
 
+        rs = db.rs.add(True)
+        rs.name = _('XML MARC merge')
+        
         # We support both the NS-aware and non-NS aware versions of the MARC file
         subs = {
             'record': ('controlfield', 'datafield', 'subfield'),
@@ -86,10 +89,11 @@ class Reader(object):
             self.record_end ()
 
             if self.record is not None:
-                self.db.add (self.record)
-            
+                k = self.db.add (self.record)
+                rs.add(k)
+                
             elem.clear()
-        return
+        return rs
 
 
 class SimpleReader(Reader):
