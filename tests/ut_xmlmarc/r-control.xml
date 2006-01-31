@@ -60,7 +60,7 @@
    <url href="http://lcawww.epfl.ch/Publications/Naumenko/Naumenko98.pdf"/>
   </attribute>
  </entry>
- <resultset id="1" name="XML MARC merge">
+ <resultset id="1" name="Imported from XML MARC">
   <ref id="1"/>
  </resultset>
 </pyblio-db>

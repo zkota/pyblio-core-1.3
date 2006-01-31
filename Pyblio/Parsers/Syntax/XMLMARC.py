@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string, re
+import string, re, logging
 
 from xml.sax.saxutils import escape, quoteattr
 
@@ -29,6 +29,9 @@ from gettext import gettext as _
 import cElementTree as ElementTree
 
 class Reader(object):
+
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.import.xmlmarc')
 
     def record_begin (self):
 
@@ -51,7 +54,7 @@ class Reader(object):
         self.db = db
 
         rs = db.rs.add(True)
-        rs.name = _('XML MARC merge')
+        rs.name = _('Imported from XML MARC')
         
         # We support both the NS-aware and non-NS aware versions of the MARC file
         subs = {
@@ -225,6 +228,10 @@ class SimpleReader(Reader):
         return
 
 class Writer(object):
+
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.export.xmlmarc')
+
 
     _re_marc = re.compile ('(\d{3,})(\w)(\w)')
     

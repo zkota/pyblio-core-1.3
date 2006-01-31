@@ -10,4 +10,7 @@
    <id value="toto:124(gronf)" />
   </attribute>
  </entry>
+ <resultset id="1" name="Imported from BibTeX">
+  <ref id="1" />
+ </resultset>
 </pyblio-db>

@@ -23,7 +23,6 @@ class WithComments (Reader):
         return
     
     def comment_add (self, data):
-
         self.comments.append (data)
         return
 

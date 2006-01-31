@@ -23,7 +23,7 @@
 """ Extension module for BibTeX files """
 
 
-import re, os, string
+import re, os, string, logging
 
 from Pyblio.Parsers.Syntax.BibTeX import Parser, Coding
 
@@ -65,6 +65,9 @@ _fl_re = re.compile ('^N*I+N+$')
 _split_re = re.compile (r'[,.]|\s+|\~')
 
 class Reader(object):
+
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.import.bibtex')
 
     def __init__ (self, charset = 'ISO8859-1'):
 
@@ -337,15 +340,11 @@ class Reader(object):
         for k, v in val:
             self.record_dispatch (k.lower (), v)
 
-            
-        # Add the document type
+        # Add the document type at the end, as it might have been
+        # modified during parsing.
         self.type_add (self.tp)
 
         self.record_end ()
-
-        if self.record:
-            self.db.add (self.record)
-
         return
     
     
@@ -355,6 +354,9 @@ class Reader(object):
 
         self.doctype = {}
 
+        rs = db.rs.add(True)
+        rs.name = _('Imported from BibTeX')
+        
         for v in db.txo ['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
@@ -364,9 +366,15 @@ class Reader(object):
                 self.comment_add (data)
                 continue
 
-            self.record_parse (data)
+            self.record = None
             
-        return db
+            self.record_parse (data)
+
+            if self.record:
+                k = self.db.add (self.record)
+                rs.add(k)
+            
+        return rs
 
 
 # --------------------------------------------------
@@ -374,7 +382,11 @@ class Reader(object):
 
 class Writer(object):
 
-    _collapse      = re.compile (r'[\s\n]+', re.MULTILINE)
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.export.bibtex')
+
+
+    _collapse = re.compile (r'[\s\n]+', re.MULTILINE)
     
     def __init__ (self):
 

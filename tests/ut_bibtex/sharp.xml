@@ -20,4 +20,7 @@
    <text>This is a title</text>
   </attribute>
  </entry>
+ <resultset id="1" name="Imported from BibTeX">
+  <ref id="1" />
+ </resultset>
 </pyblio-db>
