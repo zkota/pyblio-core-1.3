@@ -293,6 +293,19 @@ class TestBibTeXImport (pybut.TestCase):
     def testCharMacro (self):
         """ Test the handling of the char macro, especially for { and } """
         self._check ('charmacro')
+
+
+    def testEmptyAnd(self):
+        """ Sometimes, the author fields can contain « and and » """
+        self._check('emptyand')
+        
+    def testFinalDot(self):
+        """ Sometimes, the final author name is followed by a dot. """
+        self._check('finaldot')
+        
+    def testMiddleDot(self):
+        """ Sometimes, there is no space between a dot and the following word """
+        self._check('middledot')
         
 
 class TestBibTeXExport (pybut.TestCase):

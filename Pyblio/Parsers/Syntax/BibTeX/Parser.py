@@ -378,7 +378,7 @@ def _on_open (fd, ctx):
             if brace in '})':
                 # Discard bad matching of braces
                 if (brace == '}' and container != '{'):
-                    raise ParseError ('mismatched "%s"' % brace, fd.ln)
+                    raise ParserError ('mismatched "%s"' % brace, fd.ln)
 
                 if brace == ')' and container != '(':
                     data += ')'

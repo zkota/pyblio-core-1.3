@@ -1,0 +1,27 @@
+<pyblio-db>
+<pyblio-schema /><txo-group /><entry id="1">
+  <attribute id="author">
+   <person first="L." last="Herda" />
+   <person first="R." last="Urtasun" />
+   <person first="A." last="Hanson" />
+  </attribute>
+  <attribute id="booktitle">
+   <text>Automated Face and Gesture Recognition, Washington, DC</text>
+  </attribute>
+  <attribute id="date">
+   <date month="5" year="2002" />
+  </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="6" />
+  </attribute>
+  <attribute id="id">
+   <id value="HerdaUHF02" />
+  </attribute>
+  <attribute id="title">
+   <text>An Automatic Method For Determining Quaternion Field Boundaries for Ball-and-Socket Joint Limits</text>
+  </attribute>
+ </entry>
+ <resultset id="1" name="Imported from BibTeX">
+  <ref id="1" />
+ </resultset>
+</pyblio-db>

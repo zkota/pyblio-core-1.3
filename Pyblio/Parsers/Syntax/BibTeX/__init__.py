@@ -64,6 +64,11 @@ _fl_re = re.compile ('^N*I+N+$')
 
 _split_re = re.compile (r'[,.]|\s+|\~')
 
+_dotdash_re = re.compile(r'\.\s+-')
+
+def _nodotdash(txt):
+    return _dotdash_re.sub('.-', txt)
+
 class Reader(object):
 
     # The official channel in which messages must be sent
@@ -151,8 +156,8 @@ class Reader(object):
 
         def _wordify (stream):
 
-            stream = stream.execute (self.env)
-            stream = stream.subst ()
+            stream = stream.execute(self.env)
+            stream = stream.subst()
 
             # Ensure the stream is a sequence of complete words (ie,
             # concatenate successive text parts and space parts).  The
@@ -164,9 +169,10 @@ class Reader(object):
 
             while os:
                 s = os.pop (0)
-
+                
                 if s == '.':
                     stream [-1] += '.'
+                    in_space = True
                     continue
 
                 is_space = s in (' ', '\n')
@@ -216,8 +222,8 @@ class Reader(object):
         
         def _person_decode (stream):
             
-            if len (stream) == 1 and isinstance (stream [0], Parser.Block):
-                return Attribute.Person (last = stream [0].flat ())
+            if len(stream) == 1 and isinstance(stream[0], Parser.Block):
+                return Attribute.Person(last=stream [0].flat())
 
             stream = _wordify (Parser.Block ('', stream))
 
@@ -230,28 +236,31 @@ class Reader(object):
                 if ls == 1:
                     return Attribute.Person (last = stream [0])
 
+                elif ls == 0:
+                    return None
+                
                 else:
                     tt = ''.join (_typetag (stream))
 
                     if _lf_re.match (tt):
                         idx = tt.index ('I')
-                        return Attribute.Person (first = ' '.join (stream [idx:]),
-                                                 last  = ' '.join (stream [:idx]))
+                        return Attribute.Person (first=_nodotdash(' '.join (stream [idx:])),
+                                                 last=' '.join (stream [:idx]))
                         
 
                     if tt == 'NN':
-                        return Attribute.Person (first = stream [0],
+                        return Attribute.Person (first =_nodotdash(stream [0]),
                                                  last  = stream [1])
                     
                     if _fl_re.match (tt):
                         idx = tt.rindex ('I') + 1
-                        return Attribute.Person (first = ' '.join (stream [:idx]),
+                        return Attribute.Person (first=_nodotdash(' '.join (stream [:idx])),
                                                  last  = ' '.join (stream [idx:]))
 
                     try:
                         von = tt.index ('L')
 
-                        return Attribute.Person (first = ' '.join (stream [0:von]),
+                        return Attribute.Person (first =_nodotdash(' '.join (stream [0:von])),
                                                  last  = ' '.join (stream [von:]))
                         
                     except ValueError:
@@ -261,21 +270,31 @@ class Reader(object):
                     if tt == 'NNN':
                         return Attribute.Person (first = ' '.join (stream [:-1]),
                                                  last  = stream [-1])
-                    
-                    raise Exceptions.ParserError ("unable to parse name properly: %s (typed as %s)" % (
-                        repr (stream), repr (tt)))
+
+                    elif tt == 'II':
+                        # Handle the case of a final . after the author's name
+                        first, last = stream
+                        
+                        if last[-1] == '.' and len(last) > 2:
+                            last = last[:-1]
+                            return Attribute.Person (first=_nodotdash(first), last=last)
+                            
+                            
+                    raise Exceptions.ParserError ("%s: unable to parse name properly: %s (typed as %s)" % (
+                        unicode(self.key), repr(stream), repr(tt)))
                     
             elif comma == 1:
                 i = stream.index (',')
 
                 return Attribute.Person \
                        (last  = ' '.join (stream [:i]),
-                        first = ' '.join (stream [i+1:]))
+                        first = _nodotdash(' '.join (stream [i+1:])))
 
                 
-            return Attribute.Person ()
+            raise Exceptions.ParserError ("%s: unable to parse name %s properly: %d commas" % (
+                unicode(self.key), repr(stream), comma))
 
-        self.record [field] = map (_person_decode, avail)
+        self.record [field] = filter(None, map(_person_decode, avail))
         return 
 
     
