@@ -17,24 +17,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-""" Definition of the query language """
+""" Definition of the query language.
+
+A query is composed of elementary search operations, which are
+combined by boolean operations:
+
+   >>> query = (AnyWord(u'findme') | Txo('type', item)) & ~ HasField('title')
+
+"""
 
 from Pyblio import Attribute, Exceptions
 
 
-class Constraint (object):
+class _Constraint (object):
 
     def __and__ (self, other):
 
-        return ANDed (self, other)
+        return _ANDed (self, other)
 
     def __or__ (self, other):
         
-        return ORed (self, other)
+        return _ORed (self, other)
 
     def __invert__ (self):
 
-        return NOTed (self)
+        return _NOTed (self)
 
     def apply (self, fn, * args, **kargs):
 
@@ -47,7 +54,7 @@ class Constraint (object):
 
 
 
-class NOTed (Constraint):
+class _NOTed (_Constraint):
 
     def __init__ (self, a):
 
@@ -62,7 +69,7 @@ class NOTed (Constraint):
         self.a.apply (fn, * args, ** kargs)
 
 
-class Pairs (Constraint):
+class _Pairs (_Constraint):
 
     def apply (self, fn, * args, **kargs):
 
@@ -75,7 +82,7 @@ class Pairs (Constraint):
         return len (self.a) + len (self.b)
 
     
-class ORed (Pairs):
+class _ORed (_Pairs):
 
     def __init__ (self, a, b):
 
@@ -88,7 +95,7 @@ class ORed (Pairs):
                               str (self.b))
 
     
-class ANDed (Pairs):
+class _ANDed (_Pairs):
 
     def __init__ (self, a, b):
 
@@ -101,7 +108,7 @@ class ANDed (Pairs):
                               str (self.b))
 
 
-class AnyWord (Constraint):
+class AnyWord (_Constraint):
 
     """ Full text searching of a single word """
 
@@ -115,7 +122,9 @@ class AnyWord (Constraint):
         return
     
 
-class HasField (Constraint):
+class HasField (_Constraint):
+
+    """ Matches when the record has the specified field."""
 
     def __init__ (self, field):
         self.field = field
@@ -132,7 +141,7 @@ class HasField (Constraint):
         return
     
 
-class Txo (Constraint):
+class Txo (_Constraint):
 
     """ Search items that belong to the corresponding txo """
 
@@ -177,13 +186,13 @@ class Queryable (object):
     def _q_run (self, query, permanent):
 
         # Otherwise, call the corresponding boolean method
-        if isinstance (query, ORed):
+        if isinstance (query, _ORed):
             return self._q_or  (query, permanent)
 
-        if isinstance (query, ANDed):
+        if isinstance (query, _ANDed):
             return self._q_and (query, permanent)
 
-        if isinstance (query, NOTed):
+        if isinstance (query, _NOTed):
             return self._q_not (query, permanent)
 
         # This must be a single query

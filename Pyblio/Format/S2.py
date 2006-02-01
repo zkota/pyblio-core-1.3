@@ -19,8 +19,7 @@
 #
 
 """
-Data structures for stage 2 of the formatter.
-
+(Data structures for stage 2 of the formatter)
 """
 
 

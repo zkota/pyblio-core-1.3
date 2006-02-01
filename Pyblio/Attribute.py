@@ -19,7 +19,12 @@
 # 
 
 """ Basic data types that can be used as attributes for a L{Record
-<Pyblio.Store.Record>}"""
+<Pyblio.Store.Record>}.
+
+Basic attributes of a record can be B{qualified} by one or more
+additional sub-attributes. For instance, an attribute I{author} of
+type L{Person} can have, for every Person instance, a sub-attribute of
+type L{Date} that represents its birth date."""
 
 import string, re, urlparse, os
 
@@ -33,7 +38,7 @@ from gettext import gettext as _
 re_split = re.compile (r'[^\w]+', re.UNICODE)
 
 
-class Qualified (object):
+class _Qualified (object):
     """ Mix-in class that provides qualifiers to attributes, making
     them behave like composite data types (but not arbitrarily nested
     data, though)"""
@@ -64,10 +69,12 @@ class Qualified (object):
         return True           
                 
                   
-class UnknownContent (Qualified):
+class UnknownContent (_Qualified):
     """
-    This is only a temporary Type. It is used, when you add qualifiers before you
-    add the main field to a record. Trying to store it will raise an error. 
+    An invalid type.
+
+    It is used, when you add qualifiers before you add the main field
+    to a record. Trying to store it will raise an error.
     """
     def __init__ (self):
         self.q = {}
@@ -78,10 +85,11 @@ class UnknownContent (Qualified):
 
     def deep_equal (self, other):
         if not isinstance (other, UnknownContent): return False
-        return Qualified.deep_equal (self, other)
+        return _Qualified.deep_equal (self, other)
+
         
-class Person (Qualified):
-    ''' A person name '''
+class Person(_Qualified):
+    ''' A person name. '''
 
     def __init__ (self, honorific = None, first = None, last = None, lineage = None,
                   xml = None):
@@ -154,16 +162,17 @@ class Person (Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, Person):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
     
     def __repr__ (self):
         return "Person (%s, %s)" % (repr(self.last), repr(self.first))
 
     def __hash__ (self):
         return hash ((self.last, self.first, self.lineage, self.honorific))
+
         
-class Date (Qualified):
-    ''' A date '''
+class Date (_Qualified):
+    ''' A date. '''
 
     def __init__ (self, year = None, month = None, day = None):
         self.q = {}
@@ -226,7 +235,7 @@ class Date (Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, Date):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
 
         
     def __hash__ (self):
@@ -239,8 +248,8 @@ class Date (Qualified):
             repr (self.year), repr (self.month), repr (self.day))
 
 
-class Text (unicode, Qualified):
-    ''' A textual data '''
+class Text (unicode, _Qualified):
+    ''' Textual data '''
 
     def __init__ (self, text = u''):
         unicode.__init__ (self, text)
@@ -278,10 +287,10 @@ class Text (unicode, Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, Text):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
 
 
-class URL (str, Qualified):
+class URL (str, _Qualified):
     ''' An URL '''
 
     def __init__ (self, text = ''):
@@ -321,10 +330,10 @@ class URL (str, Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, URL):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
 
 
-class ID (unicode, Qualified):
+class ID (unicode, _Qualified):
 
     ''' An external identifier '''
 
@@ -358,13 +367,31 @@ class ID (unicode, Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, ID):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
 
 
 class TxoItem (object):
 
-    """ Definition of a Txo item. This item can then be reused
-    as the argument for Attribute.Txo creation.
+    """ Definition of a taxonomy item.
+
+    This item can then be reused as the argument for L{Attribute.Txo}
+    creation. A taxonomy item can be seen as a value in a enumeration
+    of possible values. Compared to a I{simple} enumeration, it has
+    the additional property of being hierachical. For instance, you
+    could define a taxonomy of document types::
+
+      - publication
+         - article
+            - peer-reviewed
+            - not peer-reviewed
+         - conference paper
+      - unpublished
+         - report
+
+    ...and use this taxonomy to fill an attribute of your records. If
+    you use L{Pyblio.Query} to search for the item I{article}, you
+    will retrieve all the records which contain one of I{article},
+    I{peer-reviewed} or I{not peer-reviewed}.
     """
 
     def __init__ (self):
@@ -405,9 +432,23 @@ class TxoItem (object):
         return 'TxoItem(%s, %s)' % (repr(self.group), repr(self.id))
 
 
-class Txo (Qualified):
+class Txo (_Qualified):
 
-    """ Relationship to a Taxonomy """
+    """ Element of a taxonomy.
+
+    In the simplest case, this can be seen as a value in a enumerated
+    set of possible values. The possible values are defined as
+    L{TxoItem}s, and are stored in the L{Store.Database}, in the
+    B{txo} attribute, and L{Store.Record}s can contain Txo attributes
+    which refer to these L{TxoItem}s. Say you have a list of known
+    document types in the I{document-type} taxonomy. You can then
+    affect the document type to the I{type} attribute of a record with
+    the following operations:
+
+       >>> item = db.txo['document-type'].byname('article')
+       >>> record.add('type', item, Attribute.Txo)
+       
+    """
 
     def __init__ (self, item = None):
         self.q = {}
@@ -461,11 +502,13 @@ class Txo (Qualified):
     def deep_equal (self, other):
         if not self == other or not isinstance (other, Txo):
             return False        
-        return Qualified.deep_equal (self, other)        
+        return _Qualified.deep_equal (self, other)        
 
     def __hash__ (self):
         return hash ((self.group, self.id))
-    
+
+
+# A mapping between class names and class objects
 N_to_C = {
     'person'    : Person,
     'date'      : Date,
@@ -475,7 +518,8 @@ N_to_C = {
     'txo'       : Txo,
     }
 
+# A mapping from class objects to class names
 C_to_N = {}
 
-for k, v in N_to_C.items (): C_to_N [v] = k
-
+for _k, _v in N_to_C.items (): C_to_N [_v] = _k
+del _k, _v

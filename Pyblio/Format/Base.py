@@ -18,5 +18,9 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 
+"""
+(Base classes of the formatting code)
+"""
+
 class Missing(KeyError):
     """ This error is raised when a specific attribute is missing."""

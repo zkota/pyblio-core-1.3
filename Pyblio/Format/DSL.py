@@ -437,15 +437,13 @@ BR = _Proto('BR')[_S1T('')]
 def lazy(fn):
 
     """ Transform a simple function into a lazy function lifted in the
-    Maybe system.
+    formatting system.
 
     This is only sugar : the initial function must be aware that every
     argument must be made strict by calling them before use.
-
     """
 
-    class _caller (Glue):
-
+    class _caller(Glue):
         def __init__ (self, * args, ** kargs):
             self.__args  = [_deferredText(arg) for arg in args]
 
@@ -464,5 +462,5 @@ def lazy(fn):
                 return fn (record, *args, **kargs)
 
             return _late
-        
+
     return _caller

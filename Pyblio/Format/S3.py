@@ -19,8 +19,7 @@
 #
 
 """
-Stage 3 objects (ie, abstract representation of the actual layout)
-
+(Stage 3 objects, ie abstract representation of the actual layout)
 """
 
 class Tag(object):

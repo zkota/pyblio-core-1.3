@@ -32,9 +32,15 @@ Overview
   
     >>> db = get ('file').dbcreate (path, schema)
   
-  Once this is done, the database is ready to accept L{records <Pyblio.Store.Record>}.
+  Once this is done, the database is ready to accept L{records
+  <Pyblio.Store.Record>}:
 
-  @see: the L{Database} class
+    >>> record = Store.Record()
+    >>> record.add('title', u'my title', Attribute.Text)
+    >>> key = db.add(record)
+
+  @see: the L{Database} class to know what operations can be performed
+  on databases.
 '''
 
 import os, string, copy
@@ -166,7 +172,7 @@ class Record (dict):
             Constructs type with value. Effects neccessary dict-conversion
             operations
             """
-            if isinstance (value, Attribute.Qualified):
+            if isinstance (value, Attribute._Qualified):
                 #is already of Attribute.XXX-type, so don't do anything.
                 return value
             else: 
@@ -527,6 +533,10 @@ class Database (object):
 
     @cvar entries: a L{resultset <Pyblio.Store.ResultSet>} containing
     all the records of the database.
+
+    @cvar txo: a L{TxoGroup} instance, containing all the taxonomy
+    definitions in the database. See L{TxoItem
+    <Pyblio.Attribute.TxoItem>}.
     '''
 
     def __init__ (self):
@@ -911,7 +921,8 @@ def get (fmt):
       - dbdestroy (file): destroy a database
 
     For more information, consult the documentation for the specific
-    backends, L{Pyblio.Stores.filestore} and L{Pyblio.Stores.bsddbstore}.
+    backends, L{Pyblio.Stores.filestore}, L{Pyblio.Stores.bsddbstore}
+    and L{Pyblio.Stores.memorystore}.
     """
 
     try:
