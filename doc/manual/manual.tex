@@ -1,0 +1,154 @@
+\documentclass[a4paper]{report} % -*- coding: latin-1 -*-
+
+\usepackage{xspace, palatino, hyperref, graphicx}
+\usepackage[latin1]{inputenc}
+
+\newcommand{\pyblio}{\textsl{pybliographer}\xspace}
+\newcommand{\py}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+
+\hyphenation{bib-li-o-gra-phic}
+
+\title{Writing bibliographic tools with \pyblio}
+\author{Frédéric Gobry}
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+
+\pyblio   is   a   developer-oriented   framework   for   manipulating
+bibliographic  data.  It  is written  in  \textsl{python}\footnote{see
+  \url{http://python.org/}}, and  uses extensively the  dynamic nature
+of this language.
+
+\pyblio  does   not  try  to   define  another  standard   format  for
+bibliographic  data, nor  does it  solely  rely on  a single  existing
+standards.    Standards  are   important   in  order   to  allow   for
+interoperability and durability.  Unfortunately, real-world data often
+contain  a  great  number   of  mistakes,  or  reflect  certain  local
+conventions. \pyblio is on  the \textit{pragmatic} side of considering
+these issues as part of its business: most of the parsing tasks can be
+easily overriden and  specialized in order to \textit{fit  the code to
+  the data}, and not the other way around.
+
+
+\section{Basic concepts}
+
+\pyblio  deals  with  sets  of  \py{Record}s, stored  in  a  so-called
+\py{Database}.  This database can  be actually  implemented on  top of
+different systems. Two are available  today, one based on a single XML
+file,  using  a  custom  XML  dialect, the  other  based  on  Berkeley
+DB\footnote{see  \url{http://www.sleepycat.com/}},  a  very  efficient
+database system.
+
+Each record represents an elementary  object you want to describe, and
+has  a  number  of  \textsl{attributes}.   For instance,  if  you  are
+describing a  book, one attribute will be  its \textsl{title}, another
+its \textsl{ISBN},  etc. Each of  these attributes can contain  one or
+more  values,  all  of   the  same  \textsl{type}.   To  continue  the
+description  of  our  book,   we  probably  have  the  \textsl{author}
+attribute,  which contains  as many  \py{Person} values  as  there are
+authors for the  book. All the values of a given  attribute are of the
+same type.
+
+In some cases, simply having  this flat key/value model to describe an
+object  is not  enough.   \pyblio  allows, for  every  value of  every
+attribute, to  provide a set of  \textsl{qualifiers}. These qualifiers
+are also attributes which can hold one or more values.  If my book, or
+information  about the  book, is  available  via the  internet, I  can
+provide  a  \textsl{link}  attribute,  but  for  each  of  the  actual
+\py{URL}s  provided,  I  might  wish  to  add  a  \textsl{description}
+qualifier, which will indicate, say, if the URL points to the editor's
+website, or to a review, etc.
+
+This nesting of objects is best described in
+figure~\ref{fig:hierarchy}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.9\textwidth]{fig/hierarchy.pdf}
+  \caption{Objects manipulated in \pyblio}
+  \label{fig:hierarchy}
+\end{figure}
+
+\pyblio comes with a set of defined attribute types, like \py{Person},
+\py{Text}, \py{Date}, \py{ID} (see the \py{Pyblio.Attribute} module
+for a complete list), and can be extended to support your own types.
+
+
+\subsection{The database schema}
+\label{sec:schema}
+
+Even though  attributes are typed,  the data model described  above is
+quite flexible.  In  order for \pyblio to help  you checking that your
+records are properly  typed, it needs to know  the database schema you
+are  using.  This  schema,  usually stored  in  an XML  file with  the
+extension \file{.sip},  simply lists  the known attributes  with their
+type and  the qualifiers it  allows for its values.   Some \file{.sip}
+files  are  distributed   with  \pyblio,  and  can  be   seen  in  the
+\py{Pyblio.RIP} directory.
+
+In   addition   to  validation   information,   the  schema   contains
+human-readable  description  of  the  different  fields,  possibly  in
+several languages, so  that it can be automatically  extracted by user
+interfaces to provide up-to-date information.
+
+\subsection{Taxonomies}
+\label{sec:taxonomies}
+
+TODO
+
+
+\subsection{Result sets}
+\label{sec:resultsets}
+
+TODO
+
+
+
+\section{Manipulating data}
+\label{sec:manipulating}
+
+TODO
+
+
+\subsection{Sorting}
+\label{sec:sorting}
+
+TODO
+
+
+\subsection{Searching}
+\label{sec:searching}
+
+TODO
+
+
+\section{Importing and exporting}
+\label{sec:importexport}
+
+TODO
+
+
+\section{Citation formatting}
+\label{sec:citation}
+
+TODO
+
+
+
+\chapter{Extending \pyblio}
+
+TODO
+
+
+\section{Specializing a parser}
+\label{sec:specializing}
+
+TODO
+
+
+\end{document}

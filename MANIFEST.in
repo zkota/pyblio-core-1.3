@@ -1,6 +1,13 @@
-recursive-include doc *.html *.css
+recursive-include doc/reference *.html *.css
+recursive-include doc/examples *.py *.bib
+recursive-include doc/manual *.pdf *.tex *.dia
+
 recursive-include Pyblio *.py
 recursive-include Pyblio/RIP *.rip *.sip
+
 recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip
-recursive-include examples *.py *.bib
+
 include ez_setup.py
+
+recursive-include Recodec *
+prune Recodec/build

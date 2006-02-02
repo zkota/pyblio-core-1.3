@@ -1,7 +1,6 @@
 from Pyblio.Parsers.Syntax import BibTeX
 from Pyblio import Attribute
 
-
 _monthmap={
     'january': 1,
     'february': 2,

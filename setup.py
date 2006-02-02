@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 NAME = 'pybliographer'
-VERSION = '1.3.1'
+VERSION = '1.3.2'
 
 try:
    from ez_setup import use_setuptools
@@ -18,7 +18,7 @@ class sdist(_sdist):
        import os, sys
 
        print >> sys.stderr, "sdist: regenerating the documentation"
-       r = os.system('epydoc -n "%s %s" -o doc Pyblio' % (NAME, VERSION))
+       r = os.system('epydoc -n "%s %s" -o doc/reference Pyblio' % (NAME, VERSION))
        
        assert r == 0, 'unable to regenerate the documentation, please install "epydoc"'
        

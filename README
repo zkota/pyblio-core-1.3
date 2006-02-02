@@ -26,8 +26,14 @@ itself (except for the ones listed below).
 == Requirements ==
 
  * python >= 2.3
- * ElementTree and cElementTree (http://effbot.org/zone/element-index.htm)
+ * ElementTree and cElementTree (<http://effbot.org/zone/element-index.htm>)
 
+In order to use the bsddb store (optional), you need a recent pybsddb
+version (>= 4.3.3) (<http://pybsddb.sourceforge.net/>)
+  
+  WARNING: the latest python version at that time (2.4.2) has not yet
+  the requested version of pybsddb.
+ 
 
 == Global installation ==
 

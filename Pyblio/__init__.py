@@ -16,3 +16,13 @@ To create, open and start filling a databases, check the
 L{Pyblio.Store} module.
 
 """
+
+import logging
+
+_base = logging.getLogger('pyblio')
+_hdlr = logging.StreamHandler()
+
+_fmtr = logging.Formatter('Pyblio[%(levelname)s]: %(message)s')
+_hdlr.setFormatter(_fmtr)
+
+_base.addHandler(_hdlr)
