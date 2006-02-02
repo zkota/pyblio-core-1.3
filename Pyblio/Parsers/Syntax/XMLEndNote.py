@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-import string, re, StringIO, sys
+import string, re, StringIO, sys, logging
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -61,6 +61,9 @@ typemap = [
 
         
 class Reader(object):
+
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.import.xmlendnote')
     
     id2type = dict (typemap)
 
@@ -142,6 +145,9 @@ class Reader(object):
     def parse (self, fd, db):
         self.db = db
 
+        rs = db.rs.add(True)
+        rs.name = _('Imported from XML EndNote')
+        
         for event, elem in ElementTree.iterparse (fd, events = ('end',)):
             if elem.tag != 'RECORD' and elem.tag != 'record': continue
 
@@ -156,13 +162,19 @@ class Reader(object):
             self.record_end ()
 
             if self.record is not None:
-                self.db.add (self.record)
-
+                k = self.db.add (self.record)
+                rs.add(k)
+                
             elem.clear()
-        return
+        
+        return rs
 
  
 class Writer(object):
+
+    # The official channel in which messages must be sent
+    log = logging.getLogger('pyblio.export.xmlendnote')
+    
 
     type2id = dict ([ (x [1], x [0]) for x in typemap ])
 

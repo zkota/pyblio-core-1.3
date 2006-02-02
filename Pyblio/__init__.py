@@ -20,9 +20,9 @@ L{Pyblio.Store} module.
 import logging
 
 _base = logging.getLogger('pyblio')
-_hdlr = logging.StreamHandler()
+log_handler = logging.StreamHandler()
 
 _fmtr = logging.Formatter('Pyblio[%(levelname)s]: %(message)s')
-_hdlr.setFormatter(_fmtr)
+log_handler.setFormatter(_fmtr)
 
-_base.addHandler(_hdlr)
+_base.addHandler(log_handler)

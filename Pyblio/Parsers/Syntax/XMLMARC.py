@@ -33,6 +33,7 @@ class Reader(object):
     # The official channel in which messages must be sent
     log = logging.getLogger('pyblio.import.xmlmarc')
 
+
     def record_begin (self):
 
         pass
