@@ -1,6 +1,6 @@
 \documentclass[a4paper]{report} % -*- coding: latin-1 -*-
 
-\usepackage{xspace, palatino, hyperref, graphicx}
+\usepackage{xspace, palatino, hyperref, graphicx, verbatim, varioref}
 \usepackage[latin1]{inputenc}
 
 \newcommand{\pyblio}{\textsl{pybliographer}\xspace}
@@ -99,32 +99,174 @@ interfaces to provide up-to-date information.
 \subsection{Taxonomies}
 \label{sec:taxonomies}
 
-TODO
+Taxonomies can be used as \textit{enumerated values}, say for listing
+the possible types of a document, or the language in which a text is
+written. They have however the extra capability of being hierarchical:
+you can define subcategories of a main category.  For instance,
+imagine a \py{doctype} taxonomy with the following values:
 
+\begin{itemize}
+\item Published
+  \begin{itemize}
+  \item Article
+    \begin{itemize}
+    \item Peer-reviewed
+    \item Non peer-reviewed
+    \end{itemize}
+  \item Book
+  \end{itemize}
+\end{itemize}
+
+You can tag an article as \py{Peer-reviewed}, but in the case you
+don't know its status, you can use \py{Article}. If you search for all
+the \py{Published} documents, you will retrieve all those that have
+the \py{Published} tag, but also those that are articles (either
+peer-reviewed or not), books,...
+
+\pyblio uses the \py{Pyblio.Attribute.Txo} object to
+\textit{represent} a logical value in a given taxonomy. Then, a record
+can be tagged with this \py{Txo} object by adding a
+\py{Pyblio.Attribute.TxoItem} value in the corresponding attribute.
+
+Taxonomies can be declared and pre-filled in a database schema, so
+that any database created from the schema will at least contain the
+specified taxonomies.
+
+To see how these taxonomies can be further created and modified,
+please have a look at the \py{txo} member of a \py{Database} object,
+which is an instance of the \py{Pyblio.Store.TxoGroup} class.
 
 \subsection{Result sets}
 \label{sec:resultsets}
 
-TODO
+Result sets are used to manipulate an explicit list of records, among
+all the records kept in a database. They are returned from queries on
+the database, and can be manipulated by the user. Result sets are
+somewhat like mathematical sets, as you cannot put duplicate values in
+them, and they have no default ordering of their elements. You can
+create result sets via the \py{rs} attribute of your database, which
+is an instance of the \py{Pyblio.Store.ResultSetStore}.
+
+A special result set is available as \py{Pyblio.entries}, and contains
+at every time \textbf{all} the records of the database.
 
 
+\subsection{Views}
+\label{sec:views}
+
+We have seen that result sets are \textbf{not} ordered. However, in
+many cases, one needs to provide the records in a specific order. To
+do so, you can create a \textsl{view} on top of a result set. This
+view is created by calling the \py{view} method of the result set,
+with an \py{order} parameter being the description of the sort order
+you wish to have. The module \py{Pyblio.Sort} provides elementary
+constructs to build such a description.
+
+Once the view is created, modifying the corresponding result set leads
+to updating the view accordingly.
 
 \section{Manipulating data}
 \label{sec:manipulating}
 
-TODO
+This section describes some simple operations you can perform on some
+subset of a \pyblio database.
 
+\subsection{Loading and saving}
+\label{sec:loading}
+
+The first thing you need to do is of course \textit{actually having} a
+database available. The following code does the job:
+\verbatiminput{code/create.py}
+
+This example relies on the fact that you already have a schema at
+hand. There are schemas available in the \file{Pyblio.RIP} directory.
+It the starts by reading the schema. The next step is to select the
+actual physical store which will hold your database. We choose to
+store it in a simple XML file, whose canonical extension is
+\file{.bip}. The last operation actually creates the database with the
+specified schema.
+
+Independently  of  the  selected  store,  it  is  always  possible  to
+\textit{export} a  database in the \file{.sip} format,  by calling the
+\py{db.xmlwrite(...)} method of the database.  Such a file can then be
+reused   later  on  by   using  \py{store.dbimport(...)}   instead  of
+\py{store..dbcreate(...)}.
+
+When you have finished modifying your database, you can call
+\py{db.save()} method to ensure that it is properly saved.
+
+\textbf{Caution:} the bsddb store for instance is updated at every
+actual modification, not only when you call the \py{save} method.
+Don't rely on it to provide some kind of \textsl{rollback} feature.
+
+\subsection{Using the registry}
+\label{sec:registry}
+
+\pyblio has a mechanism to register known schemas, and specify which
+import and export filters can properly work with each schema. This
+mechanism can be used to create our database by asking for a specific
+schema, as shown below:
+\verbatiminput{code/registry.py}
+
+The registry must be first initialized. Then you can ask for a
+specific schema, in that case a schema that supports BibTeX
+databases.
+
+\subsection{Updating records}
+\label{sec:updating}
+
+The next example will loop over all the records in a database, and add
+a new author to the list of authors.
+\verbatiminput{code/addauthor.py}
+
+We use the \py{itervalues()} iterator to loop over all the records
+stored in the database. Then, we simply insert a new value in the
+\py{author} attribute. The \py{record.add(...)} method takes care of
+creating the attribute if it does not exist yet.
+
+One thing not to forget is to store the record back in the database
+once the modification is performed. Without this step, you might
+experience weird behavior where some modifications are not properly
+kept.
+
+We finish by saving the database.
 
 \subsection{Sorting}
 \label{sec:sorting}
 
-TODO
+To sort records, you create \textit{views} (see
+section~\vref{sec:views}). You can of course create multiple views on
+top of a single result set. In order to sort the whole database,
+simply create the view on \py{database.entries} instead of a result
+set. If you want to sort your database by decreasing year and then by
+author, you can use a view like that: 
 
+\verbatiminput{code/sort.py}
+
+So, sorting  constraints can be  arbitrarily chained with  the \py{\&}
+operator,and  each constraint  can be  either  \textit{ascending} (the
+default),  or   \textit{descending}.   This  defines   a  very  simple
+\textsl{Domain Specific  Language}, or  DSL for short.  Such languages
+also appear in other part of \pyblio (searching, citation formatting),
+as they are  a convenient way to describe  complex abstraction without
+having to reinvent a complete environment.
 
 \subsection{Searching}
 \label{sec:searching}
 
-TODO
+To search,  you call  the \py{database.query(...)} method.  The method
+takes a query specification as argument, which is constructed with the
+help of another DSL, similar to the one used for sorting. You have
+access to a certain number of primitive queries, which are then linked
+together with the usual boolean operators, as in the following
+example:
+
+\verbatiminput{code/search.py}
+
+We first get the taxonomy  item corresponding to articles, and we then
+compose  the   following  query:  get  all  the   documents  that  are
+\textit{not} articles, and which contain the word \textit{lazyness} in
+any attribute.
 
 
 \section{Importing and exporting}
