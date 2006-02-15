@@ -147,10 +147,11 @@ class TestFormat (pybut.TestCase):
         
     def testInitials (self):
         
-        assert Person.initials (u'Frédéric') == 'F.'
-        assert Person.initials (u'Jean-Pierre') == 'J.-P.'
-        assert Person.initials (u'Jean Pierre') == 'J.P.'
-        assert Person.initials (u'J.Pierre') == 'J.P.'
+        self.failUnlessEqual(Person.initials(u'Frédéric'), 'F.')
+        self.failUnlessEqual(Person.initials(u'Jean-Pierre'), 'J.-P.')
+        self.failUnlessEqual(Person.initials(u'Jean Pierre'), 'J.P.')
+        self.failUnlessEqual(Person.initials(u'J.Pierre'), 'J.P.')
+        self.failUnlessEqual(Person.initials(u'JP'), 'J.P.')
 
     def testMissingPerson (self):
 

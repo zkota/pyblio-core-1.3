@@ -24,7 +24,13 @@ _ini_re = re.compile (r'([.-]|\s+)')
 def initials (name):
     """ Normalizes a first name as an initial """
 
-    if not name: return None
+    if not name:
+        return None
+
+    # if the name is full upper, we assume it is already the
+    # contracted initials form.
+    if name.upper() == name and len(name) < 4:
+        return '.'.join(name) + '.'
     
     res = []
     
