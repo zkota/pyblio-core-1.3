@@ -29,7 +29,9 @@ def initials (name):
 
     # if the name is full upper, we assume it is already the
     # contracted initials form.
-    if name.upper() == name and len(name) < 4:
+    if (name.upper() == name and
+        len(name) < 4 and 
+        _ini_re.search(name) is None):
         return '.'.join(name) + '.'
     
     res = []

@@ -152,6 +152,8 @@ class TestFormat (pybut.TestCase):
         self.failUnlessEqual(Person.initials(u'Jean Pierre'), 'J.P.')
         self.failUnlessEqual(Person.initials(u'J.Pierre'), 'J.P.')
         self.failUnlessEqual(Person.initials(u'JP'), 'J.P.')
+        self.failUnlessEqual(Person.initials(u'J'), 'J.')
+        self.failUnlessEqual(Person.initials(u'J.'), 'J.')
 
     def testMissingPerson (self):
 
