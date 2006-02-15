@@ -1,4 +1,4 @@
-FIGS = fig/hierarchy.pdf
+FIGS = fig/hierarchy.pdf fig/tree.pdf
 
 manual.pdf: manual.tex $(FIGS)
 	pdflatex manual.tex

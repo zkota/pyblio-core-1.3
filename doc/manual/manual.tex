@@ -31,7 +31,7 @@ interoperability and durability.  Unfortunately, real-world data often
 contain  a  great  number   of  mistakes,  or  reflect  certain  local
 conventions. \pyblio is on  the \textit{pragmatic} side of considering
 these issues as part of its business: most of the parsing tasks can be
-easily overriden and  specialized in order to \textit{fit  the code to
+easily overridden and  specialized in order to \textit{fit  the code to
   the data}, and not the other way around.
 
 
@@ -105,27 +105,20 @@ written. They have however the extra capability of being hierarchical:
 you can define subcategories of a main category.  For instance,
 imagine a \py{doctype} taxonomy with the following values:
 
-\begin{itemize}
-\item Published
-  \begin{itemize}
-  \item Article
-    \begin{itemize}
-    \item Peer-reviewed
-    \item Non peer-reviewed
-    \end{itemize}
-  \item Book
-  \end{itemize}
-\end{itemize}
+\begin{center}
+  \includegraphics[width=0.7\textwidth]{fig/tree.pdf}
+\end{center}
 
-You can tag an article as \py{Peer-reviewed}, but in the case you
-don't know its status, you can use \py{Article}. If you search for all
-the \py{Published} documents, you will retrieve all those that have
-the \py{Published} tag, but also those that are articles (either
-peer-reviewed or not), books,...
+You can tag an article as \py{Peer-reviewed}, but you are not required
+to use the \textit{leaf} values in this tree. In the case you don't
+know if a publication is reviewed or not, you can use the \py{Article}
+tag. Similarly, if you search for all the \py{Published} documents,
+you will retrieve all those that have the \py{Published} tag, but also
+those that are articles (either peer-reviewed or not), books,...
 
 \pyblio uses the \py{Pyblio.Attribute.Txo} object to
-\textit{represent} a logical value in a given taxonomy. Then, a record
-can be tagged with this \py{Txo} object by adding a
+\textit{represent} a logical value in a given taxonomy. A record can
+be tagged with this \py{Txo} object by adding a
 \py{Pyblio.Attribute.TxoItem} value in the corresponding attribute.
 
 Taxonomies can be declared and pre-filled in a database schema, so
@@ -265,21 +258,113 @@ example:
 
 We first get the taxonomy  item corresponding to articles, and we then
 compose  the   following  query:  get  all  the   documents  that  are
-\textit{not} articles, and which contain the word \textit{lazyness} in
+\textit{not} articles, and which contain the word \textit{laziness} in
 any attribute.
 
 
 \section{Importing and exporting}
 \label{sec:importexport}
 
-TODO
+As  \pyblio  is not  bound  to a  single  data  schema, importing  and
+exporting from  specific formats (like MARC,  BibTeX, Dublin Core,...)
+cannot  be achieved  once  for all.  In  order to  avoid  the need  to
+recreate a  BibTeX parser for every database  schema invented, \pyblio
+makes a  clear separation between  \textit{syntactic parsers}, located
+in  \py{Pyblio.Parsers.Syntactic}  and  \textit{semantic parsers},  in
+\py{Pyblio.Parsers.Semantic}. A syntactic parser  is only in charge of
+analyzing  or  generating  a   file  format,  without  any  assumption
+regarding the meaning of the  fields it reads. These syntactic parsers
+are then reused by the semantic code, which relates the meaning of the
+fields to the corresponding database.
+
+In addition, the parsers are  written so that the handling of separate
+fields can be  easily overridden in a subclass.  This makes it possible
+to extend them or  take some local \textit{specificities} into account
+(if you  need to  massage data that  contains systematic  errors, this
+proves \textit{very} useful).
+
+The  following example  assumes you  have created  a BibTeX-compatible
+database, as explained in the section\vref{sec:registry}. It will then
+open a proper BibTeX file, and merge it into the current database. The
+list of imported references is returned as a result set.
+\verbatiminput{code/import.py}
 
 
 \section{Citation formatting}
 \label{sec:citation}
 
-TODO
+The \textit{painful} part  of writing formatting code is  to take into
+account the  missing fields  without multiplying explicit  checks that
+would quickly be boring. In addition,  it is important to make it easy
+to factor  out common operations,  like formatting a list  of authors,
+and reuse them in different contexts.
 
+\pyblio  provides a \textit{domain  specific language}  that addresses
+these problems. However,  it is not intended as  a complete formatting
+language, so you cannot use it  for instance to lay out your citations
+in a complete  HTML web page (but this  specific part is comparatively
+easy).
+
+Back to practice. You can define some citation fragments like this:
+
+\begin{verbatim}
+from Pyblio.Format import People, all, one
+
+authors = People.lastFirst(all('author'))
+title = one('title') | u'(no title)'
+\end{verbatim}
+
+In this example,  the \py{authors} variable is composed  by taking all
+the  values in the  author field  (\py{all('author')}), and  pass them
+through the  \py{lastFirst} transformation, which will  format them as
+\textit{Last Name,  First Name}. The \py{Person} module contains
+other formatting variants for person names.
+
+The  \py{title} variable is  built by  taking the  first value  of the
+title  field (via  the \py{one}  operator), and  in case  it  does not
+exist,  by using the  string \textit{no  title} instead.   This \py{|}
+alternative  operator  can be  used  everywhere  a  definition can  be
+invalid.
+
+You can then group these fields together, possibly adding some style
+information in the process:
+\begin{verbatim}
+from Pyblio.Format import B
+
+citation = join(', ')[B[title], authors]
+\end{verbatim}
+
+The \py{join} operator  with take the parts between  square braces and
+link them  together with the text  specified in parameter,  a comma in
+that case.  When one of  the composing parts  is not available,  it is
+simply ignored, unless  no part is available, in  which case the whole
+expression  is invalid  (which  can  be trapped  by  using the  \py{|}
+operator). In addition, the title is enclosed in a bold \py{B} tag.
+
+Once the citation style is defined, it must be \textit{compiled} on a
+specific database:
+\begin{verbatim}
+formatter = citation(db)
+\end{verbatim}
+
+This operation checks that all the fields accessed are actually part
+of the schema. It also pre-computes certain information, so that the
+actual formatting of specific records can be a fast process.
+
+Then, you can use the returned formatter and apply it to any number of
+records from the corresponding database:
+\begin{verbatim}
+cited = formatter(record)
+\end{verbatim}
+
+You still to get a definitive result, as you still need to select the
+output format for your citation. If you want it in HTML, you can do
+this last operation:
+\begin{verbatim}
+from Pyblio.Format import HTML
+
+html = HTML.generate(cited)
+\end{verbatim}
 
 
 \chapter{Extending \pyblio}
