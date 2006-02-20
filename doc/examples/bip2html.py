@@ -17,12 +17,15 @@ assert db.schema.id == "org.pybliographer/bibtex/0.1"
 
 # Define the citation format using pyblio's domain specific language
 
-from Pyblio.Format import one, all, join, switch, I, B
+from Pyblio.Format import one, all, join, switch, I, B, A
 from Pyblio.Format import Person, Date
 
 
 # title is either the title attribute, or the string "(no title)"
 title = B[one('title') | u'(no title)']
+
+# if there is an URL available, make the title clickable
+title = A(href=one('url'))[title] | title
 
 # To generate the list of authors, take all the elements in the
 # 'author' attribute, pass them to a formatter that returns the names
