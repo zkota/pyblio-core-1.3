@@ -293,17 +293,27 @@ list of imported references is returned as a result set.
 \section{Citation formatting}
 \label{sec:citation}
 
-The \textit{painful} part  of writing formatting code is  to take into
-account the  missing fields  without multiplying explicit  checks that
-would quickly be boring. In addition,  it is important to make it easy
-to factor  out common operations,  like formatting a list  of authors,
-and reuse them in different contexts.
+The \textit{painful}  part of writing  citation formatting code  is to
+take  into account incomplete  records (sometimes  you don't  know the
+volume or  the pages,  or you  only know one  of the  two,...) without
+multiplying explicit checks that would quickly be boring. In addition,
+it is important to make it  easy to factor out common operations, like
+formatting a list of authors, so  that you can reuse them in different
+contexts.
 
 \pyblio  provides a \textit{domain  specific language}  that addresses
-these problems. However,  it is not intended as  a complete formatting
-language, so you cannot use it  for instance to lay out your citations
-in a complete  HTML web page (but this  specific part is comparatively
-easy).
+these problems.   A domain specific language  (or DSL for  short) is a
+specialized language  that lives inside  a more general  language.  In
+our case, it  means that \pyblio provides a  set of classes, functions
+and constructs  that are  highly specialized to  make the  business of
+writing the  citation code easy.  The  beauty of the idea  is that, in
+case of a missing feature in the  DSL, you still have all the power of
+python at your hand.
+
+In  any  case, this  DSL  is not  intended  as  a complete  formatting
+language, so  you cannot use  it to lay  out your citations in  a full
+blown  HTML web  page  for  instance.  Howeve,  the  specific part  of
+putting your citations in context is comparatively easy.
 
 Back to practice. You can define some citation fragments like this:
 
@@ -314,32 +324,33 @@ authors = People.lastFirst(all('author'))
 title = one('title') | u'(no title)'
 \end{verbatim}
 
-In this example,  the \py{authors} variable is composed  by taking all
-the  values in the  author field  (\py{all('author')}), and  pass them
-through the  \py{lastFirst} transformation, which will  format them as
-\textit{Last Name,  First Name}. The \py{Person} module contains
-other formatting variants for person names.
+In this example,  the \py{authors} variable is build  up by taking all
+the values  in the author  field (\py{all('author')}), and  by passing
+them through  the \py{lastFirst} function,  which will format  them as
+\textit{Last Name, First Name}.  The \py{Person} module contains other
+formatting variants for  person names if you want  to use initials for
+instance.
 
 The  \py{title} variable is  built by  taking the  first value  of the
 title  field (via  the \py{one}  operator), and  in case  it  does not
 exist,  by using the  string \textit{no  title} instead.   This \py{|}
-alternative  operator  can be  used  everywhere  a  definition can  be
-invalid.
+alternative  operator can  be used  everywhere to  express  a fallback
+value wherea definition can be invalid.
 
-You can then group these fields together, possibly adding some style
-information in the process:
+You can then group the  authors and the title together, possibly while
+adding some typographic style information in the process:
 \begin{verbatim}
 from Pyblio.Format import B
 
 citation = join(', ')[B[title], authors]
 \end{verbatim}
 
-The \py{join} operator  with take the parts between  square braces and
-link them  together with the text  specified in parameter,  a comma in
-that case.  When one of  the composing parts  is not available,  it is
+The \py{join} operator  will take the parts between  square braces and
+bind them  together with the text  specified in parameter,  a comma in
+that case.   When one of the  composing parts is not  available, it is
 simply ignored, unless  no part is available, in  which case the whole
 expression  is invalid  (which  can  be trapped  by  using the  \py{|}
-operator). In addition, the title is enclosed in a bold \py{B} tag.
+operator). In the example, the title is enclosed in a bold \py{B} tag.
 
 Once the citation style is defined, it must be \textit{compiled} on a
 specific database:
@@ -349,7 +360,7 @@ formatter = citation(db)
 
 This operation checks that all the fields accessed are actually part
 of the schema. It also pre-computes certain information, so that the
-actual formatting of specific records can be a fast process.
+actual formatting of specific records can be faster.
 
 Then, you can use the returned formatter and apply it to any number of
 records from the corresponding database:
@@ -357,8 +368,8 @@ records from the corresponding database:
 cited = formatter(record)
 \end{verbatim}
 
-You still to get a definitive result, as you still need to select the
-output format for your citation. If you want it in HTML, you can do
+You still  don't get a  definitive result, as  you need to  select the
+output format  for your citation. If you  want it in HTML,  you can do
 this last operation:
 \begin{verbatim}
 from Pyblio.Format import HTML
@@ -366,6 +377,8 @@ from Pyblio.Format import HTML
 html = HTML.generate(cited)
 \end{verbatim}
 
+Now, \py{html} contains a properly escaped HTML fragment which you can
+use in your own context.
 
 \chapter{Extending \pyblio}
 

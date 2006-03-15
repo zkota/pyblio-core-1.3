@@ -58,16 +58,16 @@ basemap = {
 def _accent (stack, cmd, tt):
 
     try:
-        m = basemap [cmd]
+        m = basemap[cmd]
 
     except KeyError:
-        return Parser.Text ('?')
+        return Parser.Text('?')
     
     if isinstance (tt, Parser.Text):
 
         if len (tt) > 1:
-            t = tt [0]
-            stack.insert (0, Parser.Text (tt [1:]))
+            t = tt[0]
+            stack.insert(0, Parser.Text(tt[1:]))
         else:
             t = tt
             
@@ -77,11 +77,11 @@ def _accent (stack, cmd, tt):
         if isinstance (t, Parser.Text):
             pass
 
-        elif isinstance (t, Parser.Cmd):
+        elif isinstance(t, Parser.Cmd):
             # There are a few special cases where one wants to accent a command, like:
             #              \'{\i}
             if t._cmd == 'i':
-                t = Parser.Text ('i')
+                t = Parser.Text('i')
             else:
                 raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
 
@@ -97,37 +97,44 @@ def _accent (stack, cmd, tt):
         raise KeyError ("cannot find %s in map %s" % (repr (t), repr (cmd)))
 
 
-commands = {
-    "'":  (_accent, 1),
-    '`':  (_accent, 1),
-    '^':  (_accent, 1),
-    '"':  (_accent, 1),
-    'c':  (_accent, 1),
-    '~':  (_accent, 1),
-    'ss': (u'ß', 0)
-    }
+class Environ(object):
 
-class Environ (object):
+    commands = {
+        "'":  (_accent, 1),
+        '`':  (_accent, 1),
+        '^':  (_accent, 1),
+        '"':  (_accent, 1),
+        'c':  (_accent, 1),
+        '~':  (_accent, 1),
+        'ss': (u'ß', 0),
+        }
+
 
     def run (self, cmd, stack):
         try:
-            fn, count = commands [cmd]
+            fn, count = self.commands[cmd]
 
         except KeyError:
             # The \char macro is special: \char125 -> character with ascii code 125
             if cmd.startswith ('char'):
-                try: return Parser.Text (unichr (int (cmd [4:])))
+                try: return Parser.Text(unichr(int(cmd[4:])))
                 except ValueError: pass
-                
-            return Parser.Text (cmd)
 
+            # Try with local extensions
+            fn = getattr(self, 'do_' + cmd, None)
+
+            if fn is None:
+                return Parser.Text(cmd)
+            else:
+                return fn(cmd, stack)
+            
         args = []
         
         while count:
             try:
                 args.append (stack.pop (0))
             except IndexError:
-                raise Exceptions.ParserError ('command %s requires %d arguments, got %s' % (
+                raise Exceptions.ParserError('command %s requires %d arguments, got %s' % (
                     repr (cmd), count, len (args)))
             
             count -= 1
