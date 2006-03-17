@@ -423,7 +423,7 @@ class _Proto(str):
 
 glob = globals ()
 
-for t in ('A', 'B', 'I', 'Small'):
+for t in ('A', 'B', 'I', 'Small', 'Span'):
     glob[t] = _Proto(t)
 
 BR = _Proto('BR')[_S1T('')]

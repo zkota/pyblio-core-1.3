@@ -24,6 +24,12 @@ Transformation of the formatted record into an HTML representation.
 
 from xml.sax.saxutils import escape
 
+def _mkattrs(attrs):
+    # merge the attributes, handling the special case of attributes
+    # like _class -> class.
+    return ' '.join(['%s="%s"' % (k.lstrip('_'), v)
+                     for k, v in attrs.items()])
+
 def generate (t):
     """
     Actual HTML generator.
@@ -34,8 +40,8 @@ def generate (t):
     @return: the HTML code representing the cited record
     """
     
-    if isinstance (t, (str, unicode)): return escape (t)
-    return _map [t.tag] (t)
+    if isinstance (t, (str, unicode)): return escape(t)
+    return _map [t.tag](t)
     
 def _do_t (t):
     return ''.join (map (generate, t.children))
@@ -46,11 +52,15 @@ def _do_i (t):
 def _do_small (t):
     return '<small>' + ''.join (map (generate, t.children)) + '</small>'
 
+def _do_span (t):
+    attrs = _mkattrs(t.attributes)
+    return '<span %s>' % attrs + ''.join (map (generate, t.children)) + '</span>'
+
 def _do_b (t):
     return '<b>' + ''.join (map (generate, t.children)) + '</b>'
     
 def _do_a (t):
-    attrs = ' '.join ([ '%s="%s"' % (k, v) for k, v in t.attributes.items () ])
+    attrs = _mkattrs(t.attributes)
     return '<a %s>' % attrs + ''.join (map (generate, t.children)) + '</a>'
 
 def _do_br (t):
@@ -64,6 +74,7 @@ _map = {
     'a' : _do_a,
     'br': _do_br,
     'small': _do_small,
+    'span': _do_span,
     }
 
 

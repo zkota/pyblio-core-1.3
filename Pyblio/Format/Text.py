@@ -50,6 +50,7 @@ _map = {
     'i' : _do_t,
     'b' : _do_t,
     'small' : _do_t,
+    'span'  : _do_t,
     'a' : _do_a,
     'br': _do_br,
     }
