@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This file is part of pybliographer
 # 
 # Copyright (C) 1998-2003 Frederic GOBRY
@@ -41,6 +42,7 @@ def _deferredText(text):
         return _S1T(text)
     return text
 
+
 class Glue(object):
     """ A base class that known how to join together multiple
     fragments of DSL code."""
@@ -65,9 +67,9 @@ class _Sum(Glue):
         self.b = b
         return
 
-    def __call__ (self, db):
-        a = self.a(db)
-        b = self.b(db)
+    def __call__ (self, db, props={}):
+        a = self.a(db, props)
+        b = self.b(db, props)
         return S2.Sum(a, b)
 
     def __repr__ (self):
@@ -81,9 +83,9 @@ class _Or(Glue):
         self.b = b
         return
 
-    def __call__(self, db):
-        a = self.a(db)
-        b = self.b(db)
+    def __call__(self, db, props={}):
+        a = self.a(db, props)
+        b = self.b(db, props)
         return S2.Or(a, b)
 
     def __repr__(self):
@@ -98,7 +100,7 @@ class _S1T(Glue):
         self.t = t
         return
 
-    def __call__(self, db):
+    def __call__(self, db, props={}):
         return S2.Text(self.t)
     
     def __repr__(self):
@@ -139,10 +141,11 @@ class _Join(Glue):
         self.children.extend([_deferredText(t) for t in children])
         return self
 
-    def __call__(self, db):
+    def __call__(self, db, props={}):
 
-        return S2.Join(self.middle(db), self.last(db),
-                       [child(db) for child in self.children])
+        return S2.Join(self.middle(db, props),
+                       self.last(db, props),
+                       [child(db, props) for child in self.children])
     
 
 class switch(Glue):
@@ -181,7 +184,7 @@ class switch(Glue):
     def __repr__(self):
         return 'switch(%s)' % repr(self._switch)
 
-    def __call__(self, db):
+    def __call__(self, db, props={}):
         # first of all, get access to the actual Txo being checked.
 
         parts = self._switch.split('.')
@@ -215,7 +218,7 @@ class switch(Glue):
         sw = {}
 
         if self._default:
-            default = self._default(db)
+            default = self._default(db, props)
         else:
             default = None
 
@@ -227,11 +230,45 @@ class switch(Glue):
                 raise KeyError(_('%s: unknown txo %s in group %s') % (
                     repr(self), repr(name), repr(s.group)))
 
-            sw[Txo(txo)] = child(db)
+            sw[Txo(txo)] = child(db, props)
 
 
         return S2.Switch(_fetch, sw, default)
+
+
+class i18n(Glue):
+    """ Translatable content.
+
+    To create translatable content, do:
+
+       >>> citation = i18n(fr=u'En français',
+                           en=u'In english',
+                           default=u'Zloktagrok')
+                           
+       >>> compiled = citation(db, props={'ln': 'fr'})
+    """
+
+    def __init__(self, **langs):
+        
+        self._langs = {}
+
+        for k, v in langs.iteritems():
+            if k == 'default': k = ''
+            self._langs[k] = _deferredText(v)
+        return
+
+    def __call__(self, db, props={}):
+
+        ln = props.get('ln', '')
+        
+        try:
+            c = self._langs[ln]
+        except KeyError:
+            c = self._langs['']
+
+        return c(db, props)
     
+            
 # ==================================================
 # Attribute accessors
 # ==================================================
@@ -245,7 +282,7 @@ class _Validated(Glue):
         return
 
 
-    def __call__(self, db):
+    def __call__(self, db, props={}):
         """ Return a compiled version of the attribute accessor."""
         
         parts = self._f.split('.')
@@ -391,11 +428,14 @@ class _Tag(Glue):
             
         return "DSL.Tag(%r%s)" % (self.tag, rstr)
 
-    def __call__(self, db):
-        children = [child(db) for child in self.children]
+    def __call__(self, db, props={}):
+        children = [child(db, props) for child in self.children]
         kwargs = {}
         for k, v in self.attributes.items():
-            kwargs[k] = v(db)
+            try:
+                kwargs[k] = v(db, props)
+            except TypeError:
+                print repr(v)
             
         return Tag(self.tag, children, kwargs)
     
@@ -452,14 +492,14 @@ def lazy(fn):
                 
             self.__kargs = kargs
             
-        def __call__(self, db):
-            args = [arg(db) for arg in self.__args]
+        def __call__(self, db, props={}):
+            args = [arg(db, props) for arg in self.__args]
             kargs = {}
             for k, v in self.__kargs.items():
-                kargs[k] = v(db)
+                kargs[k] = v(db, props)
 
             def _late(record):
-                return fn (record, *args, **kargs)
+                return fn(record, *args, **kargs)
 
             return _late
 

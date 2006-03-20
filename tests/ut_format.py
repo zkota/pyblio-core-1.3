@@ -3,7 +3,7 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch, Misc, Pages, Text
+from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch, Misc, Pages, Text, i18n
 
 
 class TestFormat (pybut.TestCase):
@@ -17,8 +17,8 @@ class TestFormat (pybut.TestCase):
         return
 
 
-    def _cmp (self, v, s):
-        stage2 = v(self.db)
+    def _cmp (self, v, s, **args):
+        stage2 = v(self.db, args)
         stage3 = stage2(self.rec)
         
         r = HTML.generate(stage3)
@@ -246,7 +246,25 @@ class TestFormat (pybut.TestCase):
         self.rec['type'] = [txo('BOOK')]
         self.failUnlessEqual(run(citation, self.rec), 'My title')
         return
-    
+
+    def testI18n(self):
+        
+        cite = i18n(fr=u'titre ' + one('title'),
+                    en=u'title ' + one('title'),
+                    default = u'default ' + one('title'))
+
+        r = []
+        for ln in ('en', 'fr', 'it'):
+            f = cite(self.db, props={'ln': ln})
+            r.append(Text.generate(f(self.rec)))
+
+        self.failUnlessEqual(r, [
+            u'title My title',
+            u'titre My title',
+            u'default My title'
+            ])
+        
+        
 
 class TestOutput (pybut.TestCase):
 
