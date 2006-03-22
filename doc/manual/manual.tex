@@ -1,7 +1,8 @@
 \documentclass[a4paper]{report} % -*- coding: latin-1 -*-
 
-\usepackage{xspace, palatino, hyperref, graphicx, verbatim, varioref}
+\usepackage{xspace, palatino, graphicx, verbatim, varioref}
 \usepackage[latin1]{inputenc}
+\usepackage[pdftex]{hyperref}
 
 \newcommand{\pyblio}{\textsl{pybliographer}\xspace}
 \newcommand{\py}[1]{\texttt{#1}}
@@ -28,10 +29,12 @@ of this language.
 bibliographic  data, nor  does it  solely  rely on  a single  existing
 standards.    Standards  are   important   in  order   to  allow   for
 interoperability and durability.  Unfortunately, real-world data often
-contain  a  great  number   of  mistakes,  or  reflect  certain  local
-conventions. \pyblio is on  the \textit{pragmatic} side of considering
-these issues as part of its business: most of the parsing tasks can be
-easily overridden and  specialized in order to \textit{fit  the code to
+contain   mistakes   (sometimes   systematic   mistakes   due   to   a
+misunderstanding of the meaning of  a field), or reflect certain local
+conventions  which are  not  part of  a  standard. \pyblio  is on  the
+\textit{pragmatic}  side of considering  these issues  as part  of its
+business: most of the parsing  and processing tasks it performs can be
+easily overridden and specialized in  order to \textit{fit the code to
   the data}, and not the other way around.
 
 
@@ -303,17 +306,19 @@ contexts.
 
 \pyblio  provides a \textit{domain  specific language}  that addresses
 these problems.   A domain specific language  (or DSL for  short) is a
-specialized language  that lives inside  a more general  language.  In
-our case, it  means that \pyblio provides a  set of classes, functions
-and constructs  that are  highly specialized to  make the  business of
-writing the  citation code easy.  The  beauty of the idea  is that, in
-case of a missing feature in the  DSL, you still have all the power of
-python at your hand.
+language specifically intended to solve  a given problem, but which is
+usually built up from a more  general language.  In our case, it means
+that \pyblio provides a set  of classes, functions and constructs that
+are highly  specialized to make  the business of writing  the citation
+code  easy.  The beauty  of the  idea is  that, in  case of  a missing
+feature in  this DSL, you still have  all the power of  python at your
+fingertips.
 
 In  any  case, this  DSL  is not  intended  as  a complete  formatting
 language, so  you cannot use  it to lay  out your citations in  a full
-blown  HTML web  page  for  instance.  Howeve,  the  specific part  of
-putting your citations in context is comparatively easy.
+blown HTML web page for instance.  Howeve, once a citation is built up
+from a reord,  the specific part of putting it in  a larger context is
+comparatively easy.
 
 Back to practice. You can define some citation fragments like this:
 
