@@ -158,28 +158,30 @@ class switch(Glue):
        
     """
 
-    def __init__(self, switch):
+    def __init__(self, switch, _cases={}, _default=None):
 
         self._switch = switch
+
+        # Warning: we do not affect the default parameter here. Doing
+        # so would lead to weird behavior if it is ever modified later
+        # on.
         self._cases = {}
-        self._default = None
+        self._cases.update(_cases)
+            
+        self._default = _default
         return
 
     def case(self, **kargs):
+        new = switch(self._switch, self._cases, self._default)
+        
         for k, v in kargs.items():
-            if k in self._cases:
-                raise RuntimeError(_('%s: case %s defined more than once') % (
-                    repr(self), repr(k)))
-
-            self._cases[k] = _deferredText(v)
-        return self
+            new._cases[k] = _deferredText(v)
+        return new
 
     def default(self, v):
-        if self._default is not None:
-            raise RuntimeError(_('%s: default case defined more than once') % (
-                    repr(self),))
-        self._default = _deferredText(v)
-        return self
+        new = switch(self._switch, self._cases, self._default)
+        new._default = _deferredText(v)
+        return new
     
     def __repr__(self):
         return 'switch(%s)' % repr(self._switch)
