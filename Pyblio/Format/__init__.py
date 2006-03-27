@@ -32,12 +32,12 @@ not to compose a whole page.
 The code here allows the writing of citation styles with a convenient
 syntax:
 
-  >>> authors  = lastFirst (all ('author'))
+  >>> authors  = lastFirst(all('author'))
 
-  >>> location = join (', ') ['vol. ' + one ('volume'),
-  ...                         'num. ' + one ('number'), ]
+  >>> location = join(', ')['vol. ' + one ('volume'),
+  ...                       'num. ' + one ('number'), ]
                        
-  >>> citation = join (', ') [ authors , I [ one ('title') | 'untitled' ] ]
+  >>> citation = join(', ')[ authors , I[one('title') | 'untitled'] ]
 
 
 Citing a reference is a multi-stage operation:

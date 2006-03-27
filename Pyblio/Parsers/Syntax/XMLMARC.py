@@ -87,7 +87,7 @@ class Reader(object):
 
                 values = [ (x.attrib ['code'], x.text or '') for x in data.findall (subfield) ]
 
-                fn = getattr (self, 'do_%d' % tag, self.do_default)
+                fn = getattr (self, 'do_%03d' % tag, self.do_default)
                 fn (tag, ind1, ind2, values)
 
             self.record_end ()
