@@ -64,19 +64,41 @@ class DOIQuery(object):
         self._uid = 0
         self._queue = []
 
+        # This holds the pending batchs to submit to the remote system
+        self._batch = []
+
+        self._running = False
+        
         self._finished = None
         self._stats = [0, 0]
         return
 
-    def _send(self):
+    def _make_batch(self):
 
         enqueued = self._queue
         self._queue = []
 
+        self._batch.append(enqueued)
+        
+        if not self._running:
+            self._running = True
+            self._send()
+        return
+
+    def _send(self):
+
+        try:
+            enqueued = self._batch.pop()
+        except IndexError:
+            self._running = False
+            return
+
+        self.log.debug('sending a new batch to the server')
+        
         data = {
             'usr': self.user,
             'pwd': self.pwd,
-            'qdata': '\n'.join([x[1] for x in enqueued])
+            'qdata': '\n'.join([x[1] for x in enqueued]).encode('utf-8')
             }
 
         req = client.getPage(
@@ -86,6 +108,8 @@ class DOIQuery(object):
 
 
         def received(data):
+            self.log.debug('received a batch from the server')
+            
             r = {}
 
             for line in data.split('\n'):
@@ -127,7 +151,7 @@ class DOIQuery(object):
                 def year(val):
                     return Attribute.Date(year=int(val))
                 
-                one('doi', doi)
+                rec.add('doi', doi, Attribute.ID)
 
                 tp = self.db.txo['doctype'].byname
                 
@@ -156,28 +180,34 @@ class DOIQuery(object):
                 r.setdefault(key, []).append(rec)
 
                 
-            # trigged the deferred of _all_ the clients of this batch
+            # trigger the deferred of _all_ the clients of this batch
             for uid, q in enqueued:
                 self._pending[uid].callback(r.get(uid, []))
                 del self._pending[uid]
 
             self._stats[0] += len(enqueued)
-            if self._finished and not self._pending:
-                self._finished.callback(self._stats)
+            self._batch_done()
             return
 
         def failed(reason):
+            self.log.debug('too bad, the batch failed: %s' % str(reason))
+            
             for uid, q in enqueued:
                 self._pending[uid].errback(reason)
                 del self._pending[uid]
                 
             self._stats[1] += len(enqueued)
-
-            if self._finished and not self._pending:
-                self._finished.callback(self._stats)
+            self._batch_done()
             return
 
         req.addCallback(received).addErrback(failed)
+        return
+
+    def _batch_done(self):
+        if self._finished and not self._pending:
+            self._finished.callback(self._stats)
+
+        self._send()
         return
     
     def _prepare(self, q):
@@ -187,15 +217,14 @@ class DOIQuery(object):
         self._queue.append((self._uid, q))
         self._uid += 1
 
-
         if len(self._queue) >= self.BATCH:
-            self._send()
+            self._make_batch()
             
         return d
 
     def finished(self):
         assert not self._finished, 'finished() called twice'
-        self._send()
+        self._make_batch()
 
         self._finished = defer.Deferred()
         return self._finished
