@@ -45,7 +45,7 @@ _schema = {}
 # and a local one, in the user's home directory.
 import Pyblio
 
-_base = os.path.dirname(Pyblio.__file__)
+_base = os.path.abspath(os.path.dirname(Pyblio.__file__))
 _user = os.path.expanduser('~/.pyblio')
 
 RIP_dirs = {

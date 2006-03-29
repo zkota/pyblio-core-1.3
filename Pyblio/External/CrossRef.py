@@ -13,6 +13,11 @@ from twisted.python import failure
 import random
 import urllib
 
+import logging
+
+from Pyblio import Store, Attribute
+
+
 class DOIQuery(object):
 
     """ Query DOI numbers.
@@ -20,11 +25,18 @@ class DOIQuery(object):
     Convenience module that properly groups queries to CrossRef in
     order to increase throughput.
 
-    >>> cnx = DOIQuery(user=..., pwd=...)
+    >>> cnx = DOIQuery(db, user=..., pwd=...)
     >>> for info in to_resolve:
     ...     cnx.journalSearch(...).addCallback(got_results)
     >>> cnx.finished()
 
+    The 'db' parameter is a database from which the queries and
+    results will be composed. It must conform to the
+
+       'org.pybliographer/crossref/0.1'
+
+    schema.
+    
     The actual queries take place when enough searches have been
     requested, or when the .finished() method is called.
 
@@ -39,14 +51,21 @@ class DOIQuery(object):
     BATCH = 30
 
     baseURL = 'http://doi.crossref.org/servlet/query'
+
+
+    log = logging.getLogger('pyblio.external.crossref')
     
-    def __init__(self, user, pwd):
+    def __init__(self, db, user, pwd):
+        self.db   = db
         self.user = user
         self.pwd  = pwd
 
         self._pending = {}
         self._uid = 0
         self._queue = []
+
+        self._finished = None
+        self._stats = [0, 0]
         return
 
     def _send(self):
@@ -83,22 +102,80 @@ class DOIQuery(object):
                 except (IndexError, ValueError):
                     continue
 
-                if doi:
-                    r.setdefault(key, []).append(doi)
+                if key not in self._pending:
+                    raise ValueError('key %s received while not expected' % repr(key))
 
+                lp = len(parts)
+                
+                if lp not in (10, 12):
+                    raise ValueError('result %s has not the expected syntax' % repr(line))
+
+                if not doi:
+                    self.log.debug('no DOI for key %s (%s)' % (repr(key), repr(line)))
+                    continue
+                
+                # recreate a proper record given the fields
+                rec = Store.Record()
+                def one(field, val):
+                    if val:
+                        rec.add(field, val, Attribute.Text)
+                    return
+
+                def person(val):
+                    return Attribute.Person(last=val)
+
+                def year(val):
+                    return Attribute.Date(year=int(val))
+                
+                one('doi', doi)
+
+                tp = self.db.txo['doctype'].byname
+                
+                if lp == 10:
+                    rec.add('doctype', tp('article'), Attribute.Txo)
+                    one('issn', parts[0])
+                    one('title', parts[1])
+                    rec.add('author', parts[2], person)
+                    one('volume', parts[3])
+                    one('issue', parts[4])
+                    one('startpage', parts[5])
+                    rec.add('year', parts[6], year)
+
+                else:
+                    rec.add('doctype', tp('book'), Attribute.Txo)
+                    one('isbn', parts[0])
+                    one('serial', parts[1])
+                    one('title', parts[1])
+                    rec.add('author', parts[2], person)
+                    one('volume', parts[3])
+                    one('edition', parts[4])
+                    one('startpage', parts[5])
+                    rec.add('year', parts[6], year)
+                    one('part', parts[7])
+                    
+                r.setdefault(key, []).append(rec)
+
+                
             # trigged the deferred of _all_ the clients of this batch
             for uid, q in enqueued:
                 self._pending[uid].callback(r.get(uid, []))
                 del self._pending[uid]
 
+            self._stats[0] += len(enqueued)
+            if self._finished and not self._pending:
+                self._finished.callback(self._stats)
             return
 
         def failed(reason):
             for uid, q in enqueued:
                 self._pending[uid].errback(reason)
                 del self._pending[uid]
-            return
+                
+            self._stats[1] += len(enqueued)
 
+            if self._finished and not self._pending:
+                self._finished.callback(self._stats)
+            return
 
         req.addCallback(received).addErrback(failed)
         return
@@ -117,26 +194,68 @@ class DOIQuery(object):
         return d
 
     def finished(self):
+        assert not self._finished, 'finished() called twice'
         self._send()
 
-    def journalSearch(self, issn='', title='',
-                      author='', volume='',
-                      issue='', startpage='',
-                      year=''):
+        self._finished = defer.Deferred()
+        return self._finished
+    
+    def search(self, record):
+        assert not self._finished, 'finished() already called'
         
-        q = '|'.join([
-            issn, title, author, volume, issue, startpage,
-            year, 'full_text', str(self._uid), ''])
+        t = record['doctype'][0]
+        t = self.db.txo[t.group][t.id].names['C']
+
+        def one(field):
+            return record.get(field, [''])[0]
+        
+        if t == 'article':
+            issn = one('issn')
+            title = one('title')
+            volume = one('volume')
+            issue = one('issue')
+            startpage = one('startpage')
+
+            try:
+                year = str(record['year'][0].year)
+            except KeyError:
+                year = ''
+
+            try:
+                author = record['author'][0].last
+            except KeyError:
+                author = ''
+            
+            q = '|'.join([
+                issn, title, author, volume, issue, startpage,
+                year, 'full_text', str(self._uid), ''])
+
+        elif t == 'book':
+            isbn = one('isbn')
+            serial = one('serial')
+            title = one('title')
+            volume = one('volume')
+            edition = one('edition')
+            page = one('startpage')
+            part = one('part')
+
+            try:
+                year = str(record['year'][0].year)
+            except KeyError:
+                year = ''
+
+            try:
+                author = record['author'][0].last
+            except KeyError:
+                author = ''
+
+            q = '|'.join([
+                isbn, serial, title, author, volume, edition, page,
+                year, part, 'full_text', str(self._uid), ''])
+
+        else:
+            raise ValueError('cannot search for doctype %s' % repr(t))
 
         return self._prepare(q)
     
-
-    def bookSearch(self, isbn='', serial='', title='', author='', volume='',
-                   edition='', page='', year='', part=''):
-
-        q = '|'.join([
-            isbn, serial, title, author, volume, edition, page,
-            year, part, 'full_text', str(self._uid), ''])
-
-        return self._prepare(q)
 

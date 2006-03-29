@@ -7,7 +7,7 @@ import unittest
 from unittest import makeSuite, TestSuite, TestCase
 
 # Setup the system so that we import the current python files
-srcdir = os.environ.get ('srcdir', '.')
+srcdir = os.path.abspath(os.environ.get ('srcdir', '.'))
 sys.path.insert (0, os.path.join (srcdir, '..'))
 
 assert os.path.isdir (os.path.join (srcdir, '..', 'Pyblio'))

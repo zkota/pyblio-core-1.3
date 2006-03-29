@@ -4,3 +4,8 @@ path: %(system-rips)s/bibtex.sip
 
 readers:
 	Pyblio.Parsers.Semantic.BibTeX.Reader
+
+[org.pybliographer/crossref/0.1]
+
+path: %(system-rips)s/crossref.sip
+
