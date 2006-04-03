@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<response>
+  <sessionID>A28onfjmf5fi5inoffC</sessionID>
+  <searchResults>
+    <queryID>1</queryID>
+    <occurancesFound>20</occurancesFound>
+    <recordsFound>20</recordsFound>
+    <recordsSearched>36250344</recordsSearched>
+  </searchResults>
+  <records>
+    <REC inst_id="2" recid="137139732" hot="yes" sortkey="3150963209" timescited="0" sharedrefs="0" inpi="false">
+      <item issue="137139706" recid="137139732" coverdate="200406" sortkey="3150963209" refkey="7051666" dbyear="2004">
+	<ut>000221959700021</ut>
+	<i_ckey>TROT006204    HJ</i_ckey>
+	<i_cid>0104744991</i_cid>
+	<source_title>HISTORIA</source_title>
+	<source_abbrev>HISTORIA</source_abbrev>
+	<item_title>The fall of the Templars - The arrest in 1307, followed by the suppression of the Order in 1312, and the execution of its leader in 1314 - Why did Phillipe le Bel attack the Templar Order? One answer, From personal motives - Interview with Yvan Gobry</item_title>
+	<sq>00078J0</sq>
+	<bib_id>(690): 62-+ JUN 2004</bib_id>
+	<bib_pages begin="62" end="+" pages="0">62-+</bib_pages>
+	<bib_issue year="2004"/>
+	<doctype code="E">Editorial Material</doctype>
+	<editions full="AHCI"/>
+	<languages count="1">
+	  <primarylang code="FR">French</primarylang>
+	</languages>
+	<authors count="2">
+	  <primaryauthor>Trotereau, J</primaryauthor>
+	  <author key="2500706">Gobry, Y</author>
+	</authors>
+	<abstract avail="N"/>
+	<refs count="0"/>
+      </item>
+    </REC>
+  </records>
+</response>

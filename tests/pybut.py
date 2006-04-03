@@ -12,6 +12,11 @@ sys.path.insert (0, os.path.join (srcdir, '..'))
 
 assert os.path.isdir (os.path.join (srcdir, '..', 'Pyblio'))
 
+base = os.path.abspath('.')
+
+def fp(*args):
+    return os.path.join(*((base,) + args))
+
 
 def _cleanup ():
     import shutil

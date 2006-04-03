@@ -9,3 +9,8 @@ readers:
 
 path: %(system-rips)s/crossref.sip
 
+
+[org.pybliographer/wok/0.1]
+
+path: %(system-rips)s/wok.sip
+

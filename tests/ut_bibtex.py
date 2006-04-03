@@ -1,6 +1,7 @@
 # -*- coding: latin-1 -*-
 
 import os, pybut, sys
+
 import StringIO
 from cElementTree import ElementTree
 
@@ -11,7 +12,10 @@ from Pyblio.Parsers.Syntax.BibTeX import Parser
 
 from Pyblio.Parsers.Syntax.BibTeX.Parser import Record, Block, Cmd, Text, Join, Comment, ATComment
 
-from Pyblio import Store, Schema
+from Pyblio import Store, Schema, Registry
+
+def fp(*args):
+    return pybut.fp(*(('ut_bibtex',) + args))
 
 class WithComments (Reader):
 
@@ -143,11 +147,17 @@ class TestBibTeXImport (pybut.TestCase):
 
     """ Perform tests on the Pyblio.Parsers.Syntax.BibTeX module """
 
+    def setUp(self):
+        Registry.parse_default()
+
+    def tearDown(self):
+        Registry.reset()
+        
     def _check (self, base):
 
         f = pybut.dbname ()
 
-        s = Schema.Schema ('../Pyblio/RIP/bibtex.sip')
+        s = Registry.getSchema('org.pybliographer/bibtex/0.1')
         
         db = Store.get ('file').dbcreate (f, s)
 
@@ -162,7 +172,7 @@ class TestBibTeXImport (pybut.TestCase):
 
         self.parser = WithComments ('latin-1')
 
-        self.parser.parse (open ('ut_bibtex/%s.bib' % base), db)
+        self.parser.parse (open(fp('%s.bib' % base)), db)
         
         db.save ()
 
@@ -175,7 +185,7 @@ class TestBibTeXImport (pybut.TestCase):
 
         tree.write(open(f, 'w'), encoding="utf-8")
         
-        pybut.fileeq (f, 'ut_bibtex/%s.xml' % base)
+        pybut.fileeq (f, fp('%s.xml' % base))
 
         Store.get ('file').dbdestroy (f, nobackup = True)
         return
@@ -314,7 +324,7 @@ class TestBibTeXExport (pybut.TestCase):
 
         f = pybut.dbname ()
 
-        db = Store.get ('file').dbopen ('ut_bibtex/%s.xml' % base)
+        db = Store.get ('file').dbopen (fp('%s.xml' % base))
         fd = open (f, 'w')
         
         self.writer = WithCaseHandler ()
@@ -323,7 +333,7 @@ class TestBibTeXExport (pybut.TestCase):
 
         fd.close ()
         
-        pybut.fileeq (f, 'ut_bibtex/%s.bib' % base)
+        pybut.fileeq (f, fp('%s.bib' % base))
         return
 
     def testEmpty (self):

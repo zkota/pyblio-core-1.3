@@ -21,22 +21,21 @@
 
 ''' This module defines some common exceptions '''
 
-class ParserError (Exception):
+class ParserError(Exception):
 
-    def __init__ (self, msg, line = None):
-        Exception.__init__ (self, line, msg)
+    def __init__(self, msg, line=None):
+        Exception.__init__(self, line, msg)
 
-class SchemaError (Exception):
-
+class SchemaError(Exception):
     pass
 
-class ConstraintError (Exception):
-
+class ConstraintError(Exception):
     pass
 
-class InvalidQuery (Exception):
-
+class InvalidQuery(Exception):
     """ Raised if an ill-typed query is attempted """
-    
     pass
 
+class QueryError(Exception):
+    """ Raised when an external query failed."""
+    pass

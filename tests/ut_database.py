@@ -3,7 +3,21 @@ import os, pybut, sys, string
 from Pyblio import Store, Schema, Attribute, Query
 from Pyblio.Sort import OrderBy
 
-class TestDatabase (pybut.TestCase):
+def fp(*args):
+    return pybut.fp(*(('ut_database',) + args))
+
+# in some cases, we cannot check for bsddb (too old)
+try:
+    m = Store.get ('bsddb')
+    skip_bsddb = None
+    
+except ImportError, msg:                         
+    print "warning: only testing the file store: %s" % msg
+
+    skip_bsddb = 'bsddb is missing'
+
+
+class TDatabase(pybut.TestCase):
 
     """ Perform tests on the Pyblio.Stores main functions """
 
@@ -16,7 +30,7 @@ class TestDatabase (pybut.TestCase):
     def testCreate (self):
         ''' Try to create a database, and check its content '''
 
-        sc = Schema.Schema ('ut_database/schema.xml')
+        sc = Schema.Schema(fp('schema.xml'))
         db = self.hd.dbcreate (self.nm, sc)
 
         e = Store.Record ()
@@ -34,7 +48,7 @@ class TestDatabase (pybut.TestCase):
     def testDestroy (self):
         ''' Try to destroy a database '''
         
-        sc = Schema.Schema ('ut_database/schema.xml')
+        sc = Schema.Schema (fp('schema.xml'))
         db = self.hd.dbcreate (self.nm, sc)
 
         db.save ()
@@ -54,7 +68,7 @@ class TestDatabase (pybut.TestCase):
     def testRecreate (self):
         ''' Make it impossible to create a db twice '''
 
-        sc = Schema.Schema ('ut_database/schema.xml')
+        sc = Schema.Schema(fp('schema.xml'))
 
         db = self.hd.dbcreate (self.nm, sc)
         db.save ()
@@ -72,7 +86,7 @@ class TestDatabase (pybut.TestCase):
     def testImport (self):
         ''' Import an XML database in the Store '''
 
-        db = self.hd.dbimport (self.nm, 'ut_database/sample.xml')
+        db = self.hd.dbimport (self.nm, fp('sample.xml'))
         db.save ()
 
         nmo = pybut.dbname ()
@@ -81,7 +95,7 @@ class TestDatabase (pybut.TestCase):
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (nmo, 'ut_database/sample.xml')
+        pybut.fileeq (nmo, fp('sample.xml'))
         self.hd.dbdestroy (self.nm, nobackup = True)
 
         os.unlink (nmo)
@@ -89,7 +103,7 @@ class TestDatabase (pybut.TestCase):
     
         
     
-class TestContent (pybut.TestCase):
+class TContent(pybut.TestCase):
 
     """ Perform data manipulation tests """
 
@@ -100,9 +114,9 @@ class TestContent (pybut.TestCase):
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
-        TestContent.count = self.count + 1
+        TContent.count = self.count + 1
 
-        sc = Schema.Schema ('ut_database/schema.xml')
+        sc = Schema.Schema(fp('schema.xml'))
         self.db = self.hd.dbcreate (self.name, sc)
 
         return
@@ -352,7 +366,7 @@ class TestContent (pybut.TestCase):
         self.db.xmlwrite (fd)
         fd.close ()
         
-        pybut.fileeq (f, 'ut_database/enumerate.xml')
+        pybut.fileeq (f, fp('enumerate.xml'))
         os.unlink (f)
         return
 
@@ -771,11 +785,11 @@ class BaseView (pybut.TestCase):
         self.b = Store.Record ()
         return
 
-class TestOrdering (BaseView):
+class TOrdering(BaseView):
 
     """ Perform data manipulation tests """
 
-    dbfile = 'ut_database/order.xml'
+    dbfile = fp('order.xml')
 
     def testAscDesc (self):
 
@@ -786,11 +800,11 @@ class TestOrdering (BaseView):
         assert v [-4:] == [4, 3, 1, 2], 'got %s' % v
 
 
-class TestView (BaseView):
+class TView(BaseView):
 
     """ Perform data manipulation tests """
 
-    dbfile = 'ut_database/view.xml'
+    dbfile = fp('view.xml')
 
     def testIterView (self):
 
@@ -976,14 +990,14 @@ class TestView (BaseView):
         return
 
 
-class TestCollate (pybut.TestCase):
+class TCollate(pybut.TestCase):
 
     def setUp (self):
 
         self.hd   = Store.get (self.fmt)
         self.name = pybut.dbname ()
         
-        self.db = self.hd.dbimport (self.name, 'ut_database/collate.xml')
+        self.db = self.hd.dbimport (self.name, fp('collate.xml'))
         self.db.save ()
 
         return
@@ -1012,7 +1026,7 @@ class TestMemoryStore(pybut.TestCase):
         return
 
     def testCreate(self):
-        sc = Schema.Schema ('ut_database/schema.xml')
+        sc = Schema.Schema(fp('schema.xml'))
         db = self.hd.dbcreate(self.name, sc)
 
         try:
@@ -1024,7 +1038,7 @@ class TestMemoryStore(pybut.TestCase):
         return
     
     def testImport(self):
-        db = self.hd.dbimport(self.name, 'ut_database/sample.xml')
+        db = self.hd.dbimport(self.name, fp('sample.xml'))
         try:
             os.stat(self.name)
             assert False, 'the file should not be created'
@@ -1037,11 +1051,11 @@ class TestMemoryStore(pybut.TestCase):
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (nmo, 'ut_database/sample.xml')
+        pybut.fileeq (nmo, fp('sample.xml'))
         return
 
     def testNoSave(self):
-        db = self.hd.dbimport(self.name, 'ut_database/sample.xml')
+        db = self.hd.dbimport(self.name, fp('sample.xml'))
         db.save()
         try:
             os.stat(self.name)
@@ -1053,42 +1067,47 @@ class TestMemoryStore(pybut.TestCase):
 
     def testNoOpen(self):
         try:
-            db = self.hd.dbopen('ut_database/sample.xml')
+            db = self.hd.dbopen(fp('sample.xml'))
             assert False, 'should not work'
             
         except Store.StoreError:
             pass
         return
     
-class TestDatabaseFile (TestDatabase):
+class TestDatabaseFile(TDatabase):
     fmt = 'file'
 
-class TestContentFile (TestContent):
+class TestContentFile(TContent):
     fmt = 'file'
 
-class TestViewFile (TestView):
+class TestViewFile(TView):
     fmt = 'file'
 
-class TestOrderingFile (TestOrdering):
+class TestOrderingFile(TOrdering):
     fmt = 'file'
 
-class TestCollateFile (TestCollate):
+class TestCollateFile(TCollate):
     fmt = 'file'
 
-class TestDatabaseDB (TestDatabase):
+class TestDatabaseDB(TDatabase):
     fmt = 'bsddb'
+    skip = skip_bsddb
+    
+class TestContentDB(TContent):
+    fmt = 'bsddb'
+    skip = skip_bsddb
 
-class TestContentDB (TestContent):
+class TestViewDB(TView):
     fmt = 'bsddb'
+    skip = skip_bsddb
 
-class TestViewDB (TestView):
+class TestCollateDB (TCollate):
     fmt = 'bsddb'
+    skip = skip_bsddb
 
-class TestCollateDB (TestCollate):
+class TestOrderingDB (TOrdering):
     fmt = 'bsddb'
-
-class TestOrderingDB (TestOrdering):
-    fmt = 'bsddb'
+    skip = skip_bsddb
 
 files = [ TestDatabaseFile,
           TestContentFile,
@@ -1106,14 +1125,9 @@ bsddb = [ TestDatabaseDB,
           ]
 
 # in some cases, we cannot check for bsddb (too old)
-try:
-    m = Store.get ('bsddb')
-    
-    suite = pybut.suite (* (files + bsddb))
-    
-except ImportError, msg:                         
-    print "warning: only testing the file store: %s" % msg
-
+if skip_bsddb:
     suite = pybut.suite (* files)
+else:
+    suite = pybut.suite (* (files + bsddb))
 
 if __name__ == '__main__':  pybut.run (suite)

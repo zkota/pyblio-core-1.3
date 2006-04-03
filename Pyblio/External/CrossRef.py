@@ -7,8 +7,7 @@ volume, year and start page.
 """
 
 from twisted.web import client
-from twisted.internet import reactor, defer
-from twisted.python import failure
+from twisted.internet import defer
 
 import random
 import urllib
