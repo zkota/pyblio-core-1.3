@@ -92,12 +92,15 @@ class DOIQuery(object):
             self._running = False
             return
 
-        self.log.debug('sending a new batch to the server')
+        qdata = '\n'.join([x[1] for x in enqueued]).encode('utf-8')
+        
+        self.log.debug('sending a batch to the server')
+        self.log.debug(repr(qdata))
         
         data = {
             'usr': self.user,
             'pwd': self.pwd,
-            'qdata': '\n'.join([x[1] for x in enqueued]).encode('utf-8')
+            'qdata': qdata,
             }
 
         req = client.getPage(
@@ -108,10 +111,12 @@ class DOIQuery(object):
 
         def received(data):
             self.log.debug('received a batch from the server')
+            self.log.debug(repr(data))
             
             r = {}
 
-            for line in data.split('\n'):
+
+            for line in data.decode('latin-1').split('\n'):
                 line = line.strip()
                 if not line: continue
 
@@ -150,10 +155,11 @@ class DOIQuery(object):
                 def year(val):
                     return Attribute.Date(year=int(val))
                 
-                rec.add('doi', doi, Attribute.ID)
-
                 tp = self.db.txo['doctype'].byname
                 
+
+                rec.add('doi', doi, Attribute.ID)
+
                 if lp == 10:
                     rec.add('doctype', tp('article'), Attribute.Txo)
                     one('issn', parts[0])
