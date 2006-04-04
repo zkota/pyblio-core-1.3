@@ -13,7 +13,7 @@ contd_re = re.compile (r'^\s{3,3}(.*?)\r?$')
 
 class ISIParser (Tagged.Parser):
 
-    """ This parser knows how to split RIS records in fields """
+    """ This parser knows how to split ISI records in fields """
 
     def line_handler (self, line, count):
 

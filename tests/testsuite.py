@@ -23,7 +23,7 @@ for f in os.listdir ('.'):
         suits.append (l ['suite'])
         
     except KeyError:
-        sys.stderr.write ("test %s does not export 'suite' variable\n" % f)
+        sys.stderr.write ("test %s does not export 'suite' variable. Use 'trial' instead?\n" % f)
 
 
 pybut.run (pybut.TestSuite (suits))

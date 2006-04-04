@@ -1,5 +1,7 @@
 """
 Format the records contained in a pybliographer database (a bip file).
+
+Usage: bip2html.py <BIP file>
 """
 
 import sys

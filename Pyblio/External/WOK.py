@@ -7,13 +7,21 @@ from twisted.web import client
 from twisted.internet import defer, reactor
 from twisted.python import failure
 
-from cElementTree import ElementTree, XML
+from cElementTree import ElementTree, XML, dump
 
-import urllib, sys
+import urllib, sys, logging
+
+from gettext import gettext as _
 
 from Pyblio.Exceptions import QueryError
+from Pyblio.Parsers.Semantic.WOK import Reader
+
 
 class _Getter(client.HTTPClientFactory):
+    """ This HTTP getter keeps track of the running protocol
+    instances, so that their transport can be closed in the middle of
+    an operation."""
+    
     def __init__(self, *args, **kargs):
         client.HTTPClientFactory.__init__(self, *args, **kargs)
 
@@ -28,25 +36,57 @@ class _Getter(client.HTTPClientFactory):
     def cancel(self):
         self.running[-1].transport.loseConnection()
         return
+
+
+def _xml(data):
+    """ Parse the result from the server, and immeditately catch
+    possible errors."""
     
+    tree = XML(data)
+
+    err = tree.find('./error')
+    if err is not None:
+        raise QueryError(err.text)
+
+    return tree
+
+def _r_info(tree):
+    """ Return (number of hits, number of searched records)."""
+
+    stats = [ int(tree.findtext(f)) for f in
+              ('./searchResults/recordsFound',
+               './searchResults/recordsSearched') ]
+    
+    return stats, tree.findtext('./sessionID')
+
 
 class WOK(object):
     """ I represent a query session on the Web of Knowledge.
 
     The session is connected to a database whose schema is
-    'org.pybliographer/wok/1.0'.
+    'org.pybliographer/wok/...'.
 
     """
 
+    # This base URL is for IP-based authentification. Don't know how
+    # other systems work.
     baseURL = "http://estipub.isiknowledge.com/esti/cgi"
 
+    # Maximal number of results one can ask in a single result set.
+    MAX_PER_BATCH = 100
+
+
+    log = logging.getLogger('pyblio.external.wok')
+
+    
     def __init__(self, db):
-        self._sessionID = None
+        self.reader = Reader()
         self.db = db
 
         self._pending = None
         self._debug = False
         return
+
 
     def _query(self, **args):
 
@@ -60,17 +100,16 @@ class WOK(object):
             'rspType': 'xml',
             'method': 'searchRetrieve',
             'firstRec': '1',
-            'numRecs': '100',
+            'numRecs': self.MAX_PER_BATCH,
             'depth': '',
             'editions': '',
             'fields': '',
             }
 
         data.update(args)
-        
-        if self._sessionID:
-            data['sessionID'] = self._sessionID
 
+        self.log.debug('sending query %s' % repr(data))
+        
         q = self.baseURL + '?' + urllib.urlencode(data)
         
         factory = _Getter(q, method='GET')
@@ -83,9 +122,11 @@ class WOK(object):
         return factory.deferred
 
 
-    def _failure(self, failure):
+    def _done(self, data):
+        """ Called in any case to mark the end of a pending request to
+        the WOK server."""
         self._pending = None
-        return failure
+        return data
 
 
     def count(self, query):
@@ -94,16 +135,7 @@ class WOK(object):
         d = self._query(query=query, numRecs=1, Logout='yes')
 
         def process(tree):
-            err = tree.find('./error')
-            if err is not None:
-                raise QueryError(err.text)
-
-            # get the count and the total
-            res = int(tree.findtext('./searchResults/recordsFound'))
-            tot = int(tree.findtext('./searchResults/recordsSearched'))
-
-            self._pending = None
-            return (res, tot)
+            return _r_info(tree)[0][0]
         
         if self._debug:
             def show(data):
@@ -111,9 +143,9 @@ class WOK(object):
                 return data
             d = d.addCallback(show)
 
-        return d.addCallback(XML).\
-               addCallback(process).\
-               addErrback(self._failure)
+        return d.addBoth(self._done).\
+               addCallback(_xml).\
+               addCallback(process)
 
     
     def search(self, query, maxhits=500):
@@ -128,18 +160,79 @@ class WOK(object):
         """
 
         assert not self._pending
+        assert maxhits > 0
 
-        data = {'query': query}
+        self._first = 1
+        self._to_fetch = None
         
-        if self._sessionID:
-            data['sessionID'] = self._sessionID
+        # Limit our initial query to the max per batch amount.
+        data = {'query': query,
+                'firstRec': self._first,
+                'numRecs': min(self.MAX_PER_BATCH, maxhits)}
 
-        d = self._query(**data)
+        # We know we won't have to continue this session.
+        if maxhits < self.MAX_PER_BATCH:
+            data['Logout'] = 'yes'
+        
+        results = defer.Deferred()
+
+        rs = self.db.rs.add(True)
+        rs.name = _('Imported from Web of Knowledge')
+
+
+        def failed(failure):
+            results.errback(failure)
 
         # We retrieve a first result containing the total, which might
         # lead to more hits afterward.
+        def received(tree):
+            stats, sessionID = _r_info(tree)
+            found, total = stats
+
+            if self._to_fetch is None:
+                # Now, we know how much records we are supposed to fetch
+                self._to_fetch = min(found, maxhits)
+                
+            self.log.debug('session %s: received batch (%d pending)' % (
+                repr(sessionID), self._to_fetch))
+
+            self.reader.parse(tree.find('./records'), self.db, rs)
+
+            parsed = len(rs)
+            missing = self._to_fetch - parsed
+            
+            # Are we supposed to continue the current query?
+            if missing <= 0:
+                # If not, the main deferred returns the result set and
+                # the stats, as the DB itself has been modified in the
+                # meantime.
+                results.callback(found)
+                return
+
+            # We can ajust the query more tightly
+            data['startRec'] = 1 + parsed
+            data['numRecs'] = min(self.MAX_PER_BATCH, missing)
+            data['SID'] = sessionID
+
+            if missing < self.MAX_PER_BATCH:
+                data['Logout'] = 'yes'
+
+            d = self._query(**data).addBoth(self._done)
+            
+            d.addCallback(_xml).\
+                addCallback(received).\
+                addErrback(failed)
+            return
+            
+        # start the query process
+        d = self._query(**data).addBoth(self._done)
+
+        d.addCallback(_xml).\
+            addCallback(received).\
+            addErrback(failed)
         
-        return
+        return results, rs
+    
 
     def cancel(self):
         """ Cancel a running query. The database is not reverted to its

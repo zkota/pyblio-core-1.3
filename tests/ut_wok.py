@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import pybut, sys, os
+import pybut, sys, os, logging
 
 from Pyblio.External import WOK
 from Pyblio import Store, Attribute, Registry
@@ -21,7 +21,7 @@ class MyWOK(http.Request):
             self.write(open(err).read())
 
         else:
-            start = self.args.get('startRec', '1')
+            start = self.args.get('startRec', ['1'])[0]
             f = os.path.join(base, 'r-' + start + '.xml')
             self.write(open(f).read())
             
@@ -35,6 +35,11 @@ class MyChannel(http.HTTPChannel):
 class Server(http.HTTPFactory):
     protocol = MyChannel
 
+
+# To activate more debugging:
+#
+#log = logging.getLogger('pyblio')
+#log.setLevel(logging.DEBUG)
 
 
 class TesFakeWOK(unittest.TestCase):
@@ -72,8 +77,26 @@ class TesFakeWOK(unittest.TestCase):
         d = self.cnx.count(query='Author=(Gobry)')
 
         def check(count):
-            self.failUnlessEqual(count[0], 20)
+            self.failUnlessEqual(count, 1641)
             
         return d.addCallback(check)
+    
+    def testQuery(self):
+        """ Return the result count for a query."""
+
+        d, rs = self.cnx.search(query='TS=(peer to peer)', maxhits=250)
+
+        def done(total):
+            self.failUnlessEqual(total, 1641)
+
+            assert len(rs) == 250
+            tmp = pybut.dbname()
+            fd = open(tmp, 'w')
+            self.db.xmlwrite(fd)
+            fd.close()
+
+            pybut.fileeq(tmp, pybut.fp('ut_wok', 'result.bip'))
+            
+        return d.addCallback(done)
     
     

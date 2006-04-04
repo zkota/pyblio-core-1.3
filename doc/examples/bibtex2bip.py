@@ -1,5 +1,7 @@
 """
 Parse a BibTeX file into a BIP (a native pybliographer database) file.
+
+Usage: bibtex2bip.py <BibTeX file> <BIP file>
 """
 
 import sys, os
