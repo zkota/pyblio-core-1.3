@@ -17,8 +17,14 @@ for f in os.listdir ('.'):
     if f in skip: continue
     
     l = {}
-    execfile (f, l, l)
-
+    try:
+        execfile (f, l, l)
+        
+    except ImportError, msg:
+        sys.stderr.write("%s: missing dependency %s" % (
+            repr(f), msg))
+        continue
+    
     try:
         suits.append (l ['suite'])
         

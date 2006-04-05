@@ -31,10 +31,7 @@ class DOIQuery(object):
 
     The 'db' parameter is a database from which the queries and
     results will be composed. It must conform to the
-
-       'org.pybliographer/crossref/0.1'
-
-    schema.
+    I{org.pybliographer/crossref/0.1} schema.
     
     The actual queries take place when enough searches have been
     requested, or when the .finished() method is called.
