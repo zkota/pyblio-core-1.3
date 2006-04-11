@@ -29,134 +29,134 @@ combined by boolean operations:
 from Pyblio import Attribute, Exceptions
 
 
-class _Constraint (object):
+class _Constraint(object):
 
-    def __and__ (self, other):
+    def __and__(self, other):
 
-        return _ANDed (self, other)
+        return _ANDed(self, other)
 
-    def __or__ (self, other):
+    def __or__(self, other):
         
-        return _ORed (self, other)
+        return _ORed(self, other)
 
-    def __invert__ (self):
+    def __invert__(self):
 
-        return _NOTed (self)
+        return _NOTed(self)
 
-    def apply (self, fn, * args, **kargs):
+    def apply (self, fn, *args, **kargs):
 
-        fn (self, * args, ** kargs)
+        fn(self, *args, ** kargs)
         return
 
-    def __len__ (self):
+    def __len__(self):
 
         return 1
 
 
 
-class _NOTed (_Constraint):
+class _NOTed(_Constraint):
 
-    def __init__ (self, a):
+    def __init__(self, a):
 
         self.a = a
         return
 
-    def __str__ (self):
-        return '~ %s' % str (self.a)
+    def __str__(self):
+        return '~ %s' % str(self.a)
 
-    def apply (self, fn, * args, **kargs):
+    def apply (self, fn, *args, **kargs):
 
-        self.a.apply (fn, * args, ** kargs)
+        self.a.apply(fn, *args, **kargs)
 
 
-class _Pairs (_Constraint):
+class _Pairs(_Constraint):
 
-    def apply (self, fn, * args, **kargs):
+    def apply(self, fn, *args, **kargs):
 
-        self.a.apply (fn, * args, ** kargs)
-        self.b.apply (fn, * args, ** kargs)
+        self.a.apply(fn, *args, **kargs)
+        self.b.apply(fn, *args, **kargs)
         return
 
-    def __len__ (self):
+    def __len__(self):
 
-        return len (self.a) + len (self.b)
+        return len(self.a) + len(self.b)
 
     
-class _ORed (_Pairs):
+class _ORed(_Pairs):
 
-    def __init__ (self, a, b):
+    def __init__(self, a, b):
 
         self.a = a
         self.b = b
         return
 
-    def __str__ (self):
-        return '(%s | %s)' % (str (self.a),
-                              str (self.b))
+    def __str__(self):
+        return '(%s | %s)' % (str(self.a),
+                              str(self.b))
 
     
-class _ANDed (_Pairs):
+class _ANDed(_Pairs):
 
-    def __init__ (self, a, b):
+    def __init__(self, a, b):
 
         self.a = a
         self.b = b
         return
 
-    def __str__ (self):
-        return '(%s & %s)' % (str (self.a),
-                              str (self.b))
+    def __str__(self):
+        return '(%s & %s)' % (str(self.a),
+                              str(self.b))
 
 
-class AnyWord (_Constraint):
+class AnyWord(_Constraint):
 
     """ Full text searching of a single word """
 
-    def __init__ (self, word):
+    def __init__(self, word):
 
         self.word = word
         return
 
 
-    def validate (self, schema):
+    def validate(self, schema):
         return
     
 
-class HasField (_Constraint):
+class HasField(_Constraint):
 
     """ Matches when the record has the specified field."""
 
-    def __init__ (self, field):
+    def __init__(self, field):
         self.field = field
         return
 
-    def validate (self, schema):
+    def validate(self, schema):
 
         try:
-            t = schema [self.field]
+            t = schema[self.field]
 
         except KeyError:
-            raise Exceptions.InvalidQuery ('unknown field: %s' % self.field)
+            raise Exceptions.InvalidQuery('unknown field: %s' % self.field)
 
         return
     
 
-class Txo (_Constraint):
+class Txo(_Constraint):
 
     """ Search items that belong to the corresponding txo """
 
     Attr = Attribute.Txo
 
-    def __init__ (self, field, txo):
+    def __init__(self, field, txo):
 
         self.field = field
         self.txo   = txo
         return
         
-    def validate (self, schema):
+    def validate(self, schema):
 
         try:
-            t = schema [self.field].type
+            t = schema[self.field].type
 
         except KeyError:
             raise Exceptions.InvalidQuery ('unknown field: %s' % self.field)
@@ -167,122 +167,124 @@ class Txo (_Constraint):
         return
 
 
-class Queryable (object):
+class Queryable(object):
 
     """ A mixin that provides an (one day optimized) query engine to a store """
 
-    def query (self, query, permanent = False):
+    def query(self, query, permanent=False):
 
         # Check if the query is well typed
-        def check (const, schema):
-            const.validate (schema)
+        def check(const, schema):
+            const.validate(schema)
             return
         
-        query.apply (check, self.schema)
+        query.apply(check, self.schema)
 
-        return self._q_run (query, permanent)
+        return self._q_run(query, permanent)
 
 
-    def _q_run (self, query, permanent):
+    def _q_run(self, query, permanent):
 
         # Otherwise, call the corresponding boolean method
-        if isinstance (query, _ORed):
-            return self._q_or  (query, permanent)
+        if isinstance(query, _ORed):
+            return self._q_or(query, permanent)
 
-        if isinstance (query, _ANDed):
-            return self._q_and (query, permanent)
+        if isinstance(query, _ANDed):
+            return self._q_and(query, permanent)
 
-        if isinstance (query, _NOTed):
-            return self._q_not (query, permanent)
+        if isinstance(query, _NOTed):
+            return self._q_not(query, permanent)
 
         # This must be a single query
-        res = self.rs.add (permanent)
-        self._q_single (query, res)
+        res = self.rs.add(permanent)
+        self._q_single(query, res)
         
         return res
 
 
-    def _q_or (self, query, permanent):
+    def _q_or(self, query, permanent):
 
-        ra = self._q_run (query.a, permanent)
-        rb = self._q_run (query.b, False)
+        ra = self._q_run(query.a, permanent)
+        rb = self._q_run(query.b, False)
 
-        for k in rb: ra.add (k)
+        for k in rb:
+            ra.add (k)
 
         return ra
 
         
-    def _q_and (self, query, permanent):
+    def _q_and(self, query, permanent):
 
-        rf = self.rs.add (permanent)
+        rf = self.rs.add(permanent)
 
-        ra = self._q_run (query.a, False)
-        rb = self._q_run (query.b, False)
+        ra = self._q_run(query.a, False)
+        rb = self._q_run(query.b, False)
 
         for k in ra:
-            if rb.has_key (k): rf.add (k)
+            if rb.has_key(k):
+                rf.add (k)
 
         return rf
 
 
-    def _q_not (self, query, permanent):
+    def _q_not(self, query, permanent):
 
-        rf = self.rs.add (permanent)
-        rs = self._q_run (query.a, False)
+        rf = self.rs.add(permanent)
+        rs = self._q_run(query.a, False)
 
-        for k in self.entries.iterkeys ():
+        for k in self.entries.iterkeys():
             if k in rs: continue
-            rf.add (k)
+            rf.add(k)
 
         return rf
         
-    def _q_single (self, q, res):
+    def _q_single(self, q, res):
         
         name = q.__class__.__name__
         
         try:
-            fn = getattr (self, '_q_%s' % name.lower ())
+            fn = getattr(self, '_q_%s' % name.lower())
             
         except AttributeError:
             raise Exceptions.InvalidQuery ('query on type %s unsupported' % name)
 
-        fn (q, res)
+        fn(q, res)
 
         return
 
 
-    def _q_hasfield (self, q, res):
+    def _q_hasfield(self, q, res):
 
-        for e in self.entries.itervalues ():
+        for e in self.entries.itervalues():
 
-            try: fs = e [q.field]
+            try: fs = e[q.field]
             except KeyError: continue
 
-            res.add (e.key)
+            res.add(e.key)
 
         return
     
-    def _q_txo (self, q, res):
+    def _q_txo(self, q, res):
 
-        full = self.txo [q.txo.group].expand (q.txo.id)
+        full = self.txo[q.txo.group].expand(q.txo.id)
 
-        for e in self.entries.itervalues ():
+        for e in self.entries.itervalues():
 
-            try:             fs = e [q.field]
+            try:             fs = e[q.field]
             except KeyError: continue
 
             for f in fs:
                 if f.id in full:
-                    res.add (e.key)
+                    res.add(e.key)
                     break
             
         return
 
-    def _q_anyword (self, q, res):
+    def _q_anyword(self, q, res):
 
-        word = q.word.lower ()
+        word = q.word.lower()
         
-        for entry in self.entries.itervalues ():
+        for entry in self.entries.itervalues():
 
             found = False
             
@@ -299,7 +301,7 @@ class Queryable (object):
                 
             if not found: continue
 
-            res.add (entry.key)
+            res.add(entry.key)
 
         return
     

@@ -35,8 +35,7 @@ from Pyblio import I18n
 
 from gettext import gettext as _
 
-re_split = re.compile (r'[^\w]+', re.UNICODE)
-
+re_split = re.compile (r'\W+', re.UNICODE)
 
 class _Qualified (object):
     """ Mix-in class that provides qualifiers to attributes, making
@@ -136,7 +135,7 @@ class Person(_Qualified):
     def index (self):
         idx = []
         for x in (self.first, self.last):
-            if x: idx = idx + map (string.lower, x.split ())
+            if x: idx = idx + map (string.lower, re_split.split(x))
             
         return filter (None, idx)
     
@@ -278,7 +277,7 @@ class Text (unicode, _Qualified):
         return
 
     def index (self):
-        idx = map (string.lower, re_split.split (self))
+        idx = map (string.lower, re_split.split(self))
         return filter (None, idx)
 
     def sort (self):

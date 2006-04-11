@@ -516,19 +516,20 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         txn = self._env.txn_begin (txn)
 
         try:
-            e = _pl (self._db.get (k, txn = txn))
-            
-            self._rs.put (k, '', txn = txn)
+            self._rs.put (k, '', txn=txn)
 
             # Update the views of the result set
-            
-            for vref in [] + self._views:
-                v = vref ()
-                if v is None:
-                    self._views.remove (vref)
-                    continue
+            if self._views:
+                e = _pl(self._db.get(k, txn=txn))
+                
+                for vref in self._views[:]:
+                    try:
+                        vref()._add(e, txn)
 
-                v._add (e, txn)
+                    except AttributeError:
+                        self._views.remove(vref)
+
+
                 
         except:
             txn.abort ()
@@ -738,35 +739,36 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         return self.itervalues ()
 
 
-    def add (self, permanent = False, rsid = None, txn = None):
+    def add(self, permanent=False, rsid=None, txn=None):
         """ Create an empty result set """
 
         txn = self._env.txn_begin (parent = txn)
 
         try:
             # get the next rs id
-            (last, avail) = _pl (self._meta.get ('rs', txn = txn))
-            (last, rsid)  = Tools.id_make (last, rsid)
+            (last, avail) = _pl (self._meta.get('rs', txn=txn))
+            (last, rsid)  = Tools.id_make(last, rsid)
             
             # Avail contains the name of the RS, which is initially
             # None, and the state (permanent / not permanent)
-            avail [rsid] = (None, permanent)
+            avail[rsid] = (None, permanent)
             
-            self._meta.put ('rs', _ps ((last, avail)), txn = txn)
+            self._meta.put('rs', _ps((last, avail)), txn=txn)
             
-            rs = ResultSet (self._db, self._env, self._meta, self._idx,
-                            rsid, permanent, txn = txn)
+            rs = ResultSet(self._db, self._env, self._meta, self._idx,
+                           rsid, permanent, txn=txn)
             
         except:
-            txn.abort ()
+            txn.abort()
             raise
         
         txn.commit ()
 
-        if permanent: self [rsid] = rs
+        if permanent:
+            self[rsid] = rs
 
-        self.register ('item-delete', rs._on_delete)
-        self.register ('item-update', rs._on_update)
+        self.register('item-delete', rs._on_delete)
+        self.register('item-update', rs._on_update)
         
         return rs
 
@@ -855,12 +857,13 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         return self [i]
 
     def keys (self):
-
         return _pl (self._enum.get (self._group)) [1].keys ()
 
     def values (self):
-
         return _pl (self._enum.get (self._group)) [1].values ()
+        
+    def items(self):
+        return _pl(self._enum.get(self._group))[1].items()
         
 
     def __setitem__ (self, key, item):
@@ -1047,13 +1050,15 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
             if create:
                 self._schema = schema
-                self._meta.put ('schema', _ps (schema), txn = txn)
-                self._meta.put ('rs', _ps ((1, {})), txn = txn)
-                self._meta.put ('serial', '1', txn = txn)
-                self._meta.put ('view', _ps ((1, {}, {})), txn = txn)
-                
+                self._meta.put('schema', _ps (schema), txn = txn)
+                self._meta.put('rs', _ps ((1, {})), txn = txn)
+                self._meta.put('serial', '1', txn = txn)
+                self._meta.put('view', _ps ((1, {}, {})), txn = txn)
+
+                self._header_set(None, txn)
+
             else:
-                self._schema = _pl (self._meta.get ('schema', txn = txn))
+                self._schema = _pl(self._meta.get('schema', txn = txn))
 
             # Full text indexing DB
             self._idx = db.DB (self._env)
@@ -1086,12 +1091,26 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self.register ('delete', self._entries_rs._delete)
         self.register ('update', self._entries_rs._update)
         
-        # No header in this db yet
-        self.header = None
         return
 
-    def _schema_get (self):
+    def _header_get(self):
+        return _pl(self._meta.get('header'))
 
+    def _header_set(self, header, txn=None):
+        txn = self._env.txn_begin(txn)
+
+        try:
+            self._meta.put('header', _ps(header), txn=txn)
+        except:
+            txn.abort ()
+            raise
+
+        txn.commit ()
+        return
+    
+    header = property(_header_get, _header_set)
+
+    def _schema_get (self):
         return self._schema
 
     def _schema_set (self, schema, txn = None):
@@ -1299,7 +1318,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
 
     
-def dbdestroy (path, nobackup = False):
+def dbdestroy(path, nobackup=False):
     # sanity checks
     if not os.path.isdir (path):
         raise ValueError ('%s is not a directory' % path)
@@ -1311,23 +1330,23 @@ def dbdestroy (path, nobackup = False):
     return
 
     
-def dbcreate (path, schema):
+def dbcreate(path, schema):
     
     return Database (path   = path,
                      schema = schema, create = True)
 
 
-def dbopen (path):
+def dbopen(path):
 
     try:
-        return Database (path = path, create = False)
+        return Database(path=path, create=False)
     
     except db.DBNoSuchFileError, msg:
         raise Store.StoreError (_("cannot open '%s': %s") % (
             path, msg))
                                 
 
-def dbimport (target, source):
+def dbimport(target, source):
 
     db = Database (path   = target,
                    schema = None, create = True)

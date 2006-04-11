@@ -100,8 +100,19 @@ class TDatabase(pybut.TestCase):
 
         os.unlink (nmo)
         return
-    
+
+    def testHeader(self):
+        sc = Schema.Schema(fp('schema.xml'))
+        db = self.hd.dbcreate(self.nm, sc)
+
+        msg = u'Hi, folks'
         
+        db.header = msg
+        db.save()
+
+        other = self.hd.dbopen(self.nm)
+        self.failUnlessEqual(other.header, msg)
+        return
     
 class TContent(pybut.TestCase):
 

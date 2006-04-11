@@ -96,7 +96,7 @@ class TestAttribute (pybut.TestCase):
         idx = Attribute.Person (first = u'Jean-Albert',
                                 last  = u'D‚‚ Schnock').index ()
         
-        assert idx == ['jean-albert', u'd‚‚', 'schnock' ]
+        assert idx == ['jean', 'albert', u'd‚‚', 'schnock' ]
 
         idx = Attribute.URL ('http://www.pybliographer.org/faq/toto.html').index ()
         assert idx == ['www', 'pybliographer', 'org', 'faq', 'toto']
