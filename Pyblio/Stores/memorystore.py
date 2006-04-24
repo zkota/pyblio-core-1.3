@@ -31,23 +31,23 @@ from Pyblio import Store
 from Pyblio.Stores.filestore import Database
 
 
-def dbdestroy (path, nobackup = False):
+def dbdestroy(path, nobackup=False):
     return
 
     
-def dbcreate (path, schema):
-    db = Database (schema = schema, file = None, create = True)
+def dbcreate(path, schema, args={}):
+    db = Database (schema=schema, file=None, create=True)
     
     return db
 
 
-def dbopen (path):
+def dbopen(path, args={}):
     raise Store.StoreError(_("there is no way to open an in-memory database"))
 
 
-def dbimport (target, source):
+def dbimport(target, source, args={}):
 
-    db = Database (file = source)
+    db = Database (file=source)
     db.file = None
 
     return db

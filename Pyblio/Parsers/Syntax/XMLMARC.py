@@ -93,7 +93,7 @@ class Reader(object):
             self.record_end ()
 
             if self.record is not None:
-                k = self.db.add (self.record)
+                k = self.db.add(self.record)
                 rs.add(k)
                 
             elem.clear()

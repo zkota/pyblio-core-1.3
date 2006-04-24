@@ -245,7 +245,7 @@ class TContent(pybut.TestCase):
 
                 q = Query.AnyWord (w)
 
-                rs = map (None, self.db.query (q))
+                rs = map (None, self.db.query(q))
                 assert rs == r, \
                        'for %s: expected %s, got %s' % (w, r, rs)
             return

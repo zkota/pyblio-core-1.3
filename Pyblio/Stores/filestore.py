@@ -34,6 +34,9 @@ import os, copy, string
 from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query, Sort
 
 
+from Pyblio.Arrays import KeyArray, match_arrays
+        
+
 class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
 
     def __init__ (self, group):
@@ -349,28 +352,29 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self.rs     = ResultSetStore (self)
         
         self._id = 1
+        self._indexed = False
 
         if create:
-            self._txo_create ()
+            self._txo_create()
 
         else:
             try:
-                self.xmlread (open (file))
+                self.xmlread(open(file))
 
             except IOError, msg:
-                raise Store.StoreError (_("cannot open database: %s") % msg)
-            
+                raise Store.StoreError(_("cannot open database: %s") % msg)
+
         return
 
-    def _entries_get (self):
+    def _entries_get(self):
         """ Return the result set that contains all the entries. """
 
         return self._rodict
 
-    entries = property (_entries_get, None)
+    entries = property(_entries_get, None)
 
 
-    def add (self, record, key = None):
+    def add(self, record, key = None):
         """ Insert a new entry in the database.
 
         New entries MUST be added with this method, not via an update
@@ -394,21 +398,26 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         
         self._dict [key] = record
 
+        if self._indexed:
+            self._idxadd(key, record)
+            
         self.emit ('add-item', key)
         
         return key
 
 
-    def __delitem__ (self, k):
+    def __delitem__(self, k):
 
         del self._dict [k]
         self.emit ('delete-item', k)
 
+        if self._indexed:
+            self._idxdel(k)
         return
 
 
-    def has_key (self, k):
-        return self._dict.has_key (k)
+    def has_key(self, k):
+        return self._dict.has_key(k)
 
 
     def __setitem__ (self, key, value):
@@ -424,6 +433,10 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         
         self._dict [key] = value
 
+        if self._indexed:
+            self._idxdel(key)
+            self._idxadd(key, value)
+            
         self.emit ('update-item', key)
         return
 
@@ -432,7 +445,7 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         return self._dict [key]
 
 
-    def save (self):
+    def save(self):
 
         if self.file is None:
             return
@@ -450,8 +463,66 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         fd.close ()
 
         return
-    
 
+    def _idxadd(self, key, val):
+        
+        for attribs in val.values():
+            for attrib in attribs:
+                
+                for idx in attrib.index():
+                    self._idx_b.setdefault(key, {})[idx] = True
+
+                    try:
+                        self._idx_f[idx].add(key)
+                    except KeyError:
+                        a = KeyArray()
+                        a.add(key)
+                        
+                        self._idx_f[idx] = a
+        return
+
+    def _idxdel(self, key):
+
+        try:
+            ws = self._idx_b[key]
+
+        except KeyError:
+            return
+
+        del self._idx_b[key]
+        
+        for w in ws:
+            del self._idx_f[w][key]
+
+        return
+    
+    def index(self):
+        """ Turn on indexing of the db content. """
+
+        if self._indexed:
+            return
+        
+        self._idx_f = {}
+        self._idx_b = {}
+
+        for key, rec in self.entries.iteritems():
+            self._idxadd(key, rec)
+
+        self._indexed = True
+        return
+
+    def _q_anyword(self, query):
+        if self._indexed:
+            word = query.word.lower()
+
+            try:
+                return self._idx_f[word]
+            except KeyError:
+                return KeyArray()
+
+        return Query.Queryable._q_anyword(self, query)
+    
+    
 def dbdestroy (path, nobackup = False):
 
     os.unlink (path)
@@ -465,7 +536,7 @@ def dbdestroy (path, nobackup = False):
     return
 
     
-def dbcreate (path, schema):
+def dbcreate(path, schema, args={}):
     # Ensure we are the ones creating the file
     try:
         fd = os.open(path, os.O_CREAT|os.O_EXCL|os.O_WRONLY, 0666)
@@ -481,12 +552,12 @@ def dbcreate (path, schema):
     return db
 
 
-def dbopen (path):
+def dbopen(path, args={}):
 
     return Database (file = path)
 
 
-def dbimport (target, source):
+def dbimport(target, source, args={}):
 
     db = Database (file = source)
     db.file = target

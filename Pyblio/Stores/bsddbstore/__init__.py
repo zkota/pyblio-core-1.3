@@ -48,10 +48,10 @@ startup time is more important.
 #   key:   the indexed value
 #   value: the entry that contains the value
 # 
-# * resultset/<id> [HASH]
+# * resultset/sets [HASH]
 # 
-#   key:   string value of the entry's key
-#   value: no meaning
+#   key:   resultset id
+#   value: a serialized boolean numpy array containing the records
 # 
 # * view/<id> [BTREE / RECNUM]
 # 
@@ -62,8 +62,15 @@ startup time is more important.
 from gettext import gettext as _
 
 import os, shutil, copy, sys, traceback, string, weakref
+from sets import Set
 
 import cPickle as pickle
+import logging
+
+log = logging.getLogger('pyblio.stores.bsddb')
+
+from Pyblio.Arrays import KeyArray, match_arrays
+
 
 # Python ships the bsddb module as 'bsddb', whereas when fetched as a
 # standalone package it is named 'bsddb3'. For the moment, we need a
@@ -101,21 +108,48 @@ _ps = pickle.dumps
 
 # --------------------------------------------------
 
-def _idxdel (_idx, id, txn):
+def _idxadd(_idx, id, words, txn):
+    """ Mark id as matching all the words. """
+    sid = str(id)
+
+    f, b = _idx
+
+    bw = Set([w.encode('utf-8') for w in words])
+
+    for word in bw:
+        # Forward link, from word to record
+        a = KeyArray(s=f.get(word))
+        a.add(id)
+
+        f.put(word, a.tostring())
+        
+    b.put(sid, _ps(bw))
+    return
+
+
+def _idxdel(_idx, id, txn):
     """ Remove any secondary index belonging to the entry """
+    txn = None
 
-    cursor = _idx.cursor (txn)
-    data   = cursor.first ()
+    sid = str(id)
+    
+    f, b = _idx
 
-    while 1:
-        if data is None: break
+    try:
+        bw = _pl(b.get(sid))
+    except TypeError:
+        bw = Set()
 
-        if data [1] == id:
-            cursor.delete ()
+    b.delete(sid)
+    
+    for word in bw:
+        a = KeyArray(s=f.get(word))
+        try:
+            del a[id]
+            f.put(word, a.tostring())
+        except IndexError:
+            pass
 
-        data = cursor.next ()
-
-    cursor.close ()
     return
 
 
@@ -170,7 +204,6 @@ class RSDB (object):
         return
 
     def __len__ (self):
-
         return self._db.stat () ['nkeys']
 
 
@@ -252,7 +285,7 @@ class View (Store.View):
         self._id   = None
 
         # Create the new view on top of the result set
-        txn = self._env.txn_begin (txn)
+        txn = self._env.txn_begin(txn)
 
         try:
 
@@ -269,7 +302,7 @@ class View (Store.View):
 
             # create the new view
             
-            self._v = db.DB (self._env)
+            self._v = db.DB(self._env.e)
             self._v.set_flags (db.DB_RECNUM)
             self._v.set_bt_compare (_compare)
             
@@ -279,12 +312,12 @@ class View (Store.View):
             for e in rs.itervalues (): self._add (e, txn)
             
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
         self._id = serial
         
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
     def iterkeys (self):
@@ -335,7 +368,7 @@ class View (Store.View):
         return c.get_recno() - 1
     
     def __getitem__ (self, idx):
-        data = self._v.get (idx + 1)
+        data = self._v.get(idx + 1)
 
         if data is None:
             raise IndexError ('no such index: %d' % idx)
@@ -350,7 +383,7 @@ class View (Store.View):
 
         if self._id is None: return
         
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
 
         try:
             # remove oneself from the meta list
@@ -365,17 +398,17 @@ class View (Store.View):
             
             self._v.close ()
             
-            db.DB (self._env).remove ('view', str (self._id))
+            db.DB(self._env.e).remove ('view', str (self._id))
 
         except:
             # exceptions in __del__ methods are not reported by default
             etype, value, tb = sys.exc_info ()
             traceback.print_exception (etype, value, tb)
             
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
     def _make_key (self, e):
@@ -409,13 +442,13 @@ class View (Store.View):
 class ResultSet (Store.ResultSet, Callback.Publisher):
 
     def __init__ (self, _db, _env, _meta, _idx,
-                  id, permanent = False, txn = None):
+                  rs, id, permanent = False, txn = None):
 
         Callback.Publisher.__init__ (self)
         
         # RS id as a string and as an integer
         self.id  = id
-        self._id = str (id)
+        self._id = str(id)
         
         self._name = None
 
@@ -426,19 +459,31 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         
         self._permanent = permanent
 
-        self._rs = db.DB (self._env)
-        self._rs.open ('resultset', self._id, db.DB_HASH,
-                       db.DB_CREATE, txn = txn)
+        self._rs = rs
 
         self._views = []
+
+        # check that the RS already exists
+        txn = self._env.txn_begin(txn)
+
+        try:
+            a = self._rs.get(self._id, txn=txn)
+            if a is None:
+                self._rs.put(self._id, _ps(KeyArray()), txn=txn)
+
+        except:
+            self._env.txn_abort(txn)
+            raise
+
+        self._env.txn_commit(txn)
         return
 
     def _name_set (self, name):
 
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
 
         try:
-            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
+            (rsid, avail) = _pl (self._meta.get('rs', txn=txn))
 
             if avail.has_key (self.id):
                 avail [self.id] = (name, self._permanent)
@@ -446,10 +491,10 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
             self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         self._name = name
         
         return
@@ -461,66 +506,47 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
     name = property (_name_get, _name_set)
 
 
-    def iterkeys (self):
-        c = self._rs.cursor ()
-        d = c.first ()
-        
-        while d:
-            key = d [0]
-            yield Store.Key (key)
+    def iterkeys(self):
+        a = _pl(self._rs.get(self._id))
 
-            d = c.next ()
-            
+        for key, status in enumerate(a.a):
+            if status:
+                yield Store.Key(key+1)
         return
 
     __iter__ = iterkeys
     
 
     def itervalues (self):
-        c = self._rs.cursor ()
-        d = c.first ()
-        
-        while d:
-            key = d [0]
 
-            k = Store.Key (key)
-            yield _pl (self._db.get (key))
-
-            d = c.next ()
+        for key in self.iterkeys():
+            yield _pl(self._db.get(str(key)))
         
         return
 
     
     def iteritems (self):
-        c = self._rs.cursor ()
-        d = c.first ()
-        
-        while d:
-            key = d [0]
+        for key in self.iterkeys():
+            yield key, _pl(self._db.get(str(key)))
 
-            k = Store.Key (key)
-            yield k, _pl (self._db.get (key))
-
-            d = c.next ()
-        
         return
 
 
-    def add (self, k, txn = None):
+    def add(self, k, txn=None):
 
         if not isinstance (k, Store.Key):
             raise ValueError ('the key must be a Store.Key, not %s' % `k`)
 
-        k = str (k)
-        
-        txn = self._env.txn_begin (txn)
+        txn = self._env.txn_begin(txn)
 
         try:
-            self._rs.put (k, '', txn=txn)
+            a = _pl(self._rs.get(self._id, txn=txn))
+            a.add(k)
+            self._rs.put(self._id, _ps(a), txn=txn)
 
             # Update the views of the result set
             if self._views:
-                e = _pl(self._db.get(k, txn=txn))
+                e = _pl(self._db.get(str(k), txn=txn))
                 
                 for vref in self._views[:]:
                     try:
@@ -528,30 +554,34 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
                     except AttributeError:
                         self._views.remove(vref)
-
-
                 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
     def __delitem__ (self, k, txn = None):
 
-        txn = self._env.txn_begin (txn)
+        txn = self._env.txn_begin(txn)
 
         try:
 
-            try:
-                self._rs.delete (str (k), txn = txn)
+            a = _pl(self._rs.get(self._id, txn=txn))
 
-            except db.DBNotFoundError:
-                raise KeyError ('unknown key %s' % str (k))
+            try:
+                if not a.a[k-1]:
+                    raise KeyError('key %s not in result set' % str(k))
+
+            except IndexError:
+                raise KeyError('key %s not in result set' % str(k))
+
+            del a[k]
+
+            self._rs.put(self._id, _ps(a), txn=txn)
 
             # Update the views of the result set
-            
             for vref in [] + self._views:
                 v = vref ()
                 
@@ -562,23 +592,30 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
                 v._del (k, txn)
 
         except KeyError:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
         
         except:
             etype, value, tb = sys.exc_info ()
             traceback.print_exception (etype, value, tb)
 
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
 
-    def has_key (self, k):
+    def __contains__(self, k):
 
-        return self._rs.get (str (k)) is not None
+        try:
+            return _pl(self._rs.get(self._id))[k-1]
+
+        except IndexError:
+            return False
+        
+    def has_key (self, k):
+        return k in self
 
 
     def view (self, criterion):
@@ -593,50 +630,60 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
     
 
     def __del__ (self):
-        if self._permanent: return
+        if self._permanent:
+            return
 
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
 
         try:
             # remove oneself from the meta list
             (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
-            if avail.has_key (self.id):
-                
+            if avail.has_key(self.id):
                 del avail [self.id]
                 self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
 
-                self._rs.close ()
-
-                db.DB (self._env).remove ('resultset', self._id)
+                self._rs.delete(self._id, txn=txn)
                 
         except:
             # exceptions in __del__ methods are not reported by default
             etype, value, tb = sys.exc_info ()
             traceback.print_exception (etype, value, tb)
             
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
     def destroy(self):
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
         
         for k in self:
-            k = str(k)
-            
             _idxdel(self._idx, k, txn)
-            self._db.delete (k, txn)
+            self._db.delete (str(k), txn)
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
             
     def __len__ (self):
-        return self._rs.stat () ['nkeys']
+        return len(_pl(self._rs.get(self._id)))
 
+
+    def _from_array(self, a):
+        txn = self._env.txn_begin()
+
+        try:
+            self._rs.put(self._id, _ps(a), txn=txn)
+
+        except:
+            self._env.txn_abort(txn)
+            raise
+
+        self._env.txn_commit(txn)
+        return
+        
 
     def _on_update (self, k, val, txn):
         
@@ -663,9 +710,9 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
             pass
 
         return
-    
 
-class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
+
+class ResultSetStore(dict, Store.ResultSetStore, Callback.Publisher):
 
     def __init__ (self, _db, _env, _meta, _idx, txn):
 
@@ -675,36 +722,47 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
         self._env  = _env
         self._meta = _meta
         self._idx  = _idx
-        
-        (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
 
-        txn = self._env.txn_begin (parent = txn)
+        (rsid, avail) = _pl(self._meta.get('rs', txn=txn))
+
+        txn = self._env.txn_begin(parent=txn)
 
         try:
+
+            self._rs = db.DB(self._env.e)
+            self._rs.open('resultset', 'sets', db.DB_HASH,
+                          db.DB_CREATE, txn=txn)
+        
             # initialize with the existing result sets
-            for rsid, data in avail.items ():
+            for rsid, data in avail.items():
                 name, status = data
             
                 rs = ResultSet(self._db, self._env, self._meta, self._idx,
-                               rsid, status, txn = txn)
+                               self._rs, rsid, status, txn=txn)
                 rs._name = name
 
-                self.register ('item-delete', rs._on_delete)
+                self.register('item-delete', rs._on_delete)
+                self.register('item-update', rs._on_update)
 
                 # assume some non-permanent result sets might still exist
-                if status: self [rsid] = rs
+                if status:
+                    self[rsid] = rs
 
-            txn.commit ()
+            self._env.txn_commit(txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
         
         return
     
     def _close (self):
 
-        self._rs.close ()
+        self._rs.close()
+        return
+
+    def _save (self):
+        self._rs.sync()
         return
 
 
@@ -717,20 +775,20 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
 
         try:
             # get the rs dict
-            (last, avail) = _pl (self._meta.get ('rs', txn = txn))
+            (last, avail) = _pl(self._meta.get('rs', txn = txn))
 
             # Avail contains the name of the RS, which is initially
             # None, and the state (permanent / not permanent)
             if avail.has_key (rs.id):
                 avail [rs.id] = (rs._name, False)
             
-            self._meta.put ('rs', _ps ((last, avail)), txn = txn)
+            self._meta.put('rs', _ps ((last, avail)), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         dict.__delitem__ (self, k)
         return
 
@@ -756,13 +814,13 @@ class ResultSetStore (dict, Store.ResultSetStore, Callback.Publisher):
             self._meta.put('rs', _ps((last, avail)), txn=txn)
             
             rs = ResultSet(self._db, self._env, self._meta, self._idx,
-                           rsid, permanent, txn=txn)
+                           self._rs, rsid, permanent, txn=txn)
             
         except:
-            txn.abort()
+            self._env.txn_abort(txn)
             raise
         
-        txn.commit ()
+        self._env.txn_commit(txn)
 
         if permanent:
             self[rsid] = rs
@@ -790,7 +848,7 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
 
     def __init__ (self, env, enum, group):
 
-        Callback.Publisher.__init__ (self)
+        Callback.Publisher.__init__(self)
 
         self._env  = env
         self._enum = enum
@@ -800,10 +858,12 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         self._byname = {}
 
         for k in self:
-            v = self [k]
+            v = self[k]
             
-            try: self._byname [v.names ['C']] = v.id
-            except KeyError: pass
+            try:
+                self._byname[v.names['C']] = v.id
+            except KeyError:
+                pass
             
         return
 
@@ -845,10 +905,10 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
             self._enum.put (self._group, _ps ((vid, data)), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         
         return key
 
@@ -895,10 +955,10 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
             self._enum.put (self._group, _ps ((vid, data)), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
     
     def __delitem__ (self, k):
@@ -921,10 +981,10 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
             self._enum.put (self._group, _ps (v), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
         
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
     def __iter__ (self):
@@ -932,9 +992,8 @@ class TxoGroup (Store.TxoGroup, Callback.Publisher):
         return iter (self.keys ())
 
     def __getitem__ (self, k):
-        v = self._enum.get (self._group)
-
-        return _pl (v) [1] [k]
+        v = self._enum.get(self._group)
+        return _pl(v)[1][k]
 
 
 
@@ -946,7 +1005,7 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
 
         self._env = env
 
-        self._enum = db.DB (self._env)
+        self._enum = db.DB(self._env.e)
         self._enum.open ('database', 'enum',
                          db.DB_HASH, db.DB_CREATE, txn = txn)
         return
@@ -995,10 +1054,10 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
                 self._enum.put (group, _ps ((1, {})), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         
         if v is not None:
             raise Exceptions.ConstraintError (_('group %s exists') % `group`)
@@ -1010,63 +1069,142 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
     
 
 # --------------------------------------------------
+
+class _TxnEnv(object):
+    """ I pretend to be a DBEnv, with overloadable txn management
+    functions. I work when transactions are enabled. """
     
-class Database (Query.Queryable, Store.Database, Callback.Publisher):
+    def __init__(self, *args, **kargs):
+        self.e = db.DBEnv(*args, **kargs)
+
+    def txn_begin(self, *args, **kargs):
+        return self.e.txn_begin(*args, **kargs)
+    
+    def open(self, *args, **kargs):
+        return self.e.open(*args, **kargs)
+    
+    def txn_commit(self, txn):
+        txn.commit()
+    
+    def txn_abort(self, txn):
+        txn.abort()
+    
+
+class _NoTxnEnv(_TxnEnv):
+    """ I pretend to be a DBEnv, with overloadable txn management
+    functions. I work when transactions are disabled. """
+
+    def txn_begin(self, *args, **kargs):
+        return None
+    
+    def txn_commit(self, txn):
+        return
+    
+    def txn_abort(self, txn):
+        return
+
+_units = {
+    'k': 1024,
+    'M': 1024 ** 2,
+    'G': 1024 ** 3,
+    }
+
+
+class Database(Query.Queryable, Store.Database, Callback.Publisher):
     """ A Pyblio database stored in a Berkeley DB engine """
     
-    def __init__ (self, path, schema = None, create = False):
+    def __init__ (self, path, schema=None, create=False, args={}):
 
-        Callback.Publisher.__init__ (self)
+        Callback.Publisher.__init__(self)
+
+        self._use_txn = args.get('transactions', True)
+
+        # Instantiate the proper environment (yes, this could be done
+        # with an if :-))
+        self._env = {True:  _TxnEnv,
+                     False: _NoTxnEnv}[self._use_txn]()
+
+        cache = args.get('cachesize', '10M')
+
+        if cache[-1] in _units.keys():
+            cache = int(cache[:-1]) * _units[cache[-1]]
+        else:
+            cache = int(cache)
+
+        gbytes = cache / _units['G']
+        bytes  = cache - (gbytes * _units['G'])
         
-        self._env = db.DBEnv ()
+        self._env.e.set_cachesize(gbytes, bytes)
 
+        log.debug('environment configured with (%d Gb, %d b) cache, transactions: %s' % (
+            gbytes, bytes, str(self._use_txn)))
+        
         if create:
             try:
-                os.mkdir (path)
+                os.mkdir(path)
 
             except OSError, msg:
-                raise Store.StoreError (_("cannot create '%s': %s") % (
+                raise Store.StoreError(_("cannot create '%s': %s") % (
                     path, msg))
             
             flag = db.DB_CREATE
-            self._env.open (path, db.DB_CREATE | db.DB_INIT_MPOOL | db.DB_INIT_TXN)
+            oflag = db.DB_CREATE | db.DB_INIT_MPOOL
+
+            if self._use_txn:
+                oflag |= db.DB_INIT_TXN
+            
+            self._env.open(path, oflag)
 
         else:
             flag = 0
-            self._env.open (path, db.DB_INIT_MPOOL | db.DB_INIT_TXN)
+            oflag = db.DB_INIT_MPOOL
+
+            if self._use_txn:
+                oflag |= db.DB_INIT_TXN
+                
+            self._env.open(path, oflag)
 
         self._path = path
 
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
 
         try:
             # DB containing the actual entries
-            self._db  = db.DB (self._env)
-            self._db.open ('database', 'entries', db.DB_HASH, flag, txn = txn)
+            self._db = db.DB(self._env.e)
+            self._db.open('database', 'entries', db.DB_HASH, flag, txn=txn)
 
             # DB with meta informations
-            self._meta  = db.DB (self._env)
-            self._meta.open ('database', 'meta', db.DB_HASH, flag, txn = txn)
+            self._meta  = db.DB(self._env.e)
+            self._meta.open('database', 'meta', db.DB_HASH, flag, txn=txn)
 
             if create:
                 self._schema = schema
-                self._meta.put('schema', _ps (schema), txn = txn)
-                self._meta.put('rs', _ps ((1, {})), txn = txn)
-                self._meta.put('serial', '1', txn = txn)
-                self._meta.put('view', _ps ((1, {}, {})), txn = txn)
-
+                self._meta.put('schema', _ps (schema), txn=txn)
+                self._meta.put('rs', _ps ((1, {})), txn=txn)
+                self._meta.put('view', _ps ((1, {}, {})), txn=txn)
+                self._meta.put('full', KeyArray().tostring(), txn=txn)
+                self._meta.put('serial', '1', txn=txn)
+                
                 self._header_set(None, txn)
 
             else:
                 self._schema = _pl(self._meta.get('schema', txn = txn))
 
-            # Full text indexing DB
-            self._idx = db.DB (self._env)
-            self._idx.set_flags (db.DB_DUP)
-            self._idx.open ('index', 'full', db.DB_HASH, flag, txn = txn)
+            # Full text indexes
 
+            # Forward index: for each word as a key, return an array
+            # of matches
+            f = db.DB(self._env.e)
+            f.open('index', 'f', db.DB_BTREE, flag)
+
+            # Backward index: for each record, list the words it matches
+            b = db.DB(self._env.e)
+            b.open('index', 'b', db.DB_BTREE, flag)
+
+            self._idx = (f, b)
+            
             # Result sets handler
-            self.rs = ResultSetStore (self._db, self._env, self._meta, self._idx, txn)
+            self.rs = ResultSetStore(self._db, self._env, self._meta, self._idx, txn)
             self.register ('delete', self.rs._on_delete)
             self.register ('update', self.rs._on_update)
 
@@ -1079,20 +1217,21 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
                 self._txo_create ()
             
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
         
-        txn.commit ()
+        self._env.txn_commit(txn)
 
         # Result set containing the full db
-        self._entries_rs = RSDB (self._db, self._env, self._meta)
+        self._entries_rs = RSDB(self._db, self._env, self._meta)
 
-        self.register ('add',    self._entries_rs._add)
-        self.register ('delete', self._entries_rs._delete)
-        self.register ('update', self._entries_rs._update)
+        self.register('add',    self._entries_rs._add)
+        self.register('delete', self._entries_rs._delete)
+        self.register('update', self._entries_rs._update)
         
         return
 
+            
     def _header_get(self):
         return _pl(self._meta.get('header'))
 
@@ -1102,10 +1241,10 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         try:
             self._meta.put('header', _ps(header), txn=txn)
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
     
     header = property(_header_get, _header_set)
@@ -1120,51 +1259,58 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self._meta.put ('schema', _ps (schema), txn = txn)
 
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         self._schema = schema
         return
 
     schema = property (_schema_get, _schema_set)
     
 
-    def save (self):
+    def save(self):
 
         # Flush the databases
-        self._db.sync ()
-        self._meta.sync ()
-        self._idx.sync ()
+        self._db.sync()
+        self._meta.sync()
+        
+        for i in self._idx:
+            i.sync()
+
+        self.rs._save()
         return
 
 
-    def add (self, val, key = None):
+    def add(self, val, key=None):
 
-        val = self.validate (val)
+        val = self.validate(val)
 
         # Be careful to always point after the last serial id used.
-        txn = self._env.txn_begin ()
+        txn = self._env.txn_begin()
 
         try:
-            serial = int (self._meta.get ('serial', txn = txn))
+            serial = int(self._meta.get('serial', txn=txn))
+            full = KeyArray(s=self._meta.get('full', txn=txn))
 
-            serial, key = Tools.id_make (serial, key)
+            serial, key = Tools.id_make(serial, key)
+            full.add(key)
             
-            self._meta.put ('serial', str (serial), txn = txn)
-
-            key = Store.Key (key)
+            self._meta.put('full', full.tostring(), txn=txn)
+            self._meta.put('serial', str(serial), txn=txn)
+            
+            key = Store.Key(key)
             val.key = key
             
-            self._insert (key, val, txn)
+            self._insert(key, val, txn)
 
-            self.emit ('add', val, txn)
+            self.emit('add', val, txn)
             
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         
         return key
     
@@ -1181,16 +1327,19 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         try:
             # Start by doing the update in the external tables, which
             # might still want to access the previous version
-            self.emit ('update', key, val, txn)
+            self.emit('update', key, val, txn)
             
-            _idxdel (self._idx, str (key), txn)
-            self._insert (key, val, txn)
+            _idxdel(self._idx, key, txn)
+            self._insert(key, val, txn)
 
         except:
-            txn.abort ()
+            etype, value, tb = sys.exc_info ()
+            traceback.print_exception (etype, value, tb)
+
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
 
 
@@ -1205,14 +1354,18 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
             self.emit ('delete', key, txn)
 
             # Then, remove the index and entry itself
-            _idxdel (self._idx, id, txn)
+            _idxdel (self._idx, key, txn)
             self._db.delete (id, txn)
 
+            full = KeyArray(s=self._meta.get('full', txn=txn))
+            del full[key]
+            self._meta.put('full', full.tostring(), txn=txn)
+            
         except:
-            txn.abort ()
+            self._env.txn_abort(txn)
             raise
 
-        txn.commit ()
+        self._env.txn_commit(txn)
         return
     
 
@@ -1230,82 +1383,57 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
 
 
     def _idxadd (self, id, val, txn):
-        
-        for attribs in val.values ():
-            for attrib in attribs:
+
+        # We need to insert the current record in both the backward
+        # and forward indexes.
+
+        def words():
+            for attribs in val.values():
+                for attrib in attribs:
                 
-                for idx in attrib.index ():
-                    idx = idx.encode ('utf-8')
-                    self._idx.put (idx, id, txn = txn)
+                    for idx in attrib.index():
+                        yield idx
+
+        _idxadd(self._idx, id, words(), txn)
         return
 
     
-    def _insert (self, key, val, txn):
+    def _insert(self, key, val, txn):
         
-        id  = str (key)
+        id  = str(key)
         
-        self._idxadd (id, val, txn)
+        self._idxadd(key, val, txn)
 
         val = copy.copy (val)
         val.key = key
         
-        val = _ps (val)
+        val = _ps(val)
         
-        self._db.put (id, val, txn = txn)
+        self._db.put(id, val, txn=txn)
         return id
 
 
-    def _q_anyword (self, query, rs):
+    def _q_all(self):
+        return KeyArray(s=self._meta.get('full'))
 
-        word = query.word.lower ()
 
-        txn = self._env.txn_begin ()
+    def _q_anyword(self, query):
 
-        try:
-            cursor = self._idx.cursor ()
-
-            try:
-                data = cursor.set (word.encode ('utf-8'))
-
-            except db.DBNotFoundError:
-                txn.commit ()
-                return rs
-
-            while 1:
-                if data is None: break
-
-                rs.add (Store.Key (data [1]), txn = txn)
-                data = cursor.next_dup ()
-
-            cursor.close ()
-            
-        except:
-            txn.abort ()
-            raise
+        word = query.word.lower().encode('utf-8')
         
-        txn.commit ()
+        return KeyArray(s=self._idx[0].get(word))
+
+
+    def _q_to_rs(self, res, permanent):
+
+        rs = self.rs.add(permanent)
+        rs._from_array(res)
 
         return rs
-    
-
-    def _q_and (self, query, permanent):
-
-        # BSDDB allows to remove the item under the cursor, therefore
-        # we do not need to use three result sets.
-        
-        ra = self._q_run (query.a, permanent)
-        rb = self._q_run (query.b, False)
-
-        for k in ra:
-            if not rb.has_key (k): del ra [k]
-
-        return ra
-        
 
     
     def __getitem__ (self, key):
-        
-        return _pl (self._db.get (str (key)))
+        return _pl(self._db.get(str(key)))
 
 
     def entries_get (self):
@@ -1315,7 +1443,9 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
     entries = property (entries_get)
 
     
-
+    def index(self):
+        pass
+    
 
     
 def dbdestroy(path, nobackup=False):
@@ -1330,26 +1460,23 @@ def dbdestroy(path, nobackup=False):
     return
 
     
-def dbcreate(path, schema):
-    
-    return Database (path   = path,
-                     schema = schema, create = True)
+def dbcreate(path, schema, args={}):
+    return Database (path=path, schema=schema, create=True, args=args)
 
 
-def dbopen(path):
+def dbopen(path, args={}):
 
     try:
-        return Database(path=path, create=False)
+        return Database(path=path, create=False, args=args)
     
     except db.DBNoSuchFileError, msg:
         raise Store.StoreError (_("cannot open '%s': %s") % (
             path, msg))
                                 
 
-def dbimport(target, source):
+def dbimport(target, source, args={}):
 
-    db = Database (path   = target,
-                   schema = None, create = True)
+    db = Database (path=target, schema=None, create=True, args=args)
 
 
     try:

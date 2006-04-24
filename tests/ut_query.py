@@ -3,11 +3,12 @@ import os, pybut, sys, string
 from Pyblio import Store, Schema, Attribute, Query
 
 class TestSimpleQuery (pybut.TestCase):
+    indexed = False
 
     def setUp (self):
 
-        self.hd   = Store.get (self.fmt)
-        self.name = pybut.dbname ()
+        self.hd   = Store.get(self.fmt)
+        self.name = pybut.dbname()
         
         return
 
@@ -22,9 +23,11 @@ class TestSimpleQuery (pybut.TestCase):
     def testAndQuery (self):
         
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        if self.indexed: db.index()
+        
         g  = db.txo ['a']
 
-        q = Query.Txo ('txo', g [2]) & Query.AnyWord ('First')
+        q = Query.Txo ('txo', g [2]) & Query.AnyWord('First')
 
         res = self._res (db.query (q))
         assert res == [3], 'got %s' % `res`
@@ -34,6 +37,8 @@ class TestSimpleQuery (pybut.TestCase):
     def testOrQuery (self):
         
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        if self.indexed: db.index()
+
         g  = db.txo ['a']
 
         q = Query.Txo ('txo', g [2]) | Query.AnyWord ('First')
@@ -46,6 +51,8 @@ class TestSimpleQuery (pybut.TestCase):
     def testNotQuery (self):
         
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
+        if self.indexed: db.index()
+
         g  = db.txo ['a']
 
         q = ~ (Query.Txo ('txo', g [2]) | Query.AnyWord ('First'))
@@ -58,6 +65,7 @@ class TestSimpleQuery (pybut.TestCase):
         """ Txo query """
 
         db = self.hd.dbimport (self.name, 'ut_query/txo.xml')
+        if self.indexed: db.index()
 
 
         # Check that querying for a base txo also returns the children
@@ -79,6 +87,7 @@ class TestSimpleQuery (pybut.TestCase):
     def textHasFieldQuery (self):
 
         db = self.hd.dbimport (self.name, 'ut_query/hasfield.xml')
+        if self.indexed: db.index()
 
         got = self._res (db.query (Query.HasField ('a')))
 
@@ -91,6 +100,7 @@ class TestSimpleQuery (pybut.TestCase):
         
         sc = Schema.Schema ('ut_query/schema.xml')
         self.db = self.hd.dbcreate (self.name, sc)
+        if self.indexed: self.db.index()
         
         import random
 
@@ -147,15 +157,20 @@ class TestSimpleQuery (pybut.TestCase):
 
 
 
-class TestSimpleQueryFile (TestSimpleQuery):
+class TestSimpleQueryFile(TestSimpleQuery):
     fmt = 'file'
 
-class TestSimpleQueryDB (TestSimpleQuery):
+class TestSimpleQueryFileIndexed(TestSimpleQuery):
+    fmt = 'file'
+    indexed = True
+    
+class TestSimpleQueryDB(TestSimpleQuery):
     fmt = 'bsddb'
 
 
 files = [
-    TestSimpleQueryFile
+    TestSimpleQueryFile,
+    TestSimpleQueryFileIndexed
     ]
 
 bsddb = [

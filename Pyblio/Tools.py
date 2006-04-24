@@ -18,7 +18,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
 
-def id_make (last, proposed = None):
+def id_make(last, proposed=None):
 
     """ Return an identifier, possibly taking into account a proposed
     id. """
@@ -33,7 +33,7 @@ def id_make (last, proposed = None):
     return last, proposed
 
        
-def format (string, width, first, next):
+def format(string, width, first, next):
 
     ''' Format a string on a given width '''
 
