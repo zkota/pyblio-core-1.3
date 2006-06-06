@@ -210,7 +210,7 @@ class WOK(object):
                 return
 
             # We can ajust the query more tightly
-            data['startRec'] = 1 + parsed
+            data['firstRec'] = 1 + parsed
             data['numRecs'] = min(self.MAX_PER_BATCH, missing)
             data['SID'] = sessionID
 

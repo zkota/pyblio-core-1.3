@@ -21,7 +21,7 @@ class MyWOK(http.Request):
             self.write(open(err).read())
 
         else:
-            start = self.args.get('startRec', ['1'])[0]
+            start = self.args.get('firstRec', ['1'])[0]
             f = os.path.join(base, 'r-' + start + '.xml')
             self.write(open(f).read())
             
@@ -88,8 +88,8 @@ class TesFakeWOK(unittest.TestCase):
 
         def done(total):
             self.failUnlessEqual(total, 1641)
-
-            assert len(rs) == 250
+            self.failUnlessEqual(len(rs), 250)
+            
             tmp = pybut.dbname()
             fd = open(tmp, 'w')
             self.db.xmlwrite(fd)

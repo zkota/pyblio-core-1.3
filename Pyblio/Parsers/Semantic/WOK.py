@@ -32,6 +32,13 @@ class Reader(object):
             self.record.add('author', author.text, single)
         return
 
+    def do_corp_authors(self, node):
+        def single(author):
+            return Attribute.Person(last=author)
+        
+        for author in node:
+            self.record.add('author', author.text, single)
+
     def do_refs(self, node):
         for ref in node:
             self.record.add('ref', ref.text, Attribute.ID)

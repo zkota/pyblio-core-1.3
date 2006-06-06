@@ -338,7 +338,7 @@ class Reader(object):
                 _("no attribute '%s' in document '%s'") % (
                 k, self.tp))
 
-        return self._mapping [attp.type] (k, v)
+        return self._mapping[attp.type](k, v)
     
     def record_parse (self, record):
 

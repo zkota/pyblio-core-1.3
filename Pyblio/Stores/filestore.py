@@ -37,7 +37,7 @@ from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query, Sort
 from Pyblio.Arrays import KeyArray, match_arrays
         
 
-class TxoGroup (dict, Store.TxoGroup, Callback.Publisher):
+class TxoGroup(dict, Store.TxoGroup, Callback.Publisher):
 
     def __init__ (self, group):
 

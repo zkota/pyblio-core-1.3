@@ -8,6 +8,10 @@
   <name>Abstract</name>
  </attribute>
 
+ <attribute id="article_no" type="text">
+  <name>Article #</name>
+ </attribute>
+
  <attribute id="author" type="person">
   <name>Authors</name>
  </attribute>
@@ -75,6 +79,22 @@
   <txo-item id="3">
    <name>Correction</name>
    <name lang="C">C</name>
+  </txo-item>
+  <txo-item id="4">
+   <name>Letter</name>
+   <name lang="C">L</name>
+  </txo-item>
+  <txo-item id="5">
+   <name>Review</name>
+   <name lang="C">R</name>
+  </txo-item>
+  <txo-item id="6">
+   <name>Meeting Abstract</name>
+   <name lang="C">M</name>
+  </txo-item>
+  <txo-item id="7">
+   <name>News item</name>
+   <name lang="C">5</name>
   </txo-item>
  </txo-group>
 

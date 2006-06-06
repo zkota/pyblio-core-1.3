@@ -60,6 +60,46 @@
    <name>Title</name>
  </attribute>
 
+ <attribute id="article_no" type="text">
+   <name>Article #</name>
+ </attribute>
+ 
+<!--
+2	Abstract of Published Item
+A	Art Exhibit Review
+@	Article
+7	Bibliography
+I	Biographical-Item
+B	Book Review
+K	Chronology
+C	Correction
+C	Correction, Addition
+Z	Dance Performance Review
+0	Database Review
+D	Discussion
+E	Editorial Material
+X	Excerpt
+O	Fiction, Creative Prose
+F	Film Review
+8	Hardware Review
+I	Item About an Individual
+L	Letter
+M,MC	Meeting Abstract
+J	Music Performance Review
+S	Music Score
+G	Music Score Review
+5	News Item
+N	Note
+Y	Poetry
+H	Record Review
+6	Reprint
+R	Review
+Q	Script
+9	Software Review
+V	TV Review, Radio Review
+V	TV Review, Radio Review, Video
+T	Theater Review
+-->
 
  <txo-group id="doctype">
    <txo-item id="1">
@@ -74,6 +114,23 @@
      <name lang="C">C</name>
      <name>Correction</name>
    </txo-item>
+   <txo-item id="4">
+     <name lang="C">L</name>
+     <name>Letter</name>
+   </txo-item>
+   <txo-item id="5">
+     <name lang="C">R</name>
+     <name>Review</name>
+   </txo-item>
+   <txo-item id="6">
+     <name lang="C">M</name>
+     <name>Meeting Abstract</name>
+   </txo-item>
+   <txo-item id="7">
+     <name lang="C">5</name>
+     <name>News item</name>
+   </txo-item>
  </txo-group>
+
 
 </pyblio-schema>
