@@ -504,7 +504,10 @@ class TContent(pybut.TestCase):
             got.sort ()
             assert got == check, 'expected %s, got %s' % (
                 check, got)
-            
+
+            for i in items:
+                self.failUnlessEqual(i in rs, i in check)
+                
         return
 
     def testResultSetsValues (self):

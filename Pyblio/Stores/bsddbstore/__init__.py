@@ -609,10 +609,11 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
     def __contains__(self, k):
 
         try:
-            return _pl(self._rs.get(self._id))[k-1]
+            return _pl(self._rs.get(self._id)).a[k-1]
 
         except IndexError:
             return False
+
         
     def has_key (self, k):
         return k in self
