@@ -25,8 +25,11 @@ class Reader(object):
     def do_authors(self, node):
         
         def single(author):
-            last, first = [part.strip() for part in author.split(',')]
-            return Attribute.Person(last=last, first=first)
+            try:
+                last, first = [part.strip() for part in author.split(',')]
+                return Attribute.Person(last=last, first=first)
+            except ValueError:
+                return Attribute.Person(last=author.strip())
         
         for author in node:
             self.record.add('author', author.text, single)

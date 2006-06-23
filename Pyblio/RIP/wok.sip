@@ -103,34 +103,128 @@ T	Theater Review
 
  <txo-group id="doctype">
    <txo-item id="1">
+     <name lang="C">2</name>
+     <name>Abstract of Published Item</name>
+   </txo-item>
+   <txo-item id="2">
+     <name lang="C">A</name>
+     <name>Art Exhibit Review</name>
+   </txo-item>
+   <txo-item id="3">
      <name lang="C">@</name>
      <name>Article</name>
    </txo-item>
-   <txo-item id="2">
-     <name lang="C">E</name>
-     <name>Editorial Material</name>
+   <txo-item id="4">
+     <name lang="C">7</name>
+     <name>Bibliography</name>
    </txo-item>
-   <txo-item id="3">
+   <txo-item id="5">
+     <name lang="C">I</name>
+     <name>Biographical Item</name>
+   </txo-item>
+   <txo-item id="6">
+     <name lang="C">B</name>
+     <name>Book review</name>
+   </txo-item>
+   <txo-item id="7">
+     <name lang="C">K</name>
+     <name>Chronology</name>
+   </txo-item>
+   <txo-item id="8">
      <name lang="C">C</name>
      <name>Correction</name>
    </txo-item>
-   <txo-item id="4">
+   <txo-item id="9">
+     <name lang="C">Z</name>
+     <name>Dance Performance Review</name>
+   </txo-item>
+   <txo-item id="10">
+     <name lang="C">0</name>
+     <name>Database Review</name>
+   </txo-item>
+   <txo-item id="11">
+     <name lang="C">D</name>
+     <name>Discussion</name>
+   </txo-item>
+   <txo-item id="12">
+     <name lang="C">E</name>
+     <name>Editorial Material</name>
+   </txo-item>
+   <txo-item id="13">
+     <name lang="C">X</name>
+     <name>Excerpt</name>
+   </txo-item>
+   <txo-item id="14">
+     <name lang="C">O</name>
+     <name>Fiction, Creative Prose</name>
+   </txo-item>
+   <txo-item id="15">
+     <name lang="C">F</name>
+     <name>Film Review</name>
+   </txo-item>
+   <txo-item id="16">
+     <name lang="C">8</name>
+     <name>Hardware Review</name>
+   </txo-item>
+   <txo-item id="17">
      <name lang="C">L</name>
      <name>Letter</name>
    </txo-item>
-   <txo-item id="5">
-     <name lang="C">R</name>
-     <name>Review</name>
-   </txo-item>
-   <txo-item id="6">
+   <txo-item id="18">
      <name lang="C">M</name>
      <name>Meeting Abstract</name>
    </txo-item>
-   <txo-item id="7">
+   <txo-item id="19">
+     <name lang="C">J</name>
+     <name>Music Performance Review</name>
+   </txo-item>
+   <txo-item id="20">
+     <name lang="C">S</name>
+     <name>Music Score</name>
+   </txo-item>
+   <txo-item id="21">
+     <name lang="C">G</name>
+     <name>Music Score Review</name>
+   </txo-item>
+   <txo-item id="22">
      <name lang="C">5</name>
      <name>News item</name>
    </txo-item>
+   <txo-item id="23">
+     <name lang="C">N</name>
+     <name>Note</name>
+   </txo-item>
+   <txo-item id="24">
+     <name lang="C">Y</name>
+     <name>Poetry</name>
+   </txo-item>
+   <txo-item id="25">
+     <name lang="C">H</name>
+     <name>Record Review</name>
+   </txo-item>
+   <txo-item id="26">
+     <name lang="C">6</name>
+     <name>Reprint</name>
+   </txo-item>
+   <txo-item id="27">
+     <name lang="C">R</name>
+     <name>Review</name>
+   </txo-item>
+   <txo-item id="28">
+     <name lang="C">Q</name>
+     <name>Script</name>
+   </txo-item>
+   <txo-item id="29">
+     <name lang="C">9</name>
+     <name>Software Review</name>
+   </txo-item>
+   <txo-item id="30">
+     <name lang="C">V</name>
+     <name>TV Review, Radio Review</name>
+   </txo-item>
+   <txo-item id="31">
+     <name lang="C">T</name>
+     <name>Theater Review</name>
+   </txo-item>
  </txo-group>
-
-
 </pyblio-schema>
