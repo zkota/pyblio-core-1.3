@@ -171,36 +171,40 @@ class RSDB (object):
         return
     
     def itervalues (self):
-        c = self._db.cursor ()
-        d = c.first ()
+        c = self._db.cursor()
+        d = c.first()
         
         while d:
-            yield _pl (d [1])
-            d = c.next ()
+            yield _pl(d[1])
+            d = c.next()
+
+        c.close()
         return
     
     def iterkeys (self):
         
-        c = self._db.cursor ()
-        d = c.first ()
+        c = self._db.cursor()
+        d = c.first()
         
         while d:
-            yield Store.Key (d [0])
-            d = c.next ()
+            yield Store.Key(d[0])
+            d = c.next()
 
+        c.close()
         return
 
     __iter__ = iterkeys
     
     
     def iteritems (self):
-        c = self._db.cursor ()
-        d = c.first ()
+        c = self._db.cursor()
+        d = c.first()
         
         while d:
-            yield Store.Key (d [0]), _pl (d [1])
-            d = c.next ()
+            yield Store.Key(d[0]), _pl(d[1])
+            d = c.next()
 
+        c.close()
         return
 
     def __len__ (self):
@@ -322,42 +326,46 @@ class View (Store.View):
 
     def iterkeys (self):
 
-        c = self._v.cursor ()
-        d = c.first ()
+        c = self._v.cursor()
+        d = c.first()
         
         while d:
-            key = d [1]
-            yield Store.Key (key)
+            key = d[1]
+            yield Store.Key(key)
 
-            d = c.next ()
-            
+            d = c.next()
+
+        c.close()
         return
 
     __iter__ = iterkeys
 
     def iteritems (self):
 
-        c = self._v.cursor ()
-        d = c.first ()
+        c = self._v.cursor()
+        d = c.first()
         
         while d:
-            key = d [1]
-            yield Store.Key (key), _pl (self._db.get (key))
+            key = d[1]
+            yield Store.Key(key), _pl(self._db.get(key))
 
-            d = c.next ()
-            
+            d = c.next()
+        
+        c.close()
         return
 
     def itervalues (self):
 
-        c = self._v.cursor ()
-        d = c.first ()
+        c = self._v.cursor()
+        d = c.first()
         
         while d:
-            key = d [1]
-            yield _pl (self._db.get (key))
+            key = d[1]
+            yield _pl(self._db.get(key))
 
-            d = c.next ()
+            d = c.next()
+            
+        c.close()
         return
 
     def index(self, key):
@@ -365,7 +373,10 @@ class View (Store.View):
         e = _pl(self._db.get(str(key)))
 
         c.set(self._make_key(e))
-        return c.get_recno() - 1
+        idx = c.get_recno() - 1
+        c.close()
+        
+        return idx
     
     def __getitem__ (self, idx):
         data = self._v.get(idx + 1)
@@ -1032,15 +1043,16 @@ class TxoStore (Store.TxoStore, Callback.Publisher):
 
     def keys (self):
         k = []
-        c = self._enum.cursor ()
+        c = self._enum.cursor()
 
-        d = c.first ()
+        d = c.first()
         while d:
             key, data = d
             k.append (key)
             
-            d = c.next ()
-
+            d = c.next()
+        c.close()
+        
         return k
 
     
@@ -1157,7 +1169,7 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
             self._env.open(path, oflag)
 
         else:
-            flag = 0
+            flag = db.DB_CREATE
             oflag = db.DB_INIT_MPOOL
 
             if self._use_txn:
