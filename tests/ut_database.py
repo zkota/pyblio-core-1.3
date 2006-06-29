@@ -775,7 +775,7 @@ class TContent(pybut.TestCase):
         return
 
 
-class BaseView (pybut.TestCase):
+class BaseView(pybut.TestCase):
     
     count = 0
     
@@ -1003,7 +1003,106 @@ class TView(BaseView):
 
         return
 
+class TCallbacks(pybut.TestCase):
+    """ Check the proper behavior of callbacks & signals """
 
+
+    def setUp (self):
+
+        self.hd = Store.get(self.fmt)
+        self.nm = pybut.dbname ()
+
+        sc = Schema.Schema(fp('schema.xml'))
+        self.db = self.hd.dbcreate(self.nm, sc)
+        return
+
+    def testChangeThenCallback(self):
+        """ Changing a record in a result set triggers a callback """
+
+        called = {'k': None}
+        def _do_call(k):
+            called['k'] = k
+
+
+        def check(v):
+            self.failUnlessEqual(called['k'], v)
+            called['k'] = None
+
+        rs1 = self.db.rs.add()
+        rs2 = self.db.rs.add()
+
+        # First element is the one used to update the content, second
+        # is the one on which we check the callback
+        iterables = [
+            (self.db, self.db.entries),
+            (self.db, self.db.entries.view(OrderBy('text'))),
+            (rs1, rs1),
+            (rs2, rs2.view(OrderBy('text')))]
+            
+        for src, rs in iterables:
+            r = Store.Record()
+            k1 = self.db.add(r)
+
+            r = Store.Record()
+            k2 = self.db.add(r)
+
+            if src is not self.db:
+                src.add(k1)
+
+                # Now, adding a new record to the rs should trigger a callback
+                rs.register('add-item', _do_call)
+                src.add(k2)
+            
+                check(k2)
+
+            # so does updating
+            rs.register('update-item', _do_call)
+            self.db[k1] = r
+            
+            check(k1)
+
+            # ...and deleting from rs
+            rs.register('delete-item', _do_call)
+
+            if src is not self.db:
+                del src[k2]
+                check(k2)
+
+            # ...but also from the whole db
+            del self.db[k1]
+            check(k1)
+        return
+    
+        
+    def testNoChangeNoCallback(self):
+        """ Changing a record _not_ in a result set triggers no callback """
+
+        def _dont_call(*args):
+            assert False, "don't call me"
+
+        r = Store.Record()
+        k1 = self.db.add(r)
+
+        r = Store.Record()
+        k2 = self.db.add(r)
+
+        rs = self.db.rs.add()
+        rs.add(k1)
+
+        # Now, adding a new record to the db should not trigger a
+        # callback
+        rs.register('add-item', _dont_call)
+        self.db.add(r)
+
+        # ...same thing when _updating_ a record not in the set
+        rs.register('update-item', _dont_call)
+        self.db[k2] = r
+
+        # ...same thing when _deleting_ a record
+        rs.register('delete-item', _dont_call)
+        del self.db[k2]
+
+        
 class TCollate(pybut.TestCase):
 
     def setUp (self):
@@ -1103,6 +1202,9 @@ class TestOrderingFile(TOrdering):
 class TestCollateFile(TCollate):
     fmt = 'file'
 
+class TestCallbacksFile(TCallbacks):
+    fmt = 'file'
+
 class TestDatabaseDB(TDatabase):
     fmt = 'bsddb'
     skip = skip_bsddb
@@ -1123,12 +1225,17 @@ class TestOrderingDB (TOrdering):
     fmt = 'bsddb'
     skip = skip_bsddb
 
+class TestCallbacksDB(TCallbacks):
+    fmt = 'bsddb'
+    skip = skip_bsddb
+
 files = [ TestDatabaseFile,
           TestContentFile,
           TestViewFile,
           TestCollateFile,
           TestOrderingFile,
           TestMemoryStore,
+          TestCallbacksFile,
           ]
 
 bsddb = [ TestDatabaseDB,
@@ -1136,6 +1243,7 @@ bsddb = [ TestDatabaseDB,
           TestViewDB,
           TestCollateDB,
           TestOrderingDB,
+          TestCallbacksDB,
           ]
 
 # in some cases, we cannot check for bsddb (too old)

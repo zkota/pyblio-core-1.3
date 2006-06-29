@@ -141,26 +141,29 @@ class TxoStore (dict, Store.TxoStore):
 
 
 # --------------------------------------------------
-class View (object):
+class View(Callback.Publisher):
 
     def __init__ (self, src, crit):
-
+        Callback.Publisher.__init__(self)
+        
         self._crit = crit
         self._src  = src
         
-        self._update (None)
+        self._update(None, '')
 
-        self._src.register ('add-item', self._update)
-        self._src.register ('delete-item', self._update)
-        self._src.register ('update-item', self._update)
+        self._src.register('add-item', self._update, 'add-item')
+        self._src.register('delete-item', self._update, 'delete-item')
+        self._src.register('update-item', self._update, 'update-item')
         return
     
-    def _update (self, key):
+    def _update(self, key, signal):
 
         view = [ (self._crit.cmp_key (e), e.key) for e in self._src.itervalues () ]
         view.sort (lambda a, b: Sort.compare (a [0], b [0]))
 
         self._view = [ x [1] for x in view ]
+
+        self.emit(signal, key)
         return
 
     def __len__ (self):
@@ -191,8 +194,10 @@ class View (object):
             yield self._src._dict [i]
 
     def index(self, key):
-        return self._view.index(key)
-
+        try:
+            return self._view.index(key)
+        except ValueError:
+            raise KeyError(key)
     
 class Viewable (object):
 
@@ -201,7 +206,7 @@ class Viewable (object):
         return View (self, criterion)
         
 
-class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
+class ResultSet(dict, Viewable, Store.ResultSet, Callback.Publisher):
 
     def __init__ (self, rsid, db):
 
@@ -261,8 +266,8 @@ class ResultSet (dict, Viewable, Store.ResultSet, Callback.Publisher):
         return
 
     def _on_db_update (self, k):
-
-        self.emit ('update-item', k)
+        if k in self:
+            self.emit('update-item', k)
         return
     
 
@@ -339,9 +344,9 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self._dict   = {}
         self._rodict = RODict (self._dict)
 
-        self.register ('add-item', self._rodict._forward, 'add-item')
-        self.register ('delete-item', self._rodict._forward, 'delete-item')
-        self.register ('update-item', self._rodict._forward, 'update-item')
+        self.register('add-item', self._rodict._forward, 'add-item')
+        self.register('delete-item', self._rodict._forward, 'delete-item')
+        self.register('update-item', self._rodict._forward, 'update-item')
         
         self.file = file
 

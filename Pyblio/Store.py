@@ -229,7 +229,7 @@ class Record (dict):
 
 # --------------------------------------------------
 
-class View (object):
+class View(object):
 
     """ A view of a Result Set represents the Result Set sorted
     according to a specific criterion.

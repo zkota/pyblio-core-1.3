@@ -155,12 +155,13 @@ def _idxdel(_idx, id, txn):
 
 # --------------------------------------------------
 
-class RSDB (object):
+class RSDB(Callback.Publisher):
 
     """ Virtual result set that loops over the full database """
 
     def __init__ (self, _db, _env, _meta):
-
+        Callback.Publisher.__init__(self)
+        
         self.id  = 0
         
         self._db   = _db
@@ -213,53 +214,28 @@ class RSDB (object):
 
     def view (self, criterion):
 
-        v = View (self._db, self._env, self._meta,
-                  self, criterion)
+        v = View(self._db, self._env, self._meta,
+                 self, criterion)
 
-        self._views.append (weakref.ref (v))
+        self.register('txn-add-item', v._add)
+        self.register('txn-delete-item', v._del)
+        self.register('txn-update-item', v._update)
         
         return v
 
-    def _add (self, e, txn):
-        
-        for vref in [] + self._views:
-            v = vref ()
-
-            if v is None:
-                self._views.remove (vref)
-                continue
-
-            v._add (e, txn)
+    def _add(self, e, txn):
+        self.emit('txn-add-item', e, txn)
+        self.emit('add-item', e.key)
         return
 
-    def _delete (self, key, txn):
-
-        # Update the views of the result set
-
-        for vref in [] + self._views:
-            v = vref ()
-
-            if v is None:
-                self._views.remove (vref)
-                continue
-
-            v._del (key, txn)
-
+    def _delete(self, key, txn):
+        self.emit('txn-delete-item', key, txn)
+        self.emit('delete-item', key)
         return
 
-    def _update (self, k, val, txn):
-        
-        # Update the views of the result set
-
-        for vref in [] + self._views:
-            v = vref ()
-
-            if v is None:
-                self._views.remove (vref)
-                continue
-
-            v._del (k, txn)
-            v._add (val, txn)
+    def _update(self, k, val, txn):
+        self.emit('txn-update-item', k, val, txn)
+        self.emit('update-item', k)
         return
     
 # --------------------------------------------------
@@ -278,10 +254,13 @@ def _compare (a, b):
     if r: return r
     return cmp (ka, kb)
 
-class View (Store.View):
+
+class View(Store.View, Callback.Publisher):
 
     def __init__ (self, _db, _env, _meta, rs, criterion, txn = None):
 
+        Callback.Publisher.__init__(self)
+        
         self._db   = _db
         self._env  = _env
         self._meta = _meta
@@ -430,27 +409,38 @@ class View (Store.View):
 
         return _ps (self._crit.cmp_key (e)) + '\0%d' % e.key
 
-    def _add (self, e, txn):
-        
-        self._v.put (self._make_key (e), str (e.key), txn = txn)
+
+    def _update(self, k, e, txn):
+        old = _pl(self._db.get(str(k), txn=txn))
+
+        self._v.delete(self._make_key(old), txn=txn)
+        self._v.put(self._make_key(e), str(k), txn=txn)
+
+        self.emit('update-item', k)
+        return
+    
+    def _add(self, e, txn):
+        self._v.put(self._make_key(e), str(e.key), txn=txn)
+        self.emit('add-item', e.key)
         return
 
-    def _del (self, k, txn):
+    def _del(self, k, txn):
 
         # To remove an entry, we have to assume the way we compute the
         # sorting key has not changed since it has been created. It
         # should be the case, because the update of the result sets
         # and views is performed as the initial step of a record
         # update.
-        e = _pl (self._db.get (str (k), txn = txn))
+        e = _pl(self._db.get(str(k), txn=txn))
+        self._v.delete(self._make_key(e), txn=txn)
 
-        self._v.delete (self._make_key (e), txn = txn)
+        self.emit('delete-item', k)
         return
 
     
 # --------------------------------------------------
 
-class ResultSet (Store.ResultSet, Callback.Publisher):
+class ResultSet(Store.ResultSet, Callback.Publisher):
 
     def __init__ (self, _db, _env, _meta, _idx,
                   rs, id, permanent = False, txn = None):
@@ -556,21 +546,15 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
             self._rs.put(self._id, _ps(a), txn=txn)
 
             # Update the views of the result set
-            if self._views:
-                e = _pl(self._db.get(str(k), txn=txn))
-                
-                for vref in self._views[:]:
-                    try:
-                        vref()._add(e, txn)
-
-                    except AttributeError:
-                        self._views.remove(vref)
+            e = _pl(self._db.get(str(k), txn=txn))
+            self.emit('txn-add-item', e, txn)
                 
         except:
             self._env.txn_abort(txn)
             raise
 
         self._env.txn_commit(txn)
+        self.emit('add-item', k)
         return
 
     def __delitem__ (self, k, txn = None):
@@ -589,18 +573,10 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
                 raise KeyError('key %s not in result set' % str(k))
 
             del a[k]
-
             self._rs.put(self._id, _ps(a), txn=txn)
 
             # Update the views of the result set
-            for vref in [] + self._views:
-                v = vref ()
-                
-                if v is None:
-                    self._views.remove (vref)
-                    continue
-
-                v._del (k, txn)
+            self.emit('txn-delete-item', k, txn)
 
         except KeyError:
             self._env.txn_abort(txn)
@@ -614,6 +590,7 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
             raise
 
         self._env.txn_commit(txn)
+        self.emit('delete-item', k)
         return
 
 
@@ -632,11 +609,12 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
 
     def view (self, criterion):
 
-        v = View (self._db, self._env, self._meta,
-                  self, criterion)
+        v = View(self._db, self._env, self._meta,
+                 self, criterion)
 
-        # keep a weakref for easy updating of the view
-        self._views.append (weakref.ref (v))
+        self.register('txn-add-item', v._add)
+        self.register('txn-delete-item', v._del)
+        self.register('txn-update-item', v._update)
         
         return v
     
@@ -697,26 +675,19 @@ class ResultSet (Store.ResultSet, Callback.Publisher):
         return
         
 
-    def _on_update (self, k, val, txn):
-        
-        # Update the views of the result set
+    def _on_update(self, k, val, txn):
 
-        for vref in [] + self._views:
-            v = vref ()
+        if k not in self:
+            return
 
-            if v is None:
-                self._views.remove (vref)
-                continue
-
-            v._del (k, txn)
-            v._add (val, txn)
+        self.emit('txn-update-item', k, val, txn)
         return
 
     
-    def _on_delete (self, key, txn = None):
+    def _on_delete(self, key, txn = None):
 
         try:
-            self.__delitem__ (key, txn)
+            self.__delitem__(key, txn)
             
         except KeyError:
             pass
@@ -1333,8 +1304,9 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
         assert self.has_key (key), \
                _('entry %s does not exist') % `key`
 
-        val = self.validate (val)
-
+        val = self.validate(val)
+        val.key = key
+        
         txn = self._env.txn_begin ()
 
         try:
