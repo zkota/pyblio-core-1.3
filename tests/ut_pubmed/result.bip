@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema id="org.pybliographer/pubmed/0.1">
+ <name>Data from PubMed</name>
+
+ <attribute id="abstract" type="text">
+  <name>Abstract</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Authors</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal title</name>
+
+  <qualifiers>
+   <attribute id="issn" type="id">
+    <name>Journal's ISSN</name>
+   </attribute>
+   <attribute id="issue" type="text">
+    <name>Issue</name>
+   </attribute>
+   <attribute id="month" type="text">
+    <name>Month</name>
+   </attribute>
+   <attribute id="volume" type="text">
+    <name>Volume</name>
+   </attribute>
+   <attribute id="year" type="text">
+    <name>Year</name>
+   </attribute>
+  </qualifiers>
+ </attribute>
+
+ <attribute id="pmid" type="id">
+  <name>PubMed unique identifier</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Article Title</name>
+ </attribute>
+
+</pyblio-schema>
+ <entry id="1">
+  <attribute id="abstract">
+   <text>This paper presents a novel technique based on plasma etching for the mass production of polymer microchip devices. The method consists of the patterning of a photo-resist by a high resolution printer on a foil composed of three layers (5 microm copper/50 microm polyimide/5 microm copper). After this step, both copper layers are chemically etched in order to serve as a contact mask on the polyimide surface so as to produce the desired microstructure pattern. The foil is placed into a reactive plasma chamber in order to etch the exposed polyimide by means of an oxidizing plasma. The method enables holes, lines or larger areas to be etched, thereby generating either microholes, microchannels or electrodes in the plastic material. The copper can then be chemically removed or further patterned to produce conductive pads which are further electroplated with gold. The microchannel is then covered with a polyethylene terephthalate/polyethylene (PET/PE) lamination. The strength of this technology is that access holes for the fluid inlet and outlet, as well as gold coated electrodes can be fabricated without post-processing in a batch process. Demonstration of the application of such microelectrochemical systems is shown here by voltammetric detection inside a 60 nL microchannel, which presents the special feature of linear depletion of the analytes in the direction parallel to the microchannel.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="Joël S" last="Rossier"/>
+   <person first="Christine" last="Vollet"/>
+   <person first="Amanda" last="Carnal"/>
+   <person first="Grégoire" last="Lagger"/>
+   <person first="Véronique" last="Gobry"/>
+   <person first="Hubert H" last="Girault"/>
+   <person first="Philippe" last="Michel"/>
+   <person first="Frédéric" last="Reymond"/>
+  </attribute>
+  <attribute id="journal">
+   <text>
+    <content>Lab on a chip. </content>
+    <attribute id="volume">
+     <text>2</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="1473-0197"/>
+    </attribute>
+    <attribute id="issue">
+     <text>3</text>
+    </attribute>
+    <attribute id="month">
+     <text>Aug</text>
+    </attribute>
+    <attribute id="year">
+     <text>2002</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="pmid">
+   <id value="15100825"/>
+  </attribute>
+  <attribute id="title">
+   <text>Plasma etched polymer microelectrochemical systems.</text>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="abstract">
+   <text>A simple desalting procedure for the coupling of a polymer microchip injector to mass spectrometry is proposed. The overall process is based on the adsorption of proteins on a poly(vinylidene difluoride) (PVDF) membrane, which are then directly eluted in the spraying solution. This microchip-based approach has been successfully applied to small drugs, peptides and proteins originally diluted in phosphate-buffered saline (PBS). Moreover, when eluting the retained proteins in small volumes, a preconcentration is obtained. The combination of single-use, mass-produceable, low-sample-consumption, easy-to-automate, miniaturized polymer injectors with easy-to-handle solution-exchange membranes makes this system particularly amenable to screening applications.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="Niels" last="Lion"/>
+   <person first="Véronique" last="Gobry"/>
+   <person first="Henrik" last="Jensen"/>
+   <person first="Joël S" last="Rossier"/>
+   <person first="Hubert" last="Girault"/>
+  </attribute>
+  <attribute id="journal">
+   <text>
+    <content>Electrophoresis.</content>
+    <attribute id="volume">
+     <text>23</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="0173-0835"/>
+    </attribute>
+    <attribute id="issue">
+     <text>20</text>
+    </attribute>
+    <attribute id="month">
+     <text>Oct</text>
+    </attribute>
+    <attribute id="year">
+     <text>2002</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="pmid">
+   <id value="12412128"/>
+  </attribute>
+  <attribute id="title">
+   <text>Integration of a membrane-based desalting step in a microfabricated disposable polymer injector for mass spectrometric protein analysis.</text>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="abstract">
+   <text>PURPOSE: This work examines the lipophilic behavior of various zwitterions and shows how distribution profiles in biphasic systems and ionic partition diagrams may improve our understanding of pH-absorption profiles of drugs. METHODS: The lipophilicity of various zwitterionic drugs was examined by potentiometry and cyclic voltammetry in the 1,2-dichloroethane/water system to study the intramolecular interactions and conformational effects affecting absorption and activity of zwitterions, as well as to draw their theoretical and experimental ionic partition diagrams. RESULTS: Different theoretical partition diagrams are reported according to the tautomeric constant of the zwitterion. Shifts of apparent PKa are obtained in the ionic partition diagrams of raclopride and eticlopride and compared to the deviations from pH-absorption profile described in the literature for lipophilic drugs. The physicochemical origin of these shifts is discussed. CONCLUSIONS: The comparison between pH-absorption profiles and ionic partition diagrams of zwitterions is shown here to be of value for a better mechanistic understanding of absorption processes, thus opening new perspectives in studying pH-absorption profiles of ionizable drugs.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="Géraldine" last="Bouchard"/>
+   <person first="Alessandra" last="Pagliara"/>
+   <person first="Pierre-Alain" last="Carrupt"/>
+   <person first="Bernard" last="Testa"/>
+   <person first="Véronique" last="Gobry"/>
+   <person first="Hubert H" last="Girault"/>
+  </attribute>
+  <attribute id="journal">
+   <text>
+    <content>Pharmaceutical research. </content>
+    <attribute id="volume">
+     <text>19</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="0724-8741"/>
+    </attribute>
+    <attribute id="issue">
+     <text>8</text>
+    </attribute>
+    <attribute id="month">
+     <text>Aug</text>
+    </attribute>
+    <attribute id="year">
+     <text>2002</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="pmid">
+   <id value="12240941"/>
+  </attribute>
+  <attribute id="title">
+   <text>Theoretical and experimental exploration of the lipophilicity of zwitterionic drugs in the 1,2-dichloroethane/water system.</text>
+  </attribute>
+ </entry>
+ <entry id="4">
+  <attribute id="abstract">
+   <text>This paper first gives a brief review of the main techniques used to measure the lipophilicity of neutral and ionic drugs, namely the shake-flask method, potentiometry, and cyclic voltammetry at liquid-liquid interfaces. The lipophilicity of 28 acidic compounds with various functional groups was studied by potentiometry and cyclic voltammetry in the n-octanol/water and 1,2-dichloroethane/water systems in order to complement our understanding of the lipophilicity of neutral and ionized acids and to clarify the solvation mechanisms responsible for their partition. The parameter diff (log P(N-A)(dce)) (i.e., log P of the neutral acid minus standard log P of the conjugated anion in 1,2-dichloroethane/water) was shown to depend not only on intramolecular interactions and conformational effects in the neutral and anionic forms, but also on the delocalization of the negative charge in the anion, confirming the ability of Born's solvation model to describe qualitatively the effect of the molecular radius on the lipophilicity of ions.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="Géraldine" last="Bouchard"/>
+   <person first="Pierre-Alain" last="Carrupt"/>
+   <person first="Bernard" last="Testa"/>
+   <person first="Véronique" last="Gobry"/>
+   <person first="Hubert H" last="Girault"/>
+  </attribute>
+  <attribute id="journal">
+   <text>
+    <content>Chemistry (Weinheim an der Bergstrasse, Germany)  </content>
+    <attribute id="volume">
+     <text>8</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="0947-6539"/>
+    </attribute>
+    <attribute id="issue">
+     <text>15</text>
+    </attribute>
+    <attribute id="month">
+     <text>Aug</text>
+    </attribute>
+    <attribute id="year">
+     <text>2002</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="pmid">
+   <id value="12203328"/>
+  </attribute>
+  <attribute id="title">
+   <text>Lipophilicity and solvation of anionic drugs.</text>
+  </attribute>
+ </entry>
+ <entry id="5">
+  <attribute id="abstract">
+   <text>This paper demonstrates the coupling of a plasma etched polymer microfluidic system with an electrospray mass spectrometer by generation of a nanospray. Taking advantage of the microtechnology processes and polymer properties, high volume production with good reproducibility of hydrophobic interfaces could be obtained. The nanospray was directly produced from the outlet of the plastic microfabricated chip positioned in front of the capillary entrance of the mass spectrometer. No chemical background due to the polymer has been observed under standard nanospray conditions. The performances of the spray as well as its efficiency have been demonstrated by flow measurements, stability establishment and tandem mass spectrometry experiment on angiotensin II. The spray was actuated without additional flow in methanol: water:acetic acid (50:49:1%) solution. A 40 fmol/microL detection limit could be reached.</text>
+  </attribute>
+  <attribute id="author">
+   <person first="Véronique" last="Gobry"/>
+   <person first="Jan" last="van Oostrum"/>
+   <person first="Marco" last="Martinelli"/>
+   <person first="Tatiana C" last="Rohner"/>
+   <person first="Frédéric" last="Reymond"/>
+   <person first="Joël S" last="Rossier"/>
+   <person first="Hubert H" last="Girault"/>
+  </attribute>
+  <attribute id="journal">
+   <text>
+    <content>Proteomics. </content>
+    <attribute id="volume">
+     <text>2</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="1615-9853"/>
+    </attribute>
+    <attribute id="issue">
+     <text>4</text>
+    </attribute>
+    <attribute id="month">
+     <text>Apr</text>
+    </attribute>
+    <attribute id="year">
+     <text>2002</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="pmid">
+   <id value="12164699"/>
+  </attribute>
+  <attribute id="title">
+   <text>Microfabricated polymer injector for direct mass spectrometry coupling.</text>
+  </attribute>
+ </entry>
+ <resultset id="1" name="Imported from PubMed">
+  <ref id="1"/>
+  <ref id="2"/>
+  <ref id="3"/>
+  <ref id="4"/>
+  <ref id="5"/>
+ </resultset>
+</pyblio-db>

@@ -1,4 +1,4 @@
-import os, logging
+import os, logging, pybut
 
 from twisted.trial import unittest
 from twisted.internet import reactor
@@ -103,4 +103,32 @@ class TestPubMed(unittest.TestCase):
                 return e
             
         return d.addCallback(self.fail).addErrback(check)
-    
+
+from Pyblio.Parsers.Semantic.PubMed import Reader
+from cElementTree import ElementTree
+
+class TestPubMedParser(unittest.TestCase):
+
+    def setUp(self):
+        Registry.parse_default()
+
+        s = Registry.getSchema('org.pybliographer/pubmed/0.1')
+        fmt = Store.get('memory')
+
+        self.db = fmt.dbcreate(None, s)
+
+    def testParsing(self):
+
+        src = os.path.join(base, 'search-0.xml')
+
+        r = Reader()
+        r.parse(ElementTree(file=open(src)), self.db)
+
+        tmp = pybut.dbname()
+        fd = open(tmp, 'w')
+        self.db.xmlwrite(fd)
+        fd.close()
+
+        pybut.fileeq(tmp, pybut.fp('ut_pubmed', 'result.bip'))
+            
+        
