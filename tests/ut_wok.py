@@ -68,8 +68,12 @@ class TesFakeWOK(unittest.TestCase):
         
         self.cnx.baseURL = 'http://localhost:8000/broken'
         d = self.cnx.count(query='Author=(Gobry)')
-        
-        return d.addCallback(self.fail).addErrback(lambda x: None)
+
+        def check(e):
+            if e.check(unittest.FailTest):
+                return e
+            
+        return d.addCallback(self.fail).addErrback(check)
     
     def testCount(self):
         """ Return the result count for a query."""

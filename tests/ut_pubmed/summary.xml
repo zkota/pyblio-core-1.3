@@ -1,0 +1,28 @@
+<eSearchResult>
+        <Count>7</Count>
+        <RetMax>7</RetMax>
+        <RetStart>0</RetStart>
+        <QueryKey>1</QueryKey>
+        <WebEnv>0K6z90-251OElTCaHaG8t9biZT6oV8evlJyqF_DpQH-g4DrFLdYA5h@9sjrJIIOFpkAAB0HT8EAAAAF</WebEnv>
+        <IdList>
+                <Id>15100825</Id>
+                <Id>12412128</Id>
+                <Id>12240941</Id>
+                <Id>12203328</Id>
+                <Id>12164699</Id>
+                <Id>11674000</Id>
+                <Id>11465429</Id>
+        </IdList>
+        <TranslationSet>
+        </TranslationSet>
+        <TranslationStack>
+                <TermSet>
+                        <Term>gobry[All Fields]</Term>
+                        <Field>All Fields</Field>
+                        <Count>7</Count>
+                        <Explode>Y</Explode>
+                </TermSet>
+                <OP>GROUP</OP>
+        </TranslationStack>
+        <QueryTranslation>gobry[All Fields]</QueryTranslation>
+</eSearchResult>

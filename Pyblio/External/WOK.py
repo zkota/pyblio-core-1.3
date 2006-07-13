@@ -4,7 +4,7 @@ Interface to ISI Web of Knowledge.
 """
 
 from twisted.web import client
-from twisted.internet import defer, reactor
+from twisted.internet import defer
 from twisted.python import failure
 
 from cElementTree import ElementTree, XML, dump
@@ -15,28 +15,7 @@ from gettext import gettext as _
 
 from Pyblio.Exceptions import QueryError
 from Pyblio.Parsers.Semantic.WOK import Reader
-
-
-class _Getter(client.HTTPClientFactory):
-    """ This HTTP getter keeps track of the running protocol
-    instances, so that their transport can be closed in the middle of
-    an operation."""
-    
-    def __init__(self, *args, **kargs):
-        client.HTTPClientFactory.__init__(self, *args, **kargs)
-
-        self.running = []
-        return
-    
-    def buildProtocol(self, addr):
-        p = client.HTTPClientFactory.buildProtocol(self, addr)
-        self.running.append(p)
-        return p
-
-    def cancel(self):
-        self.running[-1].transport.loseConnection()
-        return
-
+from Pyblio.External.HTTP import HTTPRetrieve
 
 def _xml(data):
     """ Parse the result from the server, and immeditately catch
@@ -112,14 +91,9 @@ class WOK(object):
         
         q = self.baseURL + '?' + urllib.urlencode(data)
         
-        factory = _Getter(q, method='GET')
-
-        scheme, host, port, path = client._parse(q)
-        reactor.connectTCP(host, port, factory)
-
-        self._pending = factory
+        self._pending = HTTPRetrieve(q, method='GET')
         
-        return factory.deferred
+        return self._pending.deferred
 
 
     def _done(self, data):

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!-- -*- nxml -*- -->
 
 <pyblio-schema id="org.pybliographer/wok/0.1">
- <name>Exchange information with Web of Knowledge</name>
+ <name>Data from Web of Knowledge</name>
 
  <attribute id="ut" type="id">
   <name>ISI unique identifier</name>

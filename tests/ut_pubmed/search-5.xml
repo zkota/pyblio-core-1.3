@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2006//EN" "http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_060101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>11674000</PMID>
+        <DateCreated>
+            <Year>2001</Year>
+            <Month>10</Month>
+            <Day>24</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2002</Year>
+            <Month>01</Month>
+            <Day>25</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2004</Year>
+            <Month>11</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0002-7863</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>123</Volume>
+                    <Issue>43</Issue>
+                    <PubDate>
+                        <Year>2001</Year>
+                        <Month>Oct</Month>
+                        <Day>31</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Journal of the American Chemical Society. </Title>
+                <ISOAbbreviation>J. Am. Chem. Soc.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Generalization of ionic partition diagrams to lipophilic compounds and to biphasic systems with variable phase volume ratios.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>10684-90</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>The ionic partition diagram methodology has been generalized to address both hydrophilic and lipophilic compounds and to consider biphasic systems with variable phase volume ratios. With this generalized approach electrochemical measurements of ion transfer potentials afford the determination of the standard partition coefficients of all forms of ionizable molecules, including the neutral form, as well as the evaluation of the dissociation constant of monoprotic substances. An interesting consequence of this approach is the definition of an extraction pK(a,ext) which is the apparent pK(a) of neutral acids and bases when dissolved in the organic phase.</AbstractText>
+            </Abstract>
+            <Affiliation>Laboratoire d'électrochimie, Ecole Polytechnique Fédérale de Lausanne, CH-1015 Lausanne, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>V</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Ulmeanu</LastName>
+                    <ForeName>S</ForeName>
+                    <Initials>S</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Reymond</LastName>
+                    <ForeName>F</ForeName>
+                    <Initials>F</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Bouchard</LastName>
+                    <ForeName>G</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Carrupt</LastName>
+                    <ForeName>P A</ForeName>
+                    <Initials>PA</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Testa</LastName>
+                    <ForeName>B</ForeName>
+                    <Initials>B</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>H H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>J Am Chem Soc</MedlineTA>
+            <NlmUniqueID>7503056</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Acids</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Aniline Compounds</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Ions</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Lipids</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>51-28-5</RegistryNumber>
+                <NameOfSubstance>2,4-Dinitrophenol</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>7732-18-5</RegistryNumber>
+                <NameOfSubstance>Water</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">2,4-Dinitrophenol</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Acids</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Aniline Compounds</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Electrochemistry</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Hydrogen-Ion Concentration</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Ions</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Kinetics</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Lipids</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="Y">Solubility</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Thermodynamics</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Water</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2001</Year>
+                <Month>10</Month>
+                <Day>25</Day>
+                <Hour>10</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2002</Year>
+                <Month>1</Month>
+                <Day>26</Day>
+                <Hour>10</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">11674000</ArticleId>
+            <ArticleId IdType="pii">ja015914f</ArticleId>
+            <ArticleId IdType="medline">21531631</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>11465429</PMID>
+        <DateCreated>
+            <Year>2001</Year>
+            <Month>07</Month>
+            <Day>23</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2001</Year>
+            <Month>12</Month>
+            <Day>05</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2005</Year>
+            <Month>11</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0724-8741</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>18</Volume>
+                    <Issue>5</Issue>
+                    <PubDate>
+                        <Year>2001</Year>
+                        <Month>May</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Pharmaceutical research. </Title>
+                <ISOAbbreviation>Pharm. Res.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>The apparent lipophilicity of quaternary ammonium ions is influenced by galvani potential difference, not ion-pairing: a cyclic voltammetry study.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>702-8</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>PURPOSE: This work examines whether ion-pairing contributes to the apparent lipophilicity of cations, which is seen by a shake-flask or titrimetic method to be influenced by the nature and concentration of counter-ions. METHODS: To solve this problem, the lipophilicity of several quaternary ammonium drugs was measured by cyclic voltammetry in the 1,2-dichloroethane/water system. The standard ionic partition coefficient values so obtained (log Pdce(o,C)) were correlated with log Poct values calculated by the CLOGP algorithm for the respective neutral molecules. RESULTS: The standard (i.e., intrinsic) lipophilicity values are shown to depend on a, the structure of the ion (nature, volume, charge), and b, on the Galvani potential difference at the ITIES (interface between two immiscible electrolyte solutions). CONCLUSIONS: The standard lipophilicity values were not influenced by counter-ions. In contrast, simulations showed that the increased apparent lipophilicity of cations, as measured by the shake-flask method in the presence of lipophilic anions, is fully accounted for by the resulting increase in the Galvani potential difference.</AbstractText>
+            </Abstract>
+            <Affiliation>Institut de Chimie Thérapeutique, Section de Pharmacie, Université de Lausanne, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Bouchard</LastName>
+                    <ForeName>G</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Carrupt</LastName>
+                    <ForeName>P A</ForeName>
+                    <Initials>PA</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Testa</LastName>
+                    <ForeName>B</ForeName>
+                    <Initials>B</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>V</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>H H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Pharm Res</MedlineTA>
+            <NlmUniqueID>8406521</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Ethylene Dichlorides</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Indicators and Reagents</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Lipids</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Quaternary Ammonium Compounds</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>7732-18-5</RegistryNumber>
+                <NameOfSubstance>Water</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Chemistry, Physical</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Electrochemistry</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Ethylene Dichlorides</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Indicators and Reagents</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Lipids</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Quaternary Ammonium Compounds</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Water</DescriptorName>
+                <QualifierName MajorTopicYN="N">chemistry</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2001</Year>
+                <Month>7</Month>
+                <Day>24</Day>
+                <Hour>10</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2002</Year>
+                <Month>1</Month>
+                <Day>5</Day>
+                <Hour>10</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">11465429</ArticleId>
+            <ArticleId IdType="medline">21357956</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+</PubmedArticleSet>

@@ -5,12 +5,20 @@ path: %(system-rips)s/bibtex.sip
 readers:
 	Pyblio.Parsers.Semantic.BibTeX.Reader
 
+
+# CrossRef (http://crossref.org)
 [org.pybliographer/crossref/0.1]
 
 path: %(system-rips)s/crossref.sip
 
 
+# Web of Knowledge / Web of Science
 [org.pybliographer/wok/0.1]
 
 path: %(system-rips)s/wok.sip
+
+# PubMed
+[org.pybliographer/pubmed/0.1]
+
+path: %(system-rips)s/pubmed.sip
 

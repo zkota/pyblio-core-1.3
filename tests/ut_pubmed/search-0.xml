@@ -1,0 +1,783 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2006//EN" "http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_060101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="PubMed-not-MEDLINE">
+        <PMID>15100825</PMID>
+        <DateCreated>
+            <Year>2004</Year>
+            <Month>04</Month>
+            <Day>21</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2004</Year>
+            <Month>05</Month>
+            <Day>07</Day>
+        </DateCompleted>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Print">1473-0197</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>2</Volume>
+                    <Issue>3</Issue>
+                    <PubDate>
+                        <Year>2002</Year>
+                        <Month>Aug</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Lab on a chip. </Title>
+            </Journal>
+            <ArticleTitle>Plasma etched polymer microelectrochemical systems.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>145-50</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>This paper presents a novel technique based on plasma etching for the mass production of polymer microchip devices. The method consists of the patterning of a photo-resist by a high resolution printer on a foil composed of three layers (5 microm copper/50 microm polyimide/5 microm copper). After this step, both copper layers are chemically etched in order to serve as a contact mask on the polyimide surface so as to produce the desired microstructure pattern. The foil is placed into a reactive plasma chamber in order to etch the exposed polyimide by means of an oxidizing plasma. The method enables holes, lines or larger areas to be etched, thereby generating either microholes, microchannels or electrodes in the plastic material. The copper can then be chemically removed or further patterned to produce conductive pads which are further electroplated with gold. The microchannel is then covered with a polyethylene terephthalate/polyethylene (PET/PE) lamination. The strength of this technology is that access holes for the fluid inlet and outlet, as well as gold coated electrodes can be fabricated without post-processing in a batch process. Demonstration of the application of such microelectrochemical systems is shown here by voltammetric detection inside a 60 nL microchannel, which presents the special feature of linear depletion of the analytes in the direction parallel to the microchannel.</AbstractText>
+            </Abstract>
+            <Affiliation>DiagnoSwiss, Rte de l'Ile-aux-Bois, c/o Cimo S.A, 1870, Monthey, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Rossier</LastName>
+                    <ForeName>Joël S</ForeName>
+                    <Initials>JS</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Vollet</LastName>
+                    <ForeName>Christine</ForeName>
+                    <Initials>C</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Carnal</LastName>
+                    <ForeName>Amanda</ForeName>
+                    <Initials>A</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Lagger</LastName>
+                    <ForeName>Grégoire</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>Véronique</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>Hubert H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Michel</LastName>
+                    <ForeName>Philippe</ForeName>
+                    <Initials>P</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Reymond</LastName>
+                    <ForeName>Frédéric</ForeName>
+                    <Initials>F</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2002</Year>
+                <Month>07</Month>
+                <Day>17</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Lab Chip</MedlineTA>
+            <NlmUniqueID>101128948</NlmUniqueID>
+        </MedlineJournalInfo>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2004</Year>
+                <Month>4</Month>
+                <Day>22</Day>
+                <Hour>5</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2004</Year>
+                <Month>4</Month>
+                <Day>22</Day>
+                <Hour>5</Hour>
+                <Minute>1</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="aheadofprint">
+                <Year>2002</Year>
+                <Month>Jul</Month>
+                <Day>17</Day>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="epublish">
+                <Year>2004</Year>
+                <Month>Apr</Month>
+                <Day>19</Day>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">15100825</ArticleId>
+            <ArticleId IdType="doi">10.1039/b204063h</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>12412128</PMID>
+        <DateCreated>
+            <Year>2002</Year>
+            <Month>11</Month>
+            <Day>04</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2003</Year>
+            <Month>04</Month>
+            <Day>14</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2006</Year>
+            <Month>04</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0173-0835</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>23</Volume>
+                    <Issue>20</Issue>
+                    <PubDate>
+                        <Year>2002</Year>
+                        <Month>Oct</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Electrophoresis.</Title>
+                <ISOAbbreviation>Electrophoresis</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Integration of a membrane-based desalting step in a microfabricated disposable polymer injector for mass spectrometric protein analysis.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>3583-8</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>A simple desalting procedure for the coupling of a polymer microchip injector to mass spectrometry is proposed. The overall process is based on the adsorption of proteins on a poly(vinylidene difluoride) (PVDF) membrane, which are then directly eluted in the spraying solution. This microchip-based approach has been successfully applied to small drugs, peptides and proteins originally diluted in phosphate-buffered saline (PBS). Moreover, when eluting the retained proteins in small volumes, a preconcentration is obtained. The combination of single-use, mass-produceable, low-sample-consumption, easy-to-automate, miniaturized polymer injectors with easy-to-handle solution-exchange membranes makes this system particularly amenable to screening applications.</AbstractText>
+            </Abstract>
+            <Affiliation>Electrochemistry Laboratory, Swiss Federal Institute of Technology, CH-1015 Lausanne, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Lion</LastName>
+                    <ForeName>Niels</ForeName>
+                    <Initials>N</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>Véronique</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Jensen</LastName>
+                    <ForeName>Henrik</ForeName>
+                    <Initials>H</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Rossier</LastName>
+                    <ForeName>Joël S</ForeName>
+                    <Initials>JS</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>Hubert</ForeName>
+                    <Initials>H</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Germany</Country>
+            <MedlineTA>Electrophoresis</MedlineTA>
+            <NlmUniqueID>8204476</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Membranes, Artificial</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Myoglobin</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>11061-68-0</RegistryNumber>
+                <NameOfSubstance>Insulin</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>11128-99-7</RegistryNumber>
+                <NameOfSubstance>Angiotensin II</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>525-66-6</RegistryNumber>
+                <NameOfSubstance>Propranolol</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Angiotensin II</DescriptorName>
+                <QualifierName MajorTopicYN="N">isolation &amp; purification</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Disposable Equipment</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Insulin</DescriptorName>
+                <QualifierName MajorTopicYN="N">isolation &amp; purification</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Membranes, Artificial</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Miniaturization</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Myoglobin</DescriptorName>
+                <QualifierName MajorTopicYN="N">isolation &amp; purification</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Nanotechnology</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Propranolol</DescriptorName>
+                <QualifierName MajorTopicYN="N">analysis</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Spectrum Analysis, Mass</DescriptorName>
+                <QualifierName MajorTopicYN="N">instrumentation</QualifierName>
+                <QualifierName MajorTopicYN="Y">methods</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2002</Year>
+                <Month>11</Month>
+                <Day>2</Day>
+                <Hour>4</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2003</Year>
+                <Month>4</Month>
+                <Day>15</Day>
+                <Hour>5</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">12412128</ArticleId>
+            <ArticleId IdType="doi">10.1002/1522-2683(200210)23:20&lt;3583::AID-ELPS3583&gt;3.0.CO;2-N</ArticleId>
+            <ArticleId IdType="medline">22299975</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>12240941</PMID>
+        <DateCreated>
+            <Year>2002</Year>
+            <Month>09</Month>
+            <Day>20</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2003</Year>
+            <Month>03</Month>
+            <Day>18</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2004</Year>
+            <Month>11</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0724-8741</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>19</Volume>
+                    <Issue>8</Issue>
+                    <PubDate>
+                        <Year>2002</Year>
+                        <Month>Aug</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Pharmaceutical research. </Title>
+                <ISOAbbreviation>Pharm. Res.</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Theoretical and experimental exploration of the lipophilicity of zwitterionic drugs in the 1,2-dichloroethane/water system.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>1150-9</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>PURPOSE: This work examines the lipophilic behavior of various zwitterions and shows how distribution profiles in biphasic systems and ionic partition diagrams may improve our understanding of pH-absorption profiles of drugs. METHODS: The lipophilicity of various zwitterionic drugs was examined by potentiometry and cyclic voltammetry in the 1,2-dichloroethane/water system to study the intramolecular interactions and conformational effects affecting absorption and activity of zwitterions, as well as to draw their theoretical and experimental ionic partition diagrams. RESULTS: Different theoretical partition diagrams are reported according to the tautomeric constant of the zwitterion. Shifts of apparent PKa are obtained in the ionic partition diagrams of raclopride and eticlopride and compared to the deviations from pH-absorption profile described in the literature for lipophilic drugs. The physicochemical origin of these shifts is discussed. CONCLUSIONS: The comparison between pH-absorption profiles and ionic partition diagrams of zwitterions is shown here to be of value for a better mechanistic understanding of absorption processes, thus opening new perspectives in studying pH-absorption profiles of ionizable drugs.</AbstractText>
+            </Abstract>
+            <Affiliation>Institut de Chimie Thérapeutique, Université de Lausanne, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Bouchard</LastName>
+                    <ForeName>Géraldine</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Pagliara</LastName>
+                    <ForeName>Alessandra</ForeName>
+                    <Initials>A</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Carrupt</LastName>
+                    <ForeName>Pierre-Alain</ForeName>
+                    <Initials>PA</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Testa</LastName>
+                    <ForeName>Bernard</ForeName>
+                    <Initials>B</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>Véronique</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>Hubert H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Pharm Res</MedlineTA>
+            <NlmUniqueID>8406521</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Ethylene Dichlorides</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Ions</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Lipids</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Pharmaceutical Preparations</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>107-06-2</RegistryNumber>
+                <NameOfSubstance>ethylene dichloride</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>7732-18-5</RegistryNumber>
+                <NameOfSubstance>Water</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Comparative Study</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Ethylene Dichlorides</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Hydrogen-Ion Concentration</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Ions</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Lipids</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Pharmaceutical Preparations</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Water</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2002</Year>
+                <Month>9</Month>
+                <Day>21</Day>
+                <Hour>10</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2003</Year>
+                <Month>3</Month>
+                <Day>19</Day>
+                <Hour>4</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">12240941</ArticleId>
+            <ArticleId IdType="medline">22225251</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>12203328</PMID>
+        <DateCreated>
+            <Year>2002</Year>
+            <Month>08</Month>
+            <Day>30</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2002</Year>
+            <Month>09</Month>
+            <Day>27</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2004</Year>
+            <Month>11</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">0947-6539</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>8</Volume>
+                    <Issue>15</Issue>
+                    <PubDate>
+                        <Year>2002</Year>
+                        <Month>Aug</Month>
+                        <Day>2</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Chemistry (Weinheim an der Bergstrasse, Germany)  </Title>
+            </Journal>
+            <ArticleTitle>Lipophilicity and solvation of anionic drugs.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>3478-84</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>This paper first gives a brief review of the main techniques used to measure the lipophilicity of neutral and ionic drugs, namely the shake-flask method, potentiometry, and cyclic voltammetry at liquid-liquid interfaces. The lipophilicity of 28 acidic compounds with various functional groups was studied by potentiometry and cyclic voltammetry in the n-octanol/water and 1,2-dichloroethane/water systems in order to complement our understanding of the lipophilicity of neutral and ionized acids and to clarify the solvation mechanisms responsible for their partition. The parameter diff (log P(N-A)(dce)) (i.e., log P of the neutral acid minus standard log P of the conjugated anion in 1,2-dichloroethane/water) was shown to depend not only on intramolecular interactions and conformational effects in the neutral and anionic forms, but also on the delocalization of the negative charge in the anion, confirming the ability of Born's solvation model to describe qualitatively the effect of the molecular radius on the lipophilicity of ions.</AbstractText>
+            </Abstract>
+            <Affiliation>Institut de Chimie Thérapeutique Université de Lausanne, BEP, 1015 Lausanne,Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Bouchard</LastName>
+                    <ForeName>Géraldine</ForeName>
+                    <Initials>G</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Carrupt</LastName>
+                    <ForeName>Pierre-Alain</ForeName>
+                    <Initials>PA</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Testa</LastName>
+                    <ForeName>Bernard</ForeName>
+                    <Initials>B</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>Véronique</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>Hubert H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Germany</Country>
+            <MedlineTA>Chemistry</MedlineTA>
+            <NlmUniqueID>9513783</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Anions</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Anti-Inflammatory Agents, Non-Steroidal</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Lipids</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Pharmaceutical Preparations</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Anions</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Anti-Inflammatory Agents, Non-Steroidal</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Electrochemistry</DescriptorName>
+                <QualifierName MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Lipids</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Models, Molecular</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Pharmaceutical Preparations</DescriptorName>
+                <QualifierName MajorTopicYN="Y">chemistry</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Potentiometry</DescriptorName>
+                <QualifierName MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Regression Analysis</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Solubility</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2002</Year>
+                <Month>8</Month>
+                <Day>31</Day>
+                <Hour>10</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2002</Year>
+                <Month>9</Month>
+                <Day>28</Day>
+                <Hour>4</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">12203328</ArticleId>
+            <ArticleId IdType="doi">10.1002/1521-3765(20020802)8:15&lt;3478::AID-CHEM3478&gt;3.0.CO;2-U</ArticleId>
+            <ArticleId IdType="medline">22190748</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="MEDLINE">
+        <PMID>12164699</PMID>
+        <DateCreated>
+            <Year>2002</Year>
+            <Month>08</Month>
+            <Day>07</Day>
+        </DateCreated>
+        <DateCompleted>
+            <Year>2002</Year>
+            <Month>12</Month>
+            <Day>12</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2004</Year>
+            <Month>11</Month>
+            <Day>17</Day>
+        </DateRevised>
+        <Article PubModel="Print">
+            <Journal>
+                <ISSN IssnType="Print">1615-9853</ISSN>
+                <JournalIssue CitedMedium="Print">
+                    <Volume>2</Volume>
+                    <Issue>4</Issue>
+                    <PubDate>
+                        <Year>2002</Year>
+                        <Month>Apr</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Proteomics. </Title>
+                <ISOAbbreviation>Proteomics</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Microfabricated polymer injector for direct mass spectrometry coupling.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>405-12</MedlinePgn>
+            </Pagination>
+            <Abstract>
+                <AbstractText>This paper demonstrates the coupling of a plasma etched polymer microfluidic system with an electrospray mass spectrometer by generation of a nanospray. Taking advantage of the microtechnology processes and polymer properties, high volume production with good reproducibility of hydrophobic interfaces could be obtained. The nanospray was directly produced from the outlet of the plastic microfabricated chip positioned in front of the capillary entrance of the mass spectrometer. No chemical background due to the polymer has been observed under standard nanospray conditions. The performances of the spray as well as its efficiency have been demonstrated by flow measurements, stability establishment and tandem mass spectrometry experiment on angiotensin II. The spray was actuated without additional flow in methanol: water:acetic acid (50:49:1%) solution. A 40 fmol/microL detection limit could be reached.</AbstractText>
+            </Abstract>
+            <Affiliation>Laboratoire d'Electrochimie, Ecole Polytechnique Fédérale de Lausanne, Switzerland.</Affiliation>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Gobry</LastName>
+                    <ForeName>Véronique</ForeName>
+                    <Initials>V</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>van Oostrum</LastName>
+                    <ForeName>Jan</ForeName>
+                    <Initials>J</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Martinelli</LastName>
+                    <ForeName>Marco</ForeName>
+                    <Initials>M</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Rohner</LastName>
+                    <ForeName>Tatiana C</ForeName>
+                    <Initials>TC</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Reymond</LastName>
+                    <ForeName>Frédéric</ForeName>
+                    <Initials>F</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Rossier</LastName>
+                    <ForeName>Joël S</ForeName>
+                    <Initials>JS</Initials>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Girault</LastName>
+                    <ForeName>Hubert H</ForeName>
+                    <Initials>HH</Initials>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType>Journal Article</PublicationType>
+            </PublicationTypeList>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>Germany</Country>
+            <MedlineTA>Proteomics</MedlineTA>
+            <NlmUniqueID>101092707</NlmUniqueID>
+        </MedlineJournalInfo>
+        <ChemicalList>
+            <Chemical>
+                <RegistryNumber>0</RegistryNumber>
+                <NameOfSubstance>Polymers</NameOfSubstance>
+            </Chemical>
+            <Chemical>
+                <RegistryNumber>11128-99-7</RegistryNumber>
+                <NameOfSubstance>Angiotensin II</NameOfSubstance>
+            </Chemical>
+        </ChemicalList>
+        <CitationSubset>IM</CitationSubset>
+        <CommentsCorrections>
+            <ErratumIn>
+                <RefSource>Proteomics 2002 Oct;2(10):1474</RefSource>
+            </ErratumIn>
+        </CommentsCorrections>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Angiotensin II</DescriptorName>
+                <QualifierName MajorTopicYN="N">analysis</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Nanotechnology</DescriptorName>
+                <QualifierName MajorTopicYN="N">instrumentation</QualifierName>
+                <QualifierName MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="Y">Polymers</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Research Support, Non-U.S. Gov't</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="Y">Spectrum Analysis, Mass</DescriptorName>
+                <QualifierName MajorTopicYN="N">instrumentation</QualifierName>
+                <QualifierName MajorTopicYN="N">methods</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName MajorTopicYN="N">Surface Properties</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2002</Year>
+                <Month>8</Month>
+                <Day>8</Day>
+                <Hour>10</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2002</Year>
+                <Month>12</Month>
+                <Day>13</Day>
+                <Hour>4</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">12164699</ArticleId>
+            <ArticleId IdType="medline">22154571</ArticleId>
+            <ArticleId IdType="doi">10.1002/1615-9861(200204)2:4&lt;405::AID-PROT405&gt;3.0.CO;2-Y</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+</PubmedArticleSet>
