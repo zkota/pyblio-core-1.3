@@ -42,7 +42,7 @@ class Server(http.HTTPFactory):
 #log.setLevel(logging.DEBUG)
 
 
-class TesFakeWOK(unittest.TestCase):
+class TestFakeWOK(unittest.TestCase):
 
     def setUp(self):
         Registry.parse_default()

@@ -538,6 +538,9 @@ class Database (object):
     @cvar txo: a L{TxoGroup} instance, containing all the taxonomy
     definitions in the database. See L{TxoItem
     <Pyblio.Attribute.TxoItem>}.
+
+    @cvar rs: a L{ResultSetStore} instance, containing all the result
+    sets defined on this database.
     '''
 
     def __init__ (self):
