@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema>
+ <attribute id="b" type="text">
+  <name>A B</name>
+ </attribute>
+
+</pyblio-schema>
+ <entry id="1">
+  <attribute id="b">
+   <text>A sample !</text>
+  </attribute>
+ </entry>
+</pyblio-db>
