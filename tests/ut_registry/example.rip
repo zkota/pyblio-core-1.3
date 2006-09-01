@@ -11,3 +11,7 @@ importers:
 exporters:
 	Extra.BibTeX.Writer
 
+[with-adapter]
+
+adapters:
+	Adapter.Magic -> another/format

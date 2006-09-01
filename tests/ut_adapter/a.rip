@@ -1,0 +1,5 @@
+
+[a]
+
+adapters:
+	ut_adapter.A2BAdapter -> b

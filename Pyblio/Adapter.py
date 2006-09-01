@@ -29,6 +29,8 @@ BibTeX format instead.
 from gettext import gettext as _
 
 from Pyblio.Store import Database
+from Pyblio import Registry
+
 
 class Adapter(Database):
 
@@ -111,4 +113,14 @@ def adapt_schema(db, target_schema):
     L{Adapter}s. If no suitable adapter can be found, will raise an
     AdaptError()"""
 
+    # for the moment, we only resolve direct hits. More clever
+    # resolutions will hopefully be implemented.
+
+    # search for target_schema in the adapters for the current schema:
+    adapters = Registry.get(db.schema.id, 'adapters')
     
+    for adapter in adapters:
+        if adapter.target == target_schema:
+            return adapter()(db)
+
+    return None

@@ -72,7 +72,21 @@ class TestFromAtoB(pybut.TestCase):
         fd.close()
 
         pybut.fileeq(tmp, 'ut_adapter/saved-b.bip')
+
+class TestResolution(pybut.TestCase):
+    def testResolveA2B(self):
+        sa = Schema.Schema(open('ut_adapter/a.sip'))
+
+        fmt = Store.get('memory')
+        self.dba = fmt.dbcreate(None, sa)
+
+        from Pyblio import Registry
+        Registry.reset()
+        Registry.parse('ut_adapter')
+
+        dest = Adapter.adapt_schema(self.dba, 'b')
+        self.failUnlessEqual(dest.schema.id, 'b')
         
-suite = pybut.suite(TestFromAtoB)
+suite = pybut.suite(TestFromAtoB, TestResolution)
 
 if __name__ == '__main__':  pybut.run (suite)

@@ -53,7 +53,6 @@ class Schema (dict):
         return
 
     def _name_get (self):
-
         return I18n.lz.trn (self.names)
 
     name = property (_name_get)

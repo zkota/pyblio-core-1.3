@@ -13,7 +13,7 @@ import sys
 
 from twisted.internet import reactor
 
-from Pyblio import Registry, Store
+from Pyblio import Registry, Store, Adapter
 from Pyblio.External import PubMed
 
 query, output = sys.argv[1:]
@@ -39,12 +39,12 @@ def success(total):
     print "pubmed: successfully fetched %d records" % total
     reactor.stop()
 
-    # Get an adapter from PubMed to BibTeX
-    from Pyblio.Adapters.PubMed2BibTeX import PubMed2BibTeX
+    # We filled db with pubmed data. To save it as BibTeX, we get an
+    # adapter from PubMed to BibTeX
+    bibtex = Adapter.adapt_schema(db, 'org.pybliographer/bibtex/0.1')
 
-    bibtex = PubMed2BibTeX(db)
-
-    # ... and actually save as BibTeX
+    # Now we have a "virtual" bibtex database, that we can actually
+    # save as a BibTeX file
     from Pyblio.Parsers.Semantic.BibTeX import Writer
 
     w = Writer()

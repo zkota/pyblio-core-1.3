@@ -16,8 +16,14 @@ class TestRegistry (pybut.TestCase):
 
     def testCategories(self):
         c = Registry.get('with-path', 'importers')
-
         assert len(c) == 2
+
+    def testAdapters(self):
+        c = Registry.get('with-adapter', 'adapters')
+        self.failUnlessEqual(len(c), 1)
+
+        c = c[0]
+        self.failUnlessEqual(c.target, 'another/format')
         
     
 suite = pybut.suite (TestRegistry)

@@ -12,7 +12,9 @@ class PubMed2BibTeX(OneToOneAdapter):
     def source2target(self, medline):
         bibtex = Store.Record()
 
-        bibtex.add('doctype', self.schema.txo['doctype'].byname('article'), Attribute.Txo)
+        bibtex.add('doctype',
+                   self.schema.txo['doctype'].byname('article'),
+                   Attribute.Txo)
 
         bibtex['id'] = medline['pmid']
         

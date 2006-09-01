@@ -5,6 +5,8 @@ path: %(system-rips)s/bibtex.sip
 readers:
 	Pyblio.Parsers.Semantic.BibTeX.Reader
 
+writers:
+	Pyblio.Parsers.Semantic.BibTeX.Writer
 
 # CrossRef (http://crossref.org)
 [org.pybliographer/crossref/0.1]
@@ -22,3 +24,6 @@ path: %(system-rips)s/wok.sip
 
 path: %(system-rips)s/pubmed.sip
 
+adapters:
+	Pyblio.Adapters.PubMed2BibTeX.PubMed2BibTeX
+	-> org.pybliographer/bibtex/0.1

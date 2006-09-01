@@ -29,7 +29,7 @@ First, you need to parse a few RIP repositories with L{parse}, then
 you can browse the results with L{schemas}, L{getSchema} and L{get}.
 """
 
-import os
+import os, re
 
 from ConfigParser import SafeConfigParser as Parser
 
@@ -139,8 +139,18 @@ class RIP(object):
             doc = doc.split('\n')[0].rstrip(' .\n')
 
         return doc
-        
 
+class AdapterRIP(RIP):
+    """ A special RIP that keeps the description of an Adapter."""
+    
+    def __init__(self, schema, category, name, target):
+        RIP.__init__(self, schema, category, name)
+
+        self.target = target
+        return
+
+_adapt_re = re.compile(r'([\w\d.]+)\s*->\s*([\w\d./]+)')
+    
 class _RIPCategory(dict):
     def __init__(self, schema):
         dict.__init__(self)
@@ -183,20 +193,28 @@ def parse(directory):
 
                         _schema[schema] = r
 
+                    continue
+                
+                if cat == 'adapters':
+                    names = []
+                    for m, t in _adapt_re.findall(value):
+                        names.append(AdapterRIP(schema, cat, m, t))
+                    
+
                 else:
-                    # For the other fields, we simply extend the list
-                    # of known values.
                     names = [RIP(schema, cat, x.strip())
                              for x in value.split('\n') ]
 
-                    try:
-                        _schema[schema].setdefault(cat,[]).extend(names)
+                # For the other fields, we simply extend the list
+                # of known values.
+                try:
+                    _schema[schema].setdefault(cat,[]).extend(names)
 
-                    except KeyError:
-                        r = _RIPCategory(schema)
-                        r[cat] = names
-                        
-                        _schema[schema] = r
+                except KeyError:
+                    r = _RIPCategory(schema)
+                    r[cat] = names
+
+                    _schema[schema] = r
                     
     return
 
