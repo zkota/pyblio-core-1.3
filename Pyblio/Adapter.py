@@ -98,13 +98,17 @@ class OneToOneAdapter(Adapter):
 
     entries = property(_entries, None)
     
-    def _txo(self):
-        return self.base.txo
-
-    txo = property(_txo, None)
-    
     def _rs(self):
         return self.base.rs
 
     rs = property(_rs, None)
+    
+
+
+def adapt_schema(db, target_schema):
+    """ Returns a database using the specified 'target_schema', and
+    that maps the content of 'db', thanks to one or more
+    L{Adapter}s. If no suitable adapter can be found, will raise an
+    AdaptError()"""
+
     

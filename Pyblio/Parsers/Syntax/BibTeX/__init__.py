@@ -404,7 +404,6 @@ class Writer(object):
     # The official channel in which messages must be sent
     log = logging.getLogger('pyblio.export.bibtex')
 
-
     _collapse = re.compile (r'[\s\n]+', re.MULTILINE)
     
     def __init__ (self):

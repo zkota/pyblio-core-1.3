@@ -63,3 +63,5 @@ class Reader(BibTeX.Reader):
     
         
     
+class Writer(BibTeX.Writer):
+    pass

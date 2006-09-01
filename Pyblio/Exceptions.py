@@ -39,3 +39,7 @@ class InvalidQuery(Exception):
 class QueryError(Exception):
     """ Raised when an external query failed."""
     pass
+
+class AdaptError(Exception):
+    """ Raised when an external query failed."""
+    pass
