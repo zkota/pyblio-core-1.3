@@ -47,7 +47,6 @@
   </qualifiers>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="language">
   <txo-item id="1">
    <name>english</name>
@@ -59,6 +58,7 @@
   </txo-item>
  </txo-group>
 
+</pyblio-schema>
 <header>Hi, I'm a database description</header>
  <entry id="1">
   <attribute id="author">

@@ -280,7 +280,7 @@ class Queryable(object):
 
         res = KeyArray()
         
-        full = self.txo[q.txo.group].expand(q.txo.id)
+        full = self.schema.txo[q.txo.group].expand(q.txo.id)
 
         for e in self.entries.itervalues():
 

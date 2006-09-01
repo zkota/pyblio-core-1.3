@@ -143,7 +143,7 @@ class Reader(object):
             rs.name = _('Imported from Web of Knowledge')
 
         self.db = db
-        self._type = self.db.txo['doctype'].byname
+        self._type = self.db.schema.txo['doctype'].byname
         
         for item in fd.findall('./REC/item'):
             self.record = Store.Record()

@@ -14,7 +14,6 @@
   <name>Text</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="journal">
   <txo-item id="1">
    <name>Journal</name>
@@ -36,4 +35,5 @@
   </txo-item>
  </txo-group>
 
+</pyblio-schema>
 </pyblio-db>

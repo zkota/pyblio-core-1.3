@@ -30,13 +30,13 @@
   <name>Title</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="doctype">
   <txo-item id="1">
    <name lang="C">Article</name>
   </txo-item>
  </txo-group>
 
+</pyblio-schema>
  <entry id="2">
   <attribute id="author">
    <person first="Frederic" last="Gobry"/>

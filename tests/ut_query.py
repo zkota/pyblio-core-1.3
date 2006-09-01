@@ -25,7 +25,7 @@ class TestSimpleQuery (pybut.TestCase):
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
         if self.indexed: db.index()
         
-        g  = db.txo ['a']
+        g  = db.schema.txo ['a']
 
         q = Query.Txo ('txo', g [2]) & Query.AnyWord('First')
 
@@ -39,7 +39,7 @@ class TestSimpleQuery (pybut.TestCase):
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
         if self.indexed: db.index()
 
-        g  = db.txo ['a']
+        g  = db.schema.txo ['a']
 
         q = Query.Txo ('txo', g [2]) | Query.AnyWord ('First')
 
@@ -53,7 +53,7 @@ class TestSimpleQuery (pybut.TestCase):
         db = self.hd.dbimport (self.name, 'ut_query/and.xml')
         if self.indexed: db.index()
 
-        g  = db.txo ['a']
+        g  = db.schema.txo ['a']
 
         q = ~ (Query.Txo ('txo', g [2]) | Query.AnyWord ('First'))
 
@@ -69,7 +69,7 @@ class TestSimpleQuery (pybut.TestCase):
 
 
         # Check that querying for a base txo also returns the children
-        g = db.txo ['a']
+        g = db.schema.txo ['a']
 
         a, b, c = g [1], g [2], g [3]
         

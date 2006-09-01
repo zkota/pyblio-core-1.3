@@ -215,7 +215,7 @@ class switch(Glue):
         if s.type is not Txo:
             raise TypeError(_('%s: attribute is not a txo') % repr(self))
         
-        group = db.txo[s.group]
+        group = db.schema.txo[s.group]
 
         sw = {}
 

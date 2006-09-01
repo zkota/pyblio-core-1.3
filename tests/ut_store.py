@@ -49,20 +49,6 @@ class TestStore (pybut.TestCase):
 
         schema = Schema.Schema (os.path.join ('ut_store', 's_full.xml'))
         db = Store.get ('file').dbcreate (self.f, schema)
-
-        ln = db.txo ['language']
-
-        l = Store.TxoItem ()
-        l.names ['C'] = 'EN'
-        l.names [''] = 'english'
-
-        ln.add (l)
-        
-        l = Store.TxoItem ()
-        l.names ['C'] = 'FR'
-        l.names [''] = u'français'
-        
-        ln.add (l)
         
         e = Store.Record ()
 
@@ -73,11 +59,11 @@ class TestStore (pybut.TestCase):
 
         url1 = Attribute.URL ('http://pybliographer.org')
         url1.q ['desc'] = [ Attribute.Text ('Main site') ]
-        url1.q ['lang'] = [ Attribute.Txo (db.txo ['language'].byname ('EN')) ]
+        url1.q ['lang'] = [ Attribute.Txo (db.schema.txo ['language'].byname ('EN')) ]
 
         url2 = Attribute.URL ('http://pybliographer.org')
         url2.q ['desc'] = [ Attribute.Text ('Main site') ]
-        url2.q ['lang'] = [ Attribute.Txo (db.txo ['language'].byname ('FR')) ]
+        url2.q ['lang'] = [ Attribute.Txo (db.schema.txo ['language'].byname ('FR')) ]
         e ['url']    = [ url1, url2 ]
 
         e ['text']   = [ Attribute.Text (u'sample text é') ]
@@ -116,18 +102,6 @@ class TestStore (pybut.TestCase):
         pybut.fileeq (self.f, 'ut_store/simple.xml')
         return
 
-    def testTxoRead (self):
-        """ A database with taxonomy fields can be read and saved again identically """
-        
-        db = Store.get ('file').dbopen ('ut_store/taxonomy.xml')
-
-        fd = open (self.f, 'w')
-        db.xmlwrite (fd)
-        fd.close ()
-
-        pybut.fileeq (self.f, 'ut_store/taxonomy.xml')
-        return
-
     def testQualifiedRead (self):
         """ A database with qualified fields can be read and saved again identically """
         
@@ -161,7 +135,7 @@ class TestStore (pybut.TestCase):
         schema = Schema.Schema (os.path.join ('ut_store', 's_validate.xml'))
         db = Store.get ('file').dbcreate (self.f, schema)
 
-        def fail (e):
+        def fail(e):
             try:
                 db.validate (e)
                 assert False, 'should not be accepted'
@@ -239,7 +213,7 @@ class TestStore (pybut.TestCase):
         # Check that unknown enumerates are rejected
         e = Store.Record ()
 
-        enu = Store.TxoItem ()
+        enu = Schema.TxoItem ()
 
         enu.id    = 1
         enu.group = 'b'
@@ -253,25 +227,14 @@ class TestStore (pybut.TestCase):
         e ['enum'] = [ Attribute.Txo (enu) ]
         fail (e)
 
-        # check that unexpected enums are rejected
-        g = db.txo ['c']
-
-        i = Store.TxoItem ()
-        i.names [''] = 'youou'
-        i = g.add (i)
-        
-        enu = g [i]
-
-        e ['enum'] = [ Attribute.Txo (enu) ]
-        fail (e)
 
     def testValidateTxoCleanup (self):
 
         db = Store.get ('file').dbopen ('ut_store/nasty-txo.xml')
 
         # check that unnecessary txo items are removed
-        g = db.txo ['a']
-        
+        g = db.schema.txo ['a']
+
         e = Store.Record ()
         
         e ['txo'] = [ Attribute.Txo (g [1]),

@@ -18,7 +18,6 @@
   <name>URL</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="type">
   <txo-item id="1">
    <name>Journal</name>
@@ -27,6 +26,7 @@
    <name>Book</name>
   </txo-item>
  </txo-group>
+</pyblio-schema>
 
  <entry id="1">
   <attribute id="enum">

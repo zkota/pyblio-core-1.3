@@ -86,7 +86,7 @@ class TestCrossRef(unittest.TestCase):
         
     def testJournal(self):
         r = Store.Record()
-        r.add('doctype', self.db.txo['doctype'].byname('article'), Attribute.Txo)
+        r.add('doctype', self.db.schema.txo['doctype'].byname('article'), Attribute.Txo)
 
         r.add('title', u"Journal of Physical Chemistry B", Attribute.Text)
         r.add('author', Attribute.Person(last=u"Su"))
@@ -114,7 +114,7 @@ class TestCrossRef(unittest.TestCase):
     def testMassive(self):
 
         r = Store.Record()
-        r.add('doctype', self.db.txo['doctype'].byname('article'), Attribute.Txo)
+        r.add('doctype', self.db.schema.txo['doctype'].byname('article'), Attribute.Txo)
 
         r.add('title', u"Journal of Physical Chemistry B", Attribute.Text)
         r.add('author', Attribute.Person(last=u"Su"))

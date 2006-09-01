@@ -376,7 +376,7 @@ class Reader(object):
         rs = db.rs.add(True)
         rs.name = _('Imported from BibTeX')
         
-        for v in db.txo ['doctype'].values ():
+        for v in db.schema.txo['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
         for data in Parser.read (fd, self.charset):
@@ -428,7 +428,7 @@ class Writer(object):
 
         r = []
         for d in data:
-            v = self.db.txo [d.group][d.id]
+            v = self.db.schema.txo[d.group][d.id]
 
             # Use the 'C' name by default, as it is easier to parse
             # back.
@@ -569,7 +569,7 @@ class Writer(object):
         self.key = str (self.record ['id'] [0])
 
         tp = self.record ['doctype'] [0]
-        self.type = self.db.txo [tp.group][tp.id].names ['C']
+        self.type = self.db.schema.txo[tp.group][tp.id].names ['C']
 
         return
 
@@ -595,7 +595,7 @@ class Writer(object):
         
         self.doctype = {}
 
-        for v in db.txo ['doctype'].values ():
+        for v in db.schema.txo['doctype'].values ():
             self.doctype [v.names ['C'].lower ()] = v
 
         for e in rs.itervalues ():

@@ -37,4 +37,15 @@
  <attribute id="id" type="id">
   <name>ID</name>
  </attribute>
+
+<txo-group id="language">
+  <txo-item id="1">
+   <name lang="C">EN</name>
+   <name>english</name>
+  </txo-item>
+  <txo-item id="2">
+   <name lang="C">FR</name>
+   <name>français</name>
+  </txo-item>
+</txo-group>
 </pyblio-schema>

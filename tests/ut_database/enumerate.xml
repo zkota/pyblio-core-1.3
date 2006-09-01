@@ -22,19 +22,27 @@
   <name>URL</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="a">
   <txo-item id="1">
-   <name>A / 1</name>
+   <name>Journal</name>
+   <name lang="C">J</name>
   </txo-item>
   <txo-item id="2">
-   <name>A / 2</name>
+   <name>Book</name>
+   <name lang="C">B</name>
   </txo-item>
  </txo-group>
 
  <txo-group id="b">
+  <txo-item id="1">
+   <name>Journal</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>Book</name>
+  </txo-item>
  </txo-group>
 
+</pyblio-schema>
  <entry id="1">
   <attribute id="enum-a">
    <txo group="a" id="1"/>

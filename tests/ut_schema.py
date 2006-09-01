@@ -100,7 +100,7 @@ class TestSchema (pybut.TestCase):
         fmt = Store.get('file')
         db = fmt.dbcreate(file, a)
 
-        keys = db.txo['toto'].keys()
+        keys = db.schema.txo['toto'].keys()
         keys.sort()
 
         self.failUnlessEqual(keys, [1,2])

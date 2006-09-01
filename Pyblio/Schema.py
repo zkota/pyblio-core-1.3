@@ -32,7 +32,7 @@ from gettext import gettext as _
 
 from xml.sax.saxutils import escape
 
-from Pyblio.Attribute import N_to_C, C_to_N, Txo, TxoItem
+from Pyblio.Attribute import N_to_C, C_to_N, Txo
 from Pyblio import I18n
 
 from cElementTree import ElementTree
@@ -151,18 +151,14 @@ class Schema (dict):
         keys.sort ()
 
         for k in keys:
-            self [k].xmlwrite (fd)
-            fd.write ('\n')
+            self[k].xmlwrite (fd)
+            fd.write('\n')
             
-        # Write the Txo groups predefined in the schema itself, unless
-        # we are embedded, in which case the txo are stored in the db
-        # by now.
-        if not embedded:
-            ks = self.txo.keys()
-            ks.sort()
+        ks = self.txo.keys()
+        ks.sort()
 
-            for k in ks:
-                self.txo[k].xmlwrite(fd)
+        for k in ks:
+            self.txo[k].xmlwrite(fd)
         
         fd.write ('</pyblio-schema>\n')
         return
@@ -272,6 +268,67 @@ class TxoAttribute(Attribute):
         return
 
 
+class TxoItem (object):
+
+    """ Definition of a taxonomy item.
+
+    This item can then be reused as the argument for L{Attribute.Txo}
+    creation. A taxonomy item can be seen as a value in a enumeration
+    of possible values. Compared to a I{simple} enumeration, it has
+    the additional property of being hierachical. For instance, you
+    could define a taxonomy of document types::
+
+      - publication
+         - article
+            - peer-reviewed
+            - not peer-reviewed
+         - conference paper
+      - unpublished
+         - report
+
+    ...and use this taxonomy to fill an attribute of your records. If
+    you use L{Pyblio.Query} to search for the item I{article}, you
+    will retrieve all the records which contain one of I{article},
+    I{peer-reviewed} or I{not peer-reviewed}.
+    """
+
+    def __init__ (self):
+
+        self.id     = None
+        self.group  = None
+        self.parent = None
+        
+        self.names = {}
+        return
+
+    def _name_get (self):
+
+        return I18n.lz.trn (self.names)
+
+    name = property (_name_get)
+    
+
+    def xmlwrite (self, fd, space = ''):
+
+        keys = self.names.keys ()
+        keys.sort ()
+
+        for k in keys:
+            v = self.names [k]
+            if k:
+                lang = ' lang="%s"' % k
+            else:
+                lang = ''
+            
+            fd.write ('  %s<name%s>%s</name>\n' % (
+                space, lang, escape (v.encode ('utf-8'))))
+        
+        return
+    
+    def __repr__ (self):
+
+        return 'TxoItem(%s, %s)' % (repr(self.group), repr(self.id))
+
 
 class TxoGroup(dict):
 
@@ -279,32 +336,46 @@ class TxoGroup(dict):
         dict.__init__(self)
 
         self.group = None
+
+        # the cache for searching by name
+        self._byname = {}
         return
     
     def __repr__ (self):
         return 'TxoGroup (%s)' % (
-            repr (self.id))
+            repr (self.group))
 
+    def byname (self, name):
+        return self._byname[name]
+    
     def xmlread(self, attr):
         # fetch the possible txo-items
-        self.group = attr.attrib ['id']
+        self.group = attr.attrib['id']
 
-        def nesting (tree, parent):
+        def nesting(tree, parent):
             for item in tree.findall ('./txo-item'):
                 i = TxoItem ()
 
-                i.id = int (item.attrib ['id'])
+                i.id = int(item.attrib['id'])
                 i.parent = parent
-
+                i.group = self.group
+                
                 for name in item.findall ('./name'):
                     lang = name.attrib.get ('lang', '')
-                    i.names [lang] = name.text
+                    i.names[lang] = name.text
 
+                if 'C' in i.names:
+                    cname = i.names['C']
+                    if cname in self._byname:
+                        raise SchemaError('name %r appears more than once' % cname)
+                    
+                    self._byname[cname] = i
+                    
                 self[i.id] = i
 
                 nesting (item, i.id)
 
-        nesting (attr, None)
+        nesting(attr, None)
         return
 
     
@@ -320,6 +391,19 @@ class TxoGroup(dict):
             children [v.parent].append (v.id)
 
         return children
+
+    def expand (self, k):
+        """ Return a txo and all its children """
+
+        children = self._reverse ()
+
+        full = []
+        for c in children [k]:
+            full = full + self.expand (c)
+
+        full.append (k)
+        
+        return full
 
     
     def xmlwrite (self, fd, offset=1):

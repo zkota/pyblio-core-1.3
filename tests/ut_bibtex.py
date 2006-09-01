@@ -161,15 +161,6 @@ class TestBibTeXImport (pybut.TestCase):
         
         db = Store.get ('file').dbcreate (f, s)
 
-        # Add a few document types
-        g = db.txo ['doctype']
-        
-        for t in ('Article',):
-            dt = Store.TxoItem ()
-            dt.names ['C'] = t
-
-            g.add (dt)
-
         self.parser = WithComments ('latin-1')
 
         self.parser.parse (open(fp('%s.bib' % base)), db)

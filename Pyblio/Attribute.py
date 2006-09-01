@@ -369,67 +369,6 @@ class ID (unicode, _Qualified):
         return _Qualified.deep_equal (self, other)        
 
 
-class TxoItem (object):
-
-    """ Definition of a taxonomy item.
-
-    This item can then be reused as the argument for L{Attribute.Txo}
-    creation. A taxonomy item can be seen as a value in a enumeration
-    of possible values. Compared to a I{simple} enumeration, it has
-    the additional property of being hierachical. For instance, you
-    could define a taxonomy of document types::
-
-      - publication
-         - article
-            - peer-reviewed
-            - not peer-reviewed
-         - conference paper
-      - unpublished
-         - report
-
-    ...and use this taxonomy to fill an attribute of your records. If
-    you use L{Pyblio.Query} to search for the item I{article}, you
-    will retrieve all the records which contain one of I{article},
-    I{peer-reviewed} or I{not peer-reviewed}.
-    """
-
-    def __init__ (self):
-
-        self.id     = None
-        self.group  = None
-        self.parent = None
-        
-        self.names = {}
-        return
-
-    def _name_get (self):
-
-        return I18n.lz.trn (self.names)
-
-    name = property (_name_get)
-    
-
-    def xmlwrite (self, fd, space = ''):
-
-        keys = self.names.keys ()
-        keys.sort ()
-
-        for k in keys:
-            v = self.names [k]
-            if k:
-                lang = ' lang="%s"' % k
-            else:
-                lang = ''
-            
-            fd.write ('   %s<name%s>%s</name>\n' % (
-                space, lang, escape (v.encode ('utf-8'))))
-        
-        return
-    
-    def __repr__ (self):
-
-        return 'TxoItem(%s, %s)' % (repr(self.group), repr(self.id))
-
 
 class Txo (_Qualified):
 

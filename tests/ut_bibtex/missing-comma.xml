@@ -1,5 +1,5 @@
 <pyblio-db>
-<pyblio-schema /><txo-group /><entry id="1">
+<pyblio-schema /><entry id="1">
   <attribute id="author">
    <person first="T." last="Chapman" />
    <person first="A. T." last="Hayes" />

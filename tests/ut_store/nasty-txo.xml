@@ -5,7 +5,6 @@
  <attribute id="txo" type="txo" group="a">
   <name>Text</name>
  </attribute>
-</pyblio-schema>
 
 <txo-group id="a">
   <txo-item id="1">
@@ -21,4 +20,6 @@
    </txo-item>
   </txo-item>
 </txo-group>
+
+</pyblio-schema>
 </pyblio-db>

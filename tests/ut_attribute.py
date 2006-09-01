@@ -76,7 +76,7 @@ class TestAttribute (pybut.TestCase):
 
     def testTxo (self):
 
-        from Pyblio.Store import TxoItem
+        from Pyblio.Schema import TxoItem
 
         i = TxoItem ()
         i.id = 123

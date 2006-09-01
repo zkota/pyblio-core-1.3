@@ -27,7 +27,7 @@ class Reader(BibTeX.Reader):
         return
 
     def type_add(self, name):
-        txo = self.db.txo['doctype'].byname(name.lower())
+        txo = self.db.schema.txo['doctype'].byname(name.lower())
         self.record.add('doctype', txo, Attribute.Txo)
         return
 

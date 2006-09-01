@@ -44,8 +44,6 @@
   <name>Title</name>
  </attribute>
 
-</pyblio-schema>
-
 <txo-group id="type">
   <txo-item id="1">
     <name lang="C">ARTICLE</name>
@@ -55,6 +53,7 @@
   </txo-item>
 </txo-group>
 
+</pyblio-schema>
  <entry id="1">
   <attribute id="nest">
     <text>

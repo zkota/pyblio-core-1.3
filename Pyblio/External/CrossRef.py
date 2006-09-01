@@ -152,7 +152,7 @@ class DOIQuery(object):
                 def year(val):
                     return Attribute.Date(year=int(val))
                 
-                tp = self.db.txo['doctype'].byname
+                tp = self.db.schema.txo['doctype'].byname
                 
 
                 rec.add('doi', doi, Attribute.ID)
@@ -235,7 +235,7 @@ class DOIQuery(object):
         assert not self._finished, 'finished() already called'
         
         t = record['doctype'][0]
-        t = self.db.txo[t.group][t.id].names['C']
+        t = self.db.schema.txo[t.group][t.id].names['C']
 
         def one(field):
             return record.get(field, [''])[0]

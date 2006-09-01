@@ -312,62 +312,16 @@ class TContent(pybut.TestCase):
         
         assert keys == initial
         return
-    
-
-
-    def testTxoAdd (self):
-
-        """ Check for enum addition in the database """
-        
-        # add some enums to the database
-        i = Store.TxoItem ()
-
-        a  = []
-        va = ['A / 1', 'A / 2']
-        ka = []
-
-        g = self.db.txo ['a']
-        
-        for k in va:
-            i.names [''] = k
-            ka.append (g.add (i))
-            
-        b = []
-        vb = ['B / 1', 'B / 2']
-        
-        g = self.db.txo ['b']
-        for k in vb:
-            i.names [''] = k
-            g.add (i)
-
-        na = []
-        for v in self.db.txo ['a'].values ():
-            na.append (v.names [''])
-
-        assert na == va
-        assert list (g) == ka
-        return
 
     def testTxoInDB (self):
 
         """ Use Txos in database entries """
         
         # add some enums to the database
-        i = Store.TxoItem ()
-
-        a  = []
-        va = ['A / 1', 'A / 2']
-
-        g = self.db.txo ['a']
-        for k in va:
-            i.names [''] = k
-
-            v = g.add (i)
-            a.append (self.db.txo ['a'][v])
-        
+        a = self.db.schema.txo['a']
 
         e = Store.Record ()
-        e ['enum-a'] = [ Attribute.Txo (a [0]) ]
+        e ['enum-a'] = [ Attribute.Txo (a [1]) ]
         
         self.db.add (e)
 
@@ -383,20 +337,15 @@ class TContent(pybut.TestCase):
 
     def testTxoByName (self):
         
-        g = self.db.txo ['a']
+        g = self.db.schema.txo['a']
 
-        i = Store.TxoItem ()
-
+        # a map from C name to id
         r = {}
-        
-        for k in ('A', 'B', 'C'):
-            i.names ['C'] = k
-            v = g.add (i)
+        for k in g.keys():
+            r [g[k].names['C']] = k
 
-            r [k] = v
-
-        for k in ('A', 'B', 'C'):
-            assert self.db.txo ['a'].byname (k).id == r [k]
+        for k in ('J', 'B'):
+            assert g.byname(k).id == r[k]
 
         return
     
@@ -674,106 +623,6 @@ class TContent(pybut.TestCase):
         except TypeError: pass
 
         return
-
-
-    def testTxoDel (self):
-
-        """ Forbid the removal of a Txo definition that is in use """
-
-        from Pyblio import Exceptions
-        
-        # Create two enums, one that will be used, the other not. Try
-        # to remove both.
-        i = Store.TxoItem ()
-
-        a  = []
-        va = ['A / 1', 'A / 2']
-
-        g = self.db.txo ['a']
-        for k in va:
-            i.names [''] = k
-            v = g.add (i)
-
-            a.append (self.db.txo ['a'][v])
-            
-        e = Store.Record ()
-        
-        e ['enum-a'] = [Attribute.Txo (a [1])]
-        self.db.add (e)
-
-        del self.db.txo ['a'][a [0].id]
-
-        try:
-            del self.db.txo ['a'][a [1].id]
-            assert False, 'should not be possible'
-            
-        except Exceptions.ConstraintError:
-            pass
-
-        return
-
-    def testTxoDelLeaf (self):
-
-        """ Forbid the removal of a Txo definition that is not a leaf """
-
-        from Pyblio import Exceptions
-        
-        g = self.db.txo ['a']
-
-        a = g.add (Store.TxoItem ())
-        
-        b = Store.TxoItem ()
-        b.parent = a
-
-        b = g.add (b)
-        
-        try:
-            del g [a]
-            assert False, 'should not succeed'
-            
-        except Exceptions.ConstraintError:
-            pass
-
-
-        del g [b]
-        del g [a]
-        
-        return
-
-
-    def testTxoValidParent (self):
-
-        """ Refuse invalid parent value for a TxoItem """
-        from Pyblio import Exceptions
-
-        g = self.db.txo ['a']
-
-        i = Store.TxoItem ()
-        i.parent = 123
-
-        try:
-            g.add (i)
-            assert False, 'should not succeed'
-            
-        except Exceptions.ConstraintError:
-            pass
-
-        # Check at update
-
-        i.parent = None
-        k = g.add (i)
-
-        i.parent = 123
-
-        try:
-            g [k] = i
-            assert False, 'should not succeed'
-            
-        except Exceptions.ConstraintError:
-            pass
-
-        return
-
 
 class BaseView(pybut.TestCase):
     
@@ -1127,8 +976,8 @@ class TCollate(pybut.TestCase):
 
         rss = self.db.collate (self.db.entries, 'enum')
 
-        self.check (rss [Attribute.Txo (self.db.txo ['type'][1])], [1])
-        self.check (rss [Attribute.Txo (self.db.txo ['type'][2])], [2, 3, 4])
+        self.check(rss[Attribute.Txo(self.db.schema.txo['type'][1])], [1])
+        self.check(rss[Attribute.Txo(self.db.schema.txo['type'][2])], [2, 3, 4])
 
 
 class TestMemoryStore(pybut.TestCase):

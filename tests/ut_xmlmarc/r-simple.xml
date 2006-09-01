@@ -39,9 +39,6 @@
  </attribute>
 
 </pyblio-schema>
- <txo-group id="doctype">
- </txo-group>
-
  <entry id="1">
   <attribute id="author">
    <person first="Andrey" last="Naumenko"/>

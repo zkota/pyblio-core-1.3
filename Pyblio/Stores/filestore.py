@@ -37,110 +37,6 @@ from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query, Sort
 from Pyblio.Arrays import KeyArray, match_arrays
         
 
-class TxoGroup(dict, Store.TxoGroup, Callback.Publisher):
-
-    def __init__ (self, group):
-
-        Callback.Publisher.__init__ (self)
-        
-        self._id = 1
-        self._group = group
-        self._byname = {}
-        return
-
-    def _check (self, item):
-    
-        if item.parent is not None and \
-               not self.has_key (item.parent):
-
-            raise Exceptions.ConstraintError \
-                  (_('txo has unknown parent %s') % `item.parent`)
-
-        return
-
-
-    def __setitem__ (self, key, item):
-
-        self._check (item)
-
-        if not self.has_key (key):
-            raise KeyError (_('txo %s does not exist') % `key`)
-        
-        v = copy.deepcopy (item)
-        
-        v.id    = key
-        v.group = self._group
-        
-        dict.__setitem__ (self, key, v)
-
-        try: self._byname [v.names ['C']] = v
-        except KeyError: pass
-        
-        return
-
-
-    def byname (self, key):
-
-        return self._byname [key]
-
-    
-    def add (self, item, key = None):
-
-        self._check (item)
-
-        self._id, key = Tools.id_make (self._id, key)
-
-        v = copy.deepcopy (item)
-        
-        v.id    = key
-        v.group = self._group
-        
-        dict.__setitem__ (self, key, v)
-
-        try: self._byname [v.names ['C']] = v
-        except KeyError: pass
-        
-        return key
-
-    def __delitem__ (self, k):
-
-        # Internal check for coherency: is the entry used as a parent
-        # for someone ?
-        for v in self.values ():
-
-            if v.parent == k:
-                raise Exceptions.ConstraintError \
-                      (_('txo %s is parent of %s') % (
-                    `k`, `v.id`))
-
-        self.emit ('delete', self._group, k)
-
-        dict.__delitem__ (self, k)
-        return
-    
-
-class TxoStore (dict, Store.TxoStore):
-
-    def __init__ (self, db):
-
-        self._db = db
-        return
-    
-
-    def _add (self, group):        
-        if self.has_key (group):
-            raise Exceptions.ConstraintError \
-                  (_('group %s exists') % `group`)
-        
-        gp = TxoGroup (group)
-        gp.register ('delete', self._db._txo_use_check)
-        
-        self [group] = gp
-        
-        return gp
-
-
-# --------------------------------------------------
 class View(Callback.Publisher):
 
     def __init__ (self, src, crit):
@@ -353,16 +249,12 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
         self.schema = schema
         
         self.header = None
-        self.txo    = TxoStore (self)
         self.rs     = ResultSetStore (self)
         
         self._id = 1
         self._indexed = False
 
-        if create:
-            self._txo_create()
-
-        else:
+        if not create:
             try:
                 self.xmlread(open(file))
 

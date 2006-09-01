@@ -66,7 +66,6 @@
   <name>ISI unique identifier</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="doctype">
   <txo-item id="1">
    <name>Abstract of Published Item</name>
@@ -194,6 +193,7 @@
   </txo-item>
  </txo-group>
 
+</pyblio-schema>
  <entry id="1">
   <attribute id="abstract">
    <text>None</text>

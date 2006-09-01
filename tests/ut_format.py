@@ -212,7 +212,7 @@ class TestFormat (pybut.TestCase):
 
 
         def txo(name):
-            return Attribute.Txo(self.db.txo['type'].byname(name))
+            return Attribute.Txo(self.db.schema.txo['type'].byname(name))
         
         # One cannot use switch on a non-txo attribute
         citation = switch('title').default(one('title'))

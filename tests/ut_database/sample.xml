@@ -14,7 +14,6 @@
   <name>Text</name>
  </attribute>
 
-</pyblio-schema>
  <txo-group id="journal">
   <txo-item id="3">
    <name>Journal 1</name>
@@ -33,6 +32,7 @@
   </txo-item>
  </txo-group>
 
+</pyblio-schema>
  <entry id="1">
   <attribute id="doctype">
    <txo group="type" id="1"/>

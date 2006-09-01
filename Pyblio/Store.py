@@ -43,7 +43,7 @@ Overview
   on databases.
 '''
 
-import os, string, copy
+import os, string, copy, logging
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -51,8 +51,6 @@ from xml.sax.saxutils import escape, quoteattr
 from gettext import gettext as _
 
 from Pyblio import Schema, Attribute, Exceptions, I18n
-
-from Pyblio.Attribute import TxoItem
 
 from cElementTree import ElementTree, iterparse, tostring
 
@@ -349,135 +347,6 @@ class ResultSetStore (object):
     def add (self, permanent = False, rsid = None):
         raise NotImplemented ('please override')
 
-
-# --------------------------------------------------
-    
-class TxoGroup (object):
-
-    """ Definition of a group of Txo items. Items in such a group can
-    be accessed with a numeric key as a dictionnary, but also with
-    logical names.
-
-    DERIVED BY ALL STORES
-    """
-
-    def add (self, item, key = None):
-        raise NotImplemented ('please override')
-
-    def __getitem__ (self, k):
-        raise NotImplemented ('please override')
-        
-    def __setitem__ (self, k):
-        raise NotImplemented ('please override')
-        
-    def __delitem__ (self, k):
-        raise NotImplemented ('please override')
-
-    def __iter__ (self, k):
-        raise NotImplemented ('please override')
-
-    def keys (self):
-        raise NotImplemented ('please override')
-
-    def values (self):
-        raise NotImplemented ('please override')
-
-    def byname (self, name):
-        """
-        Return the L{TxoItem} whose name in the 'C' language is passed
-        as parameter. This 'C' language is meant to be the name used
-        by programs, rather than people.
-        """
-        raise NotImplemented ('please override')
-        
-
-    def _reverse (self):
-
-        """ Create the reversed taxonomy tree """
-        
-        children = { None: [] }
-
-        for k in self.keys ():
-            children [k] = []
-
-        for v in self.values ():
-            children [v.parent].append (v.id)
-
-        return children
-
-
-    def expand (self, k):
-        """ Return a txo and all its children """
-
-        children = self._reverse ()
-
-        full = []
-        for c in children [k]:
-            full = full + self.expand (c)
-
-        full.append (k)
-        
-        return full
-
-    
-    def xmlwrite (self, fd):
-
-        children = self._reverse ()
-        
-        def subwrite (node, depth = 0):
-            child = self [node]
-
-            space = ' ' * depth
-            
-            fd.write ('  %s<txo-item id="%d">\n' % (
-                space, child.id))
-
-            child.xmlwrite (fd, space)
-
-            for n in children [node]:
-                subwrite (n, depth + 1)
-                
-            fd.write ('  %s</txo-item>\n' % space)
-            return
-
-        for n in children [None]:
-            subwrite (n)
-        
-        return
-
-
-class TxoStore (object):
-
-    """ This class is the interface via which Txo items can be
-    manipulated.
-
-    DERIVED BY ALL STORES
-    """
-
-
-    def __getitem__ (self, k):
-        raise NotImplemented ('please override')
-        
-    def keys (self):
-        raise NotImplemented ('please override')
-        
-    def xmlwrite (self, fd):
-
-        keys = self.keys ()
-        keys.sort ()
-
-        for k in keys:
-            fd.write (' <txo-group id="%s">\n' % k)
-            self [k].xmlwrite (fd)
-            fd.write (' </txo-group>\n\n')
-            
-        return
-
-    # These methods are to be inherited, but are private
-
-    def _add (self, group):
-        raise NotImplemented ('please override')
-
     
 # --------------------------------------------------
 
@@ -535,9 +404,9 @@ class Database (object):
     @cvar entries: a L{resultset <Pyblio.Store.ResultSet>} containing
     all the records of the database.
 
-    @cvar txo: a L{TxoGroup} instance, containing all the taxonomy
-    definitions in the database. See L{TxoItem
-    <Pyblio.Attribute.TxoItem>}.
+    @cvar txo: B{DEPRECATED}, use L{schema.txo} instead. A L{TxoGroup}
+    instance, containing all the taxonomy definitions in the
+    database. See L{TxoItem <Pyblio.Schema.TxoItem>}.
 
     @cvar rs: a L{ResultSetStore} instance, containing all the result
     sets defined on this database.
@@ -546,6 +415,21 @@ class Database (object):
     def __init__ (self):
         raise NotImplemented ('please override')
 
+    def _txo_warn(self):
+        from traceback import format_stack
+        for line in format_stack()[:-2]:
+            for sub in line.rstrip().split('\n'):
+                logging.warn(sub)
+        logging.warn('db.txo is deprecated. please use db.schema.txo')
+
+        # ensure we get called only once
+        Database._txo_warn = lambda self: None
+        
+    def _txo_get(self):
+        self._txo_warn()
+        return self.schema.txo
+
+    txo = property(_txo_get, None)
 
     def _entries_get (self):
         """ Return the result set that contains _all_ the entries. """
@@ -703,7 +587,7 @@ class Database (object):
 
                     # check for the enum existence
                     try:
-                        self.txo [v.group] [v.id]
+                        self.schema.txo[v.group][v.id]
                         
                     except KeyError:
                         raise Exceptions.SchemaError (
@@ -713,7 +597,7 @@ class Database (object):
                 # Remove unnecessary txo items (for instance when a
                 # more specific item is also present, there is no need
                 # to keep the parent)
-                g   = self.txo [s.group]
+                g   = self.schema.txo [s.group]
                 ids = map (lambda x: x.id, vals)
                 
                 for v in [] + vals:
@@ -732,35 +616,6 @@ class Database (object):
                 
         return entry
 
-    def _txo_use_check (self, group, key):
-        
-        """ Check if a Txo can be safely removed """
-        
-        to_check = []
-        # get the attributes that contain the txos of interest
-        for s in self.schema.values ():
-            if s.type is not Attribute.Txo: continue
-            if s.group != group: continue
-
-            to_check.append (s.id)
-
-
-        for v in self.entries.itervalues ():
-            for name in to_check:
-                try:
-                    attrs = v [name]
-                except KeyError:
-                    continue
-                
-                for attr in attrs:
-                    if attr.id != key: continue
-                    
-                    raise Exceptions.ConstraintError \
-                          (_('txo %s/%d still used in item %d') % (
-                        group, key, v.key))
-
-        return
-
     def xmlwrite (self, fd):
         """ Output a database in XML format """
         
@@ -768,8 +623,6 @@ class Database (object):
         fd.write ('<pyblio-db>\n')
 
         self.schema.xmlwrite (fd, embedded = True)
-
-        self.txo.xmlwrite (fd)
 
         if self.header:
             fd.write ('<header>%s</header>\n' % escape (self.header))
@@ -841,52 +694,13 @@ class Database (object):
                 
                 elem.clear()
             
-            if t == 'txo-group':
-                g = self.txo [elem.attrib ['id'].encode ('ascii')]
-                def nesting (tree, parent):
-                    for item in tree.findall ('./txo-item'):
-                        i = TxoItem ()
-                        
-                        i.id = int (item.attrib ['id'])
-                        i.parent = parent
-
-                        for name in item.findall ('./name'):
-                            lang = name.attrib.get ('lang', '')
-                            i.names [lang] = name.text
-
-                        g.add (i, i.id)
-
-                        nesting (item, i.id)
-
-                nesting (elem, None)
-                
-                elem.clear()
-            
-            elif elem.tag == 'pyblio-schema':
+            if t == 'pyblio-schema':
                 self.schema = Schema.Schema ()
                 self.schema.xmlread (elem)
-
-                self._txo_create ()
                 
             elif t == 'header':
                 self.header = elem.text
 
-    def _txo_create (self):
-        # Finalize the link between the schema and the db by
-        # creating the txo groups defined in the schema, so
-        # that they exist when we read their content.
-
-        for txo in self.schema.txo.values():
-            try:
-                g = self.txo._add (txo.group)
-                # Fill in the TxoGroup with the known values
-                for key, txo in txo.iteritems():
-                    g.add(txo, key=key)
-                    
-            except Exceptions.ConstraintError:
-                # Skip already defined txo groups
-                pass                    
-        return
     
 # --------------------------------------------------
 

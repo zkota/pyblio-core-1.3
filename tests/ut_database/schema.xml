@@ -22,4 +22,25 @@
   <name>URL</name>
  </attribute>
 
+ <txo-group id="a">
+  <txo-item id="1">
+   <name lang="C">J</name>
+   <name>Journal</name>
+  </txo-item>
+  <txo-item id="2">
+   <name lang="C">B</name>
+   <name>Book</name>
+  </txo-item>
+ </txo-group>
+
+ <txo-group id="b">
+  <txo-item id="1">
+   <name>Journal</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>Book</name>
+  </txo-item>
+ </txo-group>
+
+
 </pyblio-schema>
