@@ -8,6 +8,3 @@ recursive-include Pyblio/RIP *.rip *.sip
 recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip
 
 include ez_setup.py
-
-recursive-include Recodec *
-prune Recodec/build

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of pybliographer
 # 
-# Copyright (C) 1998-2003 Frederic GOBRY
+# Copyright (C) 1998-2006 Frederic GOBRY
 # Email : gobry@pybliographer.org
 # 	   
 # This program is free software; you can redistribute it and/or
@@ -26,6 +26,7 @@
 import re, os, string, logging
 
 from Pyblio.Parsers.Syntax.BibTeX import Parser, Coding
+from Pyblio.Parsers.Syntax.BibTeX import Environ as BaseEnviron
 
 from Pyblio import Attribute, Store, Exceptions, Tools
 
@@ -35,23 +36,23 @@ from gettext import gettext as _
 # Base Classes
 # ==================================================
 
-class Environ (Coding.Environ):
+class Environ(BaseEnviron.Environ):
 
     def __init__ (self):
 
         self.strings = {
-            'jan': Parser.Text ('January'),
-            'feb': Parser.Text ('February'),
-            'mar': Parser.Text ('March'),
-            'apr': Parser.Text ('April'),
-            'may': Parser.Text ('May'),
-            'jun': Parser.Text ('June'),
-            'jul': Parser.Text ('July'),
-            'aug': Parser.Text ('August'),
-            'sep': Parser.Text ('September'),
-            'oct': Parser.Text ('October'),
-            'nov': Parser.Text ('November'),
-            'dec': Parser.Text ('December'),
+            'jan': Parser.Text('January'),
+            'feb': Parser.Text('February'),
+            'mar': Parser.Text('March'),
+            'apr': Parser.Text('April'),
+            'may': Parser.Text('May'),
+            'jun': Parser.Text('June'),
+            'jul': Parser.Text('July'),
+            'aug': Parser.Text('August'),
+            'sep': Parser.Text('September'),
+            'oct': Parser.Text('October'),
+            'nov': Parser.Text('November'),
+            'dec': Parser.Text('December'),
             }
         return
 
@@ -408,8 +409,6 @@ class Writer(object):
     
     def __init__ (self):
 
-        import Recode
-
         self._mapping = {
             Attribute.Text:   self.text_add,
             Attribute.Person: self.person_add,
@@ -421,7 +420,7 @@ class Writer(object):
         return
 
     def _escape (self, text):
-        return text.encode ('latex', 'replace').replace ('\}', '\char125').replace ('\{', '\char123')
+        return Coding.encode(text)
 
     def txo_add (self, field, data):
 
@@ -580,7 +579,7 @@ class Writer(object):
 
         if key in ('id', 'doctype'): return
 
-        key = key.encode ('ascii', 'replace')
+        key = Coding.encode(key)
         
         self._mapping [self.db.schema [key].type] (key, self.record [key])
         return

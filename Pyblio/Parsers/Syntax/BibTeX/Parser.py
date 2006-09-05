@@ -26,6 +26,7 @@ including comments, strings,..."""
 import re
 
 from Pyblio.Exceptions import ParserError
+from Pyblio.Parsers.Syntax.BibTeX import Coding
 
 class IBibTeX:
     def flat (self):
@@ -124,19 +125,19 @@ class Join (list):
     def tobib (self):
         return ' # '.join (map (lambda x: x.tobib (), self))
     
-class Text (unicode):
+class Text(unicode):
 
-    def flat (self):
+    def flat(self):
         return self.replace ('~', u'\xa0')
     
     def __repr__ (self):
-        return 'Text (%s)' % unicode.__repr__ (self)
+        return 'Text(%s)' % unicode.__repr__(self)
 
     def subst (self):
         return [self]
 
-    def tobib (self):
-        return self.encode ('latex', 'replace')
+    def tobib(self):
+        return Coding.encode(self)
     
     def execute (self, env):
         return self
@@ -233,8 +234,8 @@ class Block (object):
     def tobib (self):
         return '%s%s%s' % (
             self._o,
-            ''.join (map (lambda x: x.tobib (), self._d)),
-            self.closer [self._o])
+            ''.join([x.tobib() for x in self._d]),
+            self.closer[self._o])
 
 
 class EndOfFile (Exception): pass

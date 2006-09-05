@@ -337,7 +337,16 @@ class TestBibTeXExport (pybut.TestCase):
         self._check ('exp-nested')
         return
     
-        
-suite = pybut.suite (TestBibTeXReader, TestBibTeXImport, TestBibTeXExport)
+class TestBibTeXEncoder(pybut.TestCase):
+
+    def testEncoder(self):
+        """ Some trivial conversion tasks """
+        from Pyblio.Parsers.Syntax.BibTeX.Coding import encode
+
+        self.failUnlessEqual(encode(u'héß\u0010'), r'h\'e\ss{}\char16')
+
+
+suite = pybut.suite (TestBibTeXEncoder, TestBibTeXReader,
+                     TestBibTeXImport, TestBibTeXExport)
 
 if __name__ == '__main__':  pybut.run (suite)

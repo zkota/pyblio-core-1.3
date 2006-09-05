@@ -36,18 +36,13 @@ itself (except for the ones listed below).
     the requested version of pybsddb.
 
  * In order to run external queries (to the Web of Science for instance),
-   you need to install Twisted (<http://twistedmatrix.com>).
+   you need to install Twisted (<http://twistedmatrix.com/>).
  
 
 == Global installation ==
 
 Once the required dependencies are installed, you can install this
 package in the standard place with the following commands:
-
-  * in the Recodec/ sub-directory
-  
-    python setup.py build
-    sudo python setup.py install
 
   * in the directory containing this README
 

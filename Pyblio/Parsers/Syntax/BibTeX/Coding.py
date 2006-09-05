@@ -1,18 +1,53 @@
 # -*- coding: utf-8 -*-
+# This file is part of pybliographer
+# 
+# Copyright (C) 1998-2006 Frederic GOBRY
+# Email : gobry@pybliographer.org
+# 	   
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details. 
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# 
+# 
 
-from Pyblio.Parsers.Syntax.BibTeX import Parser
-from Pyblio import Exceptions
+"""
+Handles coding and decoding of LaTeX-escaped characters.
 
+Coding and decoding tries to be as reversible as possible (though
+certain encodings are ambiguous).
+"""
+
+# this map is for composing letters with diacritics, like in \'e
 basemap = {
+    ".": {
+    'C': u"Ċ", 'E': u"Ė",
+    'G': u"Ġ", 'I': u"İ",
+    'Z': u"Ż",
+    'c': u"\u010b", 'e': u"Ė",
+    'g': u"ġ", 'z': u"ż",
+    },
+    
     "'": {
     'A': u"Á", 'E': u"É",
     'I': u"Í", 'O': u"Ó",
     'U': u"Ú", 'Y': u"Ý",
     'C': u"Ć", 'Z': u"Ź",
+    'N': u"Ń",
     'a': u"á", 'e': u"é",
     'i': u"í", 'o': u"ó",
     'u': u"ú", 'y': u"ý",
     'c': u"ć", 'z': u"ź",
+    'n': u"ń",
     },
     
     "`": {
@@ -46,102 +81,42 @@ basemap = {
     'C': u"Ç", 'c': u"ç",
     },
 
-    
     "~": {
     'A': u"Ã", 'O': u"Õ",
     'a': u"ã", 'o': u"õ",
     'n': u"ñ", 'N': u"Ñ",
     },
-
 }
 
-def _accent (stack, cmd, tt):
+staticmap = {
+    'ss': (u'ß', 0),
+}
+
+
+_reversemap = {}
+
+# construct a simple map that goes from the unicode character to the
+# BibTeX representation
+for cmd, sub in basemap.iteritems():
+    for letter, symbol in sub.iteritems():
+        _reversemap[symbol] = '\\%s%s' % (cmd, letter)
+
+for cmd, (symbol, count) in staticmap.iteritems():
+    _reversemap[symbol] = '\\%s{}' % cmd
+
+def _encodeone(char):
+    o = ord(char)
+    if o >= 32 and o <= 127 and char not in '{}%\\':
+        return char
 
     try:
-        m = basemap[cmd]
-
+        return _reversemap[char]
     except KeyError:
-        return Parser.Text('?')
-    
-    if isinstance (tt, Parser.Text):
+        return '\\char%d' % o
 
-        if len (tt) > 1:
-            t = tt[0]
-            stack.insert(0, Parser.Text(tt[1:]))
-        else:
-            t = tt
-            
-    elif isinstance (tt, Parser.Block):
-        t = tt._d [0]
-
-        if isinstance (t, Parser.Text):
-            pass
-
-        elif isinstance(t, Parser.Cmd):
-            # There are a few special cases where one wants to accent a command, like:
-            #              \'{\i}
-            if t._cmd == 'i':
-                t = Parser.Text('i')
-            else:
-                raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
-
-        else:
-            raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
-
-    else:
-        raise Exceptions.ParserError ('cannot evaluate expression %s' % repr ((cmd, tt)))
-
-    try:
-        return Parser.Text (m [t])
-    except KeyError:
-        raise KeyError ("cannot find %s in map %s" % (repr (t), repr (cmd)))
+def encode(text):
+    """ encode a unicode string into a valid BibTeX string """
+    return u''.join(_encodeone(c) for c in text)
 
 
-class Environ(object):
 
-    commands = {
-        "'":  (_accent, 1),
-        '`':  (_accent, 1),
-        '^':  (_accent, 1),
-        '"':  (_accent, 1),
-        'c':  (_accent, 1),
-        '~':  (_accent, 1),
-        'ss': (u'ß', 0),
-        }
-
-
-    def run (self, cmd, stack):
-        try:
-            fn, count = self.commands[cmd]
-
-        except KeyError:
-            # The \char macro is special: \char125 -> character with ascii code 125
-            if cmd.startswith ('char'):
-                try: return Parser.Text(unichr(int(cmd[4:])))
-                except ValueError: pass
-
-            # Try with local extensions
-            fn = getattr(self, 'do_' + cmd, None)
-
-            if fn is None:
-                return Parser.Text(cmd)
-            else:
-                return fn(cmd, stack)
-            
-        args = []
-        
-        while count:
-            try:
-                args.append (stack.pop (0))
-            except IndexError:
-                raise Exceptions.ParserError('command %s requires %d arguments, got %s' % (
-                    repr (cmd), count, len (args)))
-            
-            count -= 1
-            
-        if callable (fn):
-            return fn (stack, cmd, * args)
-
-        return Parser.Text (fn)
-    
-            

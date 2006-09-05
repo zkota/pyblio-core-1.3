@@ -376,12 +376,13 @@ class Txo (_Qualified):
 
     In the simplest case, this can be seen as a value in a enumerated
     set of possible values. The possible values are defined as
-    L{TxoItem}s, and are stored in the L{Store.Database}, in the
-    B{txo} attribute, and L{Store.Record}s can contain Txo attributes
-    which refer to these L{TxoItem}s. Say you have a list of known
-    document types in the I{document-type} taxonomy. You can then
-    affect the document type to the I{type} attribute of a record with
-    the following operations:
+    L{Pyblio.Schema.TxoItem}s, and are stored in the
+    L{Store.Database}, in the B{txo} attribute, and L{Store.Record}s
+    can contain Txo attributes which refer to these
+    L{Pyblio.Schema.TxoItem}s. Say you have a list of known document
+    types in the I{document-type} taxonomy. You can then affect the
+    document type to the I{type} attribute of a record with the
+    following operations:
 
        >>> item = db.txo['document-type'].byname('article')
        >>> record.add('type', item, Attribute.Txo)
