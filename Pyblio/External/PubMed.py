@@ -83,7 +83,12 @@ class PubMed(object):
         
         all.update(args)
         all.update(kargs)
-        
+
+        # ensure all arguments are utf8 encoded
+        for k, v in all.items():
+            if isinstance(v, unicode):
+                all[k] = v.encode('utf-8')
+                
         url = self.baseURL + service + '?' + urllib.urlencode(all)
 
         self.log.debug('sending query %r' % url)

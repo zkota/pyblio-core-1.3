@@ -61,7 +61,7 @@ class Page(rend.Page):
         if query is None:
             return None
 
-        query = query[0]
+        query = query[0].decode('utf-8')
         
         s = Registry.getSchema('org.pybliographer/pubmed/0.1')
         db = Store.get('memory').dbcreate(None, s)

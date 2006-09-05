@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os, logging, pybut
 
 from twisted.trial import unittest
@@ -87,7 +88,7 @@ class TestPubMed(unittest.TestCase):
         self.cnx.baseURL = 'http://localhost:8000/search'
         self.cnx.BATCH_SIZE = 5
         
-        d, rs = self.cnx.search('gobry')
+        d, rs = self.cnx.search(u'gobry véronique')
 
         def check(count):
             self.failUnlessEqual(len(rs), 7)

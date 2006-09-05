@@ -89,6 +89,11 @@ class WOK(object):
 
         self.log.debug('sending query %s' % repr(data))
         
+        # ensure all arguments are utf8 encoded
+        for k, v in data.items():
+            if isinstance(v, unicode):
+                data[k] = v.encode('utf-8')
+                
         q = self.baseURL + '?' + urllib.urlencode(data)
         
         self._pending = HTTPRetrieve(q, method='GET')
