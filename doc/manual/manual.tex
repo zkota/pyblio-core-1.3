@@ -122,15 +122,10 @@ those that are articles (either peer-reviewed or not), books,...
 \pyblio uses the \py{Pyblio.Attribute.Txo} object to
 \textit{represent} a logical value in a given taxonomy. A record can
 be tagged with this \py{Txo} object by adding a
-\py{Pyblio.Attribute.TxoItem} value in the corresponding attribute.
+\py{Pyblio.Schema.TxoItem} value in the corresponding attribute.
 
-Taxonomies can be declared and pre-filled in a database schema, so
-that any database created from the schema will at least contain the
-specified taxonomies.
-
-To see how these taxonomies can be further created and modified,
-please have a look at the \py{txo} member of a \py{Database} object,
-which is an instance of the \py{Pyblio.Store.TxoGroup} class.
+Taxonomies are declared in a database schema, and thus cannot change
+unless you change the schema itself.
 
 \subsection{Result sets}
 \label{sec:resultsets}
@@ -384,6 +379,64 @@ html = HTML.generate(cited)
 
 Now, \py{html} contains a properly escaped HTML fragment which you can
 use in your own context.
+
+\section{Querying external databases}
+
+\pyblio has a standard interface for querying external databases, like
+\textsl{PubMed} or the \textsl{Web of Science}. These queries rely on
+the asynchronous \py{twisted} library, which makes it possible to run
+such a query from a graphical interface without blocking, and to
+interrupt it easily.
+
+An example of such a query is described below.
+
+\verbatiminput{code/query.py}
+
+In this code, a query object \py{wok} is created, which will directly
+modify the database passed in parameter. Then a actual query is
+registered by calling \py{wok.search}. This returns two values: a
+\textsl{deferred object}, which is a twisted abstraction. You can then
+\textit{plug} a callback, in our case the \py{success()} function, to
+be called when the search succeeds. The second value returned is a
+result set, which will be filled with the entries retrieved by the
+query.
+
+Note that so far the query did not run. To start it, you need to run
+\textsl{twisted}'s main loop, called the reactor. This function won't
+exit unless you call \py{reactor.stop()} somewhere. Please have a look
+at \textsl{twisted}'s documentation\footnote{see
+  \url{http://twistedmatrix.com/}} to learn how to make use of this
+powerful framework.
+
+
+\section{Adapting to another schema}
+
+In the preceding example, we fetched results from the Web of Science
+in a database of type \py{org.pybliographer/wok/0.1}. This is a schema
+specially crafted for records coming from this database, but usually
+this is not what you expect to store in your own, say, BibTeX
+database. So what, do you need to create another query engine
+specially for your database?  Fortunately no, you can use the
+\textsl{adaptation mechanism} to make this Web of Science database
+look like a BibTeX database with a simple call like:
+
+\begin{verbatim}
+from Pyblio import Adapter
+
+bibtex = Adapter.adapt_schema(
+      db, 'org.pybliographer/bibtex/0.1')
+\end{verbatim}
+
+When this call succeeds, you will get in return a new database called
+\py{bibtex}, which will contain everything contained in \py{db}, but
+in the BibTeX schema. Please note that your database is \textit{not}
+duplicated, the \py{bibtex} database is just some kind of overlay that
+behaves as a normal database, but uses the initial content
+dynamically.
+
+Unfortunately, these adapters objects that do the mapping do not come
+out of thin air, and need to be registered in the system, via the
+usual \py{.rip} registry mechanism.
 
 \chapter{Extending \pyblio}
 

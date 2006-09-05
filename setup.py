@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 NAME = 'pybliographer'
-VERSION = '1.3.2'
+VERSION = '1.3.3'
 
 try:
    from ez_setup import use_setuptools
