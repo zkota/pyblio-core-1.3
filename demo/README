@@ -1,0 +1,6 @@
+-*- text -*-
+
+To start the pubmed demo, run:
+
+   twistd -noy pubmed.tac
+

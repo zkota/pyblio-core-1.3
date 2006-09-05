@@ -159,7 +159,6 @@ class switch(Glue):
     """
 
     def __init__(self, switch, _cases={}, _default=None):
-
         self._switch = switch
 
         # Warning: we do not affect the default parameter here. Doing
@@ -233,7 +232,6 @@ class switch(Glue):
                     repr(self), repr(name), repr(s.group)))
 
             sw[Txo(txo)] = child(db, props)
-
 
         return S2.Switch(_fetch, sw, default)
 

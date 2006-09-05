@@ -18,9 +18,18 @@ class PubMed2BibTeX(OneToOneAdapter):
 
         bibtex['id'] = medline['pmid']
         
-        for k in ('title', 'author', 'abstract'):
+        for k in ('title', 'author', 'abstract', 'journal'):
             if k in medline:
                 bibtex[k] = medline[k]
 
+        year = medline.get('journal.year')
+        if year:
+            bibtex.add('date', Attribute.Date(year=int(year[0])))
+        
+        bibtex.add('volume', medline.get('journal.volume')[0])
+        bibtex.add('number', medline.get('journal.issue')[0])
+
+        print bibtex
+        
         return bibtex
     

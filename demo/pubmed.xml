@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:nevow="http://nevow.com/ns/nevow/0.1">
+  <head>
+    <title>PubMed to BibTeX</title>
+  </head>
+  <body>
+    <i>This service is just a demo. Please try not to abuse it.</i>
+    
+    <form name="search" style="margin-top: 1em">
+      Please enter your PubMed query:
+      <br/>
+      <input type="text" name="q" size="50" nevow:render="query" />
+      <input type="submit" name="search" value="Search" />
+    </form>
+
+    <div nevow:data="results" nevow:render="results" />
+
+  <div style="border-top: 1px solid black; font-size:small; margin-top: 2em; text-align:right">
+    Powered by <a href="http://pybliographer.org/">Pybliographer</a>
+  </div>
+  </body>
+</html>

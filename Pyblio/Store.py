@@ -165,8 +165,12 @@ class Record (dict):
 
         @param constructor: a function that will turn a 'value' into a
         proper attribute.
-        """        
-        def generate (value, typ):
+        """
+
+        if value is None:
+            return
+        
+        def generate(value, typ):
             """
             Constructs type with value. Effects neccessary dict-conversion
             operations
@@ -192,7 +196,7 @@ class Record (dict):
 
             f = self.get (field, [])
 
-            f.append (generate (value, constructor))
+            f.append(generate(value, constructor))
             self [field] = f
 
         else:        

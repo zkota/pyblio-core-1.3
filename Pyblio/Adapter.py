@@ -95,6 +95,9 @@ class OneToOneAdapter(Adapter):
                 return e.iterkeys()
 
             __iter__ = iterkeys
+
+            def __len__(s):
+                return len(e)
             
         return Looper()
 

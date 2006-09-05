@@ -581,7 +581,7 @@ class Writer(object):
 
         key = Coding.encode(key)
         
-        self._mapping [self.db.schema [key].type] (key, self.record [key])
+        self._mapping[self.db.schema[key].type](key, self.record [key])
         return
     
     def write (self, fd, rs, db):

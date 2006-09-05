@@ -61,8 +61,8 @@ default = Date.year(one('date'))
 
 place = switch('doctype')
 
-place.case(article=article)
-place.default(default)
+place = place.case(article=article)
+place = place.default(default)
 
 # Bind everything together.
 citation = join(u', ')[authors, title, place] + '.'
