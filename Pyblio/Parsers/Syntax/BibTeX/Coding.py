@@ -90,6 +90,8 @@ basemap = {
 
 staticmap = {
     'ss': (u'ß', 0),
+    'ae': (u'æ', 0),
+    'oe': (u'œ', 0),
 }
 
 

@@ -144,7 +144,7 @@ class PubMed(object):
                 }
             
             wanted = min(all_results, maxhits)
-            
+
             self.log.debug('%d results, retrieving %d' % (all_results, wanted))
 
             def fetch(data):
@@ -157,10 +157,12 @@ class PubMed(object):
                 if len(rs) >= wanted:
                     results.callback(all_results)
                     return
+
+                # No need to fetch 500 results if only 20 are requested
+                batch = min(self.BATCH_SIZE, wanted - len(rs))
                 
                 d = self._query(self.SRV_FETCH, fetchdata,
-                                retstart=len(rs),
-                                retmax=self.BATCH_SIZE)
+                                retstart=len(rs), retmax=batch)
             
                 d.addCallback(_xml).\
                     addCallback(fetch).\

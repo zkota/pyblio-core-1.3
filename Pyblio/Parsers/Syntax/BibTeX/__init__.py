@@ -420,6 +420,8 @@ class Writer(object):
         return
 
     def _escape (self, text):
+        if not text:
+            return ''
         return Coding.encode(text)
 
     def txo_add (self, field, data):

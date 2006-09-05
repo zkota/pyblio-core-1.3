@@ -29,8 +29,12 @@ itself (except for the ones listed below).
 
  * ElementTree and cElementTree (<http://effbot.org/zone/element-index.htm>)
 
- * In order to use the bsddb store (optional), you need a recent pybsddb
-   version (>= 4.3.3) (<http://pybsddb.sourceforge.net/>)
+ * numpy >= 1.0b1 (<http://numpy.scipy.org/>)
+
+== Optional dependencies ==
+
+ * In order to use the bsddb store, you need a recent pybsddb version
+   (>= 4.3.3) (<http://pybsddb.sourceforge.net/>)
   
     WARNING: the latest python version at that time (2.4.2) has not yet
     the requested version of pybsddb.
@@ -42,9 +46,8 @@ itself (except for the ones listed below).
 == Global installation ==
 
 Once the required dependencies are installed, you can install this
-package in the standard place with the following commands:
-
-  * in the directory containing this README
+package in the standard place with the following commands in the
+directory containing this README:
 
     python setup.py build
     sudo python setup.py install

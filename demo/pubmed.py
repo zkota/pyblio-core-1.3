@@ -71,10 +71,10 @@ class Page(rend.Page):
 
         def success(total):
             bibtex = Adapter.adapt_schema(db, 'org.pybliographer/bibtex/0.1')
-            return True, query, bibtex
+            return True, query, bibtex, total
 
         def failure(failure):
-            return False, query, failure
+            return False, query, failure, total
 
         d.addCallback(success).addErrback(failure)
         
@@ -84,7 +84,7 @@ class Page(rend.Page):
         if data is None:
             return ctx.tag
 
-        success, query, db = data
+        success, query, db, total = data
 
         if not success:
             ctx.tag[T.h1[u'Failed to process query %s' % query]]
@@ -92,8 +92,8 @@ class Page(rend.Page):
 
             return ctx.tag
         
-        ctx.tag[T.h1[u'%d results for query "%s"' % (
-            len(db.entries), query)]]
+        ctx.tag[T.h1[u'%d/%d results for query "%s"' % (
+            len(db.entries), total, query)]]
 
         # Cite the records
         formatter = citation(db)

@@ -2,6 +2,8 @@ recursive-include doc/reference *.html *.css
 recursive-include doc/examples *.py *.bib
 recursive-include doc/manual *.pdf *.tex *.dia
 
+recursive-include demo *.xml *.tac *.py README
+
 recursive-include Pyblio *.py
 recursive-include Pyblio/RIP *.rip *.sip
 

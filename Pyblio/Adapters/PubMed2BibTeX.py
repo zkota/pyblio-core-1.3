@@ -25,11 +25,9 @@ class PubMed2BibTeX(OneToOneAdapter):
         year = medline.get('journal.year')
         if year:
             bibtex.add('date', Attribute.Date(year=int(year[0])))
-        
-        bibtex.add('volume', medline.get('journal.volume')[0])
-        bibtex.add('number', medline.get('journal.issue')[0])
 
-        print bibtex
+        bibtex.add('volume', medline.get('journal.volume', [None])[0])
+        bibtex.add('number', medline.get('journal.issue', [None])[0])
         
         return bibtex
     

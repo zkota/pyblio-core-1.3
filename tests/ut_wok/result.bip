@@ -195,9 +195,6 @@
 
 </pyblio-schema>
  <entry id="1">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="A" last="Abecker"/>
    <person first="L" last="van Elst"/>
@@ -3746,9 +3743,6 @@
   </attribute>
  </entry>
  <entry id="52">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="J" last="Misra"/>
    <person first="P" last="Pal"/>
@@ -5010,9 +5004,6 @@
   </attribute>
  </entry>
  <entry id="73">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="L" last="Liu"/>
   </attribute>
@@ -6605,9 +6596,6 @@
   </attribute>
  </entry>
  <entry id="101">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="A" last="Abecker"/>
    <person first="L" last="van Elst"/>
@@ -10156,9 +10144,6 @@
   </attribute>
  </entry>
  <entry id="152">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="J" last="Misra"/>
    <person first="P" last="Pal"/>
@@ -11420,9 +11405,6 @@
   </attribute>
  </entry>
  <entry id="173">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="L" last="Liu"/>
   </attribute>
@@ -13015,9 +12997,6 @@
   </attribute>
  </entry>
  <entry id="201">
-  <attribute id="abstract">
-   <text>None</text>
-  </attribute>
   <attribute id="author">
    <person first="A" last="Abecker"/>
    <person first="L" last="van Elst"/>

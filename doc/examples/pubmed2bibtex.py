@@ -9,12 +9,17 @@ Example:
 
 """
 
-import sys
+import sys, logging
 
 from twisted.internet import reactor
 
-from Pyblio import Registry, Store, Adapter
+from Pyblio import Registry, Store, Adapter, init_logging
 from Pyblio.External import PubMed
+
+# Do you want some debug information?
+#init_logging()
+#log = logging.getLogger('pyblio')
+#log.setLevel(logging.DEBUG)
 
 query, output = sys.argv[1:]
 
@@ -33,10 +38,10 @@ remote = PubMed.PubMed(db)
 # Perform a search. In return, we obtain the result set that will be
 # filled in with the results, and a deferred that will fire once the
 # query is over.
-d, rs = remote.search(query)
+d, rs = remote.search(query, maxhits=20)
 
 def success(total):
-    print "pubmed: successfully fetched %d records" % total
+    print "pubmed: successfully fetched %d/%d records" % (len(db.entries), total)
     reactor.stop()
 
     # We filled db with pubmed data. To save it as BibTeX, we get an

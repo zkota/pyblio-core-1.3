@@ -65,25 +65,37 @@ class Reader(object):
         self.record.add('abstract', abstract.text, Attribute.Text)
 
     def do_Article_Journal(self, node):
-        self.record.add('journal', node.find('Title').text, Attribute.Text)
-        self.record.add('journal.issn', node.find('ISSN').text, Attribute.ID)
-        
-        self.record.add('journal.volume',
-                        node.find('JournalIssue/Volume').text, Attribute.Text)
-        self.record.add('journal.issue',
-                        node.find('JournalIssue/Issue').text, Attribute.Text)
+        def maybe(dst, key, conv):
+            v = node.find(key)
+            if v is not None:
+                self.record.add(dst, v.text, conv)
 
-        self.record.add('journal.year',
-                        node.find('JournalIssue/PubDate/Year').text, Attribute.Text)
-        self.record.add('journal.month',
-                        node.find('JournalIssue/PubDate/Month').text, Attribute.Text)
+        title = node.find('Title')
+        if title is None:
+            return
+
+        self.record.add('journal', title.text, Attribute.Text)
+
+        maybe('journal.issn', 'ISSN', Attribute.ID)
+        
+        maybe('journal.volume', 'JournalIssue/Volume', Attribute.Text)
+        maybe('journal.issue', 'JournalIssue/Issue', Attribute.Text)
+
+        maybe('journal.year', 'JournalIssue/PubDate/Year', Attribute.Text)
+        maybe('journal.month', 'JournalIssue/PubDate/Month', Attribute.Text)
         
 
     def do_Article_AuthorList(self, node):
+        def v(n, k):
+            l = n.find(k)
+            if l is not None:
+                return l.text
+            return None
+        
         for au in node.findall('./Author'):
             person = Attribute.Person(
-                last=au.find('./LastName').text,
-                first=au.find('./ForeName').text)
+                last=v(au, './LastName'),
+                first=v(au, './ForeName'))
             self.record.add('author', person)
         
 
