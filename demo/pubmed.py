@@ -74,7 +74,7 @@ class Page(rend.Page):
             return True, query, bibtex, total
 
         def failure(failure):
-            return False, query, failure, total
+            return False, query, failure, 0
 
         d.addCallback(success).addErrback(failure)
         

@@ -4,10 +4,16 @@
     "DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:nevow="http://nevow.com/ns/nevow/0.1">
   <head>
-    <title>PubMed to BibTeX</title>
+    <title>A PubMed to BibTeX converter</title>
   </head>
   <body>
-    <i>This service is just a demo. Please try not to abuse it.</i>
+    <h1>A PubMed to BibTeX converter</h1>
+    <p>This application queries <a
+    href="http://www.ncbi.nlm.nih.gov/entrez/">PubMed</a> and will
+    return the result in BibTeX format. </p>
+    
+    <p><i>This service is just a demo. Please try not to abuse
+    it.</i></p>
     
     <form name="search" style="margin-top: 1em">
       Please enter your PubMed query:

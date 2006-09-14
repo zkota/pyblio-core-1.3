@@ -122,6 +122,8 @@ class PubMed(object):
 
         assert self._pending is None, 'no more than one search at a time per connection'
 
+        query = query.strip()
+        
         data = {'db': db,
                 'term': query}
 
@@ -134,6 +136,15 @@ class PubMed(object):
         rs = self.db.rs.add(True)
         rs.name = _('Imported from PubMed')
 
+        # Special case for no query: this would cause an error from
+        # the server if we do not catch it first.
+        if not query:
+            def autofire():
+                results.callback(0)
+
+            reactor.callLater(0, autofire)
+            return results, rs
+        
         def failed(reason):
             results.errback(reason)
         
