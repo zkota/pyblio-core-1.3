@@ -70,7 +70,7 @@ The ideas for the syntax have been heavily borrowed from nevow's stan.
 """
 
 
-from Pyblio.Format.DSL import join, one, all, switch, i18n
+from Pyblio.Format.DSL import join, one, all, switch, i18n, record_key
 from Pyblio.Format.DSL import A, B, I, BR, Small, Span
 from Pyblio.Format.DSL import Missing, lazy
 

@@ -364,7 +364,15 @@ class one(_Validated):
 
         return _fetch
 
-        
+
+class _record_key(Glue):
+    def __call__(self, db, props={}):
+        def _fetch(record):
+            return str(record.key)
+        return _fetch
+
+record_key = _record_key()
+
 # ==================================================
 # Tags
 # ==================================================

@@ -3,7 +3,7 @@
 import os, pybut, sys
 
 from Pyblio import Store, Attribute
-from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch, Misc, Pages, Text, i18n
+from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch, Misc, Pages, Text, i18n, record_key
 
 
 class TestFormat (pybut.TestCase):
@@ -54,6 +54,12 @@ class TestFormat (pybut.TestCase):
 
         self.failUnlessEqual(all('nest.sub')(self.db)(self.rec), self.rec ['nest'] [0].q ['sub'])
         self.failUnlessEqual(one('nest.sub')(self.db)(self.rec), self.rec ['nest'] [0].q ['sub'] [0])
+
+
+    def testRecordKey(self):
+        style = u'Record #' + record_key
+
+        self.failUnlessEqual(Text.generate(style(self.db)(self.rec)), u'Record #1')
         return
 
 
