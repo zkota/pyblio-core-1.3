@@ -1,4 +1,4 @@
-# -*- coding: latin-1 -*-
+# -*- coding: utf-8 -*-
 
 import os, pybut, sys
 
@@ -62,7 +62,7 @@ class TestBibTeXReader (pybut.TestCase):
     def testComment (self):
 
         comment = u'''
-% a simple test, héhé
+% a simple test, hÃ©hÃ©
 
 Random comments
 '''
@@ -297,7 +297,7 @@ class TestBibTeXImport (pybut.TestCase):
 
 
     def testEmptyAnd(self):
-        """ Sometimes, the author fields can contain « and and » """
+        """ Sometimes, the author fields can contain Â« and and Â» """
         self._check('emptyand')
         
     def testFinalDot(self):
@@ -336,16 +336,23 @@ class TestBibTeXExport (pybut.TestCase):
 
         self._check ('exp-nested')
         return
+
+from Pyblio.Parsers.Syntax.BibTeX.Coding import encode
     
 class TestBibTeXEncoder(pybut.TestCase):
 
     def testEncoder(self):
         """ Some trivial conversion tasks """
-        from Pyblio.Parsers.Syntax.BibTeX.Coding import encode
+        self.failUnlessEqual(encode(u'hÃ©ÃŸ\u0010'), r'h\'e\ss{}\char16')
 
-        self.failUnlessEqual(encode(u'héß\u0010'), r'h\'e\ss{}\char16')
+    def testEncodeI(self):
+        """ Check that an accent on a 'i' uses \i to avoid a double accent """
+        self.failUnlessEqual(encode(u'Ã®Ã¯'), r'\^{\i}\"{\i}')
 
-
+    def testMultiCommand(self):
+        """ Check that commands are properly separated by {} """
+        self.failUnlessEqual(encode(u'Â©Ã¦'), r'\copyright{}\ae{}')
+        
 suite = pybut.suite (TestBibTeXEncoder, TestBibTeXReader,
                      TestBibTeXImport, TestBibTeXExport)
 

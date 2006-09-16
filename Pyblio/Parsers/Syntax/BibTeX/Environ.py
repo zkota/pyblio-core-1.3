@@ -86,7 +86,7 @@ class Environ(object):
 
     commands.update(Coding.staticmap)
 
-    def run (self, cmd, stack):
+    def run(self, cmd, stack):
         try:
             fn, count = self.commands[cmd]
 
