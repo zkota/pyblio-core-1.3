@@ -49,8 +49,8 @@ _base = os.path.abspath(os.path.dirname(Pyblio.__file__))
 _user = os.path.expanduser('~/.pyblio')
 
 RIP_dirs = {
-    'system-rips': os.path.join(_base, 'RIP'),
-    'user-rips': _user,
+    'system': os.path.join(_base, 'RIP'),
+    'user': _user,
     }
 
 
@@ -168,7 +168,12 @@ def parse(directory):
         if ext != '.rip': continue
         
         name = os.path.join(directory, f)
-        p = Parser(RIP_dirs)
+
+        allvars = {}
+        allvars.update(RIP_dirs)
+        allvars['cwd'] = directory
+        
+        p = Parser(allvars)
         p.readfp(open(name), name)
         
         for schema in p.sections():

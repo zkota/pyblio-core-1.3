@@ -35,7 +35,6 @@ class WeakMethodBound :
         return apply (self.f, (o,) + arg)
 
     def same(self, fn):
-
         try:
             rf = fn.im_func
         except AttributeError:
@@ -104,10 +103,10 @@ class Publisher(object):
             cb, bound = data
 
             try:
-                apply (cb, args + bound)
+                apply(cb, args + bound)
                 
             except WeakError:
-                queue.remove (data)
+                queue.remove(data)
                 continue
 
         return

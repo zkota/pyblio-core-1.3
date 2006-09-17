@@ -1,6 +1,6 @@
 [with-path]
 
-path: %(system-rips)s/bibtex.xml
+path: %(system)s/bibtex.xml
 
 importers:
 	Extra.BibTeX.Reader
