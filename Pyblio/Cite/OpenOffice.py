@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This file is part of pybliographer
 # 
 # Copyright (C) 1998-2006 Frederic GOBRY
@@ -17,6 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 # 
+
 """
 A simple API to cite references in OpenOffice.org
 
@@ -24,12 +26,16 @@ Based on code from Bibus <http://bibus-biblio.sourceforge.net/>.
 """
 
 import uno
+from gettext import gettext as _
 
 DIRECT_VALUE    = uno.getConstantByName("com.sun.star.beans.PropertyState.DIRECT_VALUE")
 PARAGRAPH_BREAK = uno.getConstantByName("com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK")
 
 PropertyValue          = uno.getClass("com.sun.star.beans.PropertyValue")
 NoSuchElementException = uno.getClass("com.sun.star.container.NoSuchElementException")
+
+ITALIC = (uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC"),
+          uno.getConstantByName("com.sun.star.awt.FontSlant.NONE"))
 
 _OO_BIB_FIELDS = ('Identifier', 'BibiliographicType', 'Address', 'Annote', 'Author',
                   'Booktitle', 'Chapter', 'Edition', 'Editor', 'Howpublished', 'Institution',
@@ -40,16 +46,23 @@ _OO_BIB_FIELDS = ('Identifier', 'BibiliographicType', 'Address', 'Annote', 'Auth
 OO_BIBLIOGRAPHIC_FIELDS = {}
 for k, v in enumerate(_OO_BIB_FIELDS):
     OO_BIBLIOGRAPHIC_FIELDS[v] = k
-        
+
+
+from Pyblio.Format.OpenOffice import Generator, ITALIC
+
+
 class OOo(object):
     MASTER = 'com.sun.star.text.FieldMaster.Bibliography'
+
+    FRAME = u'Bibliography (Pybliographer)'
     
-    def __init__(self):
+    def __init__(self, host='localhost', port=2002):
         localContext = uno.getComponentContext()
         resolver = localContext.ServiceManager.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", localContext )
 
-        ctx = resolver.resolve("uno:socket,host=localhost,port=2002;urp;StarOffice.ComponentContext")
+        ctx = resolver.resolve("uno:socket,host=%s,port=%d;urp;StarOffice.ComponentContext" % (
+            host, port))
         
         self.smgr = ctx.ServiceManager
         self.desktop = self.smgr.createInstanceWithContext("com.sun.star.frame.Desktop",ctx)
@@ -67,8 +80,42 @@ class OOo(object):
         except NoSuchElementException:
             self.tfm = self.model.createInstance(self.MASTER)
 
+        # Try to get an existing frame of content
+        try:
+            self.frame = self.model.getTextSections().getByName(self.FRAME)
+        except NoSuchElementException:
+            self.frame = None
         return
 
+    def _createFrame(self):
+        self.frame = self.model.createInstance("com.sun.star.text.TextSection")
+        self.frame.setName(self.FRAME)
+        
+        self.text.insertString(self.cursor, '\x0a', False)
+        c = self.cursor.Text.createTextCursorByRange(self.cursor)
+        self.text.insertString(c, '\x0a', False)
+        c.goLeft(1, False)
+        self.text.insertTextContent(c, self.frame, False)
+
+        c = self.text.createTextCursorByRange(self.frame.Anchor.Start)
+        c.CharPosture = ITALIC[0]
+        self.text.insertString(c, _('Bibliography will come here...'), False)
+        c.CharPosture = ITALIC[1]
+        
+        return self.frame
+
+    def update(self):
+        if not self.frame:
+            self._createFrame()
+
+        f = self.frame
+        t = self.text
+        c = self.text.createTextCursorByRange(self.frame.Anchor.Start)
+
+        f.Anchor.setString('')
+        return Generator(t, c)
+
+    
     
     def _makeRef(self, visible_ref, key):
         """ Create a reference ready to be inserted in the document. """
