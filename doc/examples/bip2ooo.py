@@ -80,14 +80,15 @@ formatter = citation(db)
 # publication date.
 from Pyblio import Sort
 from Pyblio.Format.OpenOffice import Generator
-from Pyblio.Cite.OpenOffice import OOo
+from Pyblio.Cite.WP.OpenOffice import OOo
 
 view = db.entries.view(Sort.OrderBy('date', asc=False))
 
 # Hopefully connect to openoffice
 oo = OOo()
+oo.connect()
 
-generate = oo.update()
+generate = oo.update_biblio()
 
 for record in view.itervalues():
     generate(formatter(record))

@@ -25,7 +25,7 @@ Generate citation keys.
 
 from sets import Set
 
-def alphaloop():
+def _alphaloop():
     a = ord('a')
     while a <= ord('z'):
         yield chr(a)
@@ -33,7 +33,9 @@ def alphaloop():
     return
 
 class Unambiguous(object):
-
+    """ Base class to handle caching of generated keys. Ensures that
+    the same uid will always get the same key."""
+    
     def __init__(self, db):
         self.map = {}
         self.db = db
@@ -58,6 +60,9 @@ class Unambiguous(object):
 
 
 class Alpha(Unambiguous):
+    """ Base class to add a disambiguation letter after generated keys
+    that clash with already generated ones."""
+    
     def __init__(self, db):
         Unambiguous.__init__(self, db)
         self.seen = Set()
@@ -65,7 +70,7 @@ class Alpha(Unambiguous):
     
     def cache_update(self, uid, k):
         if k in self.seen:
-            extra = alphaloop()
+            extra = _alphaloop()
             while 1:
                 full = k + ':' + extra.next()
                 if full not in self.seen:
@@ -74,9 +79,12 @@ class Alpha(Unambiguous):
 
         self.seen.add(k)
         return Unambiguous.cache_update(self, uid, k)
-    
-class DocumentOrder(Unambiguous):
 
+
+class Numeric(Unambiguous):
+    """ Return a numeric key for documents, in the order in which they
+    are requested."""
+    
     def __init__(self, db):
         Unambiguous.__init__(self, db)
         self.current = 1
@@ -88,20 +96,8 @@ class DocumentOrder(Unambiguous):
         return k
 
     
-class AuthorYear(Alpha):
-
-    def _generate(self, uid):
-        rec = self.db[uid]
-        if not ('date' in rec or 'author' in rec):
-            return 'Unknown'
-
-        k = []
-        if 'author' in rec:
-            k.append(rec['author'][0].last)
-
-        if 'date' in rec:
-            k.append(str(rec['date'][0].year))
-
-        return ':'.join(k)
-    
-        
+def document_order(uids):
+    """ Return citations in their order of appearance in the
+    document. This is trivial, as the keys are already provided in
+    this order."""
+    return uids

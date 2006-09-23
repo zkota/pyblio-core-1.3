@@ -136,7 +136,10 @@ class OOo(object):
 
         return [[x.Value for x in r.Fields] for r in refs]
 
-    def update(self):
+    def update_keys(self, keymap):
+        pass
+
+    def update_biblio(self):
         if not self.frame:
             self._createFrame()
 

@@ -22,7 +22,6 @@
 ''' This module defines some common exceptions '''
 
 class ParserError(Exception):
-
     def __init__(self, msg, line=None):
         Exception.__init__(self, line, msg)
 

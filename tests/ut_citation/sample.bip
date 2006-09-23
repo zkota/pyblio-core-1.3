@@ -251,6 +251,9 @@
   <attribute id="date">
    <date year="2006"/>
   </attribute>
+  <attribute id="title">
+   <text>A title</text>
+  </attribute>
  </entry>
  <entry id="2">
   <attribute id="author">
