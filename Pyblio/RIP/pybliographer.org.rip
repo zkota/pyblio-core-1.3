@@ -8,6 +8,9 @@ readers:
 writers:
 	Pyblio.Parsers.Semantic.BibTeX.Writer
 
+citationkeys:
+	Pyblio.Cite.Keys.AuthorYear
+
 # CrossRef (http://crossref.org)
 [org.pybliographer/crossref/0.1]
 

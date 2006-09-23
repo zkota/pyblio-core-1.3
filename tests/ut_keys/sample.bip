@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema id="org.pybliographer/bibtex/0.1">
+ <name>BibTeX-compatible schema (version 0.1)</name>
+
+ <attribute id="abstract" type="text">
+  <name>Abstract</name>
+ </attribute>
+
+ <attribute id="address" type="text">
+  <name>Address</name>
+ </attribute>
+
+ <attribute id="address_1" type="text">
+  <name>Address 1</name>
+ </attribute>
+
+ <attribute id="address_2" type="text">
+  <name>Address 2</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Author</name>
+ </attribute>
+
+ <attribute id="booktitle" type="text">
+  <name>Book Title</name>
+ </attribute>
+
+ <attribute id="chapter" type="text">
+  <name>Chapter</name>
+ </attribute>
+
+ <attribute id="confplace" type="text">
+  <name>Conf. Place</name>
+ </attribute>
+
+ <attribute id="cote" type="text">
+  <name>Cote</name>
+ </attribute>
+
+ <attribute id="crossref" type="text">
+  <name>Crossref</name>
+ </attribute>
+
+ <attribute id="date" type="date">
+  <name>Date</name>
+ </attribute>
+
+ <attribute id="dates" type="text">
+  <name>Dates</name>
+ </attribute>
+
+ <attribute id="doctype" type="txo" group="doctype">
+  <name>Document Type</name>
+ </attribute>
+
+ <attribute id="edition" type="text">
+  <name>Edition</name>
+ </attribute>
+
+ <attribute id="editor" type="person">
+  <name>Editor</name>
+ </attribute>
+
+ <attribute id="format" type="text">
+  <name>Format</name>
+ </attribute>
+
+ <attribute id="from" type="text">
+  <name>From</name>
+ </attribute>
+
+ <attribute id="howpublished" type="text">
+  <name>How Published</name>
+ </attribute>
+
+ <attribute id="id" type="id">
+  <name>BibTeX Key</name>
+ </attribute>
+
+ <attribute id="ieeecn" type="text">
+  <name>IEEE CN</name>
+ </attribute>
+
+ <attribute id="institution" type="text">
+  <name>Institution</name>
+ </attribute>
+
+ <attribute id="isbn" type="text">
+  <name>ISBN</name>
+ </attribute>
+
+ <attribute id="issn" type="text">
+  <name>ISSN</name>
+ </attribute>
+
+ <attribute id="journal" type="text">
+  <name>Journal</name>
+ </attribute>
+
+ <attribute id="key" type="text">
+  <name>Key</name>
+ </attribute>
+
+ <attribute id="keywords" type="text">
+  <name>Keywords</name>
+ </attribute>
+
+ <attribute id="language" type="text">
+  <name>Language</name>
+ </attribute>
+
+ <attribute id="location" type="text">
+  <name>Location</name>
+ </attribute>
+
+ <attribute id="locn" type="text">
+  <name>Locn</name>
+ </attribute>
+
+ <attribute id="noseries" type="text">
+  <name># Series</name>
+ </attribute>
+
+ <attribute id="note" type="text">
+  <name>Note</name>
+ </attribute>
+
+ <attribute id="number" type="text">
+  <name>Number</name>
+ </attribute>
+
+ <attribute id="organization" type="text">
+  <name>Organization</name>
+ </attribute>
+
+ <attribute id="owner" type="text">
+  <name>Owner</name>
+ </attribute>
+
+ <attribute id="ownership" type="text">
+  <name>Ownership</name>
+ </attribute>
+
+ <attribute id="pages" type="text">
+  <name>Pages</name>
+ </attribute>
+
+ <attribute id="publisher" type="text">
+  <name>Publisher</name>
+ </attribute>
+
+ <attribute id="received" type="text">
+  <name>Received</name>
+ </attribute>
+
+ <attribute id="remarks" type="text">
+  <name>Remarks</name>
+ </attribute>
+
+ <attribute id="school" type="text">
+  <name>School</name>
+ </attribute>
+
+ <attribute id="series" type="text">
+  <name>Series</name>
+ </attribute>
+
+ <attribute id="special" type="text">
+  <name>Special</name>
+ </attribute>
+
+ <attribute id="specifictitle" type="text">
+  <name>Specific Title</name>
+ </attribute>
+
+ <attribute id="subject" type="text">
+  <name>Subject</name>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="to_appear" type="text">
+  <name>To Appear</name>
+ </attribute>
+
+ <attribute id="type" type="text">
+  <name>Type</name>
+ </attribute>
+
+ <attribute id="url" type="url">
+  <name>URL</name>
+ </attribute>
+
+ <attribute id="volume" type="text">
+  <name>Volume</name>
+ </attribute>
+
+ <txo-group id="doctype">
+  <txo-item id="1">
+   <name lang="C">article</name>
+  </txo-item>
+  <txo-item id="2">
+   <name lang="C">book</name>
+  </txo-item>
+  <txo-item id="3">
+   <name lang="C">booklet</name>
+  </txo-item>
+  <txo-item id="4">
+   <name lang="C">inbook</name>
+  </txo-item>
+  <txo-item id="5">
+   <name lang="C">incollection</name>
+  </txo-item>
+  <txo-item id="6">
+   <name lang="C">inproceedings</name>
+  </txo-item>
+  <txo-item id="7">
+   <name lang="C">manual</name>
+  </txo-item>
+  <txo-item id="8">
+   <name lang="C">mastersthesis</name>
+  </txo-item>
+  <txo-item id="9">
+   <name lang="C">misc</name>
+  </txo-item>
+  <txo-item id="10">
+   <name lang="C">phdthesis</name>
+  </txo-item>
+  <txo-item id="11">
+   <name lang="C">proceedings</name>
+  </txo-item>
+  <txo-item id="12">
+   <name lang="C">techreport</name>
+  </txo-item>
+  <txo-item id="13">
+   <name lang="C">unpublished</name>
+  </txo-item>
+ </txo-group>
+
+</pyblio-schema>
+ <entry id="1">
+  <attribute id="author">
+   <person first="Frédéric" last="Gobry"/>
+   <person first="Gédéric" last="Fobrz"/>
+  </attribute>
+  <attribute id="date">
+   <date year="2006"/>
+  </attribute>
+ </entry>
+ <entry id="2">
+  <attribute id="author">
+   <person first="F." last="Gobry"/>
+  </attribute>
+  <attribute id="date">
+   <date year="2006"/>
+  </attribute>
+ </entry>
+ <entry id="3">
+  <attribute id="author">
+   <person first="Name" last="Other"/>
+  </attribute>
+  <attribute id="date">
+   <date year="2006"/>
+  </attribute>
+ </entry>
+ <entry id="4">
+  <attribute id="date">
+   <date year="2006"/>
+  </attribute>
+ </entry>
+ <entry id="5">
+  <attribute id="author">
+   <person first="Fred" last="Gobry"/>
+  </attribute>
+ </entry>
+ <entry id="6">
+  <attribute id="journal">
+   <text>Sample</text>
+  </attribute>
+ </entry>
+</pyblio-db>
