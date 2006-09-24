@@ -1,0 +1,35 @@
+-*- text -*-
+
+Release 1.3.3 (2006-09-24)
+--------------------------
+
+ * Support for querying external databases. Available so far are
+   PubMed, Web of Science and CrossRef.
+   
+   External data are retrieved in their own native format, ensuring
+   that no data is lost unless the user does not need it. The query
+   API is fully asynchronous (thanks to the Twisted framework,
+   <http://twistedmatrix.com/>).
+
+ * Support for transparently converting between database formats.
+
+   By defining so-called Adapters, a database in format X can be
+   manipulated as if it were of format Y. This is useful for
+   integrating results from external databases, converting data,
+   having specialized database schemas,...
+
+ * Integration with OpenOffice.org and LyX
+
+   A common citation mechanism allows to plug different word
+   processors into pybliographer, and to manage citation, key
+   generation, bibliography formatting.
+
+ * Lots of internal refactoring
+
+   The most visible for existing users is the fact that taxonomies are
+   now completely integrated in the data schema, and not dynamic
+   anymore. This was necessary to make the Adaptation mechanism
+   easier. These dynamic taxonomies might be reintroduced later on
+   with a more solid basis. Immediate consequence: for a Database db,
+   please access db.schema.txo instead of db.txo.
+
