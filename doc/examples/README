@@ -1,0 +1,15 @@
+-*- text -*-
+
+What do these examples do?
+
+ - bibtex2bip.py: converts a BibTeX file into a native pybliographer
+   file (.bip)
+
+ - pubmed2bibtex.py: runs a query on the PubMed database and save the
+   result in BibTeX format
+
+ - bipcite.py: cites the references in a .bip file into either an HTML
+   file, or inside a running instance of LyX or OpenOffice.org
+
+
+

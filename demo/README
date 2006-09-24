@@ -1,5 +1,8 @@
 -*- text -*-
 
+This demo runs a web application that asks for a query, runs the query
+on PubMed, and returns the first results in BibTeX format.
+
 To start the pubmed demo, run:
 
    twistd -noy pubmed.tac
