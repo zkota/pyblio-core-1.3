@@ -99,7 +99,7 @@ def _encodeone(char):
 
 def encode(text):
     """ encode a unicode string into a valid BibTeX string """
-    return u''.join(_encodeone(c) for c in text)
+    return u''.join([_encodeone(c) for c in text])
 
 
 
