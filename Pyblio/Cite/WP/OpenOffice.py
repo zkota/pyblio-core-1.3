@@ -28,13 +28,15 @@ Based on code from Bibus <http://bibus-biblio.sourceforge.net/>.
 import uno
 from gettext import gettext as _
 
-from Pyblio.Cite import CommunicationError, OperationError
+from Pyblio.Cite.WP import CommunicationError, OperationError
+from Pyblio.Store import Key
 
 DIRECT_VALUE    = uno.getConstantByName("com.sun.star.beans.PropertyState.DIRECT_VALUE")
 PARAGRAPH_BREAK = uno.getConstantByName("com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK")
 
 PropertyValue          = uno.getClass("com.sun.star.beans.PropertyValue")
 NoSuchElementException = uno.getClass("com.sun.star.container.NoSuchElementException")
+NoConnectException     = uno.getClass("com.sun.star.connection.NoConnectException")
 
 ITALIC = (uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC"),
           uno.getConstantByName("com.sun.star.awt.FontSlant.NONE"))
@@ -52,6 +54,9 @@ for k, v in enumerate(_OO_BIB_FIELDS):
 
 from Pyblio.Format.OpenOffice import Generator, ITALIC
 
+import re
+
+_x_pyblio_re = re.compile(r'X-PYBLIO<(\d+)>')
 
 class OOo(object):
     MASTER = 'com.sun.star.text.FieldMaster.Bibliography'
@@ -85,8 +90,11 @@ class OOo(object):
         resolver = localContext.ServiceManager.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", localContext )
 
-        ctx = resolver.resolve("uno:socket,host=%s,port=%d;urp;StarOffice.ComponentContext" % (
-            self.host, self.port))
+        try:
+            ctx = resolver.resolve("uno:socket,host=%s,port=%d;urp;StarOffice.ComponentContext" % (
+                self.host, self.port))
+        except NoConnectException, msg:
+            raise CommunicationError(_("Unable to contact OpenOffice.org: %s" % msg))
         
         self.smgr = ctx.ServiceManager
         self.desktop = self.smgr.createInstanceWithContext("com.sun.star.frame.Desktop",ctx)
@@ -134,9 +142,19 @@ class OOo(object):
                                                  a.Anchor.Start)
         refs.sort(cmp)
 
-        return [[x.Value for x in r.Fields] for r in refs]
+        results = []
+        for r in refs:
+            ref, key = (r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Custom1']].Value,
+                        r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Identifier']].Value)
+
+            m = _x_pyblio_re.match(ref)
+            if m:
+                results.append((Key(m.group(1)), key))
+                
+        return results
 
     def update_keys(self, keymap):
+        # TODO: update the existing keys according to the new values
         pass
 
     def update_biblio(self):
@@ -167,12 +185,12 @@ class OOo(object):
         
         return self.frame
 
-    def _makeRef(self, visible_ref, key):
+    def _makeRef(self, ref, visible_key):
         """ Create a reference ready to be inserted in the document. """
         
         oref = self.model.createInstance("com.sun.star.text.TextField.Bibliography")
-        oref.Fields = (PropertyValue('Identifier', 0, visible_ref, DIRECT_VALUE),
-                       PropertyValue('Custom1', 0, 'X-PYBLIO<%s>' % key, DIRECT_VALUE),)
+        oref.Fields = (PropertyValue('Identifier', 0, visible_key, DIRECT_VALUE),
+                       PropertyValue('Custom1', 0, 'X-PYBLIO<%s>' % ref, DIRECT_VALUE),)
 
         return oref
 

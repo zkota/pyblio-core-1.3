@@ -98,6 +98,13 @@ class Numeric(Unambiguous):
     
 def document_order(uids):
     """ Return citations in their order of appearance in the
-    document. This is trivial, as the keys are already provided in
-    this order."""
-    return uids
+    document. This is the order in which they are presented in input,
+    except that we don't want duplicates. """
+    seen = Set()
+    for uid, key in uids:
+        if uid in seen:
+            continue
+
+        seen.add(uid)
+        yield (uid, key)
+    return

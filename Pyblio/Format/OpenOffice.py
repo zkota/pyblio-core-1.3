@@ -18,6 +18,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 
+from Pyblio.Format.Generator import Generator as Base
+
 import uno
 
 _gc = uno.getConstantByName
@@ -29,23 +31,19 @@ BOLD = (_gc("com.sun.star.awt.FontWeight.BOLD"),
         _gc("com.sun.star.awt.FontWeight.NORMAL"))
 
 
-class Generator(object):
-
+class Generator(Base):
+    """ Returns an object capable of transforming an abstract
+    representation of text into actual text in OpenOffice."""
+    
     def __init__(self, text, cursor):
         self.t = text
         self.c = cursor
+        self.first = False
         return
 
-    def __call__(self, t):
-        if isinstance(t, (str, unicode)):
-            self.t.insertString(self.c, t, False)
-        else:
-            self._map[t.tag](self, t)
-        return
-
-    def do_t(self, t):
-        for s in t.children: self(s)
-        
+    def do_string(self, t):
+        self.t.insertString(self.c, t, False)
+    
     def do_i(self, t):
         self.c.CharPosture = ITALIC[0]
         for s in t.children: self(s)
@@ -58,14 +56,13 @@ class Generator(object):
 
     def do_br(self, t):
         self.t.insertString(self.c, u'\x0a', False)
-        
-    _map = {
-        't' : do_t,
-        'i' : do_i,
-        'b' : do_b,
-        'a' : do_t,
-        'br': do_br,
-        'small': do_t,
-        'span':  do_t,
-        }
 
+    def begin_biblio(self):
+        self.first = True
+
+    def begin_reference(self, key):
+        if self.first:
+            self.first = False
+        else:
+            self.t.insertString(self.c, u'\x0d', False)
+        self.t.insertString(self.c, u'[%s]\xa0' % key, False)

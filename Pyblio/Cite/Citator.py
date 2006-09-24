@@ -102,8 +102,12 @@ class Citator(object):
             # update the biblio itself
             insert = self.wp.update_biblio()
 
+            insert.begin_biblio()
             for uid, key in self.m_order(known):
+                insert.begin_reference(key)
                 insert(self.formatter(self.db[uid]))
+                insert.end_reference(key)
+            insert.end_biblio()
         return
     
     def cite(self, uids):

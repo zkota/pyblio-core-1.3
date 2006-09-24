@@ -22,37 +22,37 @@
 Transformation of the formatted record into a textual representation.
 """
 
-def generate (t):
-    """
-    Actual text generator.
+from Pyblio.Format.Generator import Generator as Base
+from StringIO import StringIO
 
-    @param t: the formatted representation
-    @type  t: an S3 abstract tree, as returned when calling a formatted on a record
+class Generator(Base):
 
-    @return: the text representing the cited record
-    """
-    if isinstance (t, (str, unicode)): return t
-    return _map [t.tag] (t)
+    def __init__(self, fd):
+        self.fd = fd
+        return
     
-def _do_t (t):
-    return ''.join (map (generate, t.children))
-
-def _do_a (t):
-    return '%s <%s>' % (''.join (map (generate, t.children)),
-                        t.attributes ['href'])
-
-def _do_br (t):
-    return '\n'
+    def do_string(self, t):
+        self.fd.write(t)
     
+    def do_a(self, t):
+        self.fd.write('%s <%s>' % (''.join (map (generate, t.children)),
+                                   t.attributes ['href']))
 
-_map = {
-    't' : _do_t,
-    'i' : _do_t,
-    'b' : _do_t,
-    'small' : _do_t,
-    'span'  : _do_t,
-    'a' : _do_a,
-    'br': _do_br,
-    }
+    def do_br(self, t):
+        self.fd.write('\n')
+        
+    do_i = Base.do_t
+    do_b = Base.do_t
+    do_small = Base.do_t
+    do_span  = Base.do_t
+
+def generate(t):
+    """ Convenience function that generates the text in a string """
+    fd = StringIO()
+    g = Generator(fd)
+    g(t)
+
+    return fd.getvalue()
+    
 
 

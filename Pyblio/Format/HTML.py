@@ -23,6 +23,9 @@ Transformation of the formatted record into an HTML representation.
 """
 
 from xml.sax.saxutils import escape
+from StringIO import StringIO
+
+from Pyblio.Format.Generator import Generator as Base
 
 def _mkattrs(attrs):
     # merge the attributes, handling the special case of attributes
@@ -30,51 +33,64 @@ def _mkattrs(attrs):
     return ' '.join(['%s="%s"' % (k.lstrip('_'), v)
                      for k, v in attrs.items()])
 
-def generate (t):
-    """
-    Actual HTML generator.
 
-    @param t: the formatted representation
-    @type  t: an S3 abstract tree, as returned when calling a formatted on a record
+class Generator(Base):
 
-    @return: the HTML code representing the cited record
-    """
+    def __init__(self, fd):
+        self.fd = fd
+        return
     
-    if isinstance (t, (str, unicode)): return escape(t)
-    return _map [t.tag](t)
+    def do_string(self, t):
+        self.fd.write(escape(t))
     
-def _do_t (t):
-    return ''.join (map (generate, t.children))
+    def do_i(self, t):
+        self.fd.write('<i>')
+        for s in t.children: self(s)
+        self.fd.write('</i>')
 
-def _do_i (t):
-    return '<i>' + ''.join (map (generate, t.children)) + '</i>'
+    def do_small(self, t):
+        self.fd.write('<small>')
+        for s in t.children: self(s)
+        self.fd.write('</small>')
+
+    def do_span(self, t):
+        attrs = _mkattrs(t.attributes)
+        self.fd.write('<span %s>' % attrs)
+        for s in t.children: self(s)
+        self.fd.write('</span>')
+
+    def do_b(self, t):
+        self.fd.write('<b>')
+        for s in t.children: self(s)
+        self.fd.write('</b>')
+
+    def do_a(self, t):
+        attrs = _mkattrs(t.attributes)
+        self.fd.write('<a %s>' % attrs)
+        for s in t.children: self(s)
+        self.fd.write('</a>')
+
+    def do_br(self, t):
+        self.fd.write('<br>')
     
-def _do_small (t):
-    return '<small>' + ''.join (map (generate, t.children)) + '</small>'
+    def begin_biblio(self):
+        self.fd.write('<table>\n')
 
-def _do_span (t):
-    attrs = _mkattrs(t.attributes)
-    return '<span %s>' % attrs + ''.join (map (generate, t.children)) + '</span>'
+    def end_biblio(self):
+        self.fd.write('</table>')
 
-def _do_b (t):
-    return '<b>' + ''.join (map (generate, t.children)) + '</b>'
+    def begin_reference(self, key):
+        self.fd.write('<tr><td>[%s]</td><td>' % escape(key))
+
+    def end_reference(self, key):
+        self.fd.write('</td></tr>\n')
+
+
+def generate(t):
+    """ Convenience function that generates the HTML in a string """
+    fd = StringIO()
+    g = Generator(fd)
+    g(t)
+
+    return fd.getvalue()
     
-def _do_a (t):
-    attrs = _mkattrs(t.attributes)
-    return '<a %s>' % attrs + ''.join (map (generate, t.children)) + '</a>'
-
-def _do_br (t):
-    return '<br>'
-    
-
-_map = {
-    't' : _do_t,
-    'i' : _do_i,
-    'b' : _do_b,
-    'a' : _do_a,
-    'br': _do_br,
-    'small': _do_small,
-    'span': _do_span,
-    }
-
-

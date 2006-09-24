@@ -27,7 +27,7 @@ import os, string, select, signal
 
 from gettext import gettext as _
 
-from Pyblio.Cite import CommunicationError, OperationError
+from Pyblio.Cite.WP import CommunicationError, OperationError
 
 class LyX(object):
     def __init__(self, pipe='~/.lyx/lyxpipe'):
@@ -79,10 +79,19 @@ class LyX(object):
 
         # make actual keys by joining the "readable" part with the
         # constant part.
-        full = ['%s:%s' % x for x in keys]
+        full = ['%s:(%s)' % x for x in keys]
         
         self._send('citation-insert:' + ' '.join(full))
         return
+
+    def fetch(self):
+        return None
+    
+    def update_keys(self, keymap):
+        return
+
+    def update_biblio(self):
+        return None
 
     def _close(self):
         os.close(self.pin)

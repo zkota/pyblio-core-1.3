@@ -17,3 +17,41 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+"""
+A convenience object to write citations to a plain file.
+"""
+
+import codecs
+
+from Pyblio.Format.HTML import Generator
+
+class File(object):
+    def __init__(self, fd, generator=Generator):
+        self.fd = fd
+        self.gen = generator
+
+        self.cited = []
+        return
+
+    def update_biblio(self):
+        return self.gen(self.fd)
+
+    def cite(self, keys):
+        self.cited += keys
+
+    def fetch(self):
+        return self.cited
+
+    # The remaining operations are NOPs
+    def connect(self):
+        return
+
+    def is_connected(self):
+        return True
+    
+    def disconnect(self):
+        return
+    
+    def update_keys(self, keymap):
+        return
+
