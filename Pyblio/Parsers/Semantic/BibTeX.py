@@ -36,6 +36,8 @@ class Reader(BibTeX.Reader):
         return
     
     def record_end(self):
+        self.id_add('id', self.key)
+
         if self.date != Attribute.Date():
             self.record['date'] = [self.date]
         return
