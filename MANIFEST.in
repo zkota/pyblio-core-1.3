@@ -9,4 +9,4 @@ recursive-include Pyblio/RIP *.rip *.sip *.cip
 
 recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip *.cip
 
-include ez_setup.py
+include ez_setup.py NEWS

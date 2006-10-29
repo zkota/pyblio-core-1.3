@@ -1,4 +1,8 @@
 from StringIO import StringIO
+import time
+
+from twisted.python.logfile import LogFile
+from twisted.python import log
 
 from nevow import rend, loaders, stan
 from nevow.inevow import IRequest
@@ -8,6 +12,26 @@ from nevow import tags as T
 from Pyblio import Store, Registry, Adapter
 from Pyblio.External import PubMed
 from Pyblio.Parsers.Semantic.BibTeX import Writer
+
+querylog = LogFile('queries.log', '.')
+
+def queryObserver(info):
+    if 'msgtype' in info and info['msgtype'] == 'QUERY':
+        try:
+            ts = time.strftime('%Y%m%d %H:%M:%S', time.gmtime(info['time']))
+        except KeyError:
+            ts = '-'
+
+        try:
+            s = info['system'].split(',')[-1]
+        except KeyError:
+            s = '-'
+        
+        base = '%s [%-15s]' % (ts, s)
+        for msg in info['message']:
+            querylog.write('%s %s\n' % (base, msg))
+
+log.addObserver(queryObserver)
 
 Registry.parse_default()
 
@@ -62,7 +86,8 @@ class Page(rend.Page):
             return None
 
         query = query[0].decode('utf-8')
-        
+        log.msg("QUERYING %r" % query, msgtype="QUERY")
+
         s = Registry.getSchema('org.pybliographer/pubmed/0.1')
         db = Store.get('memory').dbcreate(None, s)
 
