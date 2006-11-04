@@ -50,7 +50,8 @@ class Citator(object):
         
         def get_last(name):
             name = root.find(name).text.strip()
-            return name.rsplit('.', 1)
+            idx = name.rfind('.')
+            return name[:idx], name[idx+1:]
         
         self.style = get_last('./citation-style')
         self.keys  = get_last('./key-style')
