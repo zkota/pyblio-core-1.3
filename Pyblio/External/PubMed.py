@@ -145,6 +145,8 @@ class PubMed(object):
             reactor.callLater(0, autofire)
             return results, rs
         
+        stats = {}
+
         def failed(reason):
             results.errback(reason)
         
@@ -159,23 +161,34 @@ class PubMed(object):
                 'query_key': data.find('./QueryKey').text,
                 }
             
-            wanted = min(all_results, maxhits)
+            stats['missing'] = min(all_results, maxhits)
 
-            self.log.debug('%d results, retrieving %d' % (all_results, wanted))
+            self.log.debug('%d results, retrieving %d' % (all_results, stats['missing']))
 
             def fetch(data):
+                # data is None during the initial call to the method,
+                # so that we can reuse the same code.
                 if data is not None:
                     # Process the incoming XML data
+                    previously = len(rs)
                     self.reader.parse(data, self.db, rs)
-                    self._remaining = 0
-                    pass
+                    freshly_parsed = len(rs) - previously
+                    if freshly_parsed <= 0:
+                        self.log.warn("what happend? I increased the result set by %d" % freshly_parsed)
+                        # pretend there has been at least one parsing, so
+                        # that we ensure that the task
+                        # progresses. Otherwise we might loop forever on
+                        # an entry we cannot parse.
+                        freshly_parsed = 1
 
-                if len(rs) >= wanted:
+                    stats['missing'] -= freshly_parsed
+                
+                if stats['missing'] <= 0:
                     results.callback(all_results)
                     return
 
                 # No need to fetch 500 results if only 20 are requested
-                batch = min(self.BATCH_SIZE, wanted - len(rs))
+                batch = min(self.BATCH_SIZE, stats['missing'])
                 
                 d = self._query(self.SRV_FETCH, fetchdata,
                                 retstart=len(rs), retmax=batch)
