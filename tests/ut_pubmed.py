@@ -5,16 +5,7 @@ from twisted.trial import unittest
 from twisted.internet import reactor
 
 from Pyblio.External.PubMed import PubMed
-from Pyblio import Store, Attribute, Registry, init_logging
-
-init_logging()
-log = logging.getLogger('pyblio.import.pubmed')
-log.setLevel(logging.ERROR)
-
-# To activate more debugging:
-#
-# log.setLevel(logging.DEBUG)
-
+from Pyblio import Store, Attribute, Registry
 
 base = os.path.abspath('ut_pubmed')
 

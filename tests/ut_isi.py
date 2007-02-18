@@ -5,8 +5,6 @@ import os, pybut, sys, re
 from Pyblio.Parsers.Semantic import ISI
 from Pyblio import Store, Schema, Registry, init_logging
 
-#init_logging()
-
 class TestISI (pybut.TestCase):
 
     def setUp(self):
@@ -28,14 +26,11 @@ class TestISI (pybut.TestCase):
         return
     
     def testText (self):
-
         self.parse ('ut_isi/text.isi')
         self.db.save ()
 
         pybut.fileeq (self.fn, 'ut_isi/text.xml')
         return
-    
-
 
 suite = pybut.suite (TestISI)
 
