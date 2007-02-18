@@ -28,8 +28,6 @@ def _cleanup ():
         if os.path.isdir (d): shutil.rmtree (d)
         else:                 os.unlink (d)
 
-    
-
 class _WritelnDecorator:
     """Used to decorate file-like objects with a handy 'writeln' method"""
     def __init__(self,stream):
@@ -41,8 +39,6 @@ class _WritelnDecorator:
     def writeln(self, arg=None):
         if arg: self.write("unittest: %s" % arg)
         self.write('\n') # text-mode streams translate to \r\n if needed
-
-
 
 class _TextTestResult(unittest.TestResult):
     """A test result class that can print formatted text results to a stream.
@@ -141,19 +137,16 @@ class TextTestRunner:
 
 
 def suite (* args):
-
     return TestSuite (map (lambda s: makeSuite (s, 'test'), args))
 
 
 def run (full):
-
     _cleanup ()
     
     r = TextTestRunner ()
     r.run (full)
     
     return
-
 
 def fileeq (a, b):
     for f in a, b:
@@ -166,12 +159,14 @@ def fileeq (a, b):
     os.system ("diff '%s' '%s'" % (a, b))
     assert False, '%s and %s differ' % (a, b)
 
+basedir = os.path.dirname(os.path.abspath(__file__))
 _count = 0
+
+def src(name):
+    return os.path.join(basedir, name)
 
 def dbname ():
     global _count
-
     _count = _count + 1
     return ',,db-%d' % _count
 
-            

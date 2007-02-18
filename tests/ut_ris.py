@@ -13,7 +13,7 @@ class TestRIS (pybut.TestCase):
         fd = open (file)
 
         self.fn = pybut.dbname ()
-        s = Schema.Schema ('standard.xml')
+        s = Schema.Schema (pybut.src('standard.xml'))
         self.db = Store.get ('file').dbcreate (self.fn, s)
         
         self.p = RIS.Reader ()
@@ -23,10 +23,10 @@ class TestRIS (pybut.TestCase):
 
     def testText (self):
 
-        self.parse ('ut_ris/text.ris')
+        self.parse (pybut.src('ut_ris/text.ris'))
         self.db.save ()
 
-        pybut.fileeq (self.fn, 'ut_ris/text.xml')
+        pybut.fileeq (self.fn, pybut.src('ut_ris/text.xml'))
         return
     
 

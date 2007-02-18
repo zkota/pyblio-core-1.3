@@ -16,14 +16,14 @@ class TestSchema (pybut.TestCase):
     def testEmpty (self):
         """ Open an empty document """
         
-        s = Schema.Schema ('ut_schema/empty.xml')
+        s = Schema.Schema (pybut.src('ut_schema/empty.xml'))
         assert s == {}
 
 
     def testSimple (self):
         """ Open a simple document """
         
-        s = Schema.Schema ('ut_schema/simple.xml')
+        s = Schema.Schema (pybut.src('ut_schema/simple.xml'))
         
         assert s.has_key ('author')
         assert s.has_key ('url')
@@ -36,7 +36,7 @@ class TestSchema (pybut.TestCase):
     def testDefaultName (self):
         """ Check that the default names are used when no locale is specified """
 
-        a = Schema.Schema ('ut_schema/simple.xml') ['author']
+        a = Schema.Schema (pybut.src('ut_schema/simple.xml')) ['author']
 
         assert a.name == 'Author'
         return
@@ -50,7 +50,7 @@ class TestSchema (pybut.TestCase):
         I18n.lz.lang     = 'en_US'
         I18n.lz.lang_one = 'en'
         
-        a = Schema.Schema ('ut_schema/simple.xml') ['author']
+        a = Schema.Schema (pybut.src('ut_schema/simple.xml')) ['author']
 
         assert a.name == 'Author (en)', a.name
         return
@@ -60,7 +60,7 @@ class TestSchema (pybut.TestCase):
         """ Forbid field duplication """
 
         try:
-            Schema.Schema ('ut_schema/duplicate.xml')
+            Schema.Schema (pybut.src('ut_schema/duplicate.xml'))
             assert False
             
         except Schema.SchemaError, msg:
@@ -72,7 +72,7 @@ class TestSchema (pybut.TestCase):
         for sch in ('simple.xml', 'qualifiers.xml', 'group.xml'):
             file = pybut.dbname ()
 
-            schema = os.path.join ('ut_schema', sch)
+            schema = pybut.src(os.path.join ('ut_schema', sch))
             a = Schema.Schema (schema)
 
             out = open (file, 'w')
@@ -89,7 +89,7 @@ class TestSchema (pybut.TestCase):
         """ Some fields have Txo groups."""
 
         import sys
-        a = Schema.Schema ('ut_schema/group.xml')
+        a = Schema.Schema (pybut.src('ut_schema/group.xml'))
 
         assert a ['toto'].group == 'toto'
 
@@ -112,7 +112,7 @@ class TestSchema (pybut.TestCase):
         file = pybut.dbname ()
         
         import sys
-        a = Schema.Schema ('ut_schema/complex.xml')
+        a = Schema.Schema (pybut.src('ut_schema/complex.xml'))
 
         out = open (file, 'w')
         a.xmlwrite (out)
@@ -120,7 +120,7 @@ class TestSchema (pybut.TestCase):
         
         # both files should be identical
         d1 = open (file).read ()
-        d2 = open ('ut_schema/complex.xml').read ()
+        d2 = open (pybut.src('ut_schema/complex.xml')).read ()
 
         assert d1 == d2
         
@@ -133,7 +133,7 @@ class TestSchema (pybut.TestCase):
 
         from Pyblio import Attribute
         
-        s = Schema.Schema ('ut_schema/types.xml')
+        s = Schema.Schema (pybut.src('ut_schema/types.xml'))
 
         assert s ['url'].type is Attribute.URL
         assert s ['text'].type is Attribute.Text

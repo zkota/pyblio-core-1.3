@@ -1,8 +1,3 @@
 #!/bin/sh
-
-PYTHON=${PYTHON:-python}
-
-${PYTHON} testsuite.py
-
-rm -rf ,,*
+trial ut_*.py
 rm -rf _trial_temp

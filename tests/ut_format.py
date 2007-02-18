@@ -9,7 +9,7 @@ from Pyblio.Format import Person, join, HTML, all, one, A, B, I, BR, DSL, switch
 class TestFormat (pybut.TestCase):
 
     def setUp (self):
-        self.db = Store.get('file').dbopen('ut_format/sample.bip')
+        self.db = Store.get('file').dbopen(pybut.src('ut_format/sample.bip'))
 
         self.rec = self.db[1]
         self.rec ['journal'] = [ ]
@@ -275,7 +275,7 @@ class TestFormat (pybut.TestCase):
 class TestOutput (pybut.TestCase):
 
     def setUp (self):
-        self.db = Store.get('file').dbopen('ut_format/sample.bip')
+        self.db = Store.get('file').dbopen(pybut.src('ut_format/sample.bip'))
 
         self.rec = self.db[1]
         self.rec ['journal'] = [ ]

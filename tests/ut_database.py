@@ -17,7 +17,7 @@ except ImportError, msg:
     skip_bsddb = 'bsddb is missing'
 
 
-class TDatabase(pybut.TestCase):
+class TDatabase(object):
 
     """ Perform tests on the Pyblio.Stores main functions """
 
@@ -114,7 +114,7 @@ class TDatabase(pybut.TestCase):
         self.failUnlessEqual(other.header, msg)
         return
     
-class TContent(pybut.TestCase):
+class TContent(object):
 
     """ Perform data manipulation tests """
 
@@ -624,7 +624,7 @@ class TContent(pybut.TestCase):
 
         return
 
-class BaseView(pybut.TestCase):
+class BaseView(object):
     
     count = 0
     
@@ -852,9 +852,8 @@ class TView(BaseView):
 
         return
 
-class TCallbacks(pybut.TestCase):
+class TCallbacks(object):
     """ Check the proper behavior of callbacks & signals """
-
 
     def setUp (self):
 
@@ -952,7 +951,7 @@ class TCallbacks(pybut.TestCase):
         del self.db[k2]
 
         
-class TCollate(pybut.TestCase):
+class TCollate(object):
 
     def setUp (self):
 
@@ -1036,45 +1035,45 @@ class TestMemoryStore(pybut.TestCase):
             pass
         return
     
-class TestDatabaseFile(TDatabase):
+class TestDatabaseFile(TDatabase, pybut.TestCase):
     fmt = 'file'
 
-class TestContentFile(TContent):
+class TestContentFile(TContent, pybut.TestCase):
     fmt = 'file'
 
-class TestViewFile(TView):
+class TestViewFile(TView, pybut.TestCase):
     fmt = 'file'
 
-class TestOrderingFile(TOrdering):
+class TestOrderingFile(TOrdering, pybut.TestCase):
     fmt = 'file'
 
-class TestCollateFile(TCollate):
+class TestCollateFile(TCollate, pybut.TestCase):
     fmt = 'file'
 
-class TestCallbacksFile(TCallbacks):
+class TestCallbacksFile(TCallbacks, pybut.TestCase):
     fmt = 'file'
 
-class TestDatabaseDB(TDatabase):
+class TestDatabaseDB(TDatabase, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
     
-class TestContentDB(TContent):
+class TestContentDB(TContent, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
 
-class TestViewDB(TView):
+class TestViewDB(TView, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
 
-class TestCollateDB (TCollate):
+class TestCollateDB (TCollate, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
 
-class TestOrderingDB (TOrdering):
+class TestOrderingDB (TOrdering, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
 
-class TestCallbacksDB(TCallbacks):
+class TestCallbacksDB(TCallbacks, pybut.TestCase):
     fmt = 'bsddb'
     skip = skip_bsddb
 
@@ -1095,10 +1094,10 @@ bsddb = [ TestDatabaseDB,
           TestCallbacksDB,
           ]
 
-# in some cases, we cannot check for bsddb (too old)
-if skip_bsddb:
-    suite = pybut.suite (* files)
-else:
-    suite = pybut.suite (* (files + bsddb))
+## # in some cases, we cannot check for bsddb (too old)
+## if skip_bsddb:
+##     suite = pybut.suite (* files)
+## else:
+##     suite = pybut.suite (* (files + bsddb))
 
-if __name__ == '__main__':  pybut.run (suite)
+## if __name__ == '__main__':  pybut.run (suite)

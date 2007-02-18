@@ -5,7 +5,7 @@ from Pyblio import Adapter, Store, Schema, Attribute
 class A2BAdapter(Adapter.OneToOneAdapter):
     """ This adapter renames field 'a' into field 'b' """
 
-    schema = Schema.Schema(open('ut_adapter/b.sip'))
+    schema = Schema.Schema(open(pybut.src('ut_adapter/b.sip')))
 
     def source2target(self, record):
         new = Store.Record()
@@ -28,7 +28,7 @@ class A2BAdapter(Adapter.OneToOneAdapter):
 class TestFromAtoB(pybut.TestCase):
 
     def setUp(self):
-        sa = Schema.Schema(open('ut_adapter/a.sip'))
+        sa = Schema.Schema(open(pybut.src('ut_adapter/a.sip')))
 
         fmt = Store.get('memory')
         self.dba = fmt.dbcreate(None, sa)
@@ -71,18 +71,18 @@ class TestFromAtoB(pybut.TestCase):
         self.dbb.xmlwrite(fd)
         fd.close()
 
-        pybut.fileeq(tmp, 'ut_adapter/saved-b.bip')
+        pybut.fileeq(tmp, pybut.src('ut_adapter/saved-b.bip'))
 
 class TestResolution(pybut.TestCase):
     def testResolveA2B(self):
-        sa = Schema.Schema(open('ut_adapter/a.sip'))
+        sa = Schema.Schema(open(pybut.src('ut_adapter/a.sip')))
 
         fmt = Store.get('memory')
         self.dba = fmt.dbcreate(None, sa)
 
         from Pyblio import Registry
         Registry.reset()
-        Registry.parse('ut_adapter')
+        Registry.parse(pybut.src('ut_adapter'))
 
         dest = Adapter.adapt_schema(self.dba, 'b')
         self.failUnlessEqual(dest.schema.id, 'b')

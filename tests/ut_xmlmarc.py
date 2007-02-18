@@ -25,17 +25,17 @@ class TestImport (pybut.TestCase):
 
         f = pybut.dbname ()
 
-        s = Schema.Schema ('ut_xmlmarc/schema.xml')
+        s = Schema.Schema (pybut.src('ut_xmlmarc/schema.xml'))
         
         db = Store.get ('file').dbcreate (f, s)
 
         self.parser =  XMLMARC.SimpleReader (mapping)
 
-        self.parser.parse (open ('ut_xmlmarc/%s.xml' % base), db)
+        self.parser.parse (open (pybut.src('ut_xmlmarc/%s.xml' % base)), db)
         
         db.save ()
         
-        pybut.fileeq (f, 'ut_xmlmarc/r-%s.xml' % base)
+        pybut.fileeq (f, pybut.src('ut_xmlmarc/r-%s.xml' % base))
 
         Store.get ('file').dbdestroy (f, nobackup = True)
         return

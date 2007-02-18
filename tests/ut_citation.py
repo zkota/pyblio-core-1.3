@@ -19,7 +19,7 @@ class TestGenerateKeys(pybut.TestCase):
     def testAuthorYear(self):
         from Pyblio.Cite.Style.BibTeX import AlphaKey
         
-        db = Store.get('memory').dbimport(None, 'ut_citation/sample.bip')
+        db = Store.get('memory').dbimport(None, pybut.src('ut_citation/sample.bip'))
         g = AlphaKey(db)
 
         res = [g.make_key(uid) for uid in range(1, 7)]
@@ -45,10 +45,10 @@ class TestCitation(pybut.TestCase):
     def setUp(self):
         self.fd = StringIO()
         self.wp = File(self.fd)
-        self.db = Store.get('memory').dbimport(None, 'ut_citation/sample.bip')
+        self.db = Store.get('memory').dbimport(None, pybut.src('ut_citation/sample.bip'))
 
         self.cit = Citator.Citator()
-        self.cit.xmlload('ut_citation/sample.cip')
+        self.cit.xmlload(pybut.src('ut_citation/sample.cip'))
         self.cit.prepare(self.db, self.wp)
 
     def testInsert(self):

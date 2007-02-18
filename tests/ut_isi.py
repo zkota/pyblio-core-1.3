@@ -19,17 +19,17 @@ class TestISI (pybut.TestCase):
         fd = open (file)
 
         self.fn = pybut.dbname ()
-        self.db = Store.get ('file').dbcreate (self.fn, schema)
+        self.db = Store.get('file').dbcreate (self.fn, schema)
         
         self.p = ISI.Reader()
-        self.p.parse (fd, self.db)
+        self.p.parse(fd, self.db)
         return
     
     def testText (self):
-        self.parse ('ut_isi/text.isi')
+        self.parse(pybut.src('ut_isi/text.isi'))
         self.db.save ()
 
-        pybut.fileeq (self.fn, 'ut_isi/text.xml')
+        pybut.fileeq(self.fn, pybut.src('ut_isi/text.xml'))
         return
 
 suite = pybut.suite (TestISI)

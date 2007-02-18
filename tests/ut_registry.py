@@ -6,7 +6,7 @@ class TestRegistry (pybut.TestCase):
 
     def setUp(self):
         Registry.reset()
-        Registry.parse('ut_registry')
+        Registry.parse(pybut.src('ut_registry'))
         return
 
     def testSchemas(self):

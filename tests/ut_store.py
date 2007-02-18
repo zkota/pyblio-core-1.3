@@ -21,33 +21,33 @@ class TestStore (pybut.TestCase):
     def testEmpty (self):
         """ Create an empty database with a schema """
 
-        schema = Schema.Schema (os.path.join ('ut_store', 's_simple.xml'))
+        schema = Schema.Schema (pybut.src(os.path.join ('ut_store', 's_simple.xml')))
 
         db = Store.get ('file').dbcreate (self.f, schema)
         db.save ()
         
         assert len (db.entries) == 0
 
-        pybut.fileeq (self.f, 'ut_store/empty.xml')
+        pybut.fileeq (self.f, pybut.src('ut_store/empty.xml'))
         return
 
     def testReadEmpty (self):
         """ A schema in a database is equivalent to outside the database """
         
-        db = Store.get ('file').dbopen ('ut_store/empty.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/empty.xml'))
 
         file = open (self.f, 'w')
         db.schema.xmlwrite (file)
         file.close ()
 
-        pybut.fileeq (self.f, os.path.join ('ut_store', 's_simple.xml'))
+        pybut.fileeq (self.f, pybut.src(os.path.join ('ut_store', 's_simple.xml')))
         
         return
 
     def testWrite (self):
         """ A new database can be saved with its schema """
 
-        schema = Schema.Schema (os.path.join ('ut_store', 's_full.xml'))
+        schema = Schema.Schema (pybut.src(os.path.join ('ut_store', 's_full.xml')))
         db = Store.get ('file').dbcreate (self.f, schema)
         
         e = Store.Record ()
@@ -86,53 +86,53 @@ class TestStore (pybut.TestCase):
         
         db.save ()
 
-        pybut.fileeq (self.f, 'ut_store/simple.xml')
+        pybut.fileeq (self.f, pybut.src('ut_store/simple.xml'))
         return
 
 
     def testRead (self):
         """ A database can be read and saved again identically """
 
-        db = Store.get ('file').dbopen ('ut_store/simple.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/simple.xml'))
 
         fd = open (self.f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (self.f, 'ut_store/simple.xml')
+        pybut.fileeq (self.f, pybut.src('ut_store/simple.xml'))
         return
 
     def testQualifiedRead (self):
         """ A database with qualified fields can be read and saved again identically """
         
-        db = Store.get ('file').dbopen ('ut_store/qualified.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/qualified.xml'))
 
         fd = open (self.f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (self.f, 'ut_store/qualified.xml')
+        pybut.fileeq (self.f, pybut.src('ut_store/qualified.xml'))
         return
 
     def testTxoFromSchema (self):
         """ A database with taxonomy fields in the schema can be read and saved, the txo become part of the db """
 
         tmp = pybut.dbname()
-        s = Schema.Schema('ut_store/taxoschema.xml')
+        s = Schema.Schema(pybut.src('ut_store/taxoschema.xml'))
         db = Store.get('file').dbcreate(tmp,s)
 
         fd = open (self.f, 'w')
         db.xmlwrite (fd)
         fd.close ()
 
-        pybut.fileeq (self.f, 'ut_store/taxoschemadb.xml')
+        pybut.fileeq (self.f, pybut.src('ut_store/taxoschemadb.xml'))
         return
 
     def testValidate (self):
 
         from Pyblio.Exceptions import SchemaError
         
-        schema = Schema.Schema (os.path.join ('ut_store', 's_validate.xml'))
+        schema = Schema.Schema (pybut.src(os.path.join ('ut_store', 's_validate.xml')))
         db = Store.get ('file').dbcreate (self.f, schema)
 
         def fail(e):
@@ -230,7 +230,7 @@ class TestStore (pybut.TestCase):
 
     def testValidateTxoCleanup (self):
 
-        db = Store.get ('file').dbopen ('ut_store/nasty-txo.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/nasty-txo.xml'))
 
         # check that unnecessary txo items are removed
         g = db.schema.txo ['a']
@@ -251,7 +251,7 @@ class TestStore (pybut.TestCase):
 
     def testResultSet (self):
 
-        db = Store.get ('file').dbopen ('ut_store/resultset.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/resultset.xml'))
 
         ks = db.rs [1]
         assert ks.name == 'gronf'
@@ -263,7 +263,7 @@ class TestStore (pybut.TestCase):
 
 
     def testAddSimple (self):
-        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')
+        db = Store.get ('file').dbopen (pybut.src('ut_store/addsimple.xml'))
 
         rec = Store.Record ()
         
@@ -287,7 +287,7 @@ class TestStore (pybut.TestCase):
 
 
     def testAddTextQualifiersBizarrOrder (self):
-        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        db = Store.get ('file').dbopen (pybut.src('ut_store/addsimple.xml'))
         rec = Store.Record ()
         
         rec.add ('text.qtext', 'some stuff', Attribute.Text)
@@ -314,7 +314,7 @@ class TestStore (pybut.TestCase):
 
 
     def testAddAuthorQualifiers (self):
-        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        db = Store.get ('file').dbopen (pybut.src('ut_store/addsimple.xml'))
         rec = Store.Record ()
 
         rec.add ('author', {'last':'Karlen', 'first':'Michael'}, Attribute.Person)                
@@ -339,7 +339,7 @@ class TestStore (pybut.TestCase):
 
 
     def testAddQualifiersFirst (self):
-        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        db = Store.get ('file').dbopen (pybut.src('ut_store/addsimple.xml'))
         rec = Store.Record ()
         
         rec.add ('text.qtext', 'some stuff', Attribute.Text)
@@ -361,7 +361,7 @@ class TestStore (pybut.TestCase):
 
 
     def testAddOnlyQualifiers (self):
-        db = Store.get ('file').dbopen ('ut_store/addsimple.xml')        
+        db = Store.get ('file').dbopen (pybut.src('ut_store/addsimple.xml'))
         rec = Store.Record ()
 
         rec.add ('text.qtext', 'some stuff', Attribute.Text)
