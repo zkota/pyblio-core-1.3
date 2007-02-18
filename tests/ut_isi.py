@@ -5,7 +5,7 @@ import os, pybut, sys, re
 from Pyblio.Parsers.Semantic import ISI
 from Pyblio import Store, Schema, Registry, init_logging
 
-# init_logging()
+#init_logging()
 
 class TestISI (pybut.TestCase):
 

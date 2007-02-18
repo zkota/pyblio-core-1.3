@@ -43,8 +43,14 @@
    <attribute id="abbrev" type="text">
     <name>Abbreviated name</name>
    </attribute>
+   <attribute id="issn" type="id">
+    <name>ISSN</name>
+   </attribute>
+   <attribute id="number" type="text">
+    <name>Number</name>
+   </attribute>
    <attribute id="pages" type="text">
-    <name>Series</name>
+    <name>Pages</name>
    </attribute>
    <attribute id="series" type="text">
     <name>Series</name>
@@ -229,9 +235,18 @@ solely by perturbing the current density profile.</text>
   <attribute id="source">
    <text>
     <content>PHYSICAL REVIEW LETTERS</content>
+    <attribute id="volume">
+     <text>94</text>
+    </attribute>
     <attribute id="abbrev">
      <text>PHYS REV LETT</text>
      <text>Phys. Rev. Lett.</text>
+    </attribute>
+    <attribute id="issn">
+     <id value="0031-9007"/>
+    </attribute>
+    <attribute id="number">
+     <text>10</text>
     </attribute>
     <attribute id="year">
      <text>2005</text>
@@ -295,15 +310,24 @@ extrapolated to ignited conditions.</text>
   <attribute id="source">
    <text>
     <content>NUCLEAR FUSION</content>
+    <attribute id="issn">
+     <id value="0029-5515"/>
+    </attribute>
+    <attribute id="number">
+     <text>2</text>
+    </attribute>
+    <attribute id="volume">
+     <text>45</text>
+    </attribute>
     <attribute id="abbrev">
      <text>NUCL FUSION</text>
      <text>Nucl. Fusion</text>
     </attribute>
-    <attribute id="pages">
-     <text>L1-L4</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>L1-L4</text>
     </attribute>
    </text>
   </attribute>
@@ -357,15 +381,24 @@ All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>25-29</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>25-29</text>
     </attribute>
    </text>
   </attribute>
@@ -403,15 +436,24 @@ deposition zone. (c) 2004 Published by Elsevier B.V.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>99-103</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>99-103</text>
     </attribute>
    </text>
   </attribute>
@@ -481,15 +523,24 @@ the SOL flow. (c) 2004 Elsevier B.V. All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>146-153</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>146-153</text>
     </attribute>
    </text>
   </attribute>
@@ -551,15 +602,24 @@ All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>241-245</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>241-245</text>
     </attribute>
    </text>
   </attribute>
@@ -614,15 +674,24 @@ ASYMMETRIES</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>271-275</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>271-275</text>
     </attribute>
    </text>
   </attribute>
@@ -671,15 +740,24 @@ conduction. (c) 2004 Elsevier B.V. All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>305-309</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>305-309</text>
     </attribute>
    </text>
   </attribute>
@@ -749,15 +827,24 @@ are discussed. (c) 2004 Elsevier B.V. All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>669-676</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>669-676</text>
     </attribute>
    </text>
   </attribute>
@@ -849,15 +936,24 @@ rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>677-683</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>677-683</text>
     </attribute>
    </text>
   </attribute>
@@ -908,15 +1004,24 @@ shifts. (c) 2004 Elsevier B.V. All rights reserved.</text>
   <attribute id="source">
    <text>
     <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="issn">
+     <id value="0022-3115"/>
+    </attribute>
+    <attribute id="number">
+     <text>1-3</text>
+    </attribute>
+    <attribute id="volume">
+     <text>337-39</text>
+    </attribute>
     <attribute id="abbrev">
      <text>J NUCL MATER</text>
      <text>J. Nucl. Mater.</text>
     </attribute>
-    <attribute id="pages">
-     <text>747-750</text>
-    </attribute>
     <attribute id="year">
      <text>2005</text>
+    </attribute>
+    <attribute id="pages">
+     <text>747-750</text>
     </attribute>
    </text>
   </attribute>

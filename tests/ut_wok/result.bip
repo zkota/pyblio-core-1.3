@@ -43,8 +43,14 @@
    <attribute id="abbrev" type="text">
     <name>Abbreviated name</name>
    </attribute>
+   <attribute id="issn" type="id">
+    <name>ISSN</name>
+   </attribute>
+   <attribute id="number" type="text">
+    <name>Number</name>
+   </attribute>
    <attribute id="pages" type="text">
-    <name>Series</name>
+    <name>Pages</name>
    </attribute>
    <attribute id="series" type="text">
     <name>Series</name>

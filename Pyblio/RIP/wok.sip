@@ -45,13 +45,19 @@
        <name>Series</name>
      </attribute>
      <attribute id="pages" type="text">
-       <name>Series</name>
+       <name>Pages</name>
      </attribute>
      <attribute id="volume" type="text">
        <name>Volume</name>
      </attribute>
+     <attribute id="number" type="text">
+       <name>Number</name>
+     </attribute>
      <attribute id="year" type="text">
        <name>Year</name>
+     </attribute>
+     <attribute id="issn" type="id">
+       <name>ISSN</name>
      </attribute>
    </qualifiers>
  </attribute>

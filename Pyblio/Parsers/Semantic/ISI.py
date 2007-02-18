@@ -88,6 +88,22 @@ class Reader(ISI.Reader):
         # publication year
         self.record.add('source.year', data, Attribute.Text)
 
+    def do_SE(self, line, tag, data):
+        # series
+        self.record.add('source.series', data, Attribute.Text)
+
+    def do_VL(self, line, tag, data):
+        # volume
+        self.record.add('source.volume', data, Attribute.Text)
+
+    def do_IS(self, line, tag, data):
+        # number (issue)
+        self.record.add('source.number', data, Attribute.Text)
+
+    def do_SN(self, line, tag, data):
+        # ISSN
+        self.record.add('source.issn', data, Attribute.ID)
+
     def do_C1(self, line, tag, data):
         # authors' addresses
         pass
@@ -99,8 +115,11 @@ class Reader(ISI.Reader):
         self._page_start = data
     def do_EP(self, line, tag, data):
         if self._page_start is not None:
-            self.record.add('source.pages', '%s-%s' % (self._page_start, data),
-                            Attribute.Text)
+            if self._page_start == data:
+                page_range = data
+            else:
+                page_range = self._page_start + '-' + data
+            self.record.add('source.pages', page_range, Attribute.Text)
 
     def do_default(self, line, tag, data):
         try:
