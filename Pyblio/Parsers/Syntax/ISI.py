@@ -1,12 +1,32 @@
+# This file is part of pybliographer
+# 
+# Copyright (C) 1998-2006 Frederic GOBRY
+# Email : gobry@pybliographer.org
+# 	   
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2 
+# of the License, or (at your option) any later version.
+#   
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details. 
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+"""
+Parser for the ISI file format.
+"""
+
 from Pyblio.Parsers.Syntax import Tagged
 from Pyblio import Attribute
+from Pyblio.Exceptions import ParserError
 
 from gettext import gettext as _
 
 import re, string
-
-# DEBUG
-import pprint
 
 start_re = re.compile (r'^(\w\w)\s(.*?)\r?$')
 contd_re = re.compile (r'^\s{3,3}(.*?)\r?$')
@@ -48,7 +68,7 @@ class ISIParser (Tagged.Parser):
 
         if line == 'EF': return
 
-        raise SyntaxError (_('line %d: unexpected data: %s') % (count, repr (line)))
+        raise ParserError(_('line %d: unexpected data: %s') % (count, repr (line)))
 
 
 def _mkperson (txt):
@@ -68,37 +88,32 @@ def _mkperson (txt):
 
 
 class Reader(Tagged.Reader):
-
-    """ The importer knows how to map the RIS fields to the 'standard'
-    pyblio model."""
+    """This reader has no knowledge of an actual scheme to map the
+    fields to.  Check Pyblio.Parsers.Semantic.ISI for a parser that
+    knows the actual ISI fields.
+    """
 
     Parser = ISIParser
 
     mapping = {}
 
-
-    def person_add (self, field, value):
-
+    def person_add(self, field, value):
         ''' Parse a person name in ISI format '''
 
         self.record [field] = [ _mkperson (txt) for txt in value.split ('\n') ]
         return
 
 
-    def do_default (self, line, tag, data):
-
+    def do_default(self, line, tag, data):
         try:
-            meth, field = self.mapping [tag]
-
+            meth, field = self.mapping[tag]
         except KeyError:
-
-            raise SyntaxError (_("line %s: unknown tag '%s'") % (line, tag))
+            raise ParserError(_("line %s: unknown tag '%s'") % (line, tag))
 
         except ValueError:
-
             self.emit ('warning',
                        (_("line %s: unsupported tag '%s'") % (line, tag)))
             return
 
-        meth (self, field, data)
+        meth(self, field, data)
         return

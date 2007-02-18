@@ -2,45 +2,31 @@
 
 import os, pybut, sys, re
 
-from Pyblio.Parsers.Syntax import ISI, Tagged
-from Pyblio import Store, Schema
+from Pyblio.Parsers.Semantic import ISI
+from Pyblio import Store, Schema, Registry, init_logging
 
-class Reader (ISI.Reader):
-
-    def __init__ (self):
-        ISI.Reader.__init__ (self)
-        
-        self.mapping = {
-            'TI': (self.text_add,   'title'),
-            'AU': (self.person_add, 'author'),
-            }
-
-    def do_default (self, line, tag, data):
-
-        try:
-            meth, field = self.mapping [tag]
-        except KeyError:
-            return
-        
-        meth (field, data)
-        return
-
+# init_logging()
 
 class TestISI (pybut.TestCase):
 
-    def parse (self, file):
+    def setUp(self):
+        Registry.parse_default()
 
+    def tearDown(self):
+        Registry.reset()
+
+    def parse (self, file):
+        schema = Registry.getSchema("org.pybliographer/wok/0.1")
+        
         fd = open (file)
 
         self.fn = pybut.dbname ()
-        s = Schema.Schema ('standard.xml')
-        self.db = Store.get ('file').dbcreate (self.fn, s)
+        self.db = Store.get ('file').dbcreate (self.fn, schema)
         
-        self.p = Reader ()
+        self.p = ISI.Reader()
         self.p.parse (fd, self.db)
         return
     
-
     def testText (self):
 
         self.parse ('ut_isi/text.isi')

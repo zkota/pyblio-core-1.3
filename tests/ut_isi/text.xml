@@ -1,73 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <pyblio-db>
-<pyblio-schema>
+<pyblio-schema id="org.pybliographer/wok/0.1">
+ <name>Data from Web of Knowledge</name>
+
  <attribute id="abstract" type="text">
   <name>Abstract</name>
  </attribute>
 
+ <attribute id="article_no" type="text">
+  <name>Article #</name>
+ </attribute>
+
  <attribute id="author" type="person">
-  <name>Author</name>
- </attribute>
-
- <attribute id="city" type="text">
-  <name>City</name>
- </attribute>
-
- <attribute id="date" type="date">
-  <name>Date</name>
+  <name>Authors</name>
  </attribute>
 
  <attribute id="doctype" type="txo" group="doctype">
-  <name>Document Type</name>
+  <name>Document type</name>
  </attribute>
 
- <attribute id="id" type="id">
-  <name>External Identifier</name>
+ <attribute id="doi" type="id">
+  <name>DOI</name>
  </attribute>
 
- <attribute id="isbn" type="text">
-  <name>ISBN</name>
+ <attribute id="keyword" type="text">
+  <name>Keywords</name>
  </attribute>
 
- <attribute id="issn" type="text">
-  <name>ISSN</name>
+ <attribute id="keyword-plus" type="text">
+  <name>ISI-Generated Keywords</name>
  </attribute>
 
- <attribute id="issue" type="text">
-  <name>Issue</name>
+ <attribute id="ref" type="id">
+  <name>References</name>
  </attribute>
 
- <attribute id="journal" type="text">
-  <name>Journal</name>
- </attribute>
+ <attribute id="source" type="text">
+  <name>Source Title</name>
 
- <attribute id="note" type="text">
-  <name>Note</name>
- </attribute>
-
- <attribute id="pages" type="text">
-  <name>Pages</name>
- </attribute>
-
- <attribute id="publisher" type="text">
-  <name>Publisher</name>
+  <qualifiers>
+   <attribute id="abbrev" type="text">
+    <name>Abbreviated name</name>
+   </attribute>
+   <attribute id="pages" type="text">
+    <name>Series</name>
+   </attribute>
+   <attribute id="series" type="text">
+    <name>Series</name>
+   </attribute>
+   <attribute id="volume" type="text">
+    <name>Volume</name>
+   </attribute>
+   <attribute id="year" type="text">
+    <name>Year</name>
+   </attribute>
+  </qualifiers>
  </attribute>
 
  <attribute id="title" type="text">
   <name>Title</name>
  </attribute>
 
- <attribute id="url" type="url">
-  <name>URL</name>
+ <attribute id="ut" type="id">
+  <name>ISI unique identifier</name>
  </attribute>
 
- <attribute id="volume" type="text">
-  <name>Volume</name>
- </attribute>
+ <txo-group id="doctype">
+  <txo-item id="1">
+   <name>Abstract of Published Item</name>
+   <name lang="C">2</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>Art Exhibit Review</name>
+   <name lang="C">A</name>
+  </txo-item>
+  <txo-item id="3">
+   <name>Article</name>
+   <name lang="C">@</name>
+  </txo-item>
+  <txo-item id="4">
+   <name>Bibliography</name>
+   <name lang="C">7</name>
+  </txo-item>
+  <txo-item id="5">
+   <name>Biographical Item</name>
+   <name lang="C">I</name>
+  </txo-item>
+  <txo-item id="6">
+   <name>Book review</name>
+   <name lang="C">B</name>
+  </txo-item>
+  <txo-item id="7">
+   <name>Chronology</name>
+   <name lang="C">K</name>
+  </txo-item>
+  <txo-item id="8">
+   <name>Correction</name>
+   <name lang="C">C</name>
+  </txo-item>
+  <txo-item id="9">
+   <name>Dance Performance Review</name>
+   <name lang="C">Z</name>
+  </txo-item>
+  <txo-item id="10">
+   <name>Database Review</name>
+   <name lang="C">0</name>
+  </txo-item>
+  <txo-item id="11">
+   <name>Discussion</name>
+   <name lang="C">D</name>
+  </txo-item>
+  <txo-item id="12">
+   <name>Editorial Material</name>
+   <name lang="C">E</name>
+  </txo-item>
+  <txo-item id="13">
+   <name>Excerpt</name>
+   <name lang="C">X</name>
+  </txo-item>
+  <txo-item id="14">
+   <name>Fiction, Creative Prose</name>
+   <name lang="C">O</name>
+  </txo-item>
+  <txo-item id="15">
+   <name>Film Review</name>
+   <name lang="C">F</name>
+  </txo-item>
+  <txo-item id="16">
+   <name>Hardware Review</name>
+   <name lang="C">8</name>
+  </txo-item>
+  <txo-item id="17">
+   <name>Letter</name>
+   <name lang="C">L</name>
+  </txo-item>
+  <txo-item id="18">
+   <name>Meeting Abstract</name>
+   <name lang="C">M</name>
+  </txo-item>
+  <txo-item id="19">
+   <name>Music Performance Review</name>
+   <name lang="C">J</name>
+  </txo-item>
+  <txo-item id="20">
+   <name>Music Score</name>
+   <name lang="C">S</name>
+  </txo-item>
+  <txo-item id="21">
+   <name>Music Score Review</name>
+   <name lang="C">G</name>
+  </txo-item>
+  <txo-item id="22">
+   <name>News item</name>
+   <name lang="C">5</name>
+  </txo-item>
+  <txo-item id="23">
+   <name>Note</name>
+   <name lang="C">N</name>
+  </txo-item>
+  <txo-item id="24">
+   <name>Poetry</name>
+   <name lang="C">Y</name>
+  </txo-item>
+  <txo-item id="25">
+   <name>Record Review</name>
+   <name lang="C">H</name>
+  </txo-item>
+  <txo-item id="26">
+   <name>Reprint</name>
+   <name lang="C">6</name>
+  </txo-item>
+  <txo-item id="27">
+   <name>Review</name>
+   <name lang="C">R</name>
+  </txo-item>
+  <txo-item id="28">
+   <name>Script</name>
+   <name lang="C">Q</name>
+  </txo-item>
+  <txo-item id="29">
+   <name>Software Review</name>
+   <name lang="C">9</name>
+  </txo-item>
+  <txo-item id="30">
+   <name>TV Review, Radio Review</name>
+   <name lang="C">V</name>
+  </txo-item>
+  <txo-item id="31">
+   <name>Theater Review</name>
+   <name lang="C">T</name>
+  </txo-item>
+ </txo-group>
 
 </pyblio-schema>
  <entry id="1">
+  <attribute id="abstract">
+   <text>Improved electron energy confinement in tokamak plasmas, related to
+internal transport barriers, has been linked to nonmonotonic current
+density profiles. This is difficult to prove experimentally since
+usually the current profiles evolve continuously and current injection
+generally requires significant input power. New experiments are
+presented, in which the inductive current is used to generate positive
+and negative current density perturbations in the plasma center, with
+negligible input power. These results demonstrate unambiguously for the
+first time that the electron confinement can be modified significantly
+solely by perturbing the current density profile.</text>
+  </attribute>
   <attribute id="author">
    <person first="O" last="Sauter"/>
    <person first="S" last="Coda"/>
@@ -80,12 +219,52 @@
    <person first="P" last="Nikkola"/>
    <person first="C" last="Zucca"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>BOOTSTRAP CURRENT</text>
+   <text>TCV TOKAMAK</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>PHYSICAL REVIEW LETTERS</content>
+    <attribute id="abbrev">
+     <text>PHYS REV LETT</text>
+     <text>Phys. Rev. Lett.</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Inductive current density perturbations to probe electron internal
 transport barriers in tokamaks</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227838900030"/>
+  </attribute>
  </entry>
  <entry id="2">
+  <attribute id="abstract">
+   <text>Results from an extensive database analysis of JET density profiles in
+stationary conditions show that the density peaking factor n(e0)/&lt;
+n(e)&gt; in JET H modes increases from near 1.2 at high collisionality to
+around 1.5 as the plasma collisionality decreases towards the values
+expected for ITER. This result confirms an earlier observation on AUG.
+The density peaking behaviour of L modes is remarkably different from
+that of H modes, scaling with overall plasma shear as (n(e0)/&lt; n(e)&gt;
+similar to 1.5l(i)), independently of collisionality. H-mode density
+profiles show no shear dependence, except at the lowest
+collisionalities. No evidence for L-Te, L-Ti, rho* or beta dependences
+has been obtained. Carbon impurity density profiles from charge
+exchange spectroscopy are always less peaked than electron density
+profiles and usually flat in H modes. The peaking of the electron
+density profiles, together with the flatness of the impurity density
+profiles, are favourable for fusion performance if they can be
+extrapolated to ignited conditions.</text>
+  </attribute>
   <attribute id="author">
    <person first="H" last="Weisen"/>
    <person first="A" last="Zabolotsky"/>
@@ -100,12 +279,55 @@ transport barriers in tokamaks</text>
    <person first="L" last="Zabeo"/>
    <person first="KD" last="Zastrow"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>L-MODE PLASMAS</text>
+   <text>PARTICLE PINCH</text>
+   <text>ASDEX UPGRADE</text>
+   <text>INVERSION</text>
+   <text>TOKAMAK</text>
+   <text>PROFILE</text>
+   <text>SHAPE</text>
+   <text>TCV</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>NUCLEAR FUSION</content>
+    <attribute id="abbrev">
+     <text>NUCL FUSION</text>
+     <text>Nucl. Fusion</text>
+    </attribute>
+    <attribute id="pages">
+     <text>L1-L4</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Collisionality and shear dependences of density peaking in JET and
 extrapolation to ITER</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227818500001"/>
+  </attribute>
  </entry>
  <entry id="3">
+  <attribute id="abstract">
+   <text>JET plasmas with reverse magnetic field feature a different SOL flow
+than those with normal field. The observed carbon fuelling efficiency
+from injecting methane gas was similar in reverse and normal field.
+EDGE2D modeling used an externally applied force to create the SOL
+flows, without specifying the origin of the force. The resulting flow
+agreed reasonably with the experimental values between the separatrix
+and 4 cm mid-plane depth in the SOL. The effect of the flow on the
+calculated carbon screening was 5-15% higher carbon fuelling efficiency
+for the low flow velocity with reverse field. (c) 2004 Elsevier B.V.
+All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="JD" last="Strachan"/>
    <person first="B" last="Alper"/>
@@ -119,11 +341,50 @@ extrapolation to ITER</text>
    <person first="J" last="Spence"/>
    <person first="M" last="Stamp"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>SCRAPE-OFF LAYER</text>
+   <text>DIII-D</text>
+   <text>IMPURITIES</text>
+   <text>TRANSPORT</text>
+   <text>DIVERTOR</text>
+   <text>PLASMAS</text>
+   <text>JT-60U</text>
+   <text>EDGE</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>25-29</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Methane screening in JET reverse field experiments</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500005"/>
+  </attribute>
  </entry>
  <entry id="4">
+  <attribute id="abstract">
+   <text>Divertor surface temperatures are significantly affected by the
+presence of deposited surface layers. This phenomenon can be used to
+monitor deposited layer evolution on a shot-by-shot basis. It was found
+that during an experimental campaign where the B x del B direction was
+reversed that the outer target, normally an erosion zone, became a
+deposition zone. (c) 2004 Published by Elsevier B.V.</text>
+  </attribute>
   <attribute id="author">
    <person first="P" last="Andrew"/>
    <person first="JP" last="Coad"/>
@@ -136,12 +397,47 @@ extrapolation to ITER</text>
    <person first="RA" last="Pitts"/>
    <person first="MF" last="Stamp"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>99-103</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Outer divertor target deposited layers during reversed magnetic field
 operation in JET</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500020"/>
+  </attribute>
  </entry>
  <entry id="5">
+  <attribute id="abstract">
+   <text>Asymmetries are a ubiquitous feature of the scrape-off layer (SOL) and
+divertor plasmas in any tokamak and are thought to be driven primarily
+by a variety of drift flows, the directions of which reverse with
+reversal of the main toroidal field. The understanding of precisely how
+these field dependent drifts combine to yield any given experimental
+observation is still very much incomplete. A recent campaign of
+reversed field operation at JET designed to match a variety of
+discharges to their more frequently executed forward field counterparts
+has been executed in an attempt to contribute to this understanding.
+This paper summarises the most important findings from these
+experiments and includes some new EDGE2D simulation results describing
+the SOL flow. (c) 2004 Elsevier B.V. All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="RA" last="Pitts"/>
    <person first="P" last="Andrew"/>
@@ -167,11 +463,62 @@ operation in JET</text>
    <person first="JD" last="Strachan"/>
    <person first="E" last="Tsitrone"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>SCRAPE-OFF LAYER</text>
+   <text>BOUNDARY PLASMA</text>
+   <text>MODELS</text>
+   <text>TOKAMAK</text>
+   <text>SOL</text>
+   <text>ASYMMETRIES</text>
+   <text>PARTICLE</text>
+   <text>DRIFTS</text>
+   <text>JT-60U</text>
+   <text>FLOW</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>146-153</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Edge and divertor physics with reversed toroidal field in JET</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500029"/>
+  </attribute>
  </entry>
  <entry id="6">
+  <attribute id="abstract">
+   <text>The effect of field reversal on the JET MkIIGB-SRP divertor performance
+has been investigated in L-mode density limit discharges. These
+experiments show that the direction of the magnetic field has a
+substantial effect on divertor physics, modifying the character of
+detachment and density limits. Reversal of the ion del B-drift
+direction away from the X-point results in a reduction of the density
+limit of about 15%. In contrast to forward field direction, the
+divertor parameters such as density and temperature as well as divertor
+radiation distribution and power at the divertor target become more
+symmetrical in the discharges with reversed field. The influence of
+different field configurations on the divertor performance has been
+analysed with respect to the dependence on density and heating power.
+The experimental observations of out-in asymmetry in target power as
+well as in the CIII-emission distribution is consistent with EDGE2D
+simulations, which include the effect of drifts. (c) 2004 Elsevier B.V.
+All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="A" last="Huber"/>
    <person first="J" last="Rapp"/>
@@ -191,12 +538,54 @@ operation in JET</text>
    <person first="G" last="Sergienko"/>
    <person first="M" last="Stamp"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>DIII-D</text>
+   <text>PLASMA</text>
+   <text>BEHAVIOR</text>
+   <text>PARTICLE</text>
+   <text>EDGE</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>241-245</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>The effect of field reversal on the JET MkIIGB-SRP divertor performance
 in L-mode density limit discharges</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500047"/>
+  </attribute>
  </entry>
  <entry id="7">
+  <attribute id="abstract">
+   <text>EDGE2D simulations show that high SOL flows can be generated when an
+additional radial convective transport is applied in the SOL and
+pedestal region along with a 'ballooning-like' poloidal variation in
+transport. This model produces an inward particle flux at the inboard
+side of the plasma along with an enhanced outward flux at the outer
+midplane. Parallel Mach numbers can be produced at the top of the
+machine which are comparable in magnitude to those observed by the JET
+Mach probes. For the normal toroidal magnetic field direction, the
+parallel flow Mach number is about M = 0.32 in this case. Applying
+these two additional mechanisms also allows experimental outer to inner
+target power and out-in divertor line emission intensity asymmetries to
+be qualitatively reproduced. (c) 2004 Elsevier B.V. All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="GS" last="Kirnev"/>
    <person first="G" last="Corrigan"/>
@@ -206,12 +595,56 @@ in L-mode density limit discharges</text>
    <person first="GF" last="Matthews"/>
    <person first="RA" last="Pitts"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>SCRAPE-OFF-LAYER</text>
+   <text>PLASMA-FLOW</text>
+   <text>POLOIDAL ASYMMETRIES</text>
+   <text>TARGET
+ASYMMETRIES</text>
+   <text>TOKAMAK</text>
+   <text>TRANSPORT</text>
+   <text>JT-60U</text>
+   <text>TURBULENCE</text>
+   <text>PARTICLE</text>
+   <text>FLUXES</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>271-275</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>EDGE2D code simulations of SOL flows and in-out divertor asymmetries in
 JET</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500053"/>
+  </attribute>
  </entry>
  <entry id="8">
+  <attribute id="abstract">
+   <text>The toroidal field and plasma current were reversed in recent JET
+experiments to yield a large number of good forward-reversed matched
+pairs. The direction, magnitude and scaling of the poloidal energy
+transport in the SOL can be explained by (neo-)classical drift-related
+heat fluxes (E x B and/or B x del T) whose relative contribution scales
+as rho(0s)/lambda(T sigma). Radial energy transport is largely
+independent of the B x del B direction, consistent with classical ion
+conduction. (c) 2004 Elsevier B.V. All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="W" last="Fundamenski"/>
    <person first="P" last="Andrew"/>
@@ -223,11 +656,57 @@ JET</text>
    <person first="V" last="Riccardo"/>
    <person first="S" last="Sipila"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>ELMY H-MODES</text>
+   <text>DIVERTOR</text>
+   <text>PLASMA</text>
+   <text>FIELD</text>
+   <text>ASYMMETRIES</text>
+   <text>PROFILES</text>
+   <text>REVERSAL</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>305-309</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Effect of B x del B direction on SOL energy transport in JET</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500060"/>
+  </attribute>
  </entry>
  <entry id="9">
+  <attribute id="abstract">
+   <text>A comparative analysis of the spatial and temporal characteristics of
+transient energy loads (ELMs and disruptions) on plasma facing
+components (PFCs) in present tokamak devices and their extrapolation to
+next step devices is presented. Type I ELMs lead to the expulsion of
+energy by the plasma in helical structures with ballooning-like
+features and toroidal numbers in the range n = 10-15. The plasma energy
+is transported towards the divertor and the main chamber PFCs leading
+to significant transient energy loads at these two locations on small
+wetted area. The largest transient energy fluxes onto PFCs in tokamaks
+are measured during the thermal quench of disruptions. These fluxes do
+not exceed greatly those of large Type I ELMs, due to the much larger
+wetted area for energy flux during the thermal quench compared to Type
+I ELMs. The implications of these findings for the next step devices
+are discussed. (c) 2004 Elsevier B.V. All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="T" last="Eich"/>
    <person first="A" last="Herrmann"/>
@@ -252,12 +731,59 @@ JET</text>
    <person first="V" last="Riccardo"/>
    <person first="C" last="Silva"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>EDGE LOCALIZED MODES</text>
+   <text>SCRAPE-OFF LAYER</text>
+   <text>PARTICLE LOSSES</text>
+   <text>DIII-D</text>
+   <text>ASDEX-UPGRADE</text>
+   <text>HEAT-FLUX</text>
+   <text>H-MODES</text>
+   <text>ENERGY</text>
+   <text>JET</text>
+   <text>ITER</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>669-676</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Power deposition onto plasma facing components in poloidal divertor
 tokamaks during type-I ELMS and disruptions</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500133"/>
+  </attribute>
  </entry>
  <entry id="10">
+  <attribute id="abstract">
+   <text>The paper reviews recent theoretical and experimental results focussing
+on the identification of the key factors controlling ELM energy and
+particle losses both in natural ELMs and in the presence of external
+controlling mechanisms. Present experiment and theory pointed out the
+benefit of the high plasma shaping, high q(95) and high pedestal
+density in reducing the ELM affected area and conductive energy losses
+in Type I ELMs. Small benign ELMs regimes in present machines (EDA,
+HRS, Type II, Grassy, QH, Type III in impurity seeded discharges at
+high delta) and their relevance for ITER are reviewed. Recent studies
+of active control of ELMs using stochastic boundaries, small pellets
+and edge current generation are presented. (c) 2004 Elsevier B.V. All
+rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="M" last="Becoulet"/>
    <person first="G" last="Huysmans"/>
@@ -305,11 +831,56 @@ tokamaks during type-I ELMS and disruptions</text>
    <person first="A" last="Polevoi"/>
    <person first="G" last="Federici"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="keyword">
+   <text>ELMY H-MODES</text>
+   <text>MHD STABILITY ANALYSIS</text>
+   <text>ASDEX UPGRADE</text>
+   <text>I ELMS</text>
+   <text>DIII-D</text>
+   <text>TRANSPORT BARRIERS</text>
+   <text>PELLET INJECTION</text>
+   <text>BOUNDARY PLASMA</text>
+   <text>PARTICLE LOSSES</text>
+   <text>HIGH-DENSITY</text>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>677-683</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>Edge localized modes control: experiment and theory</text>
   </attribute>
+  <attribute id="ut">
+   <id value="000227789500134"/>
+  </attribute>
  </entry>
  <entry id="11">
+  <attribute id="abstract">
+   <text>If an ELM is a peeling of flux surfaces from the plasma, due to a
+broken separatrix, current density is lost as well as particles and
+energy. The fast loss of a current-carrying plasma layer modifies the
+plasma equilibrium, leading to sudden shifts in the strike points at
+each ELM, towards the plasma centre. An experimental study of this
+conjectured model of the ELM has been made at JET, showing that in all
+cases of Type I ELMs studied, strike point shifts were observed. In two
+cases studied in detail, the estimated equilibrium changes provoked by
+flux surface peeling agree qualitatively with the observed strike point
+shifts. (c) 2004 Elsevier B.V. All rights reserved.</text>
+  </attribute>
   <attribute id="author">
    <person first="ER" last="Solano"/>
    <person first="S" last="Jachmich"/>
@@ -331,8 +902,29 @@ tokamaks during type-I ELMS and disruptions</text>
    <person first="A" last="Cenedese"/>
    <person first="D" last="Testa"/>
   </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>JOURNAL OF NUCLEAR MATERIALS</content>
+    <attribute id="abbrev">
+     <text>J NUCL MATER</text>
+     <text>J. Nucl. Mater.</text>
+    </attribute>
+    <attribute id="pages">
+     <text>747-750</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
   <attribute id="title">
    <text>ELMS and strike point jumps</text>
+  </attribute>
+  <attribute id="ut">
+   <id value="000227789500147"/>
   </attribute>
  </entry>
 </pyblio-db>
