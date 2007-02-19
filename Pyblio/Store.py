@@ -263,7 +263,7 @@ class View(object):
 
 # --------------------------------------------------
 
-class ResultSet (object):
+class ResultSet(object):
 
     """ A set of keys from the database.
 
@@ -362,6 +362,11 @@ class ResultSetStore (object):
         return self.new(rsid)
 
     def update(self, result_set):
+        """Use this to permanently store a ResultSet() in the database.
+
+        Note: when a ResultSet object is modified, it is necessary to
+        call db.rs.update(result_set) to store the updated version.
+        """
         raise NotImplemented('please override')
         
 # --------------------------------------------------

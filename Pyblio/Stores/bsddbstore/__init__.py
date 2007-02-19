@@ -52,12 +52,6 @@ startup time is more important.
 # 
 #   key:   resultset id
 #   value: a serialized boolean numpy array containing the records
-# 
-# * view/<id> [BTREE / RECNUM]
-# 
-#   key:   field on which we sort
-#   value: key from which the field is taken
-# 
 
 from gettext import gettext as _
 

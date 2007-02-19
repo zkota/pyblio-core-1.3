@@ -16,6 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+"""
+Common implementation of in-memory result sets and views.
+
+The result sets use a Pyblio.Arrays.KeyArray to store their
+content. Views are implemented with plain lists of keys.
+"""
 
 from Pyblio import Store, Callback, Arrays, Sort
 
@@ -79,6 +85,8 @@ class ResultSet(Store.ResultSet, Callback.Publisher):
         if k in self._contents:
             self.emit('update-item', k)
 
+# This class could certainly benefit from optimisations: when changing
+# a single value, the full list of results is recomputed every time.
 class View(Callback.Publisher):
 
     def __init__ (self, src, crit):
