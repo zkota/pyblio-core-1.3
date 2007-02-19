@@ -133,7 +133,7 @@ class PubMed(object):
         results = defer.Deferred()
 
         # The result set that will contain the data
-        rs = self.db.rs.add(True)
+        rs = self.db.rs.new()
         rs.name = _('Imported from PubMed')
 
         # Special case for no query: this would cause an error from

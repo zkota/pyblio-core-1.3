@@ -228,12 +228,12 @@ class Queryable(object):
 
     """ A mixin that provides an (one day optimized) query engine to a store """
 
-    def query(self, query, permanent=False):
+    def query(self, query):
         """ Perform a query and return a result set of the matching records. """
         self._q_check(query)
 
         r = query.run(self)
-        return self._q_to_rs(r, permanent)
+        return self._q_to_rs(r)
 
 
     def count(self, query):
@@ -326,9 +326,9 @@ class Queryable(object):
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def _q_to_rs(self, res, permanent):
+    def _q_to_rs(self, res):
 
-        rs = self.rs.add(permanent)
+        rs = self.rs.new()
 
         for key in res:
             rs.add(key)

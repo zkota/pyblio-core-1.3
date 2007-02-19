@@ -43,7 +43,7 @@ Overview
   on databases.
 '''
 
-import os, string, copy, logging
+import os, string, copy, logging, warnings
 
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
@@ -307,7 +307,7 @@ class ResultSet (object):
         raise NotImplemented ('please override')
 
     def destroy(self, k):
-        """ Delete and B{all the records} contained in the result set."""
+        """ Delete B{all the records} contained in the result set."""
         raise NotImplemented ('please override')
         
     def has_key (self):
@@ -348,10 +348,22 @@ class ResultSetStore (object):
     def __iter__ (self):
         raise NotImplemented ('please override')
         
-    def add (self, permanent = False, rsid = None):
+    def new(self, rsid=None):
         raise NotImplemented ('please override')
 
-    
+    def _add_warn(self):
+        warnings.warn('db.rs.add() is deprecated. please use db.rs.new()',
+                      DeprecationWarning, stacklevel=3)
+        # ensure we get called only once
+        ResultSetStore._add_warn = lambda self: None
+
+    def add(self, permanent=False, rsid=None):
+        self._add_warn()
+        return self.new(rsid)
+
+    def update(self, result_set):
+        raise NotImplemented('please override')
+        
 # --------------------------------------------------
 
 class Database (object):
@@ -420,12 +432,8 @@ class Database (object):
         raise NotImplemented ('please override')
 
     def _txo_warn(self):
-        from traceback import format_stack
-        for line in format_stack()[:-2]:
-            for sub in line.rstrip().split('\n'):
-                logging.warn(sub)
-        logging.warn('db.txo is deprecated. please use db.schema.txo')
-
+        warnings.warn('db.txo is deprecated. please use db.schema.txo',
+                      DeprecationWarning, stacklevel=2)
         # ensure we get called only once
         Database._txo_warn = lambda self: None
         
@@ -509,7 +517,7 @@ class Database (object):
                 sets [value].add (k)
 
             except KeyError:
-                rs = self.rs.add ()
+                rs = self.rs.new()
                 sets [value] = rs
 
                 rs.add (k)
@@ -632,10 +640,10 @@ class Database (object):
             fd.write ('<header>%s</header>\n' % escape (self.header))
         
         for v in self.entries.itervalues ():
-            v.xmlwrite (fd)
+            v.xmlwrite(fd)
 
         for rs in self.rs:
-            rs.xmlwrite (fd)
+            rs.xmlwrite(fd)
         
         fd.write ('</pyblio-db>\n')
         return
@@ -685,17 +693,17 @@ class Database (object):
 
             if t == 'resultset':
                 rsid = int (elem.attrib ['id'])
-                rs   = self.rs.add (permanent = True, rsid = rsid)
+                rs   = self.rs.new(rsid=rsid)
 
                 try:
                     rs.name = elem.attrib ['name']
-                    
                 except KeyError:
                     pass
 
                 for ref in elem.findall ('./ref'):
-                    rs.add (Key (ref.attrib ['id']))
-                
+                    rs.add(Key (ref.attrib ['id']))
+
+                self.rs.update(rs)
                 elem.clear()
             
             if t == 'pyblio-schema':

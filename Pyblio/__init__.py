@@ -19,7 +19,14 @@ L{Pyblio.Store} module.
 
 import logging
 
+_inited = False
+
 def init_logging(filename=None):
+    global _inited
+    if _inited:
+        return
+    _inited = True
+
     _base = logging.getLogger('pyblio')
     if filename is None:
         log_handler = logging.StreamHandler()

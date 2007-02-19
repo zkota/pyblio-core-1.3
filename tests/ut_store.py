@@ -79,11 +79,12 @@ class TestStore (pybut.TestCase):
 
         db.header = u"Hi, I'm a database description"
 
-        rs = db.rs.add (permanent = True)
+        rs = db.rs.new()
         rs.name = "sample"
 
         rs.add (1)
-        
+        db.rs.update(rs)
+
         db.save ()
 
         pybut.fileeq (self.f, pybut.src('ut_store/simple.xml'))
@@ -103,7 +104,7 @@ class TestStore (pybut.TestCase):
         return
 
     def testQualifiedRead (self):
-        """ A database with qualified fields can be read and saved again identically """
+        """ Qualified fields can be read and saved again identically """
         
         db = Store.get ('file').dbopen (pybut.src('ut_store/qualified.xml'))
 
@@ -115,7 +116,7 @@ class TestStore (pybut.TestCase):
         return
 
     def testTxoFromSchema (self):
-        """ A database with taxonomy fields in the schema can be read and saved, the txo become part of the db """
+        """ Taxonomy fields can be read and saved """
 
         tmp = pybut.dbname()
         s = Schema.Schema(pybut.src('ut_store/taxoschema.xml'))
@@ -251,13 +252,13 @@ class TestStore (pybut.TestCase):
 
     def testResultSet (self):
 
-        db = Store.get ('file').dbopen (pybut.src('ut_store/resultset.xml'))
+        db = Store.get('file').dbopen(pybut.src('ut_store/resultset.xml'))
 
-        ks = db.rs [1]
+        ks = db.rs[1]
         assert ks.name == 'gronf'
 
-        ks = ks.keys ()
-        ks.sort ()
+        ks = list(ks.iterkeys())
+        ks.sort()
 
         assert ks == [1,2], 'got %s' % repr (ks)
 

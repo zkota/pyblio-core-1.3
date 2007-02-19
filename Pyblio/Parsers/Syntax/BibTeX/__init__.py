@@ -368,13 +368,13 @@ class Reader(object):
         return
     
     
-    def parse (self, fd, db):
+    def parse(self, fd, db):
 
         self.db = db
 
         self.doctype = {}
 
-        rs = db.rs.add(True)
+        rs = db.rs.new()
         rs.name = _('Imported from BibTeX')
         
         for v in db.schema.txo['doctype'].values ():

@@ -12,6 +12,8 @@ sys.path.insert (0, os.path.join (srcdir, '..'))
 
 assert os.path.isdir (os.path.join (srcdir, '..', 'Pyblio'))
 
+from Pyblio import init_logging
+
 base = os.path.abspath('.')
 
 def fp(*args):
@@ -160,6 +162,7 @@ def fileeq (a, b):
     assert False, '%s and %s differ' % (a, b)
 
 basedir = os.path.dirname(os.path.abspath(__file__))
+init_logging(',,pyblio.log')
 _count = 0
 
 def src(name):

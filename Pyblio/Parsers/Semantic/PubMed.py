@@ -113,7 +113,7 @@ class Reader(object):
     def parse(self, fd, db, rs=None):
 
         if rs is None:
-            rs = db.rs.add(True)
+            rs = db.rs.new()
             rs.name = _('Imported from PubMed')
 
         self.db = db

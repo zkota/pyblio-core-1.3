@@ -86,14 +86,15 @@ class TestFakeWOK(unittest.TestCase):
         return d.addCallback(check)
     
     def testQuery(self):
-        """ Return the result count for a query."""
+        """ Run a simple query."""
 
         d, rs = self.cnx.search(query='TS=(peer to peer)', maxhits=250)
 
         def done(total):
             self.failUnlessEqual(total, 1641)
             self.failUnlessEqual(len(rs), 250)
-            
+
+            self.db.rs.update(rs)
             tmp = pybut.dbname()
             fd = open(tmp, 'w')
             self.db.xmlwrite(fd)

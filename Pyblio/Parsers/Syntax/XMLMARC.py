@@ -54,7 +54,7 @@ class Reader(object):
 
         self.db = db
 
-        rs = db.rs.add(True)
+        rs = db.rs.new()
         rs.name = _('Imported from XML MARC')
         
         # We support both the NS-aware and non-NS aware versions of the MARC file

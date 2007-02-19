@@ -17,20 +17,19 @@ from Pyblio import Store, Schema, Registry
 def fp(*args):
     return pybut.fp(*(('ut_bibtex',) + args))
 
-class WithComments (Reader):
+class WithComments(Reader):
 
-    def __init__ (self, charset):
-
-        Reader.__init__ (self, charset = charset)
+    def __init__(self, charset):
+        Reader.__init__(self, charset=charset)
 
         self.comments = []
         return
     
-    def comment_add (self, data):
+    def comment_add(self, data):
         self.comments.append (data)
         return
 
-    def record_begin (self):
+    def record_begin(self):
         Reader.record_begin(self)
         self.id_add ('id', self.key)
         
@@ -42,7 +41,7 @@ class WithCaseHandler (Writer):
         if key in ('title',):
             return self.capitalized_text_add (key, self.record [key])
 
-        return Writer.record_parse (self, key, value)
+        return Writer.record_parse(self, key, value)
     
 
 class TestBibTeXReader (pybut.TestCase):
@@ -163,8 +162,8 @@ class TestBibTeXImport (pybut.TestCase):
 
         self.parser = WithComments ('latin-1')
 
-        self.parser.parse (open(fp('%s.bib' % base)), db)
-        
+        rs = self.parser.parse(open(fp('%s.bib' % base)), db)
+        db.rs.update(rs)
         db.save ()
 
         # mess a bit with the file to discard the schema
@@ -297,7 +296,7 @@ class TestBibTeXImport (pybut.TestCase):
 
 
     def testEmptyAnd(self):
-        """ Sometimes, the author fields can contain « and and » """
+        """ Sometimes, the author fields can contain ' and and ' """
         self._check('emptyand')
         
     def testFinalDot(self):

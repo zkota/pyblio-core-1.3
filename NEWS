@@ -1,5 +1,16 @@
 -*- text -*-
 
+Release 1.3.4
+--------------------------
+
+ * Refactored the ResultSet management code: now, result sets are
+   passive data that is not updated automatically in the bsddb store,
+   and needs to be stored explicitely by using
+   db.rs.update(result_set). The old db.rs.add(permanent) function is
+   deprecated, and permanent=True has no meaning anymore. Use
+   db.rs.new() instead.
+
+
 Release 1.3.3 (2006-09-24)
 --------------------------
 

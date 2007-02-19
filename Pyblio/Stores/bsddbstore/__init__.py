@@ -70,7 +70,7 @@ import logging
 log = logging.getLogger('pyblio.stores.bsddb')
 
 from Pyblio.Arrays import KeyArray, match_arrays
-
+from Pyblio.Stores import resultset
 
 # Python ships the bsddb module as 'bsddb', whereas when fetched as a
 # standalone package it is named 'bsddb3'. For the moment, we need a
@@ -156,23 +156,21 @@ def _idxdel(_idx, id, txn):
 # --------------------------------------------------
 
 class RSDB(Callback.Publisher):
+    """ Virtual result set that loops over the full database"""
 
-    """ Virtual result set that loops over the full database """
-
-    def __init__ (self, _db, _env, _meta):
+    def __init__ (self, _db):
         Callback.Publisher.__init__(self)
         
         self.id  = 0
-        
-        self._db   = _db
-        self._env  = _env
-        self._meta = _meta
+        self._db = _db
 
-        self._views = []
+        _db.register('add-item',    self._add)
+        _db.register('delete-item', self._delete)
+        _db.register('update-item', self._update)
         return
     
     def itervalues (self):
-        c = self._db.cursor()
+        c = self._db._db.cursor()
         d = c.first()
         
         while d:
@@ -182,9 +180,9 @@ class RSDB(Callback.Publisher):
         c.close()
         return
     
-    def iterkeys (self):
+    def iterkeys(self):
         
-        c = self._db.cursor()
+        c = self._db._db.cursor()
         d = c.first()
         
         while d:
@@ -196,9 +194,8 @@ class RSDB(Callback.Publisher):
 
     __iter__ = iterkeys
     
-    
-    def iteritems (self):
-        c = self._db.cursor()
+    def iteritems(self):
+        c = self._db._db.cursor()
         d = c.first()
         
         while d:
@@ -208,621 +205,124 @@ class RSDB(Callback.Publisher):
         c.close()
         return
 
-    def __len__ (self):
-        return self._db.stat () ['nkeys']
+    def __len__(self):
+        return self._db._db.stat()['nkeys']
 
+    def view(self, criterion):
+        return resultset.View(self, criterion)
 
-    def view (self, criterion):
-
-        v = View(self._db, self._env, self._meta,
-                 self, criterion)
-
-        self.register('txn-add-item', v._add)
-        self.register('txn-delete-item', v._del)
-        self.register('txn-update-item', v._update)
-        
-        return v
-
-    def _add(self, e, txn):
-        self.emit('txn-add-item', e, txn)
-        self.emit('add-item', e.key)
-        return
-
-    def _delete(self, key, txn):
-        self.emit('txn-delete-item', key, txn)
-        self.emit('delete-item', key)
-        return
-
-    def _update(self, k, val, txn):
-        self.emit('txn-update-item', k, val, txn)
-        self.emit('update-item', k)
-        return
-    
-# --------------------------------------------------
-
-def _compare (a, b):
-    # orders the keys according to the criterion determined by cmp_key
-    # (). As the binary tree does not allow for multiple identical
-    # keys, use the records key to compute a strict order.
-
-    try:
-        (a, ka), (b, kb) = [ x.split ('\0') for x in (a, b) ]
-        r = Sort.compare (_pl (a), _pl (b))
-
-    except: return 0
-    
-    if r: return r
-    return cmp (ka, kb)
-
-
-class View(Store.View, Callback.Publisher):
-
-    def __init__ (self, _db, _env, _meta, rs, criterion, txn = None):
-
-        Callback.Publisher.__init__(self)
-        
-        self._db   = _db
-        self._env  = _env
-        self._meta = _meta
-        self._crit = criterion
-        self._id   = None
-
-        # Create the new view on top of the result set
-        txn = self._env.txn_begin(txn)
-
-        try:
-
-            # get a fresh view index
-            serial, meta, revert = _pl (self._meta.get ('view', txn = txn))
-
-            meta [serial] = rs.id
-            
-            info = revert.get (rs.id, {})
-            info [serial] = self._crit
-            revert [rs.id]  = info
-
-            self._meta.put ('view', _ps ((serial + 1, meta, revert)), txn = txn)
-
-            # create the new view
-            
-            self._v = db.DB(self._env.e)
-            self._v.set_flags (db.DB_RECNUM)
-            self._v.set_bt_compare (_compare)
-            
-            self._v.open ('view', str (serial), db.DB_BTREE, db.DB_CREATE, txn = txn)
-
-            # fill the view with the current content of the result set
-            for e in rs.itervalues (): self._add (e, txn)
-            
-        except:
-            self._env.txn_abort(txn)
-            raise
-
-        self._id = serial
-        
-        self._env.txn_commit(txn)
-        return
-
-    def iterkeys (self):
-
-        c = self._v.cursor()
-        d = c.first()
-        
-        while d:
-            key = d[1]
-            yield Store.Key(key)
-
-            d = c.next()
-
-        c.close()
-        return
-
-    __iter__ = iterkeys
-
-    def iteritems (self):
-
-        c = self._v.cursor()
-        d = c.first()
-        
-        while d:
-            key = d[1]
-            yield Store.Key(key), _pl(self._db.get(key))
-
-            d = c.next()
-        
-        c.close()
-        return
-
-    def itervalues (self):
-
-        c = self._v.cursor()
-        d = c.first()
-        
-        while d:
-            key = d[1]
-            yield _pl(self._db.get(key))
-
-            d = c.next()
-            
-        c.close()
-        return
-
-    def index(self, key):
-        c = self._v.cursor()
-        e = _pl(self._db.get(str(key)))
-
-        c.set(self._make_key(e))
-        idx = c.get_recno() - 1
-        c.close()
-        
-        return idx
-    
-    def __getitem__ (self, idx):
-        data = self._v.get(idx + 1)
-
-        if data is None:
-            raise IndexError ('no such index: %d' % idx)
-        return Store.Key (data [1])
-
-    
-    def __len__ (self):
-        return self._v.stat () ['nkeys']
-
-        
-    def __del__ (self):
-
-        if self._id is None: return
-        
-        txn = self._env.txn_begin()
-
-        try:
-            # remove oneself from the meta list
-            (serial, meta, revert) = _pl (self._meta.get ('view', txn = txn))
-
-            rs = meta [self._id]
-            
-            del revert [rs] [self._id]
-            del meta [self._id]
-
-            self._meta.put ('view', _ps ((serial, meta, revert)), txn = txn)
-            
-            self._v.close ()
-            
-            db.DB(self._env.e).remove ('view', str (self._id))
-
-        except:
-            # exceptions in __del__ methods are not reported by default
-            etype, value, tb = sys.exc_info ()
-            traceback.print_exception (etype, value, tb)
-            
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
-        return
-
-    def _make_key (self, e):
-        # In order to store multiple values in a DB_RECNUM BTree, it
-        # is necessary to "cheat" a bit, and disambiguate between the
-        # duplicates; this is done by appending the entry key to the
-        # value, separated by null bytes
-
-        return _ps (self._crit.cmp_key (e)) + '\0%d' % e.key
-
-
-    def _update(self, k, e, txn):
-        old = _pl(self._db.get(str(k), txn=txn))
-
-        self._v.delete(self._make_key(old), txn=txn)
-        self._v.put(self._make_key(e), str(k), txn=txn)
-
-        self.emit('update-item', k)
-        return
-    
-    def _add(self, e, txn):
-        self._v.put(self._make_key(e), str(e.key), txn=txn)
-        self.emit('add-item', e.key)
-        return
-
-    def _del(self, k, txn):
-
-        # To remove an entry, we have to assume the way we compute the
-        # sorting key has not changed since it has been created. It
-        # should be the case, because the update of the result sets
-        # and views is performed as the initial step of a record
-        # update.
-        e = _pl(self._db.get(str(k), txn=txn))
-        self._v.delete(self._make_key(e), txn=txn)
-
-        self.emit('delete-item', k)
-        return
-
-    
-# --------------------------------------------------
-
-class ResultSet(Store.ResultSet, Callback.Publisher):
-
-    def __init__ (self, _db, _env, _meta, _idx,
-                  rs, id, permanent = False, txn = None):
-
-        Callback.Publisher.__init__ (self)
-        
-        # RS id as a string and as an integer
-        self.id  = id
-        self._id = str(id)
-        
-        self._name = None
-
-        self._db   = _db
-        self._env  = _env
-        self._meta = _meta
-        self._idx  = _idx
-        
-        self._permanent = permanent
-
-        self._rs = rs
-
-        self._views = []
-
-        # check that the RS already exists
-        txn = self._env.txn_begin(txn)
-
-        try:
-            a = self._rs.get(self._id, txn=txn)
-            if a is None:
-                self._rs.put(self._id, _ps(KeyArray()), txn=txn)
-
-        except:
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
-        return
-
-    def _name_set (self, name):
-
-        txn = self._env.txn_begin()
-
-        try:
-            (rsid, avail) = _pl (self._meta.get('rs', txn=txn))
-
-            if avail.has_key (self.id):
-                avail [self.id] = (name, self._permanent)
-        
-            self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
-
-        except:
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
-        self._name = name
-        
-        return
-
-    def _name_get (self):
-        return self._name
-
-
-    name = property (_name_get, _name_set)
-
-
-    def iterkeys(self):
-        a = _pl(self._rs.get(self._id))
-
-        for key, status in enumerate(a.a):
-            if status:
-                yield Store.Key(key+1)
-        return
-
-    __iter__ = iterkeys
-    
-
-    def itervalues (self):
-
-        for key in self.iterkeys():
-            yield _pl(self._db.get(str(key)))
-        
-        return
-
-    
-    def iteritems (self):
-        for key in self.iterkeys():
-            yield key, _pl(self._db.get(str(key)))
-
-        return
-
-
-    def add(self, k, txn=None):
-
-        if not isinstance (k, Store.Key):
-            raise ValueError ('the key must be a Store.Key, not %s' % `k`)
-
-        txn = self._env.txn_begin(txn)
-
-        try:
-            a = _pl(self._rs.get(self._id, txn=txn))
-            a.add(k)
-            self._rs.put(self._id, _ps(a), txn=txn)
-
-            # Update the views of the result set
-            e = _pl(self._db.get(str(k), txn=txn))
-            self.emit('txn-add-item', e, txn)
-                
-        except:
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
+    def _add(self, k):
         self.emit('add-item', k)
         return
 
-    def __delitem__ (self, k, txn = None):
-
-        txn = self._env.txn_begin(txn)
-
-        try:
-
-            a = _pl(self._rs.get(self._id, txn=txn))
-
-            try:
-                if not a.a[k-1]:
-                    raise KeyError('key %s not in result set' % str(k))
-
-            except IndexError:
-                raise KeyError('key %s not in result set' % str(k))
-
-            del a[k]
-            self._rs.put(self._id, _ps(a), txn=txn)
-
-            # Update the views of the result set
-            self.emit('txn-delete-item', k, txn)
-
-        except KeyError:
-            self._env.txn_abort(txn)
-            raise
-        
-        except:
-            etype, value, tb = sys.exc_info ()
-            traceback.print_exception (etype, value, tb)
-
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
+    def _delete(self, k):
         self.emit('delete-item', k)
         return
 
-
-    def __contains__(self, k):
-
-        try:
-            return _pl(self._rs.get(self._id)).a[k-1]
-
-        except IndexError:
-            return False
-
-        
-    def has_key (self, k):
-        return k in self
-
-
-    def view (self, criterion):
-
-        v = View(self._db, self._env, self._meta,
-                 self, criterion)
-
-        self.register('txn-add-item', v._add)
-        self.register('txn-delete-item', v._del)
-        self.register('txn-update-item', v._update)
-        
-        return v
-    
-
-    def __del__ (self):
-        if self._permanent:
-            return
-
-        txn = self._env.txn_begin()
-
-        try:
-            # remove oneself from the meta list
-            (rsid, avail) = _pl (self._meta.get ('rs', txn = txn))
-
-            if avail.has_key(self.id):
-                del avail [self.id]
-                self._meta.put ('rs', _ps ((rsid, avail)), txn = txn)
-
-                self._rs.delete(self._id, txn=txn)
-                
-        except:
-            # exceptions in __del__ methods are not reported by default
-            etype, value, tb = sys.exc_info ()
-            traceback.print_exception (etype, value, tb)
-            
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
-        return
-
-    def destroy(self):
-        txn = self._env.txn_begin()
-        
-        for k in self:
-            _idxdel(self._idx, k, txn)
-            self._db.delete (str(k), txn)
-
-        self._env.txn_commit(txn)
-        return
-
-            
-    def __len__ (self):
-        return len(_pl(self._rs.get(self._id)))
-
-
-    def _from_array(self, a):
-        txn = self._env.txn_begin()
-
-        try:
-            self._rs.put(self._id, _ps(a), txn=txn)
-
-        except:
-            self._env.txn_abort(txn)
-            raise
-
-        self._env.txn_commit(txn)
-        return
-        
-
-    def _on_update(self, k, val, txn):
-
-        if k not in self:
-            return
-
-        self.emit('txn-update-item', k, val, txn)
-        return
-
-    
-    def _on_delete(self, key, txn = None):
-
-        try:
-            self.__delitem__(key, txn)
-            
-        except KeyError:
-            pass
-
-        return
-
-
-class ResultSetStore(dict, Store.ResultSetStore, Callback.Publisher):
-
-    def __init__ (self, _db, _env, _meta, _idx, txn):
-
-        Callback.Publisher.__init__ (self)
-
-        self._db   = _db
-        self._env  = _env
-        self._meta = _meta
-        self._idx  = _idx
-
-        (rsid, avail) = _pl(self._meta.get('rs', txn=txn))
-
-        txn = self._env.txn_begin(parent=txn)
-
-        try:
-
-            self._rs = db.DB(self._env.e)
-            self._rs.open('resultset', 'sets', db.DB_HASH,
-                          db.DB_CREATE, txn=txn)
-        
-            # initialize with the existing result sets
-            for rsid, data in avail.items():
-                name, status = data
-            
-                rs = ResultSet(self._db, self._env, self._meta, self._idx,
-                               self._rs, rsid, status, txn=txn)
-                rs._name = name
-
-                self.register('item-delete', rs._on_delete)
-                self.register('item-update', rs._on_update)
-
-                # assume some non-permanent result sets might still exist
-                if status:
-                    self[rsid] = rs
-
-            self._env.txn_commit(txn)
-
-        except:
-            self._env.txn_abort(txn)
-            raise
-        
+    def _update(self, k):
+        self.emit('update-item', k)
         return
     
-    def _close (self):
+# --------------------------------------------------
+class ResultSetStore(Store.ResultSetStore):
+    def __init__ (self, _db, txn):
+        _db.register('delete', self._on_delete_item)
 
+        self._db = weakref.ref(_db)
+        txn = _db._env.txn_begin(parent=txn)
+        try:
+            self._rs = db.DB(_db._env.e)
+            self._rs.open('resultset', 'sets', db.DB_HASH, db.DB_CREATE, txn=txn)
+            _db._env.txn_commit(txn)
+        except:
+            _db._env.txn_abort(txn)
+            raise
+        return
+    
+    def _close(self):
         self._rs.close()
         return
 
-    def _save (self):
+    def _save(self):
         self._rs.sync()
         return
 
-
-    def __delitem__ (self, k):
-
-        rs = self [k]
-        rs._permanent = False
-
-        txn = self._env.txn_begin ()
-
+    def __getitem__(self, k):
+        data = self._rs.get(str(k))
+        if data is None:
+            raise KeyError("unknown resultset %r" % k)
+        contents, name = _pl(data)
+        rs = resultset.ResultSet(k, self._db(), contents=contents)
+        rs.name = name
+        return rs
+    
+    def __delitem__(self, k):
+        _db = self._db()
+        txn = _db._env.txn_begin ()
         try:
+            self._rs.delete(str(k), txn)
             # get the rs dict
-            (last, avail) = _pl(self._meta.get('rs', txn = txn))
-
-            # Avail contains the name of the RS, which is initially
-            # None, and the state (permanent / not permanent)
-            if avail.has_key (rs.id):
-                avail [rs.id] = (rs._name, False)
-            
-            self._meta.put('rs', _ps ((last, avail)), txn = txn)
-
+            (last, avail) = _pl(_db._meta.get('rs', txn=txn))
+            del avail[k]
+            _db._meta.put('rs', _ps ((last, avail)), txn = txn)
         except:
-            self._env.txn_abort(txn)
+            _db._env.txn_abort(txn)
             raise
-
-        self._env.txn_commit(txn)
-        dict.__delitem__ (self, k)
+        _db._env.txn_commit(txn)
         return
 
+    def iteritems(self):
+        (last, avail) = _pl(self._db()._meta.get('rs'))
+        for k, name in avail.iteritems():
+            yield k, self[k]
+    
+    def itervalues(self):
+        for k, v in self.iteritems():
+            yield v
+    
+    def iterkeys(self):
+        for k, v in self.iteritems():
+            yield k
 
-    def __iter__ (self):
-        return self.itervalues ()
+    __iter__ = itervalues
 
-
-    def add(self, permanent=False, rsid=None, txn=None):
+    def new(self, rsid=None, txn=None):
         """ Create an empty result set """
-
-        txn = self._env.txn_begin (parent = txn)
-
+        _db = self._db()
+        txn = _db._env.txn_begin(parent=txn)
         try:
             # get the next rs id
-            (last, avail) = _pl (self._meta.get('rs', txn=txn))
+            (last, avail) = _pl(_db._meta.get('rs', txn=txn))
             (last, rsid)  = Tools.id_make(last, rsid)
-            
-            # Avail contains the name of the RS, which is initially
-            # None, and the state (permanent / not permanent)
-            avail[rsid] = (None, permanent)
-            
-            self._meta.put('rs', _ps((last, avail)), txn=txn)
-            
-            rs = ResultSet(self._db, self._env, self._meta, self._idx,
-                           self._rs, rsid, permanent, txn=txn)
-            
+            _db._meta.put('rs', _ps((last, avail)), txn=txn)
+            rs = resultset.ResultSet(rsid, _db)
         except:
-            self._env.txn_abort(txn)
+            _db._env.txn_abort(txn)
             raise
-        
-        self._env.txn_commit(txn)
-
-        if permanent:
-            self[rsid] = rs
-
-        self.register('item-delete', rs._on_delete)
-        self.register('item-update', rs._on_update)
-        
+        _db._env.txn_commit(txn)
         return rs
 
-    def _on_delete (self, k, trn):
+    def update(self, result_set, txn=None):
+        _db = self._db()
+        txn = _db._env.txn_begin(parent=txn)
+        try:
+            (last, avail) = _pl(_db._meta.get('rs', txn=txn))
+            avail[result_set.id] = result_set.name
+            _db._meta.put('rs', _ps((last, avail)), txn=txn)
 
-        self.emit ('item-delete', k, trn)
-        return
+            self._rs.put(str(result_set.id),
+                         _ps((result_set._contents,
+                              result_set.name)), txn=txn)
+        except:
+            _db._env.txn_abort(txn)
+            raise
+        _db._env.txn_commit(txn)
 
-    def _on_update (self, k, val, trn):
-
-        self.emit ('item-update', k, val, trn)
-        return
-
+    def _on_delete_item(self, key, txn):
+        for v in self.itervalues():
+            if key in v:
+                del v[key]
+                self.update(v, txn=txn)
     
 # --------------------------------------------------
 
@@ -960,26 +460,14 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
             self._idx = (f, b)
             
             # Result sets handler
-            self.rs = ResultSetStore(self._db, self._env, self._meta, self._idx, txn)
-            self.register ('delete', self.rs._on_delete)
-            self.register ('update', self.rs._on_update)
-
+            self.rs = ResultSetStore(self, txn)
         except:
             self._env.txn_abort(txn)
             raise
         
         self._env.txn_commit(txn)
-
-        # Result set containing the full db
-        self._entries_rs = RSDB(self._db, self._env, self._meta)
-
-        self.register('add',    self._entries_rs._add)
-        self.register('delete', self._entries_rs._delete)
-        self.register('update', self._entries_rs._update)
-
         return
 
-            
     def _header_get(self):
         return _pl(self._meta.get('header'))
 
@@ -1018,7 +506,6 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
     
 
     def save(self):
-
         # Flush the databases
         self._db.sync()
         self._meta.sync()
@@ -1053,18 +540,16 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
             self._insert(key, val, txn)
 
             self.emit('add', val, txn)
-            
         except:
             self._env.txn_abort(txn)
             raise
 
         self._env.txn_commit(txn)
-        
+        self.emit('add-item', val)
         return key
     
 
     def __setitem__ (self, key, val):
-
         assert self.has_key (key), \
                _('entry %s does not exist') % `key`
 
@@ -1089,6 +574,7 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
             raise
 
         self._env.txn_commit(txn)
+        self.emit('update-item', key)
         return
 
 
@@ -1100,7 +586,7 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
         try:
             # Start by cleaning up dependencies, as they might wish to
             # access the item a last time.
-            self.emit ('delete', key, txn)
+            self.emit('delete', key, txn)
 
             # Then, remove the index and entry itself
             _idxdel (self._idx, key, txn)
@@ -1115,27 +601,21 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
             raise
 
         self._env.txn_commit(txn)
+        self.emit('delete-item', key)
         return
     
 
     def has_key (self, k):
-
         id = str (k)
-        
         try:
             self._db.get (id)
-            
         except db.DBNotFoundError:
             return False
-
         return True
 
-
     def _idxadd (self, id, val, txn):
-
         # We need to insert the current record in both the backward
         # and forward indexes.
-
         def words():
             for attribs in val.values():
                 for attrib in attribs:
@@ -1145,10 +625,8 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
 
         _idxadd(self._idx, id, words(), txn)
         return
-
     
     def _insert(self, key, val, txn):
-        
         id  = str(key)
         
         self._idxadd(key, val, txn)
@@ -1161,40 +639,28 @@ class Database(Query.Queryable, Store.Database, Callback.Publisher):
         self._db.put(id, val, txn=txn)
         return id
 
-
     def _q_all(self):
         return KeyArray(s=self._meta.get('full'))
 
-
     def _q_anyword(self, query):
-
         word = query.word.lower().encode('utf-8')
-        
         return KeyArray(s=self._idx[0].get(word))
 
-
-    def _q_to_rs(self, res, permanent):
-
-        rs = self.rs.add(permanent)
+    def _q_to_rs(self, res):
+        rs = self.rs.new()
         rs._from_array(res)
-
         return rs
-
     
     def __getitem__ (self, key):
         return _pl(self._db.get(str(key)))
 
+    def _entries_get(self):
+        return RSDB(self)
 
-    def entries_get (self):
-
-        return self._entries_rs
-
-    entries = property (entries_get)
-
+    entries = property(_entries_get)
     
     def index(self):
         pass
-    
 
     
 def dbdestroy(path, nobackup=False):

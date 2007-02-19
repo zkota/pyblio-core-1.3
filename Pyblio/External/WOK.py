@@ -155,7 +155,7 @@ class WOK(object):
         
         results = defer.Deferred()
 
-        rs = self.db.rs.add(True)
+        rs = self.db.rs.new()
         rs.name = _('Imported from Web of Knowledge')
 
 

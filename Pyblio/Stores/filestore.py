@@ -26,207 +26,68 @@ This store is useful for relatively small databases (up to a few
 thousand entries) and that are processed in batch once for instance,
 as the reading and writing can be slow.
 """
-
+import weakref
 from gettext import gettext as _
 
 import os, copy, string
 
 from Pyblio import Store, Callback, Attribute, Exceptions, Tools, Query, Sort
-
+from Pyblio.Stores import resultset
 
 from Pyblio.Arrays import KeyArray, match_arrays
-        
 
-class View(Callback.Publisher):
-
-    def __init__ (self, src, crit):
-        Callback.Publisher.__init__(self)
-        
-        self._crit = crit
-        self._src  = src
-        
-        self._update(None, '')
-
-        self._src.register('add-item', self._update, 'add-item')
-        self._src.register('delete-item', self._update, 'delete-item')
-        self._src.register('update-item', self._update, 'update-item')
-        return
-    
-    def _update(self, key, signal):
-
-        view = [ (self._crit.cmp_key (e), e.key) for e in self._src.itervalues () ]
-        view.sort (lambda a, b: Sort.compare (a [0], b [0]))
-
-        self._view = [ x [1] for x in view ]
-
-        self.emit(signal, key)
-        return
-
-    def __len__ (self):
-
-        return len (self._view)
-
-
-    def __getitem__ (self, i):
-
-        return self._view [i]
-
-    def __iter__ (self):
-
-        return iter (self._view)
-
-    def iterkeys (self):
-
-        return iter (self._view)
-    
-    def iteritems (self):
-
-        for i in self._view:
-            yield (i, self._src._dict [i])
-            
-    def itervalues (self):
-
-        for i in self._view:
-            yield self._src._dict [i]
-
-    def index(self, key):
-        try:
-            return self._view.index(key)
-        except ValueError:
-            raise KeyError(key)
-    
-class Viewable (object):
-
-    def view (self, criterion):
-
-        return View (self, criterion)
-        
-
-class ResultSet(dict, Viewable, Store.ResultSet, Callback.Publisher):
-
-    def __init__ (self, rsid, db):
-
-        Callback.Publisher.__init__ (self)
-        dict.__init__ (self)
-
-        self.id   = rsid
-        self.name = None
-
-        self._db   = db
-        self._dict = db._dict
-
-        self._db.register ('delete-item', self._on_db_delete)
-        self._db.register ('update-item', self._on_db_update)
-        return
-
-
-    def add (self, k):
-        
-        self [k] = 1
-        self.emit ('add-item', k)
-        return
-
-    def __delitem__ (self, k):
-
-        dict.__delitem__ (self, k)
-        self.emit ('delete-item', k)
-        return
-    
-    def itervalues (self):
-        
-        for k in dict.iterkeys (self):
-            yield self._dict [k]
-
-    def iteritems (self):
-        
-        for k in dict.iterkeys (self):
-            yield (k, self._dict [k])
-
-    def destroy(self):
-        
-        for k in list(self):
-            del self._db[k]
-
-        return
-
-    def _on_db_delete (self, k):
-        """ invoked when the database removes an item """
-
-        try:
-            del self [k]
-            self.emit ('delete-item', k)
-            
-        except KeyError:
-            pass
-        
-        return
-
-    def _on_db_update (self, k):
-        if k in self:
-            self.emit('update-item', k)
-        return
-    
-
-class RODict (Viewable, Callback.Publisher):
-
+class RODict(Callback.Publisher):
     """ Read-only dictionnary """
 
     def __init__ (self, _dict):
         Callback.Publisher.__init__ (self)
-        
-        self._dict = _dict
+        self._db = _dict
         return
 
+    def view(self, criterion):
+        return resultset.View(self, criterion)        
+
     def itervalues (self):
-        
-        return self._dict.itervalues ()
+        return self._db.itervalues ()
 
     def iteritems (self):
-        
-        return self._dict.iteritems ()
+        return self._db.iteritems ()
 
     def iterkeys (self):
-        
-        return self._dict.iterkeys ()
+        return self._db.iterkeys ()
 
     __iter__ = iterkeys
 
     def __len__ (self):
-
-        return len (self._dict)
+        return len(self._db)
 
     def _forward (self, * args):
-
         """ forward messages. the message name is passed last """
-        
         args, msg = args [:-1], args [-1]
-        
         return apply (self.emit, (msg,) + args)
 
 
-class ResultSetStore (dict, Store.ResultSetStore):
-
+class ResultSetStore(dict, Store.ResultSetStore):
     def __init__ (self, db):
-        self._db = db
+        self._db = weakref.ref(db)
         self._id = 1
         return
-    
 
-    def add (self, permanent = False, rsid = None):
+    def new(self, rsid=None):
         """ Create an empty result set """
-
-        (self._id, rsid) = Tools.id_make (self._id, rsid)
-        
-        rs = ResultSet (rsid, self._db)
-        
-        if permanent:
-            self [rs.id] = rs
-        
+        db = self._db()
+        assert db is not None
+        (self._id, rsid) = Tools.id_make(self._id, rsid)
+        # a result set keeps a strong reference on the database, as it
+        # accesses its content pretty naturally
+        rs = resultset.ResultSet(rsid, db)
         return rs
 
     def __iter__ (self):
-        return self.itervalues ()
+        return self.itervalues()
 
+    def update(self, result_set):
+        self[result_set.id] = result_set
     
 # --------------------------------------------------
 
@@ -418,20 +279,15 @@ class Database (Query.Queryable, Store.Database, Callback.Publisher):
                 return KeyArray()
 
         return Query.Queryable._q_anyword(self, query)
-    
-    
-def dbdestroy (path, nobackup = False):
-
-    os.unlink (path)
-
+        
+def dbdestroy(path, nobackup=False):
+    os.unlink(path)
     if nobackup:
         try:
             os.unlink (path + '.bak')
-            
         except OSError:
             pass
     return
-
     
 def dbcreate(path, schema, args={}):
     # Ensure we are the ones creating the file
@@ -440,26 +296,17 @@ def dbcreate(path, schema, args={}):
     except OSError, msg:
         raise Store.StoreError (_("cannot create database '%s': %s") % (
             path, msg))
-
     os.close(fd)
-            
-    db = Database (schema = schema, file = path, create = True)
+    db = Database (schema=schema, file=path, create=True)
     db.save ()
-    
     return db
-
 
 def dbopen(path, args={}):
-
-    return Database (file = path)
-
+    return Database(file=path)
 
 def dbimport(target, source, args={}):
-
-    db = Database (file = source)
+    db = Database(file=source)
     db.file = target
-
     return db
-
 
 description = _("Flat XML file storage")

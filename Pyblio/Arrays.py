@@ -51,11 +51,9 @@ class KeyArray(object):
             self.a = zeros(_to_power(initial), bool)
         return
 
-
     def tostring(self):
         return self.a.tostring()
 
-    
     def add(self, k):
         """ Set the key 'k' in the array """
         k -= 1
@@ -77,10 +75,8 @@ class KeyArray(object):
         self.a[k-1] = False
         return
 
-
     def __len__(self):
         return numpy.sum(self.a)
-
 
     def __iter__(self):
         for key, status in enumerate(self.a):

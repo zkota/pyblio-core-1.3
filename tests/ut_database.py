@@ -214,7 +214,7 @@ class TContent(object):
         """ A database provides independent iterators """
 
         e  = Store.Record ()
-        rs = self.db.rs.add ()
+        rs = self.db.rs.new()
         
         for i in range (3):
             ix = self.db.add (e)
@@ -353,15 +353,15 @@ class TContent(object):
 
         e = Store.Record ()
 
-        e ['title'] = [Attribute.Text ('a sample')]
-        for i in range (5):
-            self.db.add (e)
+        e['title'] = [Attribute.Text('a sample')]
+        for i in range(5):
+            self.db.add(e)
         
-        e ['title'] = [Attribute.Text ('youyou')]
-        for i in range (5):
-            self.db.add (e)
+        e['title'] = [Attribute.Text('youyou')]
+        for i in range(5):
+            self.db.add(e)
 
-        rs = self.db.query (Query.AnyWord ('youyou'), permanent = True)
+        rs = self.db.query(Query.AnyWord('youyou'))
         rs.name = u'my set'
 
         def integrity (rs):
@@ -377,13 +377,14 @@ class TContent(object):
 
         rsid = rs.id
         
-        integrity (rs)
-        integrity (self.db.rs [rsid])
+        integrity(rs)
+        self.db.rs.update(rs)
+        integrity(self.db.rs[rsid])
         
         del rs
         
         self.db.save ()
-        self.db = self.hd.dbopen (self.name)
+        self.db = self.hd.dbopen(self.name)
 
         integrity (self.db.rs [rsid])
 
@@ -422,12 +423,14 @@ class TContent(object):
 
         for perm in (True, False):
             
-            rs = self.db.rs.add (perm)
+            rs = self.db.rs.new()
 
             # put all the entries
             for i in items:
                 rs.add (i)
 
+            if perm:
+                self.db.rs.update(rs)
             got = []
             for v in rs:
                 got.append (v)
@@ -440,6 +443,8 @@ class TContent(object):
             del rs [items [0]]
             del rs [items [-1]]
             del rs [items [2]]
+            if perm:
+                self.db.rs.update(rs)
 
             check = [] + items
             del check [2]
@@ -460,10 +465,9 @@ class TContent(object):
         return
 
     def testResultSetsValues (self):
+        """Loop over keys, values and pairs from result sets """
 
-        """ It is possible to loop over keys, values and pairs from result sets """
-
-        rs   = self.db.rs.add ()
+        rs   = self.db.rs.new()
         keys = []
         vals = range (5)
         
@@ -527,7 +531,7 @@ class TContent(object):
         for i in range (5):
             items.append (self.db.add (e))
 
-        rs = self.db.rs.add ()
+        rs = self.db.rs.new()
 
         # put all the entries twice
         for i in items + items:
@@ -545,7 +549,7 @@ class TContent(object):
 
     def testResultSetDestroy(self):
 
-        rs = self.db.rs.add()
+        rs = self.db.rs.new()
         
         for i in range(5):
             e = Store.Record()
@@ -563,45 +567,46 @@ class TContent(object):
         return
     
             
-    def testResultSetUpdate (self):
+    def testResultSetUpdate(self):
 
         """ If an item is removed from the database, it is removed
         from the result sets too.  """
 
-        def check (rs):
-            e = Store.Record ()
+        def check(rs):
+            e = Store.Record()
             items = []
         
-            for i in range (5):
-                items.append (self.db.add (e))
+            for i in range(5):
+                items.append(self.db.add(e))
         
-            for i in items: rs.add (i)
+            for i in items: rs.add(i)
 
             # remove one item in the db
-            del self.db [items [0]]
+            del self.db[items[0]]
 
-            got = map (None, rs)
-            got.sort ()
-        
-            assert got == items [1:], \
-                   "expected %s, got %s" % (items [1:], got)
+            got = map(None, rs)
+            got.sort()
+
+            assert got == items[1:], \
+                   "expected %s, got %s" % (items[1:], got)
             return
 
         # check on a fresh result set
-        rs = self.db.rs.add ()
+        rs = self.db.rs.new()
         check (rs)
 
         # check on a saved result set
-        rsid = self.db.rs.add (permanent = True).id
-        self.db.save ()
-        
-        self.db = self.hd.dbopen (self.name)
-        check (self.db.rs [rsid])
+        rs = self.db.rs.new()
+        self.db.rs.update(rs)
+        self.db.save()
+
+        rsid = rs.id
+        self.db = self.hd.dbopen(self.name)
+        check(self.db.rs[rsid])
         return
 
     def testFullRSIsReadOnly (self):
-
-        """ It is not possible to alter the database by changing Store ().entries """
+        """ Fail to alter the database by changing Store().entries. """
 
         try:
             self.db.entries.add (Store.Key (123))
@@ -639,7 +644,7 @@ class BaseView(object):
         self.db.save ()
 
         # create a RS with all the entries
-        self.rs = self.db.rs.add ()
+        self.rs = self.db.rs.new()
         
         for k in self.db.entries:
             self.rs.add (k)
@@ -670,14 +675,11 @@ class TView(BaseView):
     dbfile = fp('view.xml')
 
     def testIterView (self):
-
-        
         for rs in (self.rs, self.db.entries):
-            
-            v = rs.view (OrderBy ('text'))
+            v = rs.view(OrderBy('text'))
             r = []
             
-            for k in v.iterkeys (): r.append (k)
+            for k in v.iterkeys(): r.append(k)
 
             assert r in ([1, 4, 2, 3],
                          [4, 1, 2, 3]), 'got %s' % r
@@ -824,14 +826,14 @@ class TView(BaseView):
 
         """ Doing a modification in an entry is reflected in the DB views """
         
-        v = self.db.entries.view (OrderBy ('text'))
+        v = self.db.entries.view(OrderBy('text'))
         
-        e = self.db [4]
-        e ['text'] = Attribute.Text ('zzzzzzzzz')
+        e = self.db[4]
+        e ['text'] = Attribute.Text('zzzzzzzzz')
 
-        self.db [4] = e
+        self.db[4] = e
 
-        r = list (v)
+        r = list(v)
         assert r == [1, 2, 3, 4], 'got %s' % r
 
         return
@@ -876,8 +878,8 @@ class TCallbacks(object):
             self.failUnlessEqual(called['k'], v)
             called['k'] = None
 
-        rs1 = self.db.rs.add()
-        rs2 = self.db.rs.add()
+        rs1 = self.db.rs.new()
+        rs2 = self.db.rs.new()
 
         # First element is the one used to update the content, second
         # is the one on which we check the callback
@@ -934,7 +936,7 @@ class TCallbacks(object):
         r = Store.Record()
         k2 = self.db.add(r)
 
-        rs = self.db.rs.add()
+        rs = self.db.rs.new()
         rs.add(k1)
 
         # Now, adding a new record to the db should not trigger a
