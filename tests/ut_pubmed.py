@@ -4,7 +4,7 @@ import os, logging, pybut
 from twisted.trial import unittest
 from twisted.internet import reactor
 
-from Pyblio.External.PubMed import PubMed
+from Pyblio.External.PubMed import PubMed, QueryHelper
 from Pyblio import Store, Attribute, Registry
 
 base = os.path.abspath('ut_pubmed')
@@ -126,3 +126,23 @@ class TestPubMedParser(unittest.TestCase):
         pybut.fileeq(tmp, pybut.fp('ut_pubmed', 'result.bip'))
             
         
+class TestPubMedHelper(unittest.TestCase):
+    def testGenerateQuery(self):
+        import datetime
+        
+        helper = QueryHelper()
+        self.assertEqual('Sample',
+                         helper.makeQuery(keyword='Sample'))
+
+        from_date = datetime.date(2005,10,11)
+        to_date   = datetime.date(2006,12,13)
+        
+        self.assertEqual('Sample AND 2005/10/11:2006/12/13[edat]',
+                         helper.makeQuery(keyword='Sample',
+                                          from_date=from_date,
+                                          to_date=to_date))
+
+        r = helper.makeQuery(from_date=from_date)
+        today = datetime.date.today().strftime('%Y/%m/%d')
+        self.assertEqual('2005/10/11:%s[edat]' % today, r)
+

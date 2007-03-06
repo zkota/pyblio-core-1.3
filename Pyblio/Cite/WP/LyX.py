@@ -39,6 +39,10 @@ class LyX(object):
         return
 
     def connect(self):
+        """Establish connection with LyX.
+
+        Common failures are: nonexitent pipe, or LyX not running...
+        """
         if self.is_connected():
             return
         
@@ -101,6 +105,15 @@ class LyX(object):
         return
     
     def _send(self, msg, base='LYXCMD'):
+        """Send a command 'msg' to the LyX process.
+
+        Once a client has identified itself, it can issue commands in
+        its own context 'base'.
+        
+        Args:
+          msg: string
+          base: string
+        """
         raw = msg.encode('latin-1', 'replace')
         
         try:
