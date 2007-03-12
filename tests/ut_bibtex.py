@@ -26,12 +26,8 @@ class WithComments(Reader):
         return
     
     def comment_add(self, data):
-        self.comments.append (data)
+        self.comments.append(data)
         return
-
-    def record_begin(self):
-        Reader.record_begin(self)
-        self.id_add ('id', self.key)
         
 
 class WithCaseHandler (Writer):
@@ -45,8 +41,6 @@ class WithCaseHandler (Writer):
     
 
 class TestBibTeXReader (pybut.TestCase):
-
-
     def _cmp (self, bib, obj):
 
         io = StringIO.StringIO (bib.encode ('utf-8'))
@@ -56,7 +50,6 @@ class TestBibTeXReader (pybut.TestCase):
 
         assert ri == re, 'got\n\t %s\n instead of\n\t %s' % (
             repr (re), repr (ri))
-        
         
     def testComment (self):
 
@@ -307,12 +300,15 @@ class TestBibTeXImport (pybut.TestCase):
         """ Sometimes, there is no space between a dot and the following word """
         self._check('middledot')
         
+    def testNoKey(self):
+        """Some applications create BibTeX entries with no keys... """
+        self._check('no-key')
+        
 
 class TestBibTeXExport (pybut.TestCase):
 
     def _check (self, base):
-
-        f = pybut.dbname ()
+        f = pybut.dbname()
 
         db = Store.get ('file').dbopen (fp('%s.xml' % base))
         fd = open (f, 'w')
@@ -327,14 +323,13 @@ class TestBibTeXExport (pybut.TestCase):
         return
 
     def testEmpty (self):
-
         self._check ('exp-simple')
-        return
     
-    def testEmpty (self):
+    def testNested (self):
+        self._check('exp-nested')
 
-        self._check ('exp-nested')
-        return
+    def testNested (self):
+        self._check('exp-no-key')
 
 from Pyblio.Parsers.Syntax.BibTeX.Coding import encode
     

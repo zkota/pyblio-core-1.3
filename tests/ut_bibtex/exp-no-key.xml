@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <pyblio-db>
 <pyblio-schema>
  <attribute id="author" type="person">
@@ -37,29 +35,18 @@
  </txo-group>
 
 </pyblio-schema>
- <entry id="2">
+<entry id="1">
   <attribute id="author">
-   <person first="Frederic" last="Gobry"/>
-   <person first="First" last="Last"/>
+   <person first="Fred" last="Smith" />
   </attribute>
   <attribute id="doctype">
-   <txo group="doctype" id="1"/>
-  </attribute>
-  <attribute id="id">
-   <id value="toto2"/>
+   <txo group="doctype" id="1" />
   </attribute>
   <attribute id="journal">
-   <text>My journal</text>
-  </attribute>
-  <attribute id="note">
-   <text>a { and a }</text>
-  </attribute>
-  <attribute id="number">
-   <text>123</text>
+   <text>Some Journal</text>
   </attribute>
   <attribute id="title">
-   <text>This is a title that should span SEveral lines because it is
-   waaaaay too long for a single line. anyway. GRONF.</text>
+   <text>Something about Nothing</text>
   </attribute>
  </entry>
 </pyblio-db>

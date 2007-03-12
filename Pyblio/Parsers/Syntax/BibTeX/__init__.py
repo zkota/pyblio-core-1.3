@@ -91,7 +91,7 @@ class Reader(object):
         return
 
     def id_add (self, field, stream):
-        self.record [field] = [Attribute.ID(stream.flat())]
+        self.record[field] = [Attribute.ID(stream.flat())]
         return
 
     def url_add (self, field, stream):
@@ -565,16 +565,13 @@ class Writer(object):
         return
 
     def record_begin (self):
-
-        self.key = str (self.record ['id'] [0])
+        if 'id' in self.record:
+            self.key = str(self.record['id'][0])
 
         tp = self.record ['doctype'] [0]
         self.type = self.db.schema.txo[tp.group][tp.id].names ['C']
 
-        return
-
     def record_end (self):
-
         return
 
     def record_parse (self, key, value):
@@ -614,9 +611,17 @@ class Writer(object):
 
             self.record_end ()
 
-            if self.to_delete: continue
-            
-            ret = '@%s{%s,\n' % (self.type, self.key)
+            if self.to_delete:
+                continue
+
+            # Fully support the (bad) case where there is no key in
+            # the record, in order to support bad behaved applications
+            # that use it.
+            if self.key is None:
+                key = ''
+            else:
+                key = self.key + ','
+            ret = '@%s{%s\n' % (self.type, key)
 
             attrs = []
             keys  = self.field.keys ()

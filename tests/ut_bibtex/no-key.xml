@@ -1,0 +1,28 @@
+<pyblio-db>
+<pyblio-schema /><entry id="1">
+  <attribute id="author">
+   <person first="Fred" last="Smith" />
+  </attribute>
+  <attribute id="date">
+   <date month="9" year="1993" />
+  </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="1" />
+  </attribute>
+  <attribute id="journal">
+   <text>Some Journal</text>
+  </attribute>
+  <attribute id="number">
+   <text>40</text>
+  </attribute>
+  <attribute id="pages">
+   <text>21--23</text>
+  </attribute>
+  <attribute id="title">
+   <text>Something about Nothing</text>
+  </attribute>
+ </entry>
+ <resultset id="1" name="Imported from BibTeX">
+  <ref id="1" />
+ </resultset>
+</pyblio-db>
