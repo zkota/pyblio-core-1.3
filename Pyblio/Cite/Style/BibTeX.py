@@ -27,8 +27,8 @@ class AlphaKey(Alpha):
         return ''.join(k)
     
 
-# This formats a list of authors according to the Chicago style of
-# manual.
+# This formats a list of authors according to the Chicago manual of
+# style.
 def Chicago(people):
     return plural(people,
                   one  = join ('') [ people ],

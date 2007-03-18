@@ -54,9 +54,7 @@ class WOK(object):
     # Maximal number of results one can ask in a single result set.
     MAX_PER_BATCH = 100
 
-
     log = logging.getLogger('pyblio.external.wok')
-
     
     def __init__(self, db):
         self.reader = Reader()

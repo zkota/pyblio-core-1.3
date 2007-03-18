@@ -76,7 +76,7 @@ def _numver (txt):
 
     return tuple (v)
 
-_REQUIRED = (4,3,3,0,0)
+_REQUIRED = (4,3,0,0,0)
 
 def _checkver (module):
     version = _numver (module.__version__)
