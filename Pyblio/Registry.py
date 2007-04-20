@@ -188,7 +188,7 @@ def parse(directory):
                         assert (s.path is None or
                                 s.path == value), \
                                 _('Schema %s is available in %s and %s') % (
-                            s.path, value)
+                            schema, s.path, value)
 
                         s.path = value
 

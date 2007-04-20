@@ -24,7 +24,16 @@ class TestRegistry (pybut.TestCase):
 
         c = c[0]
         self.failUnlessEqual(c.target, 'another/format')
-        
+
+    def testUnique(self):
+        fd = open(',,sample.rip', 'w')
+        fd.write('''
+[with-path]
+
+path: %(system)s/bibtex-2.xml
+''')
+        fd.close()
+        self.failUnlessRaises(AssertionError, Registry.parse, '.')
     
 suite = pybut.suite (TestRegistry)
 if __name__ == '__main__':  pybut.run (suite)
