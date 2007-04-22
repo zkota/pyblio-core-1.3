@@ -55,121 +55,121 @@ def _xml(data):
 class QueryHelper(object):
 
     publication_types = {
-        _('Addresses'): 'addresses',
-        _('Bibliography'): 'bibliography',
-        _('Biography'): 'biography',
-        _('Classical Article'): 'classical article',
-        _('Clinical Conference'): 'clinical conference',
-        _('Clinical Trial'): 'clinical trial',
-        _('Clinical Trial, Phase I'): 'clinical trial, phase I',
-        _('Clinical Trial, Phase II'): 'clinical trial, phase II',
-        _('Clinical Trial, Phase III'): 'clinical trial, phase III',
-        _('Clinical Trial, Phase IV'): 'clinical trial, phase IV',
-        _('Comment'): 'comment',
-        _('Congresses'): 'congresses',
-        _('Consensus Development Conference'): 'consensus development conference',
-        _('Consensus Development Conference, NIH'): 'consensus development conference, NIH',
-        _('Controlled Clinical Trial'): 'controlled clinical trial',
-        _('Corrected and Republished Article'): 'corrected and republished article',
-        _('Dictionary'): 'dictionary',
-        _('Directory'): 'directory',
-        _('Duplicate Publication'): 'duplicate publication',
-        _('Editorial'): 'editorial',
-        _('Evaluation Studies'): 'evaluation studies',
-        _('Festschrift'): 'festschrift',
-        _('Government Publications'): 'government publications',
-        _('Guideline'): 'guideline',
-        _('Historical Article'): 'historical article',
-        _('Interview'): 'interview',
-        _('Journal Article'): 'journal article',
-        _('Lectures'): 'lectures',
-        _('Legal Cases'): 'legal cases',
-        _('Legislation'): 'legislation',
-        _('Letter'): 'letter',
-        _('Meta-Analysis'): 'meta-analysis',
-        _('Multicenter Study'): 'multicenter study',
-        _('News'): 'news',
-        _('Newspaper Article'): 'newspaper article',
-        _('Overall'): 'overall',
-        _('Periodical Index'): 'periodical index',
-        _('Practice Guideline'): 'practice guideline',
-        _('Randomized Controlled Trial'): 'randomized controlled trial',
-        _('Retraction of Publication'): 'retraction of publication',
-        _('Retracted Publication'): 'retracted publication',
-        _('Review'): 'review',
-        _('Review, Academic'): 'review, academic',
-        _('Review Literature'): 'review, literature',
-        _('Review, Multicase'): 'review, multicase',
-        _('Review of Reported Cases'): 'review of reported cases',
-        _('Review, Tutorial'): 'review, tutorial',
-        _('Scientific Integrity Review'): 'scientific integrity review',
-        _('Technical Report'): 'technical report',
-        _('Twin Study'): 'twin study',
-        _('Validation Studies'): 'validation studies',
+        'addresses': _('Addresses'),
+        'bibliography': _('Bibliography'),
+        'biography': _('Biography'),
+        'classical article': _('Classical Article'),
+        'clinical conference': _('Clinical Conference'),
+        'clinical trial': _('Clinical Trial'),
+        'clinical trial, phase I': _('Clinical Trial, Phase I'),
+        'clinical trial, phase II': _('Clinical Trial, Phase II'),
+        'clinical trial, phase III': _('Clinical Trial, Phase III'),
+        'clinical trial, phase IV': _('Clinical Trial, Phase IV'),
+        'comment': _('Comment'),
+        'congresses': _('Congresses'),
+        'consensus development conference': _('Consensus Development Conference'),
+        'consensus development conference, NIH': _('Consensus Development Conference, NIH'),
+        'controlled clinical trial': _('Controlled Clinical Trial'),
+        'corrected and republished article': _('Corrected and Republished Article'),
+        'dictionary': _('Dictionary'),
+        'directory': _('Directory'),
+        'duplicate publication': _('Duplicate Publication'),
+        'editorial': _('Editorial'),
+        'evaluation studies': _('Evaluation Studies'),
+        'festschrift': _('Festschrift'),
+        'government publications': _('Government Publications'),
+        'guideline': _('Guideline'),
+        'historical article': _('Historical Article'),
+        'interview': _('Interview'),
+        'journal article': _('Journal Article'),
+        'lectures': _('Lectures'),
+        'legal cases': _('Legal Cases'),
+        'legislation': _('Legislation'),
+        'letter': _('Letter'),
+        'meta-analysis': _('Meta-Analysis'),
+        'multicenter study': _('Multicenter Study'),
+        'news': _('News'),
+        'newspaper article': _('Newspaper Article'),
+        'overall': _('Overall'),
+        'periodical index': _('Periodical Index'),
+        'practice guideline': _('Practice Guideline'),
+        'randomized controlled trial': _('Randomized Controlled Trial'),
+        'retraction of publication': _('Retraction of Publication'),
+        'retracted publication': _('Retracted Publication'),
+        'review': _('Review'),
+        'review, academic': _('Review, Academic'),
+        'review, literature': _('Review Literature'),
+        'review, multicase': _('Review, Multicase'),
+        'review of reported cases': _('Review of Reported Cases'),
+        'review, tutorial': _('Review, Tutorial'),
+        'scientific integrity review': _('Scientific Integrity Review'),
+        'technical report': _('Technical Report'),
+        'twin study': _('Twin Study'),
+        'validation studies': _('Validation Studies'),
     }
 
     language = {
-        _('English'): 'english',
-        _('French'): 'french',
-        _('German'): 'german',
-        _('Italian'): 'italian',
-        _('Japanese'): 'japanese',
-        _('Russian'): 'russian',
-        _('Spanish'): 'spanish',
+        'english': _('English'),
+        'french': _('French'),
+        'german': _('German'),
+        'italian': _('Italian'),
+        'japanese': _('Japanese'),
+        'russian': _('Russian'),
+        'spanish': _('Spanish'),
     }
 
-    age_range = {
-        _('All Infant: birth-23 month'): 'infant',
-        _('All Child: 0-18 years'): 'child',
-        _('All Adult: 19+ years'): 'adult',
-        _('Newborn: birth-1 month'): 'infant, newborn',
-        _('Infant: 1-23 months'): 'infant',
-        _('Preschool Child: 2-5 years'): 'child, preschool',
-        _('Child: 6-12 years'): 'child',
-        _('Adolescent: 13-18 years'): 'adolescence',
-        _('Adult: 19-44 years'): 'adult',
-        _('Middle Aged: 45-64 years'): 'middle age',
-        _('Aged: 65+ years'): 'aged',
-        _('80 and over: 80+ years'): 'aged, 80 and over',
-    }
+    age_range = [
+        ('infant', _('All Infant (birth-23 month)')),
+        ('child', _('All Child (0-18 years)')),
+        ('adult', _('All Adult (19+ years)')),
+        ('infant, newborn', _('Newborn (birth-1 month)')),
+        ('infant', _('Infant (1-23 months)')),
+        ('child, preschool', _('Preschool Child (2-5 years)')),
+        ('child', _('Child (6-12 years)')),
+        ('adolescence', _('Adolescent (13-18 years)')),
+        ('adult', _('Adult (19-44 years)')),
+        ('middle age', _('Middle Aged (45-64 years)')),
+        ('aged', _('Aged (65+ years)')),
+        ('aged, 80 and over', _('80 and over')),
+    ]
 
     human_animal = {
-        _('Human'): 'human',
-        _('Animal'): 'animal',
+        'human': _('Human'),
+        'animal': _('Animal'),
     }
 
     gender = {
-        _('Female'): 'female',
-        _('Male'): 'male',
+        'female': _('Female'),
+        'male': _('Male'),
     }
 
     subset = {
-        _('Bioethics'): 'bioethics[ab]',
+        'bioethics[ab]': _('Bioethics'),
 
-        _('Core clinical journals'): 'jsubsetaim', #AIM - Abridged Index Medicus A list of core clinical journals created 20 years ago 
-        _('Biotechnology journals'): 'jsubsetb', #B -  biotechnology journals (assigned 1990 - 1998), non-Index Medicus
-        _('Communication disorders journals'): 'jusbsetc', #C -  communication disorders journals (assigned 1977 - 1997), non-Index Medicus
-        _('Dental journals'): 'jsubsetd', #D  -  dentistry journals 
-        _('Bioethics journals'): 'jsubsete', #E -  bioethics journals, non-Index Medicus
-        _('Health administration journals'): 'jsubseth', #H -  health administration journals, non-Index Medicus 
-        _('Index Medicus journals'): 'jsubsetim', #IM -  Index Medicus journals 
-        _('Consumer health journals'): 'jsubsetk', #K -  consumer health journals, non-Index Medicus 
-        _('Nursing journals'): 'jsubsetn', #N  -  nursing journals 
-        _('History of Medicine journals'): 'jsubsetq', #Q -  history of medicine journals, non-Index Medicus 
-        _('Reproduction journals'): 'jsubsetr', #R -  reproduction journals (assigned 1972 - 1979), non-Index Medicus
-        _('NASA journals'): 'jsubsets', #S -  National Aeronautics and Space Administration (NASA) journals, non-Index Medicus 
-        _('Health tech assesment journals'): 'jsubsett',#T -  health technology assessment journals, non-Index Medicus 
-        _('AIDS/HIV journals'): 'jsubsetx', #X -  AIDS/HIV journals, non-Index Medicus 
+        'jsubsetaim': _('Core clinical journals'), #AIM - Abridged Index Medicus A list of core clinical journals created 20 years ago 
+        'jsubsetb': _('Biotechnology journals'), #B -  biotechnology journals (assigned 1990 - 1998), non-Index Medicus
+        'jusbsetc': _('Communication disorders journals'), #C -  communication disorders journals (assigned 1977 - 1997), non-Index Medicus
+        'jsubsetd': _('Dental journals'), #D  -  dentistry journals 
+        'jsubsete': _('Bioethics journals'), #E -  bioethics journals, non-Index Medicus
+        'jsubseth': _('Health administration journals'), #H -  health administration journals, non-Index Medicus 
+        'jsubsetim': _('Index Medicus journals'), #IM -  Index Medicus journals 
+        'jsubsetk': _('Consumer health journals'), #K -  consumer health journals, non-Index Medicus 
+        'jsubsetn': _('Nursing journals'), #N  -  nursing journals 
+        'jsubsetq': _('History of Medicine journals'), #Q -  history of medicine journals, non-Index Medicus 
+        'jsubsetr': _('Reproduction journals'), #R -  reproduction journals (assigned 1972 - 1979), non-Index Medicus
+        'jsubsets': _('NASA journals'), #S -  National Aeronautics and Space Administration (NASA) journals, non-Index Medicus 
+        'jsubsett': _('Health tech assesment journals'), #T -  health technology assessment journals, non-Index Medicus 
+        'jsubsetx': _('AIDS/HIV journals'), #X -  AIDS/HIV journals, non-Index Medicus 
     
-        _('AIDS'): 'aids[sb]',
-        _('Complementary and Alternative Medicine'): 'cam[sb]',
-        _('History of Medicine'): 'history[sb]',
-        _('In process'): 'in process[sb]',
-        _('MEDLINE'): 'medline[sb]',
-        _('PubMed Central'): 'medline pmc[sb]',
-        _('Space Life Sciences'): 'space[sb]',
-        _('Supplied by Publisher'): 'publisher[sb]',
-        _('Toxicology'): 'tox[sb]',
+        'aids[sb]': _('AIDS'),
+        'cam[sb]': _('Complementary and Alternative Medicine'),
+        'history[sb]': _('History of Medicine'),
+        'in process[sb]': _('In process'),
+        'medline[sb]': _('MEDLINE'),
+        'medline pmc[sb]': _('PubMed Central'),
+        'space[sb]': _('Space Life Sciences'),
+        'publisher[sb]': _('Supplied by Publisher'),
+        'tox[sb]': _('Toxicology'),
     }
     
     def makeQuery(self, keyword=None, abstract=False, epubahead=False,
@@ -221,9 +221,9 @@ class QueryHelper(object):
         if subset:
             parts.append(subset)
         if age_range:
-            parts.append(agerange + '[mh]')
+            parts.append(age_range + '[mh]')
         if human_animal:
-            parts.append(humananimal + '[mh]')
+            parts.append(human_animal + '[mh]')
         if gender:
             parts.append(gender + '[mh]')
 
@@ -332,7 +332,6 @@ class PubMed(object):
         if not query:
             def autofire():
                 results.callback(0)
-
             reactor.callLater(0, autofire)
             return results, rs
         
@@ -344,7 +343,7 @@ class PubMed(object):
         def got_summary(data):
             # Total number of results
             all_results = int(data.find('./Count').text)
-
+            
             # Parameters necessary to fetch the content of the result set
             fetchdata = {
                 'db': db,
@@ -354,7 +353,8 @@ class PubMed(object):
             
             stats['missing'] = min(all_results, maxhits)
 
-            self.log.debug('%d results, retrieving %d' % (all_results, stats['missing']))
+            self.log.info('%d results, retrieving %d' % (
+                all_results, stats['missing']))
 
             def fetch(data):
                 # data is None during the initial call to the method,
@@ -375,11 +375,13 @@ class PubMed(object):
                     stats['missing'] -= freshly_parsed
                 
                 if stats['missing'] <= 0:
+                    self.log.info('finished')
                     results.callback(all_results)
                     return
 
                 # No need to fetch 500 results if only 20 are requested
                 batch = min(self.BATCH_SIZE, stats['missing'])
+                self.log.info('retrieving next %d' % batch)
                 
                 d = self._query(self.SRV_FETCH, fetchdata,
                                 retstart=len(rs), retmax=batch)

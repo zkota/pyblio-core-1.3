@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pyblio-citator>
+  <name>Plain</name>
+  
+  <!-- How individual references are formatted -->
+  <citation-style>
+    Pyblio.Cite.Style.BibTeX.full
+  </citation-style>
+  
+  <!-- How do the keys look like -->
+  <key-style>
+    Pyblio.Cite.Style.Base.Numeric
+  </key-style>
+  
+  <!-- Order of the keys in the bibliography -->
+  <bibliography-order>
+    Pyblio.Cite.Style.Base.document_order
+  </bibliography-order>
+</pyblio-citator>

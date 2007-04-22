@@ -1,6 +1,6 @@
 import pybut
 
-from Pyblio import Adapter, Store, Schema, Attribute
+from Pyblio import Adapter, Store, Schema, Attribute, Registry
 
 class A2BAdapter(Adapter.OneToOneAdapter):
     """ This adapter renames field 'a' into field 'b' """
@@ -60,6 +60,17 @@ class TestFromAtoB(pybut.TestCase):
         del self.dba[k]
         self.failUnlessEqual(list(self.dbb.entries.itervalues()), [])
 
+    def testResultSet(self):
+        r = Store.Record()
+        k = r.add('a', 'A sample !', Attribute.Text)
+
+        # Add a record in A...
+        k = self.dba.add(r)
+
+        rs = self.dbb.rs.new()
+        rs.add(k)
+
+        self.failUnlessEqual(list(rs.iteritems()), [(k, self.dbb[k])])
 
     def testXMLWrite(self):
         r = Store.Record()
@@ -86,6 +97,24 @@ class TestResolution(pybut.TestCase):
 
         dest = Adapter.adapt_schema(self.dba, 'b')
         self.failUnlessEqual(dest.schema.id, 'b')
+
+class TestAdapters(pybut.TestCase):
+    def setUp(self):
+        Registry.parse_default()
+    def tearDown(self):
+        Registry.reset()
+    def check(self, name, schema):
+        src = Store.get('file').dbopen(
+            pybut.src('ut_adapter/' + name + '-src.bip'))
+        dst = Adapter.adapt_schema(src, schema)
+        tmp = pybut.dbname()
+        fd = open(tmp, 'w')
+        dst.xmlwrite(fd)
+        fd.close()
+        pybut.fileeq(pybut.src('ut_adapter/' + name + '-dst.bip'), tmp)
+
+    def testWOK2BibTeX(self):
+        self.check('wok-to-bibtex', 'org.pybliographer/bibtex/0.1')
         
 suite = pybut.suite(TestFromAtoB, TestResolution)
 

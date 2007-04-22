@@ -95,15 +95,15 @@ class Record (dict):
 	self.key = None
         return
 
-    def get (self, key, default = None):
+    def get(self, key, default=None):
         """ Get a field, understanding the dotted notation of the
         L{add} method"""
-        if '.' not in key: return dict.get (self, key, default)
+        if '.' not in key:
+            return dict.get(self, key, default)
 
-        l, r = key.split ('.')
+        l, r = key.split('.')
         try:
-            return self [l] [0].q [r]
-
+            return self[l][0].q[r]
         except (KeyError, IndexError):
             return default
         
@@ -275,7 +275,7 @@ class ResultSet(object):
     """
 
 
-    def add (self, k):
+    def add(self, k):
         """ Add a new item in the set.
 
         @param k: the key to add to the set
@@ -283,7 +283,7 @@ class ResultSet(object):
         """
         raise NotImplemented ('please override')
     
-    def __delitem__ (self, k):
+    def __delitem__(self, k):
         """ Remove an item from the set.
 
         @param k: the key to remove from the set
@@ -291,32 +291,32 @@ class ResultSet(object):
         """
         raise NotImplemented ('please override')
 
-    def __iter__ (self):
+    def __iter__(self):
         raise NotImplemented ('please override')
 
-    def itervalues (self):
+    def itervalues(self):
         raise NotImplemented ('please override')
     
-    def iterkeys (self):
+    def iterkeys(self):
         raise NotImplemented ('please override')
     
-    def iteritems (self):
+    def iteritems(self):
         raise NotImplemented ('please override')
 
-    def __len__ (self):
+    def __len__(self):
         raise NotImplemented ('please override')
 
     def destroy(self, k):
         """ Delete B{all the records} contained in the result set."""
         raise NotImplemented ('please override')
         
-    def has_key (self):
+    def has_key(self):
         raise NotImplemented ('please override')
     
-    def view (self, criterion):
+    def view(self, criterion):
         raise NotImplemented ('please override')
         
-    def xmlwrite (self, fd):
+    def xmlwrite(self, fd):
 
         if self.name:
             name = ' name=%s' % quoteattr (self.name.encode ('utf-8'))

@@ -18,7 +18,6 @@ class WeakMethodBound :
     """ A weak reference on a bound method """
     
     def __init__ (self, f):
-
         # Keep a hard reference on the function itself
         self.f = f.im_func
         self.c = weakref.ref(f.im_self)
@@ -26,7 +25,6 @@ class WeakMethodBound :
 
     
     def __call__ (self , *arg):
-
         o = self.c()
         
         if o is None:
@@ -44,19 +42,15 @@ class WeakMethodBound :
 
 
 class WeakMethodFree:
-
     """ A weak reference on an unbound method """
-    
     def __init__ (self, f):
         self.f = weakref.ref(f)
         return
     
     def __call__ (self, *arg):
         o = self.f()
-        
         if o is None :
             raise WeakError , 'Function no longer exist'
-        
         return apply(o, arg)
 
     def same(self, fn):
@@ -87,28 +81,22 @@ class Publisher(object):
     
 
     def emit(self, signal, *args):
-
         """ Call this method to emit a signal. Registered client will
         have their callbacks automatically invoked, with the specified
         arguments """
         
         try:
             queue = self.__observers[signal]
-            
         except KeyError:
             return
 
         for data in queue[:]:
-
             cb, bound = data
-
             try:
                 apply(cb, args + bound)
-                
             except WeakError:
                 queue.remove(data)
                 continue
-
         return
     
 

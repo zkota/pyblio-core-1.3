@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<pyblio-db>
+<pyblio-schema id="org.pybliographer/wok/0.1">
+ <name>Data from Web of Knowledge</name>
+
+ <attribute id="abstract" type="text">
+  <name>Abstract</name>
+ </attribute>
+
+ <attribute id="article_no" type="text">
+  <name>Article #</name>
+ </attribute>
+
+ <attribute id="author" type="person">
+  <name>Authors</name>
+ </attribute>
+
+ <attribute id="doctype" type="txo" group="doctype">
+  <name>Document type</name>
+ </attribute>
+
+ <attribute id="doi" type="id">
+  <name>DOI</name>
+ </attribute>
+
+ <attribute id="keyword" type="text">
+  <name>Keywords</name>
+ </attribute>
+
+ <attribute id="keyword-plus" type="text">
+  <name>ISI-Generated Keywords</name>
+ </attribute>
+
+ <attribute id="ref" type="id">
+  <name>References</name>
+ </attribute>
+
+ <attribute id="source" type="text">
+  <name>Source Title</name>
+
+  <qualifiers>
+   <attribute id="abbrev" type="text">
+    <name>Abbreviated name</name>
+   </attribute>
+   <attribute id="issn" type="id">
+    <name>ISSN</name>
+   </attribute>
+   <attribute id="number" type="text">
+    <name>Number</name>
+   </attribute>
+   <attribute id="pages" type="text">
+    <name>Pages</name>
+   </attribute>
+   <attribute id="series" type="text">
+    <name>Series</name>
+   </attribute>
+   <attribute id="volume" type="text">
+    <name>Volume</name>
+   </attribute>
+   <attribute id="year" type="text">
+    <name>Year</name>
+   </attribute>
+  </qualifiers>
+ </attribute>
+
+ <attribute id="title" type="text">
+  <name>Title</name>
+ </attribute>
+
+ <attribute id="ut" type="id">
+  <name>ISI unique identifier</name>
+ </attribute>
+
+ <txo-group id="doctype">
+  <txo-item id="1">
+   <name>Abstract of Published Item</name>
+   <name lang="C">2</name>
+  </txo-item>
+  <txo-item id="2">
+   <name>Art Exhibit Review</name>
+   <name lang="C">A</name>
+  </txo-item>
+  <txo-item id="3">
+   <name>Article</name>
+   <name lang="C">@</name>
+  </txo-item>
+  <txo-item id="4">
+   <name>Bibliography</name>
+   <name lang="C">7</name>
+  </txo-item>
+  <txo-item id="5">
+   <name>Biographical Item</name>
+   <name lang="C">I</name>
+  </txo-item>
+  <txo-item id="6">
+   <name>Book review</name>
+   <name lang="C">B</name>
+  </txo-item>
+  <txo-item id="7">
+   <name>Chronology</name>
+   <name lang="C">K</name>
+  </txo-item>
+  <txo-item id="8">
+   <name>Correction</name>
+   <name lang="C">C</name>
+  </txo-item>
+  <txo-item id="9">
+   <name>Dance Performance Review</name>
+   <name lang="C">Z</name>
+  </txo-item>
+  <txo-item id="10">
+   <name>Database Review</name>
+   <name lang="C">0</name>
+  </txo-item>
+  <txo-item id="11">
+   <name>Discussion</name>
+   <name lang="C">D</name>
+  </txo-item>
+  <txo-item id="12">
+   <name>Editorial Material</name>
+   <name lang="C">E</name>
+  </txo-item>
+  <txo-item id="13">
+   <name>Excerpt</name>
+   <name lang="C">X</name>
+  </txo-item>
+  <txo-item id="14">
+   <name>Fiction, Creative Prose</name>
+   <name lang="C">O</name>
+  </txo-item>
+  <txo-item id="15">
+   <name>Film Review</name>
+   <name lang="C">F</name>
+  </txo-item>
+  <txo-item id="16">
+   <name>Hardware Review</name>
+   <name lang="C">8</name>
+  </txo-item>
+  <txo-item id="17">
+   <name>Letter</name>
+   <name lang="C">L</name>
+  </txo-item>
+  <txo-item id="18">
+   <name>Meeting Abstract</name>
+   <name lang="C">M</name>
+  </txo-item>
+  <txo-item id="19">
+   <name>Music Performance Review</name>
+   <name lang="C">J</name>
+  </txo-item>
+  <txo-item id="20">
+   <name>Music Score</name>
+   <name lang="C">S</name>
+  </txo-item>
+  <txo-item id="21">
+   <name>Music Score Review</name>
+   <name lang="C">G</name>
+  </txo-item>
+  <txo-item id="22">
+   <name>News item</name>
+   <name lang="C">5</name>
+  </txo-item>
+  <txo-item id="23">
+   <name>Note</name>
+   <name lang="C">N</name>
+  </txo-item>
+  <txo-item id="24">
+   <name>Poetry</name>
+   <name lang="C">Y</name>
+  </txo-item>
+  <txo-item id="25">
+   <name>Record Review</name>
+   <name lang="C">H</name>
+  </txo-item>
+  <txo-item id="26">
+   <name>Reprint</name>
+   <name lang="C">6</name>
+  </txo-item>
+  <txo-item id="27">
+   <name>Review</name>
+   <name lang="C">R</name>
+  </txo-item>
+  <txo-item id="28">
+   <name>Script</name>
+   <name lang="C">Q</name>
+  </txo-item>
+  <txo-item id="29">
+   <name>Software Review</name>
+   <name lang="C">9</name>
+  </txo-item>
+  <txo-item id="30">
+   <name>TV Review, Radio Review</name>
+   <name lang="C">V</name>
+  </txo-item>
+  <txo-item id="31">
+   <name>Theater Review</name>
+   <name lang="C">T</name>
+  </txo-item>
+ </txo-group>
+
+</pyblio-schema>
+ <entry id="1">
+  <attribute id="author">
+   <person first="A" last="Abecker"/>
+   <person first="L" last="van Elst"/>
+   <person first="S" last="Staab"/>
+  </attribute>
+  <attribute id="doctype">
+   <txo group="doctype" id="3"/>
+  </attribute>
+  <attribute id="source">
+   <text>
+    <content>PROFESSIONAL KNOWLEDGE MANAGEMENT</content>
+    <attribute id="volume">
+     <text>3782</text>
+    </attribute>
+    <attribute id="series">
+     <text>LECTURE NOTES IN ARTIFICIAL INTELLIGENCE</text>
+    </attribute>
+    <attribute id="abbrev">
+     <text>LECT NOTES ARTIF INT</text>
+    </attribute>
+    <attribute id="pages">
+     <text>222-223</text>
+    </attribute>
+    <attribute id="year">
+     <text>2005</text>
+    </attribute>
+   </text>
+  </attribute>
+  <attribute id="title">
+   <text>PAIKM-2005 - Peer-to-Peer and agent infrastructures for knowledge management</text>
+  </attribute>
+  <attribute id="ut">
+   <id value="000235835600025"/>
+  </attribute>
+ </entry>
+</pyblio-db>

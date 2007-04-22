@@ -22,6 +22,10 @@ path: %(cwd)s/crossref.sip
 
 path: %(cwd)s/wok.sip
 
+adapters:
+	Pyblio.Adapters.WOK2BibTeX.WOK2BibTeX
+	-> org.pybliographer/bibtex/0.1
+
 # PubMed
 [org.pybliographer/pubmed/0.1]
 

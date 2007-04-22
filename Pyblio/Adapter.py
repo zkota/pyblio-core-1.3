@@ -50,12 +50,55 @@ class Adapter(Database):
         raise RuntimeError(_("Adapter databases cannot be read from file"))
     
     
+class ResultSetAdapter(object):
+    def __init__(self, db, rs):
+        self.db = db
+        self.rs = rs
+
+    def itervalues(self):
+        for k in self.rs.iterkeys():
+            yield self.db[k]
+
+    def iteritems(self):
+        for k in self.rs.iterkeys():
+            yield k, self.db[k]
+
+    def iterkeys(self):
+        return self.rs.iterkeys()
+
+    def add(self, k):
+        self.rs.add(k)
+        
+    def __delitem__(self, k):
+        del self.rs[k]
+
+class ResultSetStoreAdapter(object):
+    def __init__(self, db, adapted):
+        self.db = db
+        self.adapted = adapted
+
+    def __getitem__ (self, k):
+        return ResultSetAdapter(self.adapted, self.db.rs[k])
+
+    def __delitem__ (self, k):
+        del self.db.rs[k]
+
+    def __iter__ (self):
+        return iter(self.db.rs)
+
+    def new(self, rsid=None):
+        return ResultSetAdapter(self.adapted, self.db.rs.new())
+
+    def update(self, result_set):
+        return self.db.rs.update(result_set)
 
 class OneToOneAdapter(Adapter):
-
     """ This adapter assumes a one-to-one mapping between the source
-    and the target databases. """
+    and the target databases. The keys are not modified. """
 
+    def __init__(self, base):
+        Adapter.__init__(self, base)
+        self.rs = ResultSetStoreAdapter(base, self)
 
     def source2target(self, record):
         """ Translates a record from the source db to the target db """
@@ -79,36 +122,23 @@ class OneToOneAdapter(Adapter):
 
     def _entries(self):
         e = self.base.entries
-        
         class Looper:
             def itervalues(s):
                 for v in e.itervalues():
                     yield self.source2target(v)
                 return
-            
             def iteritems(s):
                 for k, v in e.iteritems():
                     yield k, self.source2target(v)
                 return
-
             def iterkeys(s):
                 return e.iterkeys()
-
-            __iter__ = iterkeys
-
             def __len__(s):
                 return len(e)
-            
+            __iter__ = iterkeys
         return Looper()
 
     entries = property(_entries, None)
-    
-    def _rs(self):
-        return self.base.rs
-
-    rs = property(_rs, None)
-    
-
 
 def adapt_schema(db, target_schema):
     """ Returns a database using the specified 'target_schema', and
