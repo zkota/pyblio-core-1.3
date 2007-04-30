@@ -40,7 +40,7 @@ setup(
     packages = find_packages(),
 
     package_data = {
-    'Pyblio': ['RIP/*.sip', 'RIP/*.rip'],
+    'Pyblio': ['RIP/*.sip', 'RIP/*.rip', 'RIP/*.cip'],
     },
 
     author = "Frédéric Gobry",
