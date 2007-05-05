@@ -47,6 +47,8 @@ class WOK(object):
 
     """
 
+    schema = 'org.pybliographer/wok/0.1'
+
     # This base URL is for IP-based authentification. Don't know how
     # other systems work.
     baseURL = "http://estipub.isiknowledge.com/esti/cgi"

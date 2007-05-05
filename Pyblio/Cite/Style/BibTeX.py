@@ -72,5 +72,5 @@ plain = join('. ')[plain_author, one('title'), plain_place] + '.'
 # The "full" format also provides an abstract.
 full = join('\n')[Span(size='large', weight='bold')[one('title')],
                   Span(size='large')[plain_author],
-                  plain_place,
+                  Span(size='large')[plain_place],
                   Span(color='#505050')[one('abstract')]]

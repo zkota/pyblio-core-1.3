@@ -31,7 +31,10 @@ def init_logging(filename=None):
     if filename is None:
         log_handler = logging.StreamHandler()
     else:
-        log_handler = logging.FileHandler(filename)
+        from logging.handlers import RotatingFileHandler
+        log_handler = RotatingFileHandler(filename, maxBytes=10 * 2**20,
+                                          backupCount=5)
+
     _fmtr = logging.Formatter('%(name)s(%(filename)s) [%(levelname)s]: %(message)s')
     log_handler.setFormatter(_fmtr)
     

@@ -246,6 +246,8 @@ class QueryHelper(object):
 class PubMed(object):
     """ A connection to the PubMed database """
 
+    schema = 'org.pybliographer/pubmed/0.1'
+
     baseURL = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils'
 
     BATCH_SIZE = 500

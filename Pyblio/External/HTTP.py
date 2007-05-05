@@ -14,6 +14,11 @@ if socks:
     socks_port = int(socks_port)
 
 class SOCKS4Protocol(Protocol):
+    """Implementation of subset of SOCKS4.
+
+    Once the communication is established, this class behaves as a
+    transport for the client that instanciated it.
+    """
     def connectionMade(self):
         self.established = False
         self.buf = ""
@@ -61,6 +66,7 @@ class SOCKS4Protocol(Protocol):
         self.transport.loseConnection()
 
 class SOCKS4Client(ClientFactory):
+    """ A SOCKS4 connection to a server."""
     protocol = SOCKS4Protocol
 
     def __init__(self, addr, port, client):
@@ -70,6 +76,9 @@ class SOCKS4Client(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         self.client.clientConnectionFailed(connector, reason)
+
+    def clientConnectionLost(self, connector, reason):
+        self.client.clientConnectionLost(connector, reason)
 
 class HTTPRetrieve(client.HTTPClientFactory):
     """ Cancellable HTTP client.
