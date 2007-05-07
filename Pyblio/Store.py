@@ -108,7 +108,7 @@ class Record (dict):
             return default
         
 
-    def xmlwrite (self, fd, offset = 1):
+    def xmlwrite(self, fd, offset=1):
         """ Export as XML.
 
         Writes the content of the record as an XML fragment.
@@ -135,7 +135,7 @@ class Record (dict):
         fd.write (ws + '</entry>\n')
         return
 
-    def add (self, field, value, constructor = None):
+    def add(self, field, value, constructor=None):
         """
         Adds a new value to a field of this record.
         
@@ -212,7 +212,7 @@ class Record (dict):
             upd.append (generate (value, constructor))
             f [-1].q [sub] = upd
 
-    def deep_equal (self, other):
+    def deep_equal(self, other):
         if not isinstance (other, Record): return False
 
         for k in self:

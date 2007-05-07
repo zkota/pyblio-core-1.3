@@ -238,11 +238,11 @@ class Block (object):
             self.closer[self._o])
 
 
-class EndOfFile (Exception): pass
+class EndOfFile(Exception): pass
 
-class Cache (object):
+class Cache(object):
 
-    def __init__ (self, fd, charset):
+    def __init__(self, fd, charset):
 
         self.fd = fd
         self.ln = 0
@@ -251,25 +251,22 @@ class Cache (object):
         self._buf = []
         return
 
-    def readline (self):
-
+    def readline(self):
         self.ln += 1
-
         if self._buf:
-            return self._buf.pop ()
+            return self._buf.pop()
 
-        l = self.fd.readline ()
-        if not l: raise EndOfFile ()
-        
-        return l.decode (self.cs)
+        l = self.fd.readline()
+        if not l:
+            raise EndOfFile()
+        try:
+            return l.decode(self.cs)
+        except UnicodeDecodeError, err:
+            raise ParserError(str(err), self.ln)
 
-    def unreadline (self, line):
-
+    def unreadline(self, line):
         self.ln -= 1
         self._buf.append (line)
-        
-        return
-
 
 class Context (object):
 

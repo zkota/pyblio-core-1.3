@@ -16,6 +16,8 @@ if socks:
 class SOCKS4Protocol(Protocol):
     """Implementation of subset of SOCKS4.
 
+    Information taken from http://en.wikipedia.org/wiki/SOCKS
+    
     Once the communication is established, this class behaves as a
     transport for the client that instanciated it.
     """
@@ -23,8 +25,12 @@ class SOCKS4Protocol(Protocol):
         self.established = False
         self.buf = ""
         log.msg("SOCKS connection to %s" % self.factory.addr)
-        data = struct.pack('!BBH', 0x04, 0x01, self.factory.port)
+        data = struct.pack('!BBH',
+                           0x04, # SOCKS version 4
+                           0x01, # request tcp connection
+                           self.factory.port)
         data += socket.inet_aton(self.factory.addr)
+        # provide a dumb username
         data += 'pyblio\0'
         self.transport.write(data)
 

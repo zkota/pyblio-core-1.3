@@ -11,8 +11,8 @@ from Pyblio.Parsers.Syntax.BibTeX import Writer
 from Pyblio.Parsers.Syntax.BibTeX import Parser
 
 from Pyblio.Parsers.Syntax.BibTeX.Parser import Record, Block, Cmd, Text, Join, Comment, ATComment
-
 from Pyblio import Store, Schema, Registry
+from Pyblio.Exceptions import ParserError
 
 def fp(*args):
     return pybut.fp(*(('ut_bibtex',) + args))
@@ -41,12 +41,12 @@ class WithCaseHandler (Writer):
     
 
 class TestBibTeXReader (pybut.TestCase):
-    def _cmp (self, bib, obj):
+    def _cmp (self, bib, obj, charset='utf-8'):
 
-        io = StringIO.StringIO (bib.encode ('utf-8'))
-        re = list (Parser.read (io))
+        io = StringIO.StringIO(bib)
+        re = list(Parser.read(io, charset=charset))
 
-        ri = eval (obj)
+        ri = eval(obj)
 
         assert ri == re, 'got\n\t %s\n instead of\n\t %s' % (
             repr (re), repr (ri))
@@ -134,6 +134,11 @@ tutu
 
         self._cmp (b, o)
 
+    def testCharset(self):
+        b = u'''@article{toto, gronf = "héhé"}'''.encode('latin-1')
+        o = """[Record (u'article', Text(u'toto'), [(Text(u'gronf'), Join ([Block ('\"', [Text(u\'h\xe9h\xe9\')])]))])]"""
+        self._cmp(b, o, 'latin-1')
+        self.failUnlessRaises(ParserError, self._cmp, b, o, 'utf-8')
         
 class TestBibTeXImport (pybut.TestCase):
 
