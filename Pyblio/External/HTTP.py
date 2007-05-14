@@ -4,7 +4,6 @@ import socket
 from twisted.web import client
 from twisted.internet import reactor
 from twisted.internet.protocol import ClientFactory, Protocol
-from twisted.names.client import getHostByName
 from twisted.python import log
 
 # provide SOCKS access if needed
@@ -100,6 +99,7 @@ class HTTPRetrieve(client.HTTPClientFactory):
 
         scheme, host, port, path = client._parse(url)
         if socks:
+            from twisted.names.client import getHostByName
             def connectToIP(ip):
                 self.socks = SOCKS4Client(ip, port, self)
                 reactor.connectTCP(socks_addr, socks_port, self.socks)
