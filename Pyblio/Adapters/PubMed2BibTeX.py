@@ -28,6 +28,7 @@ class PubMed2BibTeX(OneToOneAdapter):
 
         bibtex.add('volume', medline.get('journal.volume', [None])[0])
         bibtex.add('number', medline.get('journal.issue', [None])[0])
+        bibtex.add('pages', medline.get('journal.pages', [None])[0])
         
         return bibtex
     

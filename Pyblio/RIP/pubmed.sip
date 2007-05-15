@@ -25,6 +25,9 @@
     <attribute id="month" type="text">
       <name>Month</name>
     </attribute>
+    <attribute id="pages" type="text">
+      <name>Pagination</name>
+    </attribute>
   </qualifiers>
  </attribute>
 

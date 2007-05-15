@@ -97,7 +97,28 @@ class Reader(object):
                 last=v(au, './LastName'),
                 first=v(au, './ForeName'))
             self.record.add('author', person)
-        
+
+    def do_Article_Pagination(self, node):
+        v = node.find('./MedlinePgn')
+        if v is not None:
+            # pubmed will return abbreviated page ranges (1234-45
+            # meaning 1234-1245). We transform them into full ranges,
+            # as this is only some kind of space saving convention.
+            pages = v.text
+            textual_pair = pages.split('-')
+            try:
+                pair = [int(x) for x in textual_pair]
+            except ValueError:
+                pair = []
+            if len(pair) == 2 and pair[1] < pair[0]:
+                # we could play with logs to find out the actual cut
+                # point, but using the textual representation is
+                # probably more natural
+                left, right = textual_pair
+                full_right = left[:len(left)-len(right)] + right
+                if int(full_right) > pair[0]:
+                    pages = '%s-%s' % (left, full_right)
+            self.record.add('journal.pages', pages, Attribute.Text)
 
     def do_PMID(self, node):
         self.record.add('pmid', node.text, Attribute.ID)

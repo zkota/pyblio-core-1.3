@@ -25,6 +25,9 @@
    <attribute id="month" type="text">
     <name>Month</name>
    </attribute>
+   <attribute id="pages" type="text">
+    <name>Pagination</name>
+   </attribute>
    <attribute id="volume" type="text">
     <name>Volume</name>
    </attribute>
@@ -60,20 +63,23 @@
   <attribute id="journal">
    <text>
     <content>Lab on a chip. </content>
-    <attribute id="volume">
-     <text>2</text>
-    </attribute>
     <attribute id="issn">
      <id value="1473-0197"/>
-    </attribute>
-    <attribute id="issue">
-     <text>3</text>
     </attribute>
     <attribute id="month">
      <text>Aug</text>
     </attribute>
+    <attribute id="volume">
+     <text>2</text>
+    </attribute>
     <attribute id="year">
      <text>2002</text>
+    </attribute>
+    <attribute id="issue">
+     <text>3</text>
+    </attribute>
+    <attribute id="pages">
+     <text>145-150</text>
     </attribute>
    </text>
   </attribute>
@@ -98,20 +104,23 @@
   <attribute id="journal">
    <text>
     <content>Electrophoresis.</content>
-    <attribute id="volume">
-     <text>23</text>
-    </attribute>
     <attribute id="issn">
      <id value="0173-0835"/>
-    </attribute>
-    <attribute id="issue">
-     <text>20</text>
     </attribute>
     <attribute id="month">
      <text>Oct</text>
     </attribute>
+    <attribute id="volume">
+     <text>23</text>
+    </attribute>
     <attribute id="year">
      <text>2002</text>
+    </attribute>
+    <attribute id="issue">
+     <text>20</text>
+    </attribute>
+    <attribute id="pages">
+     <text>3583-3588</text>
     </attribute>
    </text>
   </attribute>
@@ -137,20 +146,23 @@
   <attribute id="journal">
    <text>
     <content>Pharmaceutical research. </content>
-    <attribute id="volume">
-     <text>19</text>
-    </attribute>
     <attribute id="issn">
      <id value="0724-8741"/>
-    </attribute>
-    <attribute id="issue">
-     <text>8</text>
     </attribute>
     <attribute id="month">
      <text>Aug</text>
     </attribute>
+    <attribute id="volume">
+     <text>19</text>
+    </attribute>
     <attribute id="year">
      <text>2002</text>
+    </attribute>
+    <attribute id="issue">
+     <text>8</text>
+    </attribute>
+    <attribute id="pages">
+     <text>1150-1159</text>
     </attribute>
    </text>
   </attribute>
@@ -175,20 +187,23 @@
   <attribute id="journal">
    <text>
     <content>Chemistry (Weinheim an der Bergstrasse, Germany)  </content>
-    <attribute id="volume">
-     <text>8</text>
-    </attribute>
     <attribute id="issn">
      <id value="0947-6539"/>
-    </attribute>
-    <attribute id="issue">
-     <text>15</text>
     </attribute>
     <attribute id="month">
      <text>Aug</text>
     </attribute>
+    <attribute id="volume">
+     <text>8</text>
+    </attribute>
     <attribute id="year">
      <text>2002</text>
+    </attribute>
+    <attribute id="issue">
+     <text>15</text>
+    </attribute>
+    <attribute id="pages">
+     <text>3478-3484</text>
     </attribute>
    </text>
   </attribute>
@@ -215,20 +230,23 @@
   <attribute id="journal">
    <text>
     <content>Proteomics. </content>
-    <attribute id="volume">
-     <text>2</text>
-    </attribute>
     <attribute id="issn">
      <id value="1615-9853"/>
-    </attribute>
-    <attribute id="issue">
-     <text>4</text>
     </attribute>
     <attribute id="month">
      <text>Apr</text>
     </attribute>
+    <attribute id="volume">
+     <text>2</text>
+    </attribute>
     <attribute id="year">
      <text>2002</text>
+    </attribute>
+    <attribute id="issue">
+     <text>4</text>
+    </attribute>
+    <attribute id="pages">
+     <text>405-412</text>
     </attribute>
    </text>
   </attribute>

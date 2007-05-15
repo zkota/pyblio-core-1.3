@@ -59,7 +59,8 @@ plain_author = Chicago(firstLast(all('author')))
 
 plain_journal = join(', ')[
     I[one('journal')],
-    join(':')[one('volume'), one('number')],
+    join('')[join(':')[one('volume'), one('number')],
+             '(' + one('pages') + ')'],
     year(one('date'))
 ]
 
