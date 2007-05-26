@@ -19,19 +19,26 @@ class WOK2BibTeX(OneToOneAdapter):
 
         dt = wok['doctype'][0]
         dt = self.base.schema.txo[dt.group][dt.id].names['C']
+        target_type = self.typemap.get(dt, 'article')
+        bibtex.add('doctype', self.schema.txo['doctype'].byname(
+            target_type), Attribute.Txo)
 
-        if dt in self.typemap:
-            bibtex.add('doctype', self.schema.txo['doctype'].byname(
-                self.typemap[dt]), Attribute.Txo)
         for k in ('title', 'author', 'abstract'):
             if k in wok:
                 bibtex[k] = wok[k]
 
         if 'source' in wok:
-            bibtex.add('journal', unicode(wok.get('source')[0]),
-                       Attribute.Text)
-            for sub in ('pages', 'volume', 'number', 'year'):
-                data = wok.get('source.' + sub)
-                if data: bibtex.add(sub, data[0])
+            source = wok.get('source')[0]
+            bibtex.add('journal', unicode(source), Attribute.Text)
+            for sub in ('pages', 'volume', 'number'):
+                data = source.q.get(sub)
+                if data:
+                    bibtex.add(sub, data[0])
+            if 'year' in source.q:
+                try:
+                    bibtex.add('date',
+                               Attribute.Date(int(source.q['year'][0])))
+                except TypeError:
+                    pass
         return bibtex
     

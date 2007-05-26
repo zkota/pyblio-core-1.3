@@ -249,6 +249,9 @@
    <person first="L" last="van Elst"/>
    <person first="S" last="Staab"/>
   </attribute>
+  <attribute id="date">
+   <date year="2005"/>
+  </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="1"/>
   </attribute>
@@ -266,9 +269,6 @@
   </attribute>
   <attribute id="volume">
    <text>3782</text>
-  </attribute>
-  <attribute id="year">
-   <text>2005</text>
   </attribute>
  </entry>
 </pyblio-db>
