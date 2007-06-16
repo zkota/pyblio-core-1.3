@@ -26,6 +26,7 @@ import logging
 from gettext import gettext as _
 
 from Pyblio import Attribute, Store
+from Pyblio.Exceptions import ParserError
 
 
 class Reader(object):
@@ -81,7 +82,10 @@ class Reader(object):
         return
 
     def do_abstract(self, node):
-        self.record.add('abstract', node.text, Attribute.Text)
+        if node.attrib.get("avail").lower() != 'y':
+            return
+        paras = [n.text for n in node.findall('p')]
+        self.record.add('abstract', '\n'.join(paras), Attribute.Text)
         return
 
     def do_doctype(self, node):
@@ -183,5 +187,3 @@ class Reader(object):
             rs.add(k)
         
         return rs
-    
-    
