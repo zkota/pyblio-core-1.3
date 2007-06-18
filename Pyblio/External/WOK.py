@@ -20,7 +20,7 @@ from Pyblio.External.HTTP import HTTPRetrieve
 def _xml(data):
     """ Parse the result from the server, and immeditately catch
     possible errors."""
-    
+
     tree = XML(data)
 
     err = tree.find('./error')

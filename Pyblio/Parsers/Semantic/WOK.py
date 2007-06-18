@@ -47,16 +47,32 @@ class Reader(object):
         self.record.add('ut', node.text, Attribute.ID)
 
     def do_authors(self, node):
-        
+        # authors can be either listed as <primaryauthor> and <author>
+        # fields (with text concatenated), or split into finer tags
+        # under <fullauthorname>. As <fullauthorname> simply follows
+        # the simpler tags, there is no way to know in advance if it
+        # is provided or not...
         def single(author):
             try:
                 last, first = [part.strip() for part in author.split(',')]
                 return Attribute.Person(last=last, first=first)
             except ValueError:
                 return Attribute.Person(last=author.strip())
-        
+
+        simple = None
         for author in node:
-            self.record.add('author', author.text, single)
+            if author.tag in ('primaryauthor', 'author'):
+                if simple is not None:
+                    self.record.add('author', simple)
+                simple = single(author.text)
+            elif author.tag == 'fullauthorname':
+                auth = Attribute.Person(
+                    last=author.findtext('./AuLastName'),
+                    first=author.findtext('./AuFirstName'))
+                self.record.add('author', auth)
+                simple = None
+        if simple is not None:
+            self.record.add('author', simple)
         return
 
     def do_corp_authors(self, node):

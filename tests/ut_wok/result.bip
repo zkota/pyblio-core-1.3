@@ -201,39 +201,50 @@
 
 </pyblio-schema>
  <entry id="1">
+  <attribute id="abstract">
+   <text>Unstructured P2P systems have gained great popularity in recent years and are currently used by millions of users. One fundamental property of these systems is the lack of structure, which allows decentralized operation and makes it easy for new users to join and participate in the system. However, the lack of structure can also be abused by malicious users. We explore one such attack, that enables malicious users to use unstructured P2P systems to perform Denial of Service (DoS) attacks to third parties. Specifically, we show that a malicious node can coerce a large number of peers to perform requests to a target host that may not even be part of the P2P network, including downloading unwanted files from a target Web Server. This is a classic form of denial-of-service which also has two interesting characteristics: (a) it is hard to identify the originator of the attack, (b) it is even harder to stop the attack. The second property comes from the fact that certain unstructured P2P systems seem to have a kind of "memory", retaining knowledge about (potentially false) queries for many days. In this paper we present real-world experiments of Gnutella-based DoS attacks to Web Servers. We explore the magnitude of the problem and present a solution to protect innocent victims against this attack.</text>
+  </attribute>
   <attribute id="author">
-   <person first="A" last="Abecker"/>
-   <person first="L" last="van Elst"/>
-   <person first="S" last="Staab"/>
+   <person first="Elias" last="Athanasopoulos"/>
+   <person first="Kostas G." last="Anagnostakis"/>
+   <person first="Evangelos P." last="Markatos"/>
   </attribute>
   <attribute id="doctype">
    <txo group="doctype" id="3"/>
   </attribute>
+  <attribute id="ref">
+   <id value="131693322"/>
+   <id value="151312863"/>
+   <id value="121566332"/>
+   <id value="151312864"/>
+   <id value="151312865"/>
+   <id value="151312866"/>
+  </attribute>
   <attribute id="source">
    <text>
-    <content>PROFESSIONAL KNOWLEDGE MANAGEMENT</content>
+    <content>APPLIED CRYPTOGRAPHY AND NETWORK SECURITY, PROCEEDINGS</content>
     <attribute id="volume">
-     <text>3782</text>
+     <text>3989</text>
     </attribute>
     <attribute id="series">
-     <text>LECTURE NOTES IN ARTIFICIAL INTELLIGENCE</text>
+     <text>LECTURE NOTES IN COMPUTER SCIENCE</text>
     </attribute>
     <attribute id="abbrev">
-     <text>LECT NOTES ARTIF INT</text>
+     <text>LECT NOTES COMPUT SC</text>
     </attribute>
     <attribute id="pages">
-     <text>222-223</text>
+     <text>130-145</text>
     </attribute>
     <attribute id="year">
-     <text>2005</text>
+     <text>2006</text>
     </attribute>
    </text>
   </attribute>
   <attribute id="title">
-   <text>PAIKM-2005 - Peer-to-Peer and agent infrastructures for knowledge management</text>
+   <text>Misusing unstructured P2P systems to perform DoS attacks: The network that never forgets</text>
   </attribute>
   <attribute id="ut">
-   <id value="000235835600025"/>
+   <id value="000238570400009"/>
   </attribute>
  </entry>
  <entry id="2">

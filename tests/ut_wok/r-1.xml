@@ -8,75 +8,80 @@
 <recordsSearched>36250344</recordsSearched>
 </searchResults>
 <records>
-<REC inst_id="0" recid="149337584" hot="yes" sortkey="3119749140" timescited="0" sharedrefs="0" inpi="false">
-<item issue="149337363" recid="149337584" coverdate="200500" sortkey="3119749140" refkey="12257" dbyear="2006">
-<ut>000235835600025</ut>
-<i_ckey>ABEC0222053782LA</i_ckey>
-<i_cid>0109934310</i_cid>
-<source_title>PROFESSIONAL KNOWLEDGE MANAGEMENT</source_title>
-<source_series>LECTURE NOTES IN ARTIFICIAL INTELLIGENCE</source_series>
-<source_abbrev>LECT NOTES ARTIF INT</source_abbrev>
-<item_title>PAIKM-2005 - Peer-to-Peer and agent infrastructures for knowledge management</item_title>
-<sq>B5029B0</sq>
-<bib_id>3782: 222-223 2005</bib_id>
-<bib_pages begin="222" end="223" pages="2">222-223</bib_pages>
-<bib_issue year="2005" vol="3782"/>
+<REC inst_id="1" recid="151312862" hot="yes" sortkey="3118529064" timescited="0" sharedrefs="0" inpi="false">
+<item issue="151312797" recid="151312862" coverdate="200600" sortkey="3118529064" refkey="289891" dbyear="2006">
+<ut>000238570400009</ut>
+<i_ckey>ATHA0130063989LE</i_ckey>
+<i_cid>0111353930</i_cid>
+<source_title>APPLIED CRYPTOGRAPHY AND NETWORK SECURITY, PROCEEDINGS</source_title>
+<source_series>LECTURE NOTES IN COMPUTER SCIENCE</source_series>
+<source_abbrev>LECT NOTES COMPUT SC</source_abbrev>
+<item_title>Misusing unstructured P2P systems to perform DoS attacks: The network that never forgets</item_title>
+<sq>B6930B0</sq>
+<bib_id>3989: 130-145 2006</bib_id>
+<bib_pages begin="130" end="145" pages="16">130-145</bib_pages>
+<bib_issue year="2006" vol="3989"/>
 <doctype code="@">Article</doctype>
 <editions full="SCI"/>
 <languages count="1">
 <primarylang code="EN">English</primarylang>
 </languages>
 <authors count="3">
-<primaryauthor>Abecker, A</primaryauthor>
-<author key="7167510">van Elst, L</author>
-<author key="6628237">Staab, S</author>
+<primaryauthor>Athanasopoulos, E</primaryauthor>
+<fullauthorname>
+<AuRole>Author</AuRole>
+<AuLastName>Athanasopoulos</AuLastName>
+<AuFirstName>Elias</AuFirstName>
+<AuCollectiveName>Athanasopoulos, Elias</AuCollectiveName>
+</fullauthorname>
+<author key="169471">Anagnostakis, KG</author>
+<fullauthorname>
+<AuRole>Author</AuRole>
+<AuLastName>Anagnostakis</AuLastName>
+<AuFirstName>Kostas G.</AuFirstName>
+<AuCollectiveName>Anagnostakis, Kostas G.</AuCollectiveName>
+</fullauthorname>
+<author key="4468025">Markatos, EP</author>
+<fullauthorname>
+<AuRole>Author</AuRole>
+<AuLastName>Markatos</AuLastName>
+<AuFirstName>Evangelos P.</AuFirstName>
+<AuCollectiveName>Markatos, Evangelos P.</AuCollectiveName>
+</fullauthorname>
 </authors>
 <emails count="3">
 <email>
-<name>Abecker, A</name>
-<email_addr>abecker@fzi.de</email_addr>
+<name>Athanasopoulos, E</name>
+<email_addr>elathan@ics.forth.gr</email_addr>
 </email>
 <email>
-<name>van Elst, L</name>
-<email_addr>elst@dfki.de</email_addr>
+<name>Anagnostakis, KG</name>
+<email_addr>kostas@i2r.a-star.edu.sg</email_addr>
 </email>
 <email>
-<name>Staab, S</name>
-<email_addr>staab@uni-koblenz.de</email_addr>
+<name>Markatos, EP</name>
+<email_addr>markatos@ics.forth.gr</email_addr>
 </email>
 </emails>
-<reprint>
-<rp_author>Abecker, A</rp_author>
-<rp_address>FZI, Karlsruhe, Germany</rp_address>
-<rp_organization>FZI</rp_organization>
-<rp_city>Karlsruhe</rp_city>
-<rp_country>Germany</rp_country>
-</reprint>
-<research_addrs count="3">
+<research_addrs count="1">
 <research>
-<rs_address>FZI, Karlsruhe, Germany</rs_address>
-<rs_organization>FZI</rs_organization>
-<rs_city>Karlsruhe</rs_city>
-<rs_country>Germany</rs_country>
-</research>
-<research>
-<rs_address>German Res Ctr AI, Kaiserslautern, Germany</rs_address>
-<rs_organization>German Res Ctr AI</rs_organization>
-<rs_city>Kaiserslautern</rs_city>
-<rs_country>Germany</rs_country>
-</research>
-<research>
-<rs_address>Univ Koblenz Landau, Inst Comp Sci, Koblenz, Germany</rs_address>
-<rs_organization>Univ Koblenz Landau</rs_organization>
-<rs_suborganizations count="1">
-<rs_suborganization>Inst Comp Sci</rs_suborganization>
-</rs_suborganizations>
-<rs_city>Koblenz</rs_city>
-<rs_country>Germany</rs_country>
+<rs_address>Inst Infocomm Res, Singapore, Singapore</rs_address>
+<rs_organization>Inst Infocomm Res</rs_organization>
+<rs_city>Singapore</rs_city>
+<rs_country>Singapore</rs_country>
 </research>
 </research_addrs>
-<abstract avail="N"/>
-<refs count="0"/>
+<abstract avail="Y" count="1">
+<p>Unstructured P2P systems have gained great popularity in recent years and are currently used by millions of users. One fundamental property of these systems is the lack of structure, which allows decentralized operation and makes it easy for new users to join and participate in the system. However, the lack of structure can also be abused by malicious users. We explore one such attack, that enables malicious users to use unstructured P2P systems to perform Denial of Service (DoS) attacks to third parties. Specifically, we show that a malicious node can coerce a large number of peers to perform requests to a target host that may not even be part of the P2P network, including downloading unwanted files from a target Web Server. This is a classic form of denial-of-service which also has two interesting characteristics: (a) it is hard to identify the originator of the attack, (b) it is even harder to stop the attack. The second property comes from the fact that certain unstructured P2P systems seem to have a kind of "memory", retaining knowledge about (potentially false) queries for many days. In this paper we present real-world experiments of Gnutella-based DoS attacks to Web Servers. We explore the magnitude of the problem and present a solution to protect innocent victims against this attack.</p>
+</abstract>
+<refs count="6">
+<ref>131693322</ref>
+<ref>151312863</ref>
+<ref>121566332</ref>
+<ref>151312864</ref>
+<ref>151312865</ref>
+<ref>151312866</ref>
+</refs>
 </item>
 </REC>
 
