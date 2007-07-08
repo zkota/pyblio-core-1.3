@@ -145,23 +145,20 @@ class OOo(object):
         return [r for r in [self._parseRef(ref) for ref in refs] if r]
 
     def update_keys(self, keymap):
-        # Update the existing keys according to the new values. This
-        # must be done in two passes, as OpenOffice will reject any
-        # Identifier that is already used. So let's first rename them all
-        # to something unique first, and set the final value in a second
-        # phase.
-        refmap = {}
+        # Update the existing keys according to the new values. Simply
+        # modifying the fields leads to an inconsistent display
+        # (probably an openoffice bug). So this method simply
+        # overwrites the existing TextField with the updated one.
         refs = list(self.tfm.getPropertyValue('DependentTextFields'))
         for ref in refs:
             fields = self._parseRef(ref)
             if not fields:
                 continue
-            uid, readable, extra = fields
-            refmap[uid] = (ref, fields)
-
-        for uid, name in keymap.iteritems():
-            ref, (_, _, extra) = refmap[uid]
-            self._makeRef(uid, name, extra, oref=ref)
+            uid, old_name, extra = fields
+            if uid in keymap:
+                nref = self._makeRef(uid, keymap[uid], extra)
+                c = self.cursor.Text.createTextCursorByRange(ref.getAnchor())
+                c.Text.insertTextContent(c, nref, True)
 
         return self.fetch()
 
@@ -193,19 +190,16 @@ class OOo(object):
         
         return self.frame
 
-    def _makeRef(self, ref, visible_key, extra, oref=None):
+    def _makeRef(self, ref, visible_key, extra):
         """ Create a reference ready to be inserted in the document. """
 
         if extra is not None:
             extra = 'X-PYBLIO-EXTRA:%s' % extra
 
-        if oref is None:
-            oref = self.model.createInstance("com.sun.star.text.TextField.Bibliography")
-
+        oref = self.model.createInstance("com.sun.star.text.TextField.Bibliography")
         oref.Fields = (PropertyValue('Identifier', 0, visible_key, DIRECT_VALUE),
                        PropertyValue('Custom1', 0, 'X-PYBLIO<%s>' % ref, DIRECT_VALUE),
                        PropertyValue('Custom2', 0, extra, DIRECT_VALUE),)
-
         return oref
 
     def _parseRef(self, r):
