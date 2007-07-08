@@ -42,6 +42,12 @@ class File(object):
     def fetch(self):
         return self.cited
 
+    def update_keys(self, keymap):
+        for i, (uid, name, extra) in enumerate(self.cited):
+            if uid in keymap:
+                self.cited[i] = (uid, keymap[uid], extra)
+        return self.cited
+
     # The remaining operations are NOPs
     def connect(self):
         return
@@ -52,6 +58,3 @@ class File(object):
     def disconnect(self):
         return
     
-    def update_keys(self, keymap):
-        return
-

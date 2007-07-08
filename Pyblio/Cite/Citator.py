@@ -113,7 +113,7 @@ class Citator(object):
                 if newkey != key:
                     to_update[uid] = newkey
 
-            self.wp.update_keys(to_update)
+            known = self.wp.update_keys(to_update)
 
             # update the biblio itself
             insert = self.wp.update_biblio()

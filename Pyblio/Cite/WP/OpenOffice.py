@@ -163,6 +163,8 @@ class OOo(object):
             ref, (_, _, extra) = refmap[uid]
             self._makeRef(uid, name, extra, oref=ref)
 
+        return self.fetch()
+
     def update_biblio(self):
         if not self.frame:
             self._createFrame()
