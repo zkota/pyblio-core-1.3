@@ -75,7 +75,7 @@ class Reader(object):
     # The official channel in which messages must be sent
     log = logging.getLogger('pyblio.import.bibtex')
 
-    def __init__ (self, charset = 'ISO8859-1'):
+    def __init__ (self, charset='ISO8859-1'):
 
         self.charset = charset
 
@@ -341,7 +341,7 @@ class Reader(object):
 
         return self._mapping[attp.type](k, v)
     
-    def record_parse (self, record):
+    def record_parse(self, record):
 
         tp = record.type.lower ()
 

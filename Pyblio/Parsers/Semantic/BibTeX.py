@@ -80,7 +80,6 @@ class Reader(BibTeX.Reader):
             self.date.month =_monthmap[month]
         except KeyError, msg:
             raise KeyError('in %s: %s' % (self.key, msg))
-            
         return
     
         

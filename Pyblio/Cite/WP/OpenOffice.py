@@ -41,31 +41,25 @@ NoConnectException     = uno.getClass("com.sun.star.connection.NoConnectExceptio
 ITALIC = (uno.getConstantByName("com.sun.star.awt.FontSlant.ITALIC"),
           uno.getConstantByName("com.sun.star.awt.FontSlant.NONE"))
 
-_OO_BIB_FIELDS = ('Identifier', 'BibiliographicType', 'Address', 'Annote', 'Author',
-                  'Booktitle', 'Chapter', 'Edition', 'Editor', 'Howpublished', 'Institution',
-                  'Journal', 'Month', 'Note', 'Number', 'Organizations', 'Pages', 'Publisher',
-                  'School', 'Series', 'Title', 'Report_Type', 'Volume', 'Year', 'URL', 'Custom1',
-                  'Custom2', 'Custom3', 'Custom4', 'Custom5', 'ISBN')
-
 OO_BIBLIOGRAPHIC_FIELDS = {}
-for k, v in enumerate(_OO_BIB_FIELDS):
-    OO_BIBLIOGRAPHIC_FIELDS[v] = k
-
+for f in ('Custom1', 'Custom2', 'Identifier'):
+    OO_BIBLIOGRAPHIC_FIELDS[f] = \
+        uno.getConstantByName("com.sun.star.text.BibliographyDataField." + f.upper())
 
 from Pyblio.Format.OpenOffice import Generator, ITALIC
 
 import re
 
 _x_pyblio_re = re.compile(r'X-PYBLIO<(\d+)>')
+_x_pyblio_extra_re = re.compile(r'X-PYBLIO-EXTRA:(.*)')
 
 class OOo(object):
     MASTER = 'com.sun.star.text.FieldMaster.Bibliography'
 
     FRAME = u'Bibliography (Pybliographer)'
     
-    def __init__(self, host='localhost', port=2002):
-        self.host = host
-        self.port = port
+    def __init__(self, connection=('pipe', 'OOo_pipe')):
+        self.remote = connection
         self.smgr = None
         return
 
@@ -90,9 +84,15 @@ class OOo(object):
         resolver = localContext.ServiceManager.createInstanceWithContext(
             "com.sun.star.bridge.UnoUrlResolver", localContext )
 
+        if self.remote[0] == 'pipe':
+            cnx_parameter = 'pipe,name=%s' % self.remote[1]
+        elif self.remote[0] == 'socket':
+            cnx_parameter = 'socket,host=%s,port=%d' % self.remote[1:]
+        else:
+            cnx_parameter = ''
         try:
-            ctx = resolver.resolve("uno:socket,host=%s,port=%d;urp;StarOffice.ComponentContext" % (
-                self.host, self.port))
+            ctx = resolver.resolve("uno:%s;urp;StarOffice.ComponentContext" % (
+                cnx_parameter))
         except NoConnectException, msg:
             raise CommunicationError(_("Unable to contact OpenOffice.org: %s" % msg))
         
@@ -119,12 +119,13 @@ class OOo(object):
             self.frame = None
         return
 
-    def cite(self, keys):
+    def cite(self, keys, db):
         """ Insert a list of references in the document, at the
-        cursor. Each reference is a tuple (visible key, internal id)"""
-
-        for ref, key in keys:
-            oref = self._makeRef(ref, key)
+        cursor location. Each reference is a tuple
+          (visible_key, internal_id, extra_data)
+        """
+        for ref, key, extra in keys:
+            oref = self._makeRef(ref, key, extra)
             c = self.cursor.Text.createTextCursorByRange(self.cursor)
             c.Text.insertTextContent(c, oref, True)
             self.cursor.setPropertyToDefault('CharStyleName')
@@ -141,21 +142,26 @@ class OOo(object):
             return self.text.compareRegionStarts(b.Anchor.Start,
                                                  a.Anchor.Start)
         refs.sort(cmp)
-
-        results = []
-        for r in refs:
-            ref, key = (r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Custom1']].Value,
-                        r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Identifier']].Value)
-
-            m = _x_pyblio_re.match(ref)
-            if m:
-                results.append((Key(m.group(1)), key))
-                
-        return results
+        return [r for r in [self._parseRef(ref) for ref in refs] if r]
 
     def update_keys(self, keymap):
-        # TODO: update the existing keys according to the new values
-        pass
+        # Update the existing keys according to the new values. This
+        # must be done in two passes, as OpenOffice will reject any
+        # Identifier that is already used. So let's first rename them all
+        # to something unique first, and set the final value in a second
+        # phase.
+        refmap = {}
+        refs = list(self.tfm.getPropertyValue('DependentTextFields'))
+        for ref in refs:
+            fields = self._parseRef(ref)
+            if not fields:
+                continue
+            uid, readable, extra = fields
+            refmap[uid] = (ref, fields)
+
+        for uid, name in keymap.iteritems():
+            ref, (_, _, extra) = refmap[uid]
+            self._makeRef(uid, name, extra, oref=ref)
 
     def update_biblio(self):
         if not self.frame:
@@ -185,12 +191,34 @@ class OOo(object):
         
         return self.frame
 
-    def _makeRef(self, ref, visible_key):
+    def _makeRef(self, ref, visible_key, extra, oref=None):
         """ Create a reference ready to be inserted in the document. """
-        
-        oref = self.model.createInstance("com.sun.star.text.TextField.Bibliography")
+
+        if extra is not None:
+            extra = 'X-PYBLIO-EXTRA:%s' % extra
+
+        if oref is None:
+            oref = self.model.createInstance("com.sun.star.text.TextField.Bibliography")
+
         oref.Fields = (PropertyValue('Identifier', 0, visible_key, DIRECT_VALUE),
-                       PropertyValue('Custom1', 0, 'X-PYBLIO<%s>' % ref, DIRECT_VALUE),)
+                       PropertyValue('Custom1', 0, 'X-PYBLIO<%s>' % ref, DIRECT_VALUE),
+                       PropertyValue('Custom2', 0, extra, DIRECT_VALUE),)
 
         return oref
 
+    def _parseRef(self, r):
+        ref, key, extra = (
+            r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Custom1']].Value,
+            r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Identifier']].Value,
+            r.Fields[OO_BIBLIOGRAPHIC_FIELDS['Custom2']].Value)
+
+        if extra:
+            m = _x_pyblio_extra_re.match(extra)
+            if m:
+                extra = m.group(1)
+            else:
+                extra = None
+        m = _x_pyblio_re.match(ref)
+        if m:
+            return (Key(m.group(1)), key, extra)
+        return None

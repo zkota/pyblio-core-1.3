@@ -29,10 +29,13 @@ nasty things if the file comes from untrusted sources.
 """
 
 
+import logging
 from cElementTree import ElementTree
 from gettext import gettext as _
 
 from Pyblio.Exceptions import ParserError
+
+log = logging.getLogger('pyblio.cite.citator')
 
 class Citator(object):
     """ """
@@ -58,7 +61,17 @@ class Citator(object):
         self.order = get_last('./bibliography-order')
         return
 
-    def prepare(self, db, wp):
+    def prepare(self, db, wp, extra_info=None):
+        """Link the citator with a specific database and word
+        processor. @extra_info is an optional function that will
+        return a string to store along with the entry, if the word
+        processor allows it.
+
+        Args:
+          db: Pyblio.Store.Database
+          wp: Pyblio.Cite.WP.IWordProcessor
+          extra_info: str = fn(Pyblio.Store.Key, Pyblio.Store.Database) or None
+        """
         
         def load(path):
             mod = __import__(path[0], {}, {}, [path[1]])
@@ -70,7 +83,8 @@ class Citator(object):
 
         self.db = db
         self.wp = wp
-
+        self.extra_info = extra_info or (lambda key, db: None)
+        
         # keygen will generate the new keys
         self.keygen = self.m_keys(self.db)
 
@@ -85,6 +99,7 @@ class Citator(object):
         # info. Fetch the list of known references from the current
         # document
         known = self.wp.fetch()
+        log.info('fetched keys from document: %r' % known)
 
         if known is not None:
             # Regenerate the keys, and update the ones that changed.
@@ -93,10 +108,10 @@ class Citator(object):
             self.keygen = self.m_keys(self.db)
             
             to_update = {}
-            for uid, key in known:
+            for uid, key, extra in known:
                 newkey = self.keygen.make_key(uid)
                 if newkey != key:
-                    to_update[uid] = key
+                    to_update[uid] = newkey
 
             self.wp.update_keys(to_update)
 
@@ -115,8 +130,10 @@ class Citator(object):
         """ Insert the specified record identifiers in the current
         document"""
         
-        keys = [(ref, self.keygen.make_key(ref)) for ref in uids]
-        self.wp.cite(keys)
+        keys = [(ref,
+                 self.keygen.make_key(ref),
+                 self.extra_info(ref, self.db)) for ref in uids]
+        self.wp.cite(keys, self.db)
         return
     
     

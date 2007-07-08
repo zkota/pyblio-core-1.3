@@ -53,7 +53,7 @@ class TestCitation(pybut.TestCase):
 
     def testInsert(self):
         self.cit.cite([1])
-        self.failUnlessEqual(self.wp.cited, [(1, '1')])
+        self.failUnlessEqual(self.wp.cited, [(1, '1', None)])
 
         self.cit.update()
         content = self.fd.getvalue()

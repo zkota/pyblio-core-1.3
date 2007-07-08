@@ -101,10 +101,9 @@ def document_order(uids):
     document. This is the order in which they are presented in input,
     except that we don't want duplicates. """
     seen = Set()
-    for uid, key in uids:
+    for uid, key, extra in uids:
         if uid in seen:
             continue
-
         seen.add(uid)
         yield (uid, key)
     return

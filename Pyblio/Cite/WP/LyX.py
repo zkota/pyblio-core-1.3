@@ -77,15 +77,29 @@ class LyX(object):
             self._close()
         return
     
-    def cite(self, keys):
+    def cite(self, keys, db):
+        """ Insert the keys in the actual wordprocessor document. Each
+        key contains the actual key and a readable representation for
+        the reference.
+
+        Args:
+          keys: [(Pyblio.Store.Key, str)]
+          db: Pyblio.Store.Database
+        """
         if not self.is_connected():
             raise OperationError(_("Cannot cite when not connected"))
 
-        # make actual keys by joining the "readable" part with the
-        # constant part.
-        full = ['%s:(%s)' % x for x in keys]
+        # For bibtex databases, we use the actual bibtex key as the
+        # citation key. This allows us to cite with pyblio and
+        # generate the actual bibliography with bibtex.  Once we are
+        # able to superceed bibtex totally, we might adopt a more
+        # general scheme.
+        if db.schema.id != 'org.pybliographer/bibtex/0.1':
+            raise OperationError(_("LyX only allows citing from BibTeX"))
+
+        full = [str(db[key]['id'][0]) for (key, plain, extra) in keys]
         
-        self._send('citation-insert:' + ' '.join(full))
+        self._send('citation-insert:' + ','.join(full))
         return
 
     def fetch(self):

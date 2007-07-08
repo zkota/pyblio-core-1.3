@@ -36,7 +36,7 @@ class File(object):
     def update_biblio(self):
         return self.gen(self.fd)
 
-    def cite(self, keys):
+    def cite(self, keys, db):
         self.cited += keys
 
     def fetch(self):
