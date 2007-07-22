@@ -62,7 +62,7 @@
   </attribute>
   <attribute id="journal">
    <text>
-    <content>Lab on a chip. </content>
+    <content>Lab Chip</content>
     <attribute id="issn">
      <id value="1473-0197"/>
     </attribute>

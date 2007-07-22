@@ -37,12 +37,12 @@ from gettext import gettext as _
 
 re_split = re.compile (r'\W+', re.UNICODE)
 
-class _Qualified (object):
+class _Qualified(object):
     """ Mix-in class that provides qualifiers to attributes, making
     them behave like composite data types (but not arbitrarily nested
     data, though)"""
     
-    def _xmlsubwrite (self, fd, offset = 1):
+    def _xmlsubwrite(self, fd, offset = 1):
         ws = ' ' * offset
         
         for k, vs in self.q.items ():
@@ -53,7 +53,7 @@ class _Qualified (object):
             fd.write (ws + '</attribute>\n')
         return
 
-    def deep_equal (self, other):
+    def deep_equal(self, other):
         for k in self.q:
             if not k in other.q or not len (self.q [k]) == len (other.q [k]):
                 return False
@@ -66,9 +66,13 @@ class _Qualified (object):
             if not k in self.q:
                 return False
         return True           
-                
-                  
-class UnknownContent (_Qualified):
+
+    def is_complete(self):
+        """Returns True if the field has an actual value (ie, hasn't
+        been created by adding qualifiers only)"""
+        return True
+
+class UnknownContent(_Qualified):
     """
     An invalid type.
 
@@ -86,6 +90,8 @@ class UnknownContent (_Qualified):
         if not isinstance (other, UnknownContent): return False
         return _Qualified.deep_equal (self, other)
 
+    def is_complete(self):
+        return False
         
 class Person(_Qualified):
     ''' A person name. '''

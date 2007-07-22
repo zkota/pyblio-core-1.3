@@ -26,6 +26,9 @@ import logging
 from gettext import gettext as _
 
 from Pyblio import Attribute, Store
+from cElementTree import dump
+
+_DEBUG = False
 
 class Reader(object):
     """ Parse records as returned by PubMed's web service."""
@@ -49,6 +52,10 @@ class Reader(object):
             self.uid(), repr(node.tag)))
         return
 
+    def do_MedlineJournalInfo(self, node):
+        # this can contain the journal title, but as a fallback
+        self._fallback_journal = node.findtext('./MedlineTA')
+
     def do_Article(self, node):
         for child in node:
             fn = getattr(self, 'do_Article_' + child.tag,
@@ -69,12 +76,8 @@ class Reader(object):
             if v is not None:
                 self.record.add(dst, v.text, conv)
 
-        title = node.find('Title')
-        if title is None:
-            return
-
-        self.record.add('journal', title.text, Attribute.Text)
-
+        # optionally, the title can come from the MedlineTA field
+        maybe('journal', 'Title', Attribute.Text)
         maybe('journal.issn', 'ISSN', Attribute.ID)
         
         maybe('journal.volume', 'JournalIssue/Volume', Attribute.Text)
@@ -126,9 +129,13 @@ class Reader(object):
     def record_begin (self):
         pass
 
-    def record_end (self):
-        pass
-    
+    def record_end(self):
+        # in some cases, the journal title wasn't in the Journal node,
+        # but can be recovered from the MedlineTA field.
+        j = self.record.get('journal')
+        if j and not j[0].is_complete() and self._fallback_journal:
+            self.record.add('journal', self._fallback_journal, Attribute.Text)
+
     def parse(self, fd, db, rs=None):
 
         if rs is None:
@@ -141,6 +148,8 @@ class Reader(object):
             self.record = Store.Record()
             self.record_begin()
 
+            if _DEBUG:
+                dump(item)
             for child in item:
                 fn = getattr(self, 'do_' + child.tag,
                              self.do_default)
@@ -152,5 +161,3 @@ class Reader(object):
             rs.add(k)
         
         return rs
-    
-    
