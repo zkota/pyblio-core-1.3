@@ -92,11 +92,13 @@ class Reader(object):
             if l is not None:
                 return l.text
             return None
-        
+
+        # believe it if you want, but some records specify a
+        # "ForeName", and others a "FirstName"...
         for au in node.findall('./Author'):
             person = Attribute.Person(
                 last=v(au, './LastName'),
-                first=v(au, './ForeName'))
+                first=v(au, './ForeName') or v(au, './FirstName'))
             self.record.add('author', person)
 
     def do_Article_Pagination(self, node):
