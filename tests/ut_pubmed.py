@@ -131,13 +131,13 @@ class TestPubMedHelper(unittest.TestCase):
         import datetime
         
         helper = QueryHelper()
-        self.assertEqual('Sample',
+        self.assertEqual('Sample[ALL]',
                          helper.makeQuery(keyword='Sample'))
 
         from_date = datetime.date(2005,10,11)
         to_date   = datetime.date(2006,12,13)
         
-        self.assertEqual('Sample AND 2005/10/11:2006/12/13[edat]',
+        self.assertEqual('Sample[ALL] AND 2005/10/11:2006/12/13[edat]',
                          helper.makeQuery(keyword='Sample',
                                           from_date=from_date,
                                           to_date=to_date))

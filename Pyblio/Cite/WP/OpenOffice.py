@@ -135,7 +135,6 @@ class OOo(object):
         """ Fetch all the references in the document, in order of appearance """
 
         refs = list(self.tfm.getPropertyValue('DependentTextFields'))
-
         # We need to reorder the fields by checking their relative
         # position.
         def cmp(a, b):

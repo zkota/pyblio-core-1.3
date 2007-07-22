@@ -54,6 +54,31 @@ def _xml(data):
 
 class QueryHelper(object):
 
+    query_fields = {
+        'ALL': _('All Fields'),
+        'AD': _('Affiliation'),
+        'AU': _('Author Name'),
+        'RN': _('EC/RN Number'),
+        'EDAT': _('Entrez Date'),
+        'FILTER': _('Filter'),
+        'IP': _('Issue'),
+        'TA': _('Journal Title'),
+        'LA': _('Language'),
+        'MHDA': _('MeSH Date'),
+        'MAJR': _('MeSH Major Topic'),
+        'SH': _('MeSH Subheading'),
+        'MH': _('MeSH Terms'),
+        'PG': _('Pagination'),
+        'DP': _('Publication Date'),
+        'PT': _('Publication Type'),
+        'SI': _('Secondary Source ID'),
+        'NM': _('Substance Name'),
+        'TW': _('Text Word'),
+        'TI': _('Title'),
+        'TIAB': _('Title/Abstract'),
+        'PMID': _('UID'),
+        'VI': _('Volume'),
+        }
     publication_types = {
         'addresses': _('Addresses'),
         'bibliography': _('Bibliography'),
@@ -172,15 +197,16 @@ class QueryHelper(object):
         'tox[sb]': _('Toxicology'),
     }
     
-    def makeQuery(self, keyword=None, abstract=False, epubahead=False,
-                  publication_type=None, language=None, subset=None,
-                  age_range=None, human_animal=None, gender=None,
+    def makeQuery(self, field='ALL', keyword=None, abstract=False,
+                  epubahead=False, publication_type=None,
+                  language=None, subset=None, age_range=None,
+                  human_animal=None, gender=None,
                   use_publication_date=False, from_date=None,
                   to_date=None):
         
         """Compose an advanced query.
 
-        'field' is a single value from self.fields.
+        'field' is a single value from self.query_fields.
         'publication_type' is a single value from self.publication_types, or None.
         'language' is from self.language or None
         'subset' is from self.subset or None
@@ -193,6 +219,7 @@ class QueryHelper(object):
         use the entrez date.
         
         Args:
+          field: string
           keyword: string
           abstract: bool
           epubahead: bool
@@ -209,7 +236,7 @@ class QueryHelper(object):
 
         parts = []
         if keyword is not None:
-            parts.append(keyword)
+            parts.append(keyword + '[%s]' % field)
         if abstract:
             parts.append('hasabstract')
         if epubahead:

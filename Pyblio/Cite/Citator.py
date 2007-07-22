@@ -85,12 +85,11 @@ class Citator(object):
         self.wp = wp
         self.extra_info = extra_info or (lambda key, db: None)
         
-        # keygen will generate the new keys
-        self.keygen = self.m_keys(self.db)
-
         # formatter is the compiled citation formatter
         self.formatter = self.m_style(self.db)
-        return
+
+        # keygen will generate the new keys
+        self.keygen = self.m_keys(self.db)
     
     def update(self):
         """ Force an update of keys and bibliography content """

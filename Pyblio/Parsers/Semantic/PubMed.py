@@ -49,7 +49,6 @@ class Reader(object):
             self.uid(), repr(node.tag)))
         return
 
-
     def do_Article(self, node):
         for child in node:
             fn = getattr(self, 'do_Article_' + child.tag,
@@ -83,7 +82,6 @@ class Reader(object):
 
         maybe('journal.year', 'JournalIssue/PubDate/Year', Attribute.Text)
         maybe('journal.month', 'JournalIssue/PubDate/Month', Attribute.Text)
-        
 
     def do_Article_AuthorList(self, node):
         def v(n, k):
@@ -100,7 +98,7 @@ class Reader(object):
 
     def do_Article_Pagination(self, node):
         v = node.find('./MedlinePgn')
-        if v is not None:
+        if v is not None and v.text:
             # pubmed will return abbreviated page ranges (1234-45
             # meaning 1234-1245). We transform them into full ranges,
             # as this is only some kind of space saving convention.
