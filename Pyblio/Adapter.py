@@ -29,6 +29,7 @@ BibTeX format instead.
 from gettext import gettext as _
 
 from Pyblio.Store import Database
+from Pyblio.Exceptions import AdaptError
 from Pyblio import Registry
 
 
@@ -149,6 +150,9 @@ def adapt_schema(db, target_schema):
     # for the moment, we only resolve direct hits. More clever
     # resolutions will hopefully be implemented.
 
+    if db.schema.id == target_schema:
+        return db
+
     # search for target_schema in the adapters for the current schema:
     adapters = Registry.get(db.schema.id, 'adapters')
     
@@ -156,4 +160,5 @@ def adapt_schema(db, target_schema):
         if adapter.target == target_schema:
             return adapter()(db)
 
-    return None
+    raise AdaptError(_("no adaptor for converting a %s into a %s") % (
+        db.schema.id, target_schema))

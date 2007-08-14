@@ -42,3 +42,4 @@ class QueryError(Exception):
 class AdaptError(Exception):
     """ Raised when an external query failed."""
     pass
+
