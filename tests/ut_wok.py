@@ -45,7 +45,7 @@ class Server(http.HTTPFactory):
 class TestFakeWOK(unittest.TestCase):
 
     def setUp(self):
-        Registry.parse_default()
+        Registry.load_default_settings()
 
         s = Registry.getSchema('org.pybliographer/wok/0.1')
         fmt = Store.get('memory')

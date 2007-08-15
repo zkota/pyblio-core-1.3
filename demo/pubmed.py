@@ -33,7 +33,7 @@ def queryObserver(info):
 
 log.addObserver(queryObserver)
 
-Registry.parse_default()
+Registry.load_default_settings()
 
 # This will output the database in BibTeX format
 w = Writer()

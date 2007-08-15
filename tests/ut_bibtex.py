@@ -145,7 +145,7 @@ class TestBibTeXImport (pybut.TestCase):
     """ Perform tests on the Pyblio.Parsers.Syntax.BibTeX module """
 
     def setUp(self):
-        Registry.parse_default()
+        Registry.load_default_settings()
 
     def tearDown(self):
         Registry.reset()

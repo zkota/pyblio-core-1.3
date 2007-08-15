@@ -24,7 +24,7 @@ from Pyblio.External import PubMed
 query, output = sys.argv[1:]
 
 # Create a database that is capable of storing Web of Science results.
-Registry.parse_default()
+Registry.load_default_settings()
 
 s = Registry.getSchema('org.pybliographer/pubmed/0.1')
 

@@ -8,7 +8,7 @@ from Pyblio import Store, Schema, Registry, init_logging
 class TestISI (pybut.TestCase):
 
     def setUp(self):
-        Registry.parse_default()
+        Registry.load_default_settings()
 
     def tearDown(self):
         Registry.reset()

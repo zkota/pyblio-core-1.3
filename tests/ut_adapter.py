@@ -93,14 +93,14 @@ class TestResolution(pybut.TestCase):
 
         from Pyblio import Registry
         Registry.reset()
-        Registry.parse(pybut.src('ut_adapter'))
+        Registry.load_settings(pybut.src('ut_adapter'))
 
         dest = Adapter.adapt_schema(self.dba, 'b')
         self.failUnlessEqual(dest.schema.id, 'b')
 
 class TestAdapters(pybut.TestCase):
     def setUp(self):
-        Registry.parse_default()
+        Registry.load_default_settings()
     def tearDown(self):
         Registry.reset()
     def check(self, name, schema):

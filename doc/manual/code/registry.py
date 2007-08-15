@@ -1,6 +1,6 @@
 from Pyblio import Store, Registry
 
-Registry.parse_default()
+Registry.load_default_settings()
 
 schema = Registry.getSchema("org.pybliographer/bibtex/0.1")
 store = Store.get('file')

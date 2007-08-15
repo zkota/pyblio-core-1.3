@@ -159,7 +159,7 @@ class _RIPCategory(dict):
         return
 
     
-def parse(directory):
+def load_settings(directory):
     """ Parse the specified directory, and load all the .rip files it
     contains."""
 
@@ -223,10 +223,16 @@ def parse(directory):
                     
     return
 
-def parse_default():
+def load_default_settings():
+    """Load the RIP files contained in the default system-wide and
+    user-specific directories.
+
+    The system directory is in '<installation prefix>/Pyblio/RIP', and
+    the user directory is '~/.pyblio'.
+    """
     for d in RIP_dirs.values():
         try:
-            parse(d)
+            load_settings(d)
         except OSError:
             pass
     return

@@ -37,9 +37,7 @@ from gettext import gettext as _
 # ==================================================
 
 class Environ(BaseEnviron.Environ):
-
-    def __init__ (self):
-
+    def __init__(self):
         self.strings = {
             'jan': Parser.Text('January'),
             'feb': Parser.Text('February'),
@@ -54,7 +52,6 @@ class Environ(BaseEnviron.Environ):
             'nov': Parser.Text('November'),
             'dec': Parser.Text('December'),
             }
-        return
 
 
 # ==================================================
@@ -71,14 +68,11 @@ def _nodotdash(txt):
     return _dotdash_re.sub('.-', txt)
 
 class Reader(object):
-
     # The official channel in which messages must be sent
     log = logging.getLogger('pyblio.import.bibtex')
 
-    def __init__ (self, charset='ISO8859-1'):
-
+    def __init__(self, charset='ISO8859-1'):
         self.charset = charset
-
         self._mapping = {
             Attribute.Text:   self.text_add,
             Attribute.Person: self.person_add,
@@ -86,31 +80,29 @@ class Reader(object):
             Attribute.Date:   self.date_add,
             Attribute.ID:     self.id_add,
             }
-
         self.env = Environ ()        
         return
 
-    def id_add (self, field, stream):
+    def id_add(self, field, stream):
         self.record[field] = [Attribute.ID(stream.flat())]
         return
 
-    def url_add (self, field, stream):
+    def url_add(self, field, stream):
         url = stream.flat().replace(u'\xa0', u'~')
         self.record.add(field, url, Attribute.URL)
         return
     
-    def date_add (self, field, stream):
+    def date_add(self, field, stream):
         self.record [field] = [Attribute.Date()]
 
-    def to_text (self, stream):
+    def to_text(self, stream):
         return Attribute.Text (stream.execute (self.env).flat ())
         
-    def text_add (self, field, stream):        
+    def text_add(self, field, stream):        
         self.record [field] = [ self.to_text (stream) ]
         return
 
-    def person_add (self, field, stream):
-
+    def person_add(self, field, stream):
         ''' Parse a stream of tokens as a series of person names '''
         
         # The first level of the parsing is of interest, as non-person
@@ -321,24 +313,24 @@ class Reader(object):
     def record_end (self):
         pass
 
-    def record_dispatch (self, k, v):
+    def do_default(self, k, v):
+        raise Exceptions.SchemaError(
+            _("no attribute '%s' in document '%s'") % (
+            k, self.tp))
+
+    def record_dispatch(self, k, v):
         # Dispatch by name, on do_<fieldname> methods
         try:
             m = getattr(self, 'do_' + k.lower())
             return m(v)
-        
         except AttributeError:
             pass
 
         # Dispatch by type, calling <type>_add methods
         try:
             attp = self.db.schema [k]
-            
         except KeyError:
-            raise Exceptions.SchemaError (
-                _("no attribute '%s' in document '%s'") % (
-                k, self.tp))
-
+            return self.do_default(k, v)
         return self._mapping[attp.type](k, v)
     
     def record_parse(self, record):

@@ -39,3 +39,4 @@ def init_logging(filename=None):
     log_handler.setFormatter(_fmtr)
     
     _base.addHandler(log_handler)
+    _base.info("logger started")

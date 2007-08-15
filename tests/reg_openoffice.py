@@ -4,7 +4,7 @@ from Pyblio.Cite.WP.OpenOffice import OOo
 from Pyblio.Format import B, one
 from Pyblio import Registry, Attribute, Store
 
-Registry.parse_default()
+Registry.load_default_settings()
 s  = Registry.getSchema('org.pybliographer/bibtex/0.1')
 db = Store.get('memory').dbcreate(None, s)
 

@@ -19,7 +19,7 @@ from Pyblio.External import WOK
 query, output = sys.argv[1:]
 
 # Create a database that is capable of storing Web of Science results.
-Registry.parse_default()
+Registry.load_default_settings()
 
 s = Registry.getSchema('org.pybliographer/wok/0.1')
 fmt = Store.get('file')

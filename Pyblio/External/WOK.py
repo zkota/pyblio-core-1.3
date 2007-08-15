@@ -16,6 +16,8 @@ from gettext import gettext as _
 from Pyblio.Exceptions import QueryError
 from Pyblio.Parsers.Semantic.WOK import Reader
 from Pyblio.External.HTTP import HTTPRetrieve
+from Pyblio.External import IExternal
+
 
 def _xml(data):
     """ Parse the result from the server, and immeditately catch
@@ -39,7 +41,7 @@ def _r_info(tree):
     return stats, tree.findtext('./sessionID')
 
 
-class WOK(object):
+class WOK(IExternal):
     """ I represent a query session on the Web of Knowledge.
 
     The session is connected to a database whose schema is

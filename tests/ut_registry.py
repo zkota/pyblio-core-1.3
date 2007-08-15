@@ -6,7 +6,7 @@ class TestRegistry (pybut.TestCase):
 
     def setUp(self):
         Registry.reset()
-        Registry.parse(pybut.src('ut_registry'))
+        Registry.load_settings(pybut.src('ut_registry'))
         return
 
     def testSchemas(self):
@@ -33,7 +33,7 @@ class TestRegistry (pybut.TestCase):
 path: %(system)s/bibtex-2.xml
 ''')
         fd.close()
-        self.failUnlessRaises(AssertionError, Registry.parse, '.')
+        self.failUnlessRaises(AssertionError, Registry.load_settings, '.')
     
 suite = pybut.suite (TestRegistry)
 if __name__ == '__main__':  pybut.run (suite)

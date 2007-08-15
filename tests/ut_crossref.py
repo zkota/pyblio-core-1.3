@@ -67,7 +67,7 @@ class Server(http.HTTPFactory):
 class TestCrossRef(unittest.TestCase):
 
     def setUp(self):
-        Registry.parse_default()
+        Registry.load_default_settings()
 
         s = Registry.getSchema('org.pybliographer/crossref/0.1')
         fmt = Store.get('memory')

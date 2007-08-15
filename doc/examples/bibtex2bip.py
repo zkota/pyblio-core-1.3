@@ -11,7 +11,7 @@ in_f, out_f = sys.argv[1:3]
 from Pyblio.Parsers.Semantic import BibTeX
 from Pyblio import Store, Registry
 
-Registry.parse_default()
+Registry.load_default_settings()
 
 # This id refers to the bibtex format as known by pybliographer by
 # default.
