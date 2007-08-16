@@ -45,6 +45,8 @@ from Pyblio.Parsers.Semantic import BibTeX
 
 log = logging.getLogger('pyblio.external.citeseer')
 
+whitespace = re.compile(r'[\s\n]+', re.M)
+
 class ResultScraper(object):
     """Parse a Citeseer result page containing links to the actual
     detailed citations."""
@@ -84,10 +86,14 @@ class RelaxedBibTeX(BibTeX.Reader):
     def do_default(self, field, value):
         log.warn('dropping field %r' % field)
 
+    def to_text(self, stream):
+        text = stream.execute(self.env).flat().strip()
+        return Attribute.Text(whitespace.sub(' ', text))
 
 class CitationScraper(object):
     """Parse a detailed citation page, containing an abstract and a
     BibTeX snippet."""
+
     def __init__(self, page):
         self.soup = BeautifulSoup.BeautifulSoup(page)
 
@@ -95,22 +101,23 @@ class CitationScraper(object):
         content = {'bibtex': self.soup.pre.string}
         abstract = self.soup.findAll(text='Abstract:')
         if abstract:
-            content['abstract'] = abstract[0].parent.nextSibling.strip()
+            abstract = abstract[0].parent.nextSibling.strip()
+            content['abstract'] = whitespace.sub(' ', abstract)
         return content
         
 
 class Citeseer(IExternal):
     """A connection to Citeseer."""
 
-    schema = 'org.pybliographer/pubmed/0.1'
+    schema = 'org.pybliographer/bibtex/0.1'
 
-    baseURL = 'http://citeseer.ist.psu.edu/cis'
     BATCH_SIZE = 50
     FETCHER_POOL = 2 # how many detailed pages to fetch at a time
     
     MIRRORS = ['http://citeseer.ist.psu.edu/cis',
                'http://citeseer.ittc.ku.edu/cs']
 
+    baseURL = MIRRORS[1]
     
     def __init__(self, db):
         self.db = db
@@ -126,7 +133,7 @@ class Citeseer(IExternal):
               'am': self.BATCH_SIZE,
               'ao': 'Citations',
               'af': 'Any',
-              'qtype':'document:'}
+              'qtype': 'document:'}
         all = {'q': query,
                'qb': ','.join('%s=%s' % v for v in qb.iteritems())}
             
@@ -165,26 +172,28 @@ class Citeseer(IExternal):
         req = self._query(query)
         results = defer.Deferred()
 
+        self._abort = False
+
         def failed(reason):
             results.errback(reason)
 
-        def got_page(data):
+        def got_page(data, link):
             """Handle a detailed citation page."""
             if data:
+                log.info('obtained page %r' % link)
                 citation = data.citation()
                 fd = StringIO.StringIO(citation['bibtex'].encode('utf-8'))
-                single = self._reader.parse(fd, self.db)
-                assert len(single) == 1
-                single = list(single.iterkeys())[0]
-                # we can enrich the result with an abstract
-                if 'abstract' in citation:
-                    record = self.db[single]
-                    record.add('abstract',
-                               citation['abstract'],
-                               Attribute.Text)
-                    self.db[single] = record
-                rs.add(single)
-            if self._links:
+                obtained = self._reader.parse(fd, self.db)
+                for key in obtained:
+                    # we can enrich the result with an abstract
+                    if 'abstract' in citation:
+                        record = self.db[key]
+                        record.add('abstract',
+                                   citation['abstract'],
+                                   Attribute.Text)
+                        self.db[key] = record
+                    rs.add(key)
+            if self._links and not self._abort:
                 # there are more links to process, launch a new
                 # HTTPRetrieve().
                 link = self._links.pop()
@@ -196,15 +205,22 @@ class Citeseer(IExternal):
                     return data
                 def parse_citation(data):
                     return CitationScraper(data)
+                def inner_failure(data):
+                    if not self._running:
+                        results.errback(data)
+                    self._abort = data
                 fetcher.deferred.\
                         addBoth(done).\
                         addCallback(parse_citation).\
-                        addCallback(got_page).\
-                        addErrback(failed)
+                        addCallback(got_page, link).\
+                        addErrback(inner_failure)
             elif not self._running:
                 # we are done once there is no pending link to fetch
                 # and all the running fetchers have returned.
-                results.callback(self._total)
+                if self._abort:
+                    results.errback(self._abort)
+                else:
+                    results.callback(self._total)
 
         def got_summary(data):
             """Handle a result page."""
@@ -217,12 +233,16 @@ class Citeseer(IExternal):
 
             def got_links(data):
                 current = data.links()
+                previous = len(self._links)
                 self._links.update(current)
+                obtained = len(self._links) - previous
+                if obtained == 0:
+                    log.warn('this batch did not provide new links, stopping')
                 self._current += self.BATCH_SIZE
                 log.info('%d links in this batch (%s/%d)' % (
                     len(current), len(self._links), self._total))
                 missing = self._target - len(self._links)
-                if missing > 0:
+                if missing > 0 and obtained > 0:
                     log.info('getting batch at %d, %d missing' % (
                         self._current, missing))
                     next = self._query(query, self._current)
@@ -231,12 +251,13 @@ class Citeseer(IExternal):
                     # start getting the detailed citation pages
                     self._running = []
                     for i in xrange(self.FETCHER_POOL):
-                        got_page(None)
+                        got_page(None, None)
             got_links(data)
         req.addCallback(got_summary).addErrback(failed)
         return results, rs
 
     def cancel(self):
+        self._abort = True
         if self._pending:
             self._pending.cancel()
     

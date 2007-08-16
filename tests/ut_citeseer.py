@@ -27,7 +27,7 @@ class TestScraping(unittest.TestCase):
             open(os.path.join(base, 'citation.html')).read())
         citation = scrape.citation()
         self.failUnlessEqual(
-            "I'm an abstract", citation['abstract'])
+            "I'm an abstract with white space !", citation['abstract'])
         bibtex = """@misc{ sample,
   author = "O. Babaoglu and H. Meling and A. Montresor"
 }"""
