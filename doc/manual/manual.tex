@@ -20,9 +20,9 @@
 
 \chapter{Introduction}
 
-\pyblio is a developer-oriented framework for manipulating
-bibliographic data.  It is written in \textsl{python}\footnote{see
-  \url{http://python.org/}}, and uses extensively the dynamic nature
+\pyblio   is   a   developer-oriented   framework   for   manipulating
+bibliographic  data.  It  is  written in  \textsl{python}\footnote{see
+  \url{http://python.org/}}, and  uses extensively the  dynamic nature
 of this language.
 
 \pyblio  does   not  try  to   define  another  standard   format  for
@@ -41,11 +41,19 @@ easily overridden and specialized in  order to \textit{fit the code to
 \section{Basic concepts}
 
 \pyblio  deals  with  sets  of  \py{Record}s, stored  in  a  so-called
-\py{Database}.  This database can  be actually  implemented on  top of
-different systems. Two are available  today, one based on a single XML
-file,  using  a  custom  XML  dialect, the  other  based  on  Berkeley
-DB\footnote{see  \url{http://www.sleepycat.com/}},  a  very  efficient
-database system.
+\py{Database}.  This  database can be  actually implemented on  top of
+different systems.  Three are available today:
+\begin{itemize}
+\item in-memory: useful when the  data is converted from one format to
+  another and doesn't need to be stored in \pyblio.
+\item file: as a single XML file, using a custom XML dialect, suitable
+  for small to medium databases (thousands of records).
+\item Berkeley  DB\footnote{see \url{http://www.sleepycat.com/}}: this
+  is   a  very   efficient  database   system,  suitable   for  larger
+  databases.  In this  case the  limitations are  due to  some \pyblio
+  design decisions, and  should be reached after a  million records or
+  so.
+\end{itemize}
 
 Each record represents an elementary  object you want to describe, and
 has  a  number  of  \textsl{attributes}.   For instance,  if  you  are
@@ -58,9 +66,9 @@ authors for the  book. All the values of a given  attribute are of the
 same type.
 
 In some cases, simply having  this flat key/value model to describe an
-object  is not  enough.   \pyblio  allows, for  every  value of  every
-attribute, to  provide a set of  \textsl{qualifiers}. These qualifiers
-are also attributes which can hold one or more values.  If my book, or
+object is not  enough.  \pyblio allows every value  of every attribute
+to  provide a set  of \textsl{qualifiers}.  These qualifiers  are also
+attributes  which  can  hold one  or  more  values.   If my  book,  or
 information  about the  book, is  available  via the  internet, I  can
 provide  a  \textsl{link}  attribute,  but  for  each  of  the  actual
 \py{URL}s  provided,  I  might  wish  to  add  a  \textsl{description}
@@ -78,7 +86,7 @@ figure~\ref{fig:hierarchy}.
 \end{figure}
 
 \pyblio comes with a set of defined attribute types, like \py{Person},
-\py{Text}, \py{Date}, \py{ID} (see the \py{Pyblio.Attribute} module
+\py{Text},  \py{Date}, \py{ID}  (see the  \py{Pyblio.Attribute} module
 for a complete list), and can be extended to support your own types.
 
 
@@ -113,29 +121,29 @@ imagine a \py{doctype} taxonomy with the following values:
 \end{center}
 
 You can tag an article as \py{Peer-reviewed}, but you are not required
-to use the \textit{leaf} values in this tree. In the case you don't
+to use  the \textit{leaf} values in  this tree. In the  case you don't
 know if a publication is reviewed or not, you can use the \py{Article}
-tag. Similarly, if you search for all the \py{Published} documents,
+tag. Similarly,  if you search  for all the  \py{Published} documents,
 you will retrieve all those that have the \py{Published} tag, but also
 those that are articles (either peer-reviewed or not), books,...
 
-\pyblio uses the \py{Pyblio.Attribute.Txo} object to
-\textit{represent} a logical value in a given taxonomy. A record can
-be tagged with this \py{Txo} object by adding a
+\pyblio     uses    the     \py{Pyblio.Attribute.Txo}     object    to
+\textit{represent} a logical  value in a given taxonomy.  A record can
+be    tagged    with    this    \py{Txo}   object    by    adding    a
 \py{Pyblio.Schema.TxoItem} value in the corresponding attribute.
 
-Taxonomies are declared in a database schema, and thus cannot change
+Taxonomies are declared  in a database schema, and  thus cannot change
 unless you change the schema itself.
 
 \subsection{Result sets}
 \label{sec:resultsets}
 
-Result sets are used to manipulate an explicit list of records, among
-all the records kept in a database. They are returned from queries on
-the database, and can be manipulated by the user. Result sets are
+Result sets are used to  manipulate an explicit list of records, among
+all the records kept in a  database. They are returned from queries on
+the  database, and can  be manipulated  by the  user. Result  sets are
 somewhat like mathematical sets, as you cannot put duplicate values in
-them, and they have no default ordering of their elements. You can
-create result sets via the \py{rs} attribute of your database, which
+them, and  they have  no default ordering  of their elements.  You can
+create result sets  via the \py{rs} attribute of  your database, which
 is an instance of the \py{Pyblio.Store.ResultSetStore}.
 
 A special result set is available as \py{Pyblio.entries}, and contains
@@ -145,12 +153,12 @@ at every time \textbf{all} the records of the database.
 \subsection{Views}
 \label{sec:views}
 
-We have seen that result sets are \textbf{not} ordered. However, in
-many cases, one needs to provide the records in a specific order. To
-do so, you can create a \textsl{view} on top of a result set. This
-view is created by calling the \py{view} method of the result set,
-with an \py{order} parameter being the description of the sort order
-you wish to have. The module \py{Pyblio.Sort} provides elementary
+We have  seen that result  sets are \textbf{not} ordered.  However, in
+many cases, one  needs to provide the records in  a specific order. To
+do so,  you can create  a \textsl{view} on  top of a result  set. This
+view is  created by  calling the \py{view}  method of the  result set,
+with an \py{order}  parameter being the description of  the sort order
+you  wish to  have.  The module  \py{Pyblio.Sort} provides  elementary
 constructs to build such a description.
 
 Once the view is created, modifying the corresponding result set leads
@@ -159,7 +167,7 @@ to updating the view accordingly.
 \section{Manipulating data}
 \label{sec:manipulating}
 
-This section describes some simple operations you can perform on some
+This section describes some simple  operations you can perform on some
 subset of a \pyblio database.
 
 \subsection{Loading and saving}
@@ -169,11 +177,11 @@ The first thing you need to do is of course \textit{actually having} a
 database available. The following code does the job:
 \verbatiminput{code/create.py}
 
-This example relies on the fact that you already have a schema at
-hand. There are schemas available in the \file{Pyblio.RIP} directory.
-It the starts by reading the schema. The next step is to select the
-actual physical store which will hold your database. We choose to
-store it in a simple XML file, whose canonical extension is
+This example  relies on  the fact  that you already  have a  schema at
+hand. There are schemas  available in the \file{Pyblio.RIP} directory.
+It the  starts by reading the schema.  The next step is  to select the
+actual  physical store  which will  hold your  database. We  choose to
+store  it  in  a  simple   XML  file,  whose  canonical  extension  is
 \file{.bip}. The last operation actually creates the database with the
 specified schema.
 
@@ -183,41 +191,39 @@ Independently  of  the  selected  store,  it  is  always  possible  to
 reused   later  on  by   using  \py{store.dbimport(...)}   instead  of
 \py{store..dbcreate(...)}.
 
-When you have finished modifying your database, you can call
+When  you  have  finished   modifying  your  database,  you  can  call
 \py{db.save()} method to ensure that it is properly saved.
 
-\textbf{Caution:} the bsddb store for instance is updated at every
-actual modification, not only when you call the \py{save} method.
+\textbf{Caution:}  the bsddb store  for instance  is updated  at every
+actual  modification, not  only when  you call  the  \py{save} method.
 Don't rely on it to provide some kind of \textsl{rollback} feature.
 
 \subsection{Using the registry}
 \label{sec:registry}
 
-\pyblio has a mechanism to register known schemas, and specify which
-import and export filters can properly work with each schema. This
-mechanism can be used to create our database by asking for a specific
-schema, as shown below:
-\verbatiminput{code/registry.py}
+\pyblio has a  mechanism to register known schemas,  and specify which
+import and  export filters  can properly work  with each  schema. This
+mechanism can be used to create  our database by asking for a specific
+schema, as shown below: \verbatiminput{code/registry.py}
 
-The registry must be first initialized. Then you can ask for a
-specific schema, in that case a schema that supports BibTeX
-databases.
+The  registry  must be  first  initialized. Then  you  can  ask for  a
+specific schema, in that case a schema that supports BibTeX databases.
 
 \subsection{Updating records}
 \label{sec:updating}
 
 The next example will loop over all the records in a database, and add
-a new author to the list of authors.
+a      new      author      to      the     list      of      authors.
 \verbatiminput{code/addauthor.py}
 
-We use the \py{itervalues()} iterator to loop over all the records
-stored in the database. Then, we simply insert a new value in the
-\py{author} attribute. The \py{record.add(...)} method takes care of
+We use  the \py{itervalues()}  iterator to loop  over all  the records
+stored in  the database.  Then, we  simply insert a  new value  in the
+\py{author} attribute.  The \py{record.add(...)} method  takes care of
 creating the attribute if it does not exist yet.
 
-One thing not to forget is to store the record back in the database
-once the modification is performed. Without this step, you might
-experience weird behavior where some modifications are not properly
+One thing  not to forget is to  store the record back  in the database
+once  the modification  is  performed. Without  this  step, you  might
+experience weird  behavior where  some modifications are  not properly
 kept.
 
 We finish by saving the database.
@@ -225,12 +231,12 @@ We finish by saving the database.
 \subsection{Sorting}
 \label{sec:sorting}
 
-To sort records, you create \textit{views} (see
-section~\vref{sec:views}). You can of course create multiple views on
-top of a single result set. In order to sort the whole database,
-simply create the view on \py{database.entries} instead of a result
-set. If you want to sort your database by decreasing year and then by
-author, you can use a view like that: 
+To     sort     records,     you    create     \textit{views}     (see
+section~\vref{sec:views}). You can of  course create multiple views on
+top  of a  single result  set. In  order to  sort the  whole database,
+simply create  the view on  \py{database.entries} instead of  a result
+set. If you want to sort  your database by decreasing year and then by
+author, you can use a view like that:
 
 \verbatiminput{code/sort.py}
 
@@ -245,11 +251,11 @@ having to reinvent a complete environment.
 \subsection{Searching}
 \label{sec:searching}
 
-To search,  you call  the \py{database.query(...)} method.  The method
+To search,  you call the \py{database.query(...)}  method.  The method
 takes a query specification as argument, which is constructed with the
-help of another DSL, similar to the one used for sorting. You have
+help of  another DSL, similar  to the one  used for sorting.  You have
 access to a certain number of primitive queries, which are then linked
-together with the usual boolean operators, as in the following
+together  with  the  usual  boolean  operators, as  in  the  following
 example:
 
 \verbatiminput{code/search.py}
@@ -276,7 +282,7 @@ are then reused by the semantic code, which relates the meaning of the
 fields to the corresponding database.
 
 In addition, the parsers are  written so that the handling of separate
-fields can be  easily overridden in a subclass.  This makes it possible
+fields can be easily overridden in a subclass.  This makes it possible
 to extend them or  take some local \textit{specificities} into account
 (if you  need to  massage data that  contains systematic  errors, this
 proves \textit{very} useful).
@@ -358,8 +364,8 @@ specific database:
 formatter = citation(db)
 \end{verbatim}
 
-This operation checks that all the fields accessed are actually part
-of the schema. It also pre-computes certain information, so that the
+This operation checks  that all the fields accessed  are actually part
+of the schema.  It also pre-computes certain information,  so that the
 actual formatting of specific records can be faster.
 
 Then, you can use the returned formatter and apply it to any number of
@@ -383,41 +389,41 @@ use in your own context.
 \section{Querying external databases}
 
 \pyblio has a standard interface for querying external databases, like
-\textsl{PubMed} or the \textsl{Web of Science}. These queries rely on
-the asynchronous \py{twisted} library, which makes it possible to run
-such a query from a graphical interface without blocking, and to
+\textsl{PubMed} or the \textsl{Web  of Science}. These queries rely on
+the asynchronous \py{twisted} library,  which makes it possible to run
+such  a query  from a  graphical  interface without  blocking, and  to
 interrupt it easily.
 
 An example of such a query is described below.
 
 \verbatiminput{code/query.py}
 
-In this code, a query object \py{wok} is created, which will directly
-modify the database passed in parameter. Then a actual query is
-registered by calling \py{wok.search}. This returns two values: a
+In this code, a query  object \py{wok} is created, which will directly
+modify  the database  passed  in  parameter. Then  a  actual query  is
+registered  by calling  \py{wok.search}.  This returns  two values:  a
 \textsl{deferred object}, which is a twisted abstraction. You can then
-\textit{plug} a callback, in our case the \py{success()} function, to
-be called when the search succeeds. The second value returned is a
-result set, which will be filled with the entries retrieved by the
+\textit{plug} a callback, in  our case the \py{success()} function, to
+be called  when the  search succeeds. The  second value returned  is a
+result set,  which will  be filled with  the entries retrieved  by the
 query.
 
-Note that so far the query did not run. To start it, you need to run
-\textsl{twisted}'s main loop, called the reactor. This function won't
+Note that so far  the query did not run. To start  it, you need to run
+\textsl{twisted}'s main loop, called  the reactor. This function won't
 exit unless you call \py{reactor.stop()} somewhere. Please have a look
-at \textsl{twisted}'s documentation\footnote{see
-  \url{http://twistedmatrix.com/}} to learn how to make use of this
+at            \textsl{twisted}'s            documentation\footnote{see
+  \url{http://twistedmatrix.com/}} to  learn how  to make use  of this
 powerful framework.
 
 
 \section{Adapting to another schema}
 
-In the preceding example, we fetched results from the Web of Science
+In the preceding  example, we fetched results from  the Web of Science
 in a database of type \py{org.pybliographer/wok/0.1}. This is a schema
-specially crafted for records coming from this database, but usually
-this is not what you expect to store in your own, say, BibTeX
-database. So what, do you need to create another query engine
-specially for your database?  Fortunately no, you can use the
-\textsl{adaptation mechanism} to make this Web of Science database
+specially crafted  for records coming from this  database, but usually
+this  is  not what  you  expect  to store  in  your  own, say,  BibTeX
+database.  So  what,  do  you  need to  create  another  query  engine
+specially  for  your  database?   Fortunately  no,  you  can  use  the
+\textsl{adaptation  mechanism} to  make this  Web of  Science database
 look like a BibTeX database with a simple call like:
 
 \begin{verbatim}
@@ -427,26 +433,46 @@ bibtex = Adapter.adapt_schema(
       db, 'org.pybliographer/bibtex/0.1')
 \end{verbatim}
 
-When this call succeeds, you will get in return a new database called
-\py{bibtex}, which will contain everything contained in \py{db}, but
-in the BibTeX schema. Please note that your database is \textit{not}
+When this call succeeds, you will  get in return a new database called
+\py{bibtex}, which  will contain everything contained  in \py{db}, but
+in the BibTeX  schema. Please note that your  database is \textit{not}
 duplicated, the \py{bibtex} database is just some kind of overlay that
-behaves as a normal database, but uses the initial content
+behaves  as   a  normal  database,   but  uses  the   initial  content
 dynamically.
 
-Unfortunately, these adapters objects that do the mapping do not come
-out of thin air, and need to be registered in the system, via the
+Unfortunately, these adapters objects that  do the mapping do not come
+out of  thin air,  and need to  be registered  in the system,  via the
 usual \py{.rip} registry mechanism.
 
 \chapter{Extending \pyblio}
 
-TODO
-
-
 \section{Specializing a parser}
 \label{sec:specializing}
 
-TODO
+Let's say your BibTeX file uses a field called \py{status} that is not
+standard.   You need  to create  a new  schema that  declares  it, and
+derive the base BibTeX parser to provide an extra field handler:
+\begin{verbatim}
+class MyBibTeXReader(Semantic.BibTeX.Reader):
+    def do_status_field(self, key, value):
+        # do things for the field "status"
+\end{verbatim}
+
+Once this is done, you can register the new reader in a RIP file.
+
+In  some cases,  it is  necessary  to perform  cross-field checks  and
+modifications.  This can  be achieved  by using  the  following simple
+extension hooks:
+\begin{description}
+\item[\py{Parser.record\_begin(self)}] is invoked  at the beginning of
+  each record.
+\item[\py{Parser.record\_end(self)}] is invoked once all the fields of
+  a record have been parsed.
+\item[\py{Parser.do\_default(self, field, value)}] will be invoked for
+  unknown fields.
+\end{description}
+
+\section{Writing an external query engine}
 
 
 \end{document}
