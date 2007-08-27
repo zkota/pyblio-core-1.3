@@ -22,11 +22,10 @@ import string, re, logging
 
 from xml.sax.saxutils import escape, quoteattr
 
-from Pyblio import Attribute, Store, Exceptions, Tools
+from Pyblio import Attribute, Store, Exceptions, Tools, Compat
 
 from gettext import gettext as _
 
-import cElementTree as ElementTree
 
 class Reader(object):
 
@@ -68,7 +67,7 @@ class Reader(object):
                                 )
             }
         
-        for event, elem in ElementTree.iterparse (fd, events = ('end',)):
+        for event, elem in Compat.ElementTree.iterparse (fd, events = ('end',)):
             try: controlfield, datafield, subfield = subs [elem.tag]
             except KeyError: continue
             

@@ -7,7 +7,7 @@ from twisted.web import client
 from twisted.internet import defer
 from twisted.python import failure
 
-from cElementTree import ElementTree, XML, dump
+from Pyblio import Compat
 
 import urllib, sys, logging
 
@@ -23,7 +23,7 @@ def _xml(data):
     """ Parse the result from the server, and immeditately catch
     possible errors."""
 
-    tree = XML(data)
+    tree = Compat.ElementTree.XML(data)
 
     err = tree.find('./error')
     if err is not None:

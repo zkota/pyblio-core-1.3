@@ -31,7 +31,7 @@ import datetime
 
 from gettext import gettext as _
 
-from cElementTree import ElementTree, XML, dump
+from Pyblio import Compat
 
 from twisted.web import client
 from twisted.internet import defer, reactor
@@ -44,7 +44,7 @@ from Pyblio.Parsers.Semantic.PubMed import Reader
 def _xml(data):
     """ Parse the result from the server, and immeditately catch
     possible errors."""
-    tree = XML(data)
+    tree = Compat.ElementTree.XML(data)
 
     err = tree.find('./ERROR')
     if err is not None:

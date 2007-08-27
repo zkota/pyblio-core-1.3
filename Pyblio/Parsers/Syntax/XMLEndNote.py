@@ -23,9 +23,7 @@ import string, re, StringIO, sys, logging
 from xml import sax
 from xml.sax.saxutils import escape, quoteattr
 
-from Pyblio import Attribute, Store, Exceptions, Tools
-
-import cElementTree as ElementTree
+from Pyblio import Attribute, Store, Exceptions, Tools, Compat
 
 from gettext import gettext as _
 
@@ -148,7 +146,7 @@ class Reader(object):
         rs = db.rs.add(True)
         rs.name = _('Imported from XML EndNote')
         
-        for event, elem in ElementTree.iterparse (fd, events = ('end',)):
+        for event, elem in Compat.ElementTree.iterparse (fd, events = ('end',)):
             if elem.tag != 'RECORD' and elem.tag != 'record': continue
 
             self.record = Store.Record ()

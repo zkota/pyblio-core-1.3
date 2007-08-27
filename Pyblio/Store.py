@@ -50,9 +50,8 @@ from xml.sax.saxutils import escape, quoteattr
 
 from gettext import gettext as _
 
-from Pyblio import Schema, Attribute, Exceptions, I18n
+from Pyblio import Schema, Attribute, Exceptions, I18n, Compat
 
-from cElementTree import ElementTree, iterparse, tostring
 
 class StoreError (Exception):
     """ Generic error occuring while accessing a database storage """
@@ -656,7 +655,7 @@ class Database (object):
 
     def xmlread (self, fd):
 
-        for event, elem in iterparse (fd, events = ('end',)):
+        for event, elem in Compat.ElementTree.iterparse (fd, events = ('end',)):
             t = elem.tag
 
             if t == 'entry':

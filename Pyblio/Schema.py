@@ -33,9 +33,7 @@ from gettext import gettext as _
 from xml.sax.saxutils import escape
 
 from Pyblio.Attribute import N_to_C, C_to_N, Txo
-from Pyblio import I18n
-
-from cElementTree import ElementTree
+from Pyblio import I18n, Compat
 
 class SchemaError (Exception): pass
 
@@ -48,7 +46,7 @@ class Schema (dict):
         self.txo = {}
         
         if file:
-            tree = ElementTree (file = file)
+            tree = Compat.ElementTree.ElementTree (file = file)
             self.xmlread (tree.getroot ())
         return
 

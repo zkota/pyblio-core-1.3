@@ -30,7 +30,7 @@ nasty things if the file comes from untrusted sources.
 
 
 import logging
-from cElementTree import ElementTree
+from Pyblio import Compat
 from gettext import gettext as _
 
 from Pyblio.Exceptions import ParserError
@@ -44,7 +44,7 @@ class Citator(object):
         pass
 
     def xmlload(self, fd):
-        tree = ElementTree(file=fd)
+        tree = Compat.ElementTree.ElementTree(file=fd)
         root = tree.getroot()
         if root.tag != 'pyblio-citator':
             raise ParserError(_("file is not a Citator XML file"))
