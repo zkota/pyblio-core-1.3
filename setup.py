@@ -57,7 +57,7 @@ multiple publication database formats, or extend existing parsers;
 define citation formats; modify, search and sort bibliographic data.
 """,
     
-    license = "LGPL",
+    license = "GPL",
 
     classifiers=[
    'Development Status :: 4 - Beta',

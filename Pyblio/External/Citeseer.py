@@ -217,10 +217,10 @@ class Citeseer(IExternal):
             elif not self._running:
                 # we are done once there is no pending link to fetch
                 # and all the running fetchers have returned.
-                if self._abort:
-                    results.errback(self._abort)
-                else:
+                if not self._abort or self._abort is True:
                     results.callback(self._total)
+                else:
+                    results.errback(self._abort)
 
         def got_summary(data):
             """Handle a result page."""
