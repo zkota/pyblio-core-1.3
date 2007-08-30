@@ -25,8 +25,7 @@ import logging
 
 from gettext import gettext as _
 
-from Pyblio import Attribute, Store
-from cElementTree import dump
+from Pyblio import Attribute, Store, Compat
 
 _DEBUG = False
 
@@ -151,7 +150,7 @@ class Reader(object):
             self.record_begin()
 
             if _DEBUG:
-                dump(item)
+                Compat.ElementTree.dump(item)
             for child in item:
                 fn = getattr(self, 'do_' + child.tag,
                              self.do_default)

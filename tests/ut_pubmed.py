@@ -5,7 +5,7 @@ from twisted.trial import unittest
 from twisted.internet import reactor
 
 from Pyblio.External.PubMed import PubMed, QueryHelper
-from Pyblio import Store, Attribute, Registry
+from Pyblio import Store, Attribute, Registry, Compat
 
 base = os.path.abspath('ut_pubmed')
 
@@ -99,7 +99,6 @@ class TestPubMed(unittest.TestCase):
         return d.addCallback(self.fail).addErrback(check)
 
 from Pyblio.Parsers.Semantic.PubMed import Reader
-from cElementTree import ElementTree
 
 class TestPubMedParser(unittest.TestCase):
 
@@ -116,7 +115,7 @@ class TestPubMedParser(unittest.TestCase):
         src = os.path.join(base, 'search-0.xml')
 
         r = Reader()
-        r.parse(ElementTree(file=open(src)), self.db)
+        r.parse(Compat.ElementTree.ElementTree(file=open(src)), self.db)
 
         tmp = pybut.dbname()
         fd = open(tmp, 'w')

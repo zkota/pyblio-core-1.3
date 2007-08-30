@@ -7,6 +7,6 @@ recursive-include demo *.xml *.tac *.py README
 recursive-include Pyblio *.py
 recursive-include Pyblio/RIP *.rip *.sip *.cip
 
-recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip *.cip
+recursive-include tests *.sh *.py *.xml *.bib *.isi *.ris *.rip *.bip *.sip *.cip *.html
 
 include ez_setup.py NEWS

@@ -3,7 +3,6 @@
 import os, pybut, sys
 
 import StringIO
-from cElementTree import ElementTree
 
 from Pyblio.Parsers.Semantic.BibTeX import Reader
 from Pyblio.Parsers.Syntax.BibTeX import Writer
@@ -11,7 +10,7 @@ from Pyblio.Parsers.Syntax.BibTeX import Writer
 from Pyblio.Parsers.Syntax.BibTeX import Parser
 
 from Pyblio.Parsers.Syntax.BibTeX.Parser import Record, Block, Cmd, Text, Join, Comment, ATComment
-from Pyblio import Store, Schema, Registry
+from Pyblio import Store, Schema, Registry, Compat
 from Pyblio.Exceptions import ParserError
 
 def fp(*args):
@@ -165,7 +164,7 @@ class TestBibTeXImport (pybut.TestCase):
         db.save ()
 
         # mess a bit with the file to discard the schema
-        tree = ElementTree(file=open(f))
+        tree = Compat.ElementTree.ElementTree(file=open(f))
         for s in tree.findall('./pyblio-schema'):
             s.clear()
         for s in tree.findall('./txo-group'):
