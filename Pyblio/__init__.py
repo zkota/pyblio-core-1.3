@@ -19,6 +19,9 @@ L{Pyblio.Store} module.
 
 import logging
 
+numeric_version= (1,3,4)
+version = '.'.join(str(x) for x in numeric_version)
+
 _inited = False
 
 def init_logging(filename=None):

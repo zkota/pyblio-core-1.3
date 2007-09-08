@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
 NAME = 'pyblio-core'
-VERSION = '1.3.0'
+
+import sys, os
+sys.path.insert(0, os.path.dirname(__file__))
+
+from Pyblio import version as VERSION
+
+print "setup for %s-%s" % (NAME, VERSION)
 
 try:
    from ez_setup import use_setuptools
@@ -13,7 +19,7 @@ from setuptools import setup, find_packages
 from setuptools.command.sdist import sdist as _sdist
 
 class sdist(_sdist):
-    def run (self):
+    def run(self):
        # Recompile the doc if possible
        import os, sys
 
