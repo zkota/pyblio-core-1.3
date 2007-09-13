@@ -58,7 +58,7 @@ class Environ(BaseEnviron.Environ):
 # BibTeX interface
 # ==================================================
 _lf_re = re.compile ('^N+I+$')
-_fl_re = re.compile ('^N*I+N+$')
+_fl_re = re.compile ('^[IN]*?I+N+$')
 
 _split_re = re.compile (r'[,.]|\s+|\~')
 
@@ -228,23 +228,18 @@ class Reader(object):
                 ls = len (stream)
                 if ls == 1:
                     return Attribute.Person (last = stream [0])
-
                 elif ls == 0:
                     return None
-                
                 else:
-                    tt = ''.join (_typetag (stream))
+                    tt = ''.join(_typetag(stream))
 
-                    if _lf_re.match (tt):
-                        idx = tt.index ('I')
-                        return Attribute.Person (first=_nodotdash(' '.join (stream [idx:])),
-                                                 last=' '.join (stream [:idx]))
-                        
-
+                    if _lf_re.match(tt):
+                        idx = tt.index('I')
+                        return Attribute.Person(first=_nodotdash(' '.join(stream[idx:])),
+                                                last=' '.join(stream[:idx]))
                     if tt == 'NN':
-                        return Attribute.Person (first =_nodotdash(stream [0]),
-                                                 last  = stream [1])
-                    
+                        return Attribute.Person(first=_nodotdash(stream[0]),
+                                                last=stream[1])
                     if _fl_re.match (tt):
                         idx = tt.rindex ('I') + 1
                         return Attribute.Person (first=_nodotdash(' '.join (stream [:idx])),

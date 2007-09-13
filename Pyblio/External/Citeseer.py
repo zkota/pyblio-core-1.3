@@ -40,7 +40,7 @@ from twisted.internet import defer, reactor
 from Pyblio import Attribute
 from Pyblio.External import IExternal
 from Pyblio.External.HTTP import HTTPRetrieve
-from Pyblio.Exceptions import QueryError
+from Pyblio.Exceptions import QueryError, ParserError
 from Pyblio.Parsers.Semantic import BibTeX
 
 log = logging.getLogger('pyblio.external.citeseer')
@@ -182,17 +182,25 @@ class Citeseer(IExternal):
             if data:
                 log.info('obtained page %r' % link)
                 citation = data.citation()
-                fd = StringIO.StringIO(citation['bibtex'].encode('utf-8'))
-                obtained = self._reader.parse(fd, self.db)
-                for key in obtained:
-                    # we can enrich the result with an abstract
-                    if 'abstract' in citation:
-                        record = self.db[key]
-                        record.add('abstract',
-                                   citation['abstract'],
-                                   Attribute.Text)
-                        self.db[key] = record
-                    rs.add(key)
+                if not citation['bibtex']:
+                    log.warn('page has no bibtex field?')
+                else:
+                    fd = StringIO.StringIO(citation['bibtex'].encode('utf-8'))
+                    try:
+                        obtained = self._reader.parse(fd, self.db)
+                    except ParserError, msg:
+                        log.error('unable to parse %r: %s' % (
+                            citation['bibtex'], msg))
+                        obtained = []
+                    for key in obtained:
+                        # we can enrich the result with an abstract
+                        if 'abstract' in citation:
+                            record = self.db[key]
+                            record.add('abstract',
+                                       citation['abstract'],
+                                       Attribute.Text)
+                            self.db[key] = record
+                        rs.add(key)
             if self._links and not self._abort:
                 # there are more links to process, launch a new
                 # HTTPRetrieve().

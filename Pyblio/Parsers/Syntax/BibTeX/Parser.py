@@ -24,6 +24,7 @@ operation on the content. Tries to return _everything_ from the file,
 including comments, strings,..."""
 
 import re
+from gettext import gettext as _
 
 from Pyblio.Exceptions import ParserError
 from Pyblio.Parsers.Syntax.BibTeX import Coding
@@ -238,7 +239,9 @@ class Block (object):
             self.closer[self._o])
 
 
-class EndOfFile(Exception): pass
+class EndOfFile(ParserError):
+    def __init__(self):
+        ParserError.__init__(self, _('end of file reached'))
 
 class Cache(object):
 
