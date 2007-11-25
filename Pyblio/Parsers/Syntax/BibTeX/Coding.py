@@ -95,7 +95,7 @@ def _encodeone(char):
     try:
         return _reversemap[char]
     except KeyError:
-        return '\\char%d' % o
+        return '\\char%d{}' % o
 
 def encode(text):
     """ encode a unicode string into a valid BibTeX string """

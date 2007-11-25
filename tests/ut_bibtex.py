@@ -341,7 +341,7 @@ class TestBibTeXEncoder(pybut.TestCase):
 
     def testEncoder(self):
         """ Some trivial conversion tasks """
-        self.failUnlessEqual(encode(u'héß\u0010'), r'h\'e\ss{}\char16')
+        self.failUnlessEqual(encode(u'héß\u0010'), r'h\'e\ss{}\char16{}')
 
     def testEncodeI(self):
         """ Check that an accent on a 'i' uses \i to avoid a double accent """
