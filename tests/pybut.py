@@ -165,8 +165,8 @@ basedir = os.path.dirname(os.path.abspath(__file__))
 init_logging(',,pyblio.log')
 _count = 0
 
-def src(name):
-    return os.path.join(basedir, name)
+def src(*name):
+    return os.path.join(basedir, *name)
 
 def dbname ():
     global _count
