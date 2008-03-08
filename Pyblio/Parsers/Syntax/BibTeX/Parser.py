@@ -30,60 +30,74 @@ from Pyblio.Exceptions import ParserError
 from Pyblio.Parsers.Syntax.BibTeX import Coding
 
 class IBibTeX:
-    def flat (self):
+    def flat(self):
         """ Return a textual version of the field, with no visible BibTeX / LaTeX markup """
         pass
 
-    def subst (self):
+    def subst(self):
         """ Return a flattened list of the balanced expressions composing the field """
         pass
 
-    def execute (self, environ):
+    def execute(self, environ):
         """ Execute the known LaTeX commands forming the field,
         substitute the known symbols, and return the resulting string"""
         pass
 
-    def tobib (self):
+    def tobib(self):
         """ Return the BibTeX version of the field """
         pass
 
 
-class Comment (unicode):
+class Comment(unicode):
     """ A bibtex file comment """
     
     def __repr__ (self):
         return 'Comment (%s)' % unicode.__repr__ (self)
 
+    def tobib(self):
+        return self
 
-class ATComment (Comment):
+class ATComment(Comment):
     def __repr__ (self):
         return '@Comment (%s)' % unicode.__repr__ (self)
 
-class Record (object):
+    def tobib(self):
+        return '@comment%s' % self
 
-    def __init__ (self, type, key, fields):
+class Record(object):
+
+    def __init__(self, type, key, fields):
 
         self.type   = type
         self.key    = key
         self.fields = fields
-        
-        return
 
-    def __cmp__ (self, other):
-
+    def __cmp__(self, other):
         if self.type != other.type: return 1
         if self.key  != other.key : return 1
 
         return cmp (self.fields, other.fields)
         
-    def __repr__ (self):
-
-        return 'Record (%s, %s, %s)' % (
+    def __repr__(self):
+        return 'Record(%s, %s, %s)' % (
             repr (self.type),
             repr (self.key),
             repr (self.fields))
-    
-class Join (list):
+
+    def tobib(self):
+        content = []
+        if self.key:
+            content.append(self.key.tobib())
+        for key, value in self.fields:
+            content.append('%s = %s' % (key.tobib(), value.tobib()))
+        if len(content) > 1:
+            around = '\n'
+        else:
+            around = ''
+        return '@%s{' % self.type + ',\n  '.join(content) + around + '}\n'
+
+
+class Join(list):
     """ A value, as a concatenation of blocks """
     
     def __repr__ (self):
@@ -104,16 +118,15 @@ class Join (list):
 
     def execute (self, env):
         # Joining of bare Text fragments leads to a lookup in the @string environment
-        def subjoin (fragment):
-            if isinstance (fragment, Text):
+        def subjoin(fragment):
+            if isinstance(fragment, Text):
                 try:
-                    return env.strings [fragment]
+                    return env.strings[fragment]
                 except KeyError:
                     pass
-            return fragment.execute (env)
+            return fragment.execute(env)
                 
-        return Join ([ subjoin (x) for x in self ])
-
+        return Join([subjoin(x) for x in self])
 
     def flat (self):
         try:
@@ -122,14 +135,14 @@ class Join (list):
             print repr (self)
             raise
 
-
     def tobib (self):
         return ' # '.join (map (lambda x: x.tobib (), self))
     
+
 class Text(unicode):
 
     def flat(self):
-        return self.replace ('~', u'\xa0')
+        return self.replace('~', u'\xa0')
     
     def __repr__ (self):
         return 'Text(%s)' % unicode.__repr__(self)
@@ -138,36 +151,38 @@ class Text(unicode):
         return [self]
 
     def tobib(self):
-        return Coding.encode(self)
+        return self
     
     def execute (self, env):
         return self
 
-class Cmd (object):
+
+class Cmd(object):
     """ A LaTeX \-command """
     
-    def __init__ (self, cmd):
+    def __init__(self, cmd):
         self._cmd = cmd
         return
     
-    def __repr__ (self):
+    def __repr__(self):
         return 'Cmd (%s)' % `self._cmd`
 
-    def flat (self):
+    def flat(self):
         return self._cmd
 
-    def subst (self):
+    def subst(self):
         return [self]
 
-    def tobib (self):
+    def tobib(self):
         return '\\%s' % self._cmd
 
-    def __cmp__ (self, other):
-        if not isinstance (other, Cmd): return 1
+    def __cmp__(self, other):
+        if not isinstance(other, Cmd): return 1
         
-        return cmp (self._cmd, other._cmd)
+        return cmp(self._cmd, other._cmd)
+
         
-class Block (object):
+class Block(object):
     """ A textual block, as a sequence of text and commands """
 
     closer = {
@@ -176,24 +191,22 @@ class Block (object):
         '(': ')',
         }
 
-    def __init__ (self, opening, data = None):
+    def __init__(self, opening, data=None):
         self._o = opening
 
         if data is None: self._d = ()
         else:            self._d = data
-        return
     
-    def flat (self):
+    def flat(self):
         r = ''
         for o in self._d:
             r = r + o.flat ()
-
         return r
 
-    def append (self, v):
+    def append(self, v):
         return self._d.append (v)
         
-    def execute (self, env):
+    def execute(self, env):
         final = []
         stack = [] + list (self._d)
         
@@ -319,7 +332,7 @@ def _on_out (fd, ctx):
     assert False
 
 _brace_re  = re.compile (r'[()"{}\\]')
-_cmd_re    = re.compile (r'(\w+|\S| )(.*)')
+_cmd_re    = re.compile (r'(\w+|\S| )?(.*)')
 _inline_re = re.compile (r'([,#=])')
 
 def _on_open (fd, ctx):
@@ -350,13 +363,19 @@ def _on_open (fd, ctx):
         data += before
 
         if brace == '\\':
-            m = _cmd_re.match (l)
+            m = _cmd_re.match(l)
             
             if not m:
                 raise ParserError ('backslash at the end of a line', fd.ln)
 
-            if data: curr.append (Text (data))
-            curr.append (Cmd (m.group (1)))
+            if data:
+                curr.append(Text(data))
+
+            # Allow \ at the end of a line, equivalent to \<space>
+            cmd = m.group(1)
+            if not cmd:
+                cmd = '\n'
+            curr.append(Cmd(cmd))
             
             l = m.group (2)
             data = ''
@@ -519,7 +538,7 @@ _fstm = {
     ST_OPEN: _on_open,
     }
 
-def read (fd, charset = 'utf-8'):
+def read(fd, charset='utf-8'):
 
     ctx = Context ()
     
@@ -534,6 +553,5 @@ def read (fd, charset = 'utf-8'):
             for d in data: yield d
         else:
             yield data
-        
-    return
+
 

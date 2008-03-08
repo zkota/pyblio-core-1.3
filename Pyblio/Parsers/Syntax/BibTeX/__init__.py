@@ -80,7 +80,7 @@ class Reader(object):
             Attribute.Date:   self.date_add,
             Attribute.ID:     self.id_add,
             }
-        self.env = Environ ()        
+        self.env = Environ()        
         return
 
     def id_add(self, field, stream):
@@ -110,7 +110,7 @@ class Reader(object):
         # author = "{Name of a Company} and {Another One}"
 
         # Join joins, ie strings written as {toto} # {tutu}
-        stream = stream.join ()
+        stream = stream.join()
 
         # ...and expand the low-level text in fragment split on "," "." and space
         stream, os = [], stream
@@ -433,15 +433,16 @@ class Writer(object):
 
         data = self._escape (' '.join (data))
         
-        # by default, new lines and multiple spaces are not significant in bibtex fields
+        # by default, new lines and multiple spaces are not
+        # significant in bibtex fields
         data = self._collapse.sub (' ', data)
         
         self.field [field] = '{%s}' % data
         return
 
     def capitalized_text_add (self, field, data):
-
-        # by default, new lines and multiple spaces are not significant in bibtex fields
+        # by default, new lines and multiple spaces are not
+        # significant in bibtex fields
         data = self._collapse.sub (' ', ' '.join (data))
 
         # If the text contains capitals that are not at the beginning

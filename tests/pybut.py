@@ -150,7 +150,7 @@ def run (full):
     
     return
 
-def fileeq (a, b):
+def fileeq(a, b):
     for f in a, b:
         if not os.path.exists (f):
             assert False, 'cannot diff %s and %s: %s does not exist' % (
