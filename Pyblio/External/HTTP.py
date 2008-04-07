@@ -108,7 +108,6 @@ class HTTPRetrieve(client.HTTPClientFactory):
             getHostByName(host).addCallback(connectToIP).addErrback(failed)
         else:
             reactor.connectTCP(host, port, self)
-        return
     
     def buildProtocol(self, addr):
         p = client.HTTPClientFactory.buildProtocol(self, addr)
@@ -117,5 +116,4 @@ class HTTPRetrieve(client.HTTPClientFactory):
 
     def cancel(self):
         self.running[-1].transport.loseConnection()
-        return
 

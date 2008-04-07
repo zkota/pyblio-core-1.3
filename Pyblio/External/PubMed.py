@@ -38,6 +38,7 @@ from twisted.internet import defer, reactor
 
 from Pyblio.Exceptions import QueryError
 from Pyblio.External.HTTP import HTTPRetrieve
+from Pyblio.External import batch
 from Pyblio.Parsers.Semantic.PubMed import Reader
 
 
@@ -290,12 +291,54 @@ class PubMed(object):
     def __init__(self, db):
 
         self.db = db
-        self._pending = None
         self.reader = Reader()
-        
-        return
 
-    def _query(self, service, args, **kargs):
+        self._pending = None
+
+    def count(self, query, db='PubMed'):
+        assert self._pending is None, 'no more than one search at a time per connection'
+
+        data = {'db': db, 'term': query}
+        req = self._send_query(self.SRV_SEARCH, data, rettype='count')
+
+        def success(data):
+            return int(data.find('./Count').text)
+        return req.addCallback(success)
+    
+    def search(self, query, maxhits=500, db='PubMed'):
+
+        query = query.strip()
+        
+        # The result set that will contain the data
+        self._rs = self.db.rs.new()
+        self._rs.name = _('Imported from PubMed')
+
+        # Special case for no query: this would cause an error from
+        # the server if we do not catch it first.
+        if not query:
+            results = defer.Deferred()
+            def autofire():
+                results.callback(0)
+            reactor.callLater(0, autofire)
+            return results, rs
+
+        self._query = query
+        self._pubmed_db = db
+        self._total = None
+        self._webenv = None
+        self._query_key = None
+
+        self._batch = batch.Batch(maxhits, self.BATCH_SIZE)
+        return self._batch.fetch(self._runner), self._rs
+
+    def cancel(self):
+        """ Cancel a running query.
+
+        The database is not reverted to its original state."""
+        if self._pending:
+            self._pending.cancel()
+
+    def _send_query(self, service, args, **kargs):
 
         all = {'email': self.adminEmail,
                'tool': self.toolName,
@@ -320,121 +363,52 @@ class PubMed(object):
             self._pending = None
             return data
         
-        return self._pending.deferred.addBoth(done)
+        return self._pending.deferred.addBoth(done).addCallback(_xml)
 
+    def _runner(self, start, count):
 
-    def count(self, query, db='PubMed'):
+        if self._total is None:
+            # for the first iteration of the query, we send a
+            # "Search", which prepares the query, returns the total
+            # number of results, and gives us a key to access the
+            # content. The following calls will use "Fetch" to
+            # actually gather the results.
+            data = {'db': self._pubmed_db, 'term': self._query}
+            d = self._send_query(self.SRV_SEARCH, data, usehistory='y')
 
-        assert self._pending is None, 'no more than one search at a time per connection'
-
-        data = {'db': db,
-                'term': query}
-
-        req = self._query(self.SRV_SEARCH, data, rettype='count')
-
-        def success(data):
-            return int(data.find('./Count').text)
-
-        return req.addCallback(_xml).addCallback(success)
-
-    
-    def search(self, query, maxhits=500, db='PubMed'):
-
-        assert self._pending is None, 'no more than one search at a time per connection'
-
-        query = query.strip()
-        
-        data = {'db': db,
-                'term': query}
-
-        req = self._query(self.SRV_SEARCH, data, usehistory='y')
-
-        # The deferred for the global result
-        results = defer.Deferred()
-
-        # The result set that will contain the data
-        rs = self.db.rs.new()
-        rs.name = _('Imported from PubMed')
-
-        # Special case for no query: this would cause an error from
-        # the server if we do not catch it first.
-        if not query:
-            def autofire():
-                results.callback(0)
-            reactor.callLater(0, autofire)
-            return results, rs
-        
-        stats = {}
-
-        def failed(reason):
-            results.errback(reason)
-        
-        def got_summary(data):
-            # Total number of results
-            all_results = int(data.find('./Count').text)
+            def _got_summary(data):
+                # Total number of results
+                self._total = int(data.find('./Count').text)
             
-            # Parameters necessary to fetch the content of the result set
+                # Parameters necessary to fetch the content of the result set
+                self._webenv = data.find('./WebEnv').text
+                self._query_key = data.find('./QueryKey').text
+
+                # next run, we will actually start fetching the
+                # results, starting at 0
+                return 0, self._total
+            return d.addCallback(_got_summary)
+
+        else:
+            def _received(data):
+                previously = len(self._rs)
+                self.reader.parse(data, self.db, self._rs)
+                freshly_parsed = len(self._rs) - previously
+                if freshly_parsed <= 0:
+                    self.log.warn("what happend? I increased the result set by %d" % freshly_parsed)
+                    # pretend there has been at least one parsing, so
+                    # that we ensure that the task
+                    # progresses. Otherwise we might loop forever on
+                    # an entry we cannot parse.
+                    freshly_parsed = 1
+                return freshly_parsed, self._total
+
             fetchdata = {
-                'db': db,
-                'WebEnv': data.find('./WebEnv').text,
-                'query_key': data.find('./QueryKey').text,
-                }
-            
-            stats['missing'] = min(all_results, maxhits)
+                'db': self._pubmed_db,
+                'WebEnv': self._webenv,
+                'query_key': self._query_key,
+            }
+            d = self._send_query(self.SRV_FETCH, fetchdata,
+                                 retstart=start, retmax=count)
+            return d.addCallback(_received)
 
-            self.log.info('%d results, retrieving %d' % (
-                all_results, stats['missing']))
-
-            def fetch(data):
-                # data is None during the initial call to the method,
-                # so that we can reuse the same code.
-                if data is not None:
-                    # Process the incoming XML data
-                    previously = len(rs)
-                    self.reader.parse(data, self.db, rs)
-                    freshly_parsed = len(rs) - previously
-                    if freshly_parsed <= 0:
-                        self.log.warn("what happend? I increased the result set by %d" % freshly_parsed)
-                        # pretend there has been at least one parsing, so
-                        # that we ensure that the task
-                        # progresses. Otherwise we might loop forever on
-                        # an entry we cannot parse.
-                        freshly_parsed = 1
-
-                    stats['missing'] -= freshly_parsed
-                
-                if stats['missing'] <= 0:
-                    self.log.info('finished')
-                    results.callback(all_results)
-                    return
-
-                # No need to fetch 500 results if only 20 are requested
-                batch = min(self.BATCH_SIZE, stats['missing'])
-                self.log.info('retrieving next %d' % batch)
-                
-                d = self._query(self.SRV_FETCH, fetchdata,
-                                retstart=len(rs), retmax=batch)
-            
-                d.addCallback(_xml).\
-                    addCallback(fetch).\
-                    addErrback(failed)
-                return
-
-            # Bootstrap the fetching process
-            fetch(None)
-
-        req.addCallback(_xml).\
-            addCallback(got_summary).\
-            addErrback(failed)
-
-        return results, rs
-
-
-    def cancel(self):
-        """ Cancel a running query. The database is not reverted to its
-        original state."""
-        if not self._pending:
-            return
-
-        self._pending.cancel()
-        return
